@@ -98,10 +98,10 @@
 \begin{definition} \label{an:def:infinite-countable-uncountable-sets}
   A set $X$ is said to be
   \begin{itemize}
-    \item \textbf{infinite} if it is not finite
+    \item \textbf{infinite} if $\neg\paren*{\abs*{X} < \aleph_{0}}$
     \item \textbf{countable} if $\N \sim X$
-    \item \textbf{at most countable} if it is either finite or countable
-    \item \textbf{uncountable} if it is neither finite nor countable
+    \item \textbf{at most countable} if $\abs*{X} < \aleph_{0} \lor \N \sim X$
+    \item \textbf{uncountable} if $\neg\paren*{\abs*{X} < \aleph_{0} \lor \N \sim X}$
   \end{itemize}
   The notation
   \begin{itemize}
@@ -128,27 +128,33 @@
   \]
   Then
   \begin{itemize}
-    \item \textbf{Base case:} Define $f: [1, 0]_{\N} \xrightarrow{\sim} [1, 0]_{\N}$ by
+    \item \textbf{Base case:} Define $f: [1, 0]_{\N} \to [1, 0]_{\N}$ by
           \[
             \forall k \in [1, 0]_{\N}, f(k) = k
           \]
           Then
           \[
-            \abs*{[1, 0]_{\N}} = 0 < \aleph_{0}
+            \begin{array}{c}
+              [1, 0]_{\N} = \vnot                           \\
+              \Downarrow                                    \\
+              f: [1, 0]_{\N} \xrightarrow{\sim} [1, 0]_{\N} \\
+              \Downarrow                                    \\
+              \abs*{[1, 0]_{\N}} < \aleph_{0}
+            \end{array}
           \]
           Therefore,
           \[
             \begin{array}{c}
-              \forall A \subseteq [1, 0]_{\N}, A = [1, 0]_{\N}           \\
-              \Downarrow                                                 \\
-              \forall A \subseteq [1, 0]_{\N}, \abs*{A} = 0 < \aleph_{0} \\
-              \Downarrow                                                 \\
+              \forall A \subseteq [1, 0]_{\N}, A = [1, 0]_{\N}       \\
+              \Downarrow                                             \\
+              \forall A \subseteq [1, 0]_{\N}, \abs*{A} < \aleph_{0} \\
+              \Downarrow                                             \\
               P(0) \text{ is true}
             \end{array}
           \]
     \item \textbf{Inductive step:} Suppose
           \begin{itemize}
-            \item $P(n)$ be true
+            \item $P(n)$ is true
             \item $A \subseteq [1, n + 1]_{\N}$
           \end{itemize}
           Then
@@ -165,13 +171,11 @@
                   \[
                     B \coloneqq A \setminus \set*{n + 1} \subseteq [1, n]_{\N}
                   \]
-                  Then
+                  Since $P(n)$ is true,
                   \[
                     \begin{array}{c}
-                      B \subseteq [1, n]_{\N}                   \\
-                      \by{\ensuremath{P(n)} is true} \Downarrow \\
-                      \abs*{B} < \aleph_{0}                     \\
-                      \Downarrow                                \\
+                      \abs*{B} < \aleph_{0} \\
+                      \Downarrow            \\
                       \exists m \in [0, \infty)_{\N}, \exists f: [1, m]_{\N} \xrightarrow{\sim} B
                     \end{array}
                   \]
@@ -239,7 +243,7 @@
                     \begin{array}{c}
                       g: [1, m + 1]_{\N} \xrightarrow{\sim} A \\
                       \Downarrow                              \\
-                      \abs*{A} = m + 1 < \aleph_{0}           \\
+                      \abs*{A} < \aleph_{0}                   \\
                     \end{array}
                   \]
           \end{itemize}
