@@ -152,14 +152,15 @@
 \end{theorem}
 
 \begin{proof}
-  Suppose $x_{1}, x_{2} \in E$.
+  \leavevmode\par
   \begin{enumerate}[label=\textbf{(\Alph*)}]
     \item Suppose
           \begin{itemize}
             \item $f: X \hookrightarrow Y$
+            \item $x_{1}, x_{2} \in E$
             \item  $f|_{E}^{F}(x_{1}) = f|_{E}^{F}(x_{2})$
           \end{itemize}
-          Then
+          By \cref{an:def:injective-surjective-bijective},
           \[
             \begin{array}{c}
               f(x_{1}) = f(x_{2}) \\
@@ -167,7 +168,7 @@
               x_{1} = x_{2}
             \end{array}
           \]
-    \item Suppose $f(E) = F$. Then
+    \item Suppose $f(E) = F$. By \cref{an:def:image-inverse-image},
           \[
             \begin{array}{c}
               \forall y \in F, \exists x \in E, f(x) = y \\
@@ -210,21 +211,20 @@
 \end{theorem}
 
 \begin{proof}
-  Suppose $x_{1}, x_{2} \in X$.
+  \leavevmode\par
   \begin{enumerate}[label=\textbf{(\Alph*)}]
     \item Suppose
           \begin{itemize}
             \item $f: X \hookrightarrow Y$
             \item $g: Y \hookrightarrow Z$
+            \item $x_{1}, x_{2} \in X$
             \item $(g \circ f)(x_{1}) = (g \circ f)(x_{2})$
           \end{itemize}
-          Then
+          By \cref{an:def:injective-surjective-bijective},
           \[
             \begin{array}{c}
-              g(f(x_{1})) = g(f(x_{2})) \\
-              \Downarrow                \\
-              f(x_{1}) = f(x_{2})       \\
-              \Downarrow                \\
+              f(x_{1}) = f(x_{2}) \\
+              \Downarrow          \\
               x_{1} = x_{2}
             \end{array}
           \]
@@ -233,7 +233,7 @@
             \item $f: X \twoheadrightarrow Y$
             \item $g: Y \twoheadrightarrow Z$
           \end{itemize}
-          Then
+          By \cref{an:def:injective-surjective-bijective},
           \begin{itemize}
             \item $\forall z \in Z, \exists y \in Y, g(y) = z$
             \item $\forall y \in Y, \exists x \in X, f(x) = y$
