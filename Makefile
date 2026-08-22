@@ -2,7 +2,7 @@ PYTHON ?= python3
 BOOK ?=
 SLUG ?=
 TITLE ?=
-TREE_IGNORE ?= vscode-build|build|context.tex|tree.txt|.git|.vscode|.lake|__pycache__
+TREE_IGNORE ?= vscode-build|build|context.tex|tree.txt|.git|.vscode|.lake|.latexindent_cache|.ruff_cache|__pycache__
 
 COMMAND_GOALS := lean readme site generated format
 CHECK_REQUESTED := $(filter check,$(MAKECMDGOALS))
