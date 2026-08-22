@@ -1,0 +1,53 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{textbook-core}[2026/08/22 Core typography and document utilities]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Font and Typography
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% LuaLaTeX / XeLaTeX font support
+\RequirePackage{fontspec}
+\setmainfont{TeX Gyre Termes}
+
+% Better typography
+\RequirePackage{microtype}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Graphics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage[
+  paperwidth=176mm,
+  paperheight=250mm,
+  inner=22mm,
+  outer=18mm,
+  top=22mm,
+  bottom=24mm,
+  headheight=14pt,
+  headsep=8mm,
+  footskip=12mm
+]{geometry}
+
+\RequirePackage{graphicx}
+\RequirePackage{xcolor}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Lists
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{enumitem}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Hyperlinks and Cross References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage[
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=green,
+  urlcolor=cyan
+]{hyperref}
+
+% Load cleveref after hyperref
+\RequirePackage[nameinlink]{cleveref}

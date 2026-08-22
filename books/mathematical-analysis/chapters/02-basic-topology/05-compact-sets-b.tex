@@ -1,0 +1,195 @@
+\bigskip
+
+\begin{theorem} \label{an:thm:compact-set-is-bounded}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    E \text{ is compact} \implies E \text{ is bounded}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $E$ is compact. If
+  \[
+    E = \vnot
+  \]
+  then $E$ is bounded. Otherwise, let $p \in E$. Define
+  \[
+    G_{n} = N_{n}(p)
+  \]
+  for each $n \in \N$. Then
+  \[
+    \forall n, m \in \N, n \leq m \implies G_{n} \subseteq G_{m}
+  \]
+  By \cref{an:thm:archimedean-property},
+  \[
+    \begin{array}{c}
+      \forall q \in X, \exists n \in \N, d(p, q) < n         \\
+      \Downarrow                                             \\
+      E \subseteq X \subseteq \bigcup_{n = 1}^{\infty} G_{n} \\
+      \Downarrow                                             \\
+      \set*{G_{n}}_{n = 1}^{\infty} \text{ is an open cover of } E
+    \end{array}
+  \]
+  Since $E$ is compact,
+  \[
+    \exists S \subseteq \N,
+    \bracket*{\begin{gathered}
+        \abs*{S} < \aleph_{0} \\
+        E \subseteq \bigcup_{n \in S} G_{n}
+      \end{gathered}}
+  \]
+  By \cref{an:thm:finite-ordered-set-has-extremum},
+  \[
+    \begin{array}{c}
+      \abs*{S} < \aleph_{0}                                          \\
+      \Downarrow                                                     \\
+      \exists m \in S, m = \max S                                    \\
+      \Downarrow                                                     \\
+      E \subseteq \bigcup_{n \in S} G_{n} \subseteq G_{m} = N_{m}(p) \\
+      \Downarrow                                                     \\
+      E \text{ is bounded}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:closed-subset-of-compact-set-is-compact}
+  Suppose $(X, d)$ is a metric space and $F \subseteq E \subseteq X$. Then
+  \[
+    \bracket*{\begin{gathered}
+        E \text{ is compact} \\
+        F \text{ is closed}
+      \end{gathered}} \implies F \text{ is compact}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E$ is compact
+    \item $F$ is closed
+  \end{itemize}
+  Suppose $\set*{H_{\alpha}}_{\alpha \in A}$ is an open cover of $F$. Then
+  \[
+    X = F \cup F^{c} \subseteq \paren*{\bigcup_{\alpha \in A}
+      H_{\alpha}} \cup F^{c} = \bigcup_{\alpha \in A} \paren*{H_{\alpha} \cup F^{c}}
+  \]
+  By \cref{an:cor:closed-set-complement-is-open-set,an:thm:arbitrary-union-of-open-sets-is-open},
+  \[
+    \begin{array}{c}
+      F^{c} \text{ is open}                                       \\
+      \Downarrow                                                  \\
+      \forall \alpha \in A, H_{\alpha} \cup F^{c} \text{ is open} \\
+      \Downarrow                                                  \\
+      \set*{H_{\alpha} \cup F^{c}}_{\alpha \in A} \text{ is an open cover of } E
+    \end{array}
+  \]
+  Since $E$ is compact,
+  \[
+    \exists B \subseteq A,
+    \bracket*{\begin{gathered}
+        \abs*{B} < \aleph_{0} \\
+        E \subseteq \bigcup_{\alpha \in B} \paren*{H_{\alpha} \cup F^{c}}
+      \end{gathered}}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      F \subseteq E                                           \\
+      \Downarrow                                              \\
+      F \subseteq \bigcup_{\alpha \in B} \paren*{H_{\alpha} \cup F^{c}}
+      = \paren*{\bigcup_{\alpha \in B} H_{\alpha}} \cup F^{c} \\
+      \Downarrow                                              \\
+      F \subseteq \bigcup_{\alpha \in B} H_{\alpha}           \\
+      \Downarrow                                              \\
+      F \text{ is compact}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:infinite-subset-of-compact-set-has-limit-point}
+  Suppose $(X, d)$ is a metric space and $F \subseteq E \subseteq X$. Then
+  \[
+    \bracket*{\begin{gathered}
+        E \text{ is compact} \\
+        \abs*{F} \geq \aleph_{0}
+      \end{gathered}} \implies F' \cap E \neq \vnot
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose that
+  \begin{itemize}
+    \item $E$ is compact
+    \item $\abs*{F} \geq \aleph_{0}$
+  \end{itemize}
+  Assume
+  \[
+    F' \cap E = \vnot
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall p \in E, \exists r_{p} \in \R^{+}, \widetilde{N}_{r_{p}}(p) \cap F = \vnot \\
+      \Downarrow                                                                         \\
+      N_{r_{p}}(p) \cap F \subseteq \set*{p}
+    \end{array}
+  \]
+  Define
+  \[
+    G_{\alpha} = N_{r_{\alpha}}(\alpha)
+  \]
+  for each $\alpha \in E$. Then
+  \[
+    \begin{array}{c}
+      \forall \alpha \in E, \alpha \in G_{\alpha}   \\
+      \Downarrow                                    \\
+      E \subseteq \bigcup_{\alpha \in E} G_{\alpha} \\
+      \Downarrow                                    \\
+      \set*{G_{\alpha}}_{\alpha \in E} \text{ is an open cover of } E
+    \end{array}
+  \]
+  Since $E$ is compact, by \cref{an:thm:subset-of-finite-set-is-finite}
+  \[
+    \begin{array}{c}
+      \exists S \subseteq E,
+      \bracket*{\begin{gathered}
+          \abs*{S} < \aleph_{0} \\
+          E \subseteq \bigcup_{\alpha \in S} G_{\alpha}
+        \end{gathered}}                              \\
+      \Downarrow                                                                    \\
+      E \subseteq \bigcup_{\alpha \in S} G_{\alpha}                                 \\
+      \Downarrow                                                                    \\
+      F \subseteq E \subseteq \bigcup_{\alpha \in S} G_{\alpha}                     \\
+      \Downarrow                                                                    \\
+      F = F \cap \bigcup_{\alpha \in S} G_{\alpha} = \bigcup_{\alpha \in S}
+      \paren*{F \cap G_{\alpha}} \subseteq \bigcup_{\alpha \in S} \set*{\alpha} = S \\
+      \Downarrow                                                                    \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    F' \cap E \neq \vnot
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:finite-compact-intersection-property}
+  Suppose $(X, d)$ is a metric space. If
+  \[
+    \forall \alpha \in A, K_{\alpha} \subseteq X \text{ is compact}
+  \]
+  then
+  \[
+    \paren*{\forall B \subseteq A,
+      \bracket*{\begin{gathered}
+          \abs*{B} < \aleph_{0} \\
+          \bigcap_{\alpha \in B} K_{\alpha} \neq \vnot
+        \end{gathered}}} \implies \bigcap_{\alpha \in A} K_{\alpha} \neq \vnot
+  \]
+\end{theorem}

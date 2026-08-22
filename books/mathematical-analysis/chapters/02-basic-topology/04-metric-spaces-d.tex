@@ -1,0 +1,206 @@
+\bigskip
+
+\begin{theorem} \label{an:thm:isolated-points}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    \forall p \in X, p \in E \setminus E' \iff p \text{ is an isolated point of } E
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\implies$)} Suppose $p \in E \setminus E'$. Then
+  \[
+    \begin{array}{c}
+      p \notin E'                                               \\
+      \Downarrow                                                \\
+      \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(p) = \vnot \\
+      \Downarrow                                                \\
+      \paren*{E \cap N_{r}(p)} \setminus \set*{p} = \vnot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      p \in E \land p \in N_{r}(p) \\
+      \Downarrow                   \\
+      E \cap N_{r}(p) = \set*{p}   \\
+      \Downarrow                   \\
+      p \text{ is an isolated point of } E
+    \end{array}
+  \]
+  \textbf{($\impliedby$)} Suppose $p$ is an isolated point of $E$. Then
+  \[
+    \exists r \in \R^{+}, E \cap N_{r}(p) = \set*{p}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      p \in E                             \\
+      \Downarrow                          \\
+      E \cap \widetilde{N}_{r}(p) = \vnot \\
+      \Downarrow                          \\
+      p \notin E'                         \\
+      \Downarrow                          \\
+      p \in E \setminus E'
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{definition} \label{an:def:boundary}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. The \textbf{boundary} $\partial E$ of $E$ is defined as
+  \[
+    \partial E \coloneqq \overline{E} \cap \overline{E^{c}}
+  \]
+\end{definition}
+
+\bigskip
+
+\begin{theorem}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    \partial E = \overline{E} \setminus E^{\circ}
+  \]
+\end{theorem}
+
+\begin{proof}
+  We will show
+  \[
+    \begin{array}{c}
+      \paren*{E^{\circ}}^{c} = \overline{E^{c}} \\
+      \Downarrow                                \\
+      \overline{E} \cap \overline{E^{c}} = \overline{E} \setminus E^{\circ}
+    \end{array}
+  \]
+  Suppose $p \in X$. Then
+  \begin{align*}
+    p \in \paren*{E^{\circ}}^{c} & \iff p \notin E^{\circ}                                   \\
+                                 & \iff \forall r \in \R^{+}, N_{r}(p) \not\subseteq E       \\
+                                 & \iff \forall r \in \R^{+}, N_{r}(p) \cap E^{c} \neq \vnot \\
+                                 & \iff p \in \overline{E^{c}}
+  \end{align*}
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:deleted-neighborhood-in-rn-is-non-empty}
+  Suppose $n \in \N$. Then
+  \[
+    \forall \bm{p} \in \R^{n}, \forall r \in \R^{+}, \widetilde{N}_r(\bm{p}) \neq \vnot
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose $\bm{p} \in \R^{n}$ and $r \in \R^{+}$. Then
+  \[
+    d\paren*{\bm{p} + \frac{r}{2} \bm{e_{1}}, \bm{p}} = \norm*{\paren*{\bm{p} + \frac{r}{2} \bm{e_{1}}}
+      - \bm{p}} = \norm*{\frac{r}{2} \bm{e_{1}}} = \frac{r}{2} \norm*{\bm{e_{1}}} = \frac{r}{2} < r
+  \]
+  where $\bm{e_{1}} = (1, 0, 0, \dots, 0) \in \R^{n}$. Therefore,
+  \[
+    \begin{array}{c}
+      \bm{p} \neq \paren*{\bm{p} + \frac{r}{2} \bm{e_{1}}} \in \widetilde{N}_r(\bm{p}) \\
+      \Downarrow                                                                       \\
+      \widetilde{N}_r(\bm{p}) \neq \vnot
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-boundary-in-rn}
+  Suppose $n \in \N$ and $E \subseteq \R^{n}$. Then
+  \[
+    \partial E = \paren*{E \setminus E'} \cup \paren*{E^{c} \setminus (E^{c})'} \cup \paren*{E' \cap (E^{c})'}
+  \]
+  This states that $\partial E$ consists of
+  \begin{itemize}
+    \item The set of all isolated points of $E$
+    \item The set of all isolated points of $E^{c}$
+    \item The set of all limit points of both $E$ and $E^{c}$
+  \end{itemize}
+  where the three sets are disjoint.
+\end{theorem}
+
+\begin{proof}
+  By definition,
+  \begin{align*}
+    \partial E & = \overline{E} \cap \overline{E^{c}}                   \\
+               & = \paren*{E \cup E'} \cap \paren*{E^{c} \cup (E^{c})'} \\
+               & = \paren*{E \cap E^{c}} \cup \paren*{E \cap (E^{c})'}
+    \cup \paren*{E' \cap E^{c}} \cup \paren*{E' \cap (E^{c})'}
+  \end{align*}
+  Consider
+  \begin{itemize}
+    \item $E = \paren*{E \setminus E'} \cup \paren*{E \cap E'}$
+    \item $E^{c} = \paren*{E^{c} \setminus (E^{c})'} \cup \paren*{E^{c} \cap (E^{c})'}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $E \cap (E^{c})' = \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+            \cup \paren*{\paren*{E \cap E'} \cap (E^{c})'}$
+    \item $E' \cap E^{c} = \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}}
+            \cup \paren*{E' \cap \paren*{E^{c} \cap (E^{c})'}}$
+  \end{itemize}
+  Consider
+  \begin{itemize}
+    \item $\paren*{\paren*{E \cap E'} \cap (E^{c})'} \subseteq E' \cap (E^{c})'$
+    \item $\paren*{E' \cap \paren*{E^{c} \cap (E^{c})'}} \subseteq E' \cap (E^{c})'$
+  \end{itemize}
+  Then
+  \begin{align*}
+    \partial E & = \vnot \cup \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+    \cup \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}} \cup \paren*{E' \cap (E^{c})'} \\
+               & = \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+    \cup \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}} \cup \paren*{E' \cap (E^{c})'}
+  \end{align*}
+  Also,
+  \[
+    \begin{array}{c}
+      \forall \bm{p} \in E \setminus E', \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(\bm{p}) = \vnot \\
+      \Downarrow                                                                                        \\
+      \widetilde{N}_{r}(\bm{p}) \subseteq E^{c}
+    \end{array}
+  \]
+  By \cref{an:lem:deleted-neighborhood-in-rn-is-non-empty},
+  \[
+    \forall s \in \R^{+}, \widetilde{N}_{s}(\bm{p}) \cap \widetilde{N}_{r}(\bm{p}) =
+    \widetilde{N}_{\min(s,r)}(\bm{p}) \neq \vnot
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall s \in \R^{+}, \widetilde{N}_{s}(\bm{p}) \cap \widetilde{N}_{r}(\bm{p}) \neq \vnot \\
+      \Downarrow                                                                                \\
+      \widetilde{N}_{s}(\bm{p}) \cap \paren*{\widetilde{N}_{r}(\bm{p}) \cap E^{c}} \neq \vnot   \\
+      \Downarrow                                                                                \\
+      \vnot \neq \paren*{\widetilde{N}_{s}(\bm{p}) \cap E^{c}} \cap \widetilde{N}_{r}(\bm{p})
+      \subseteq \widetilde{N}_{s}(\bm{p}) \cap E^{c}                                            \\
+      \Downarrow                                                                                \\
+      E^{c} \cap \widetilde{N}_{s}(\bm{p}) \neq \vnot                                           \\
+      \Downarrow                                                                                \\
+      \bm{p} \in (E^{c})'
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      E \setminus E' \subseteq (E^{c})' \\
+      \Downarrow                        \\
+      \paren*{E \setminus E'} \cap (E^{c})' = E \setminus E'
+    \end{array}
+  \]
+  Similarly,
+  \[
+    \begin{array}{c}
+      E^{c} \setminus (E^{c})' \subseteq E' \\
+      \Downarrow                            \\
+      E' \cap \paren*{E^{c} \setminus (E^{c})'} = E^{c} \setminus (E^{c})'
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \partial E = \paren*{E \setminus E'} \cup \paren*{E^{c} \setminus (E^{c})'} \cup \paren*{E' \cap (E^{c})'}
+  \]
+\end{proof}

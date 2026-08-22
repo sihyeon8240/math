@@ -1,0 +1,220 @@
+\begin{proof}
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose $n \leq m$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            \forall i \in [1, n]_{\N}, f(i) = i
+          \]
+          Suppose
+          \begin{itemize}
+            \item $i, j \in [1, n]_{\N}$
+            \item $f(i) = f(j)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(i) = f(j) \\
+              \Downarrow  \\
+              i = j
+            \end{array}
+          \]
+          Therefore,
+          \[
+            f: [1, n]_{\N} \hookrightarrow [1, m]_{\N}
+          \]
+    \item \begin{itemize}
+            \item Suppose $n = m = 0$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall i \in [1, n]_{\N}, f(i) = i
+                  \]
+                  Then
+                  \[
+                    f: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}
+                  \]
+            \item Suppose $n \geq m \geq 1$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall i \in [1, n]_{\N}, f(i) = \begin{dcases}
+                      i, & \text{if } i < m    \\
+                      m, & \text{if } i \geq m
+                    \end{dcases}
+                  \]
+                  Suppose $j \in [1, m]_{\N}$. Then
+                  \begin{itemize}
+                    \item If $j = m$, then
+                          \[
+                            f(n) = j
+                          \]
+                    \item Otherwise,
+                          \[
+                            f(j) = j
+                          \]
+                  \end{itemize}
+                  Therefore,
+                  \[
+                    f: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}
+                  \]
+          \end{itemize}
+    \item Suppose $n = m$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            \forall i \in [1, n]_{\N}, f(i) = i
+          \]
+          Then
+          \begin{itemize}
+            \item \textbf{Injectivity}: Suppose
+                  \begin{itemize}
+                    \item $i, j \in [1, n]_{\N}$
+                    \item $f(i) = f(j)$
+                  \end{itemize}
+                  Then
+                  \[
+                    \begin{array}{c}
+                      f(i) = f(j) \\
+                      \Downarrow  \\
+                      i = j
+                    \end{array}
+                  \]
+                  Therefore,
+                  \[
+                    f: [1, n]_{\N} \hookrightarrow [1, m]_{\N}
+                  \]
+            \item \textbf{Surjectivity}: Suppose $j \in [1, m]_{\N}$. Then
+                  \[
+                    f(j) = j
+                  \]
+                  Therefore,
+                  \[
+                    f: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            f: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-cardinality}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\abs*{X} \leq \abs*{Y} \iff \exists f: X \hookrightarrow Y$
+    \item $\abs*{X} \geq \abs*{Y} > 0 \lor \abs*{X} = \abs*{Y} = 0
+            \iff \exists f: X \twoheadrightarrow Y$
+    \item $\abs*{X} = \abs*{Y} \iff \exists f: X \xrightarrow{\sim} Y$
+  \end{enumerate}
+  The contraposition of \textbf{(A, $\impliedby$)} is called the \textbf{pigeonhole principle}.
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists n \in [0, \infty)_{\N}, \exists f_{X}: [1, n]_{\N} \xrightarrow{\sim} X$
+    \item $\exists m \in [0, \infty)_{\N}, \exists f_{Y}: [1, m]_{\N} \xrightarrow{\sim} Y$
+  \end{itemize}
+  Therefore,
+  \begin{itemize}
+    \item \textbf{($\impliedby$)} Suppose $f: X \to Y$. Define $F: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            F \equiv (f_{Y})^{-1} \circ f \circ f_{X}
+          \]
+          By \cref{an:thm:inverse-function-is-bijective,an:thm:properties-of-composition-functions},
+          \begin{itemize}
+            \item $f: X \hookrightarrow Y \implies F: [1, n]_{\N} \hookrightarrow [1, m]_{\N}$
+            \item $f: X \twoheadrightarrow Y \implies F: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}$
+          \end{itemize}
+          This implies
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item
+                  \[
+                    \begin{array}{c}
+                      \exists f: X \hookrightarrow Y                     \\
+                      \Downarrow                                         \\
+                      \exists F: [1, n]_{\N} \hookrightarrow [1, m]_{\N} \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn}} \Downarrow  \\
+                      n \leq m
+                    \end{array}
+                  \]
+            \item
+                  \[
+                    \begin{array}{c}
+                      \exists f: X \twoheadrightarrow Y                     \\
+                      \Downarrow                                            \\
+                      \exists F: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn}} \Downarrow     \\
+                      n \geq m \geq 1 \lor n = m = 0
+                    \end{array}
+                  \]
+            \item
+                  \[
+                    \begin{array}{c}
+                      \exists f: X \xrightarrow{\sim} Y                     \\
+                      \Downarrow                                            \\
+                      \exists F: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N} \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn}} \Downarrow     \\
+                      n = m
+                    \end{array}
+                  \]
+          \end{enumerate}
+    \item \textbf{($\implies$)} Suppose $G: [1, n]_{\N} \to [1, m]_{\N}$. Define $f: X \to Y$ by
+          \[
+            f \equiv f_{Y} \circ G \circ (f_{X})^{-1}
+          \]
+          By \cref{an:thm:inverse-function-is-bijective,an:thm:properties-of-composition-functions},
+          \begin{itemize}
+            \item $G: [1, n]_{\N} \hookrightarrow [1, m]_{\N} \implies f: X \hookrightarrow Y$
+            \item $G: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \implies f: X \twoheadrightarrow Y$
+          \end{itemize}
+          This implies
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item
+                  \[
+                    \begin{array}{c}
+                      n \leq m                                                   \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn-converse}} \Downarrow \\
+                      \exists G: [1, n]_{\N} \hookrightarrow [1, m]_{\N}         \\
+                      \Downarrow                                                 \\
+                      \exists f: X \hookrightarrow Y
+                    \end{array}
+                  \]
+            \item
+                  \[
+                    \begin{array}{c}
+                      n \geq m \geq 1 \lor n = m = 0                             \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn-converse}} \Downarrow \\
+                      \exists G: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}      \\
+                      \Downarrow                                                 \\
+                      \exists f: X \twoheadrightarrow Y
+                    \end{array}
+                  \]
+            \item
+                  \[
+                    \begin{array}{c}
+                      n = m                                                      \\
+                      \by{\Cref{an:lem:properties-of-Nm-Nn-converse}} \Downarrow \\
+                      \exists G: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N}      \\
+                      \Downarrow                                                 \\
+                      \exists f: X \xrightarrow{\sim} Y
+                    \end{array}
+                  \]
+          \end{enumerate}
+  \end{itemize}
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:union-of-two-disjoint-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, X \cap Y = \vnot \land \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \cup Y} < \aleph_{0}
+  \]
+\end{lemma}

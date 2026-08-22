@@ -1,0 +1,211 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $X \cap Y = \vnot$
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \xrightarrow{\sim} X$
+    \item $\exists m \in [0, \infty)_{\N}, \exists g: [1, m]_{\N} \xrightarrow{\sim} Y$
+  \end{itemize}
+  Define $h: [1, m + n]_{\N} \to X \cup Y$ by
+  \[
+    \forall i \in [1, m + n]_{\N}, h(i) = \begin{dcases}
+      f(i),     & \text{if } i \leq n \\
+      g(i - n), & \text{otherwise}
+    \end{dcases}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $i, j \in [1, m + n]_{\N}$
+            \item $h(i) = h(j)$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item If $i \leq n$, then
+                  \[
+                    \begin{array}{c}
+                      h(i) = f(i)                                                      \\
+                      \Downarrow                                                       \\
+                      f(i) = h(j) \in X                                                \\
+                      \by{\ensuremath{X \cap Y = \vnot}} \Downarrow                    \\
+                      j \leq n                                                         \\
+                      \Downarrow                                                       \\
+                      h(j) = f(j)                                                      \\
+                      \Downarrow                                                       \\
+                      f(i) = f(j)                                                      \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      i = j
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      h(i) = g(i - n)                                                  \\
+                      \Downarrow                                                       \\
+                      g(i - n) = h(j) \in Y                                            \\
+                      \by{\ensuremath{X \cap Y = \vnot}} \Downarrow                    \\
+                      j > n                                                            \\
+                      \Downarrow                                                       \\
+                      h(j) = g(j - n)                                                  \\
+                      \Downarrow                                                       \\
+                      g(i - n) = g(j - n)                                              \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow \\
+                      i - n = j - n                                                    \\
+                      \Downarrow                                                       \\
+                      i = j
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{Surjectivity}: Suppose $k \in X \cup Y$. Then
+          \begin{itemize}
+            \item If $k \in X$, then
+                  \[
+                    \begin{array}{c}
+                      k \in X                                                          \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      \exists i \in [1, n]_{\N}, f(i) = k                              \\
+                      \Downarrow                                                       \\
+                      h(i) = k
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      k \in Y                                                          \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow \\
+                      \exists j \in [1, m]_{\N}, g(j) = k                              \\
+                      \Downarrow                                                       \\
+                      h(j + n) = k
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      h: [1, m + n]_{\N} \xrightarrow{\sim} X \cup Y \\
+      \Downarrow                                     \\
+      \abs*{X \cup Y} = m + n < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:union-of-two-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \cup Y} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Define
+  \begin{itemize}
+    \item $A \coloneqq X \setminus Y \subseteq X$
+    \item $B \coloneqq Y \setminus X \subseteq Y$
+    \item $C \coloneqq X \cap Y \subseteq X$
+  \end{itemize}
+  By \cref{an:thm:subset-of-finite-set-is-finite},
+  \begin{itemize}
+    \item $\abs*{A} < \aleph_{0}$
+    \item $\abs*{B} < \aleph_{0}$
+    \item $\abs*{C} < \aleph_{0}$
+  \end{itemize}
+  Also,
+  \begin{itemize}
+    \item $A \cap B = \varnothing$
+    \item $B \cap C = \varnothing$
+    \item $C \cap A = \varnothing$
+  \end{itemize}
+  Consider
+  \begin{itemize}
+    \item $X = (X \setminus Y) \cup (X \cap Y) = A \cup C$
+    \item $Y = (Y \setminus X) \cup (X \cap Y) = B \cup C$
+    \item $X \cup Y = (X \setminus Y) \cup (Y \setminus X) \cup (X \cap Y) = A \cup B \cup C$
+  \end{itemize}
+  By \cref{an:lem:union-of-two-disjoint-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{A \cup B} < \aleph_{0}          \\
+      \Downarrow                            \\
+      \abs*{(A \cup B) \cup C} < \aleph_{0} \\
+      \Downarrow                            \\
+      \abs*{X \cup Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:finite-union-of-finite-sets-is-finite}
+  \[
+    \forall n \in \N, \forall X_{1}, X_{2}, \ldots, X_{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} < \aleph_{0}}
+    \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in \N, P(n): \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} < \aleph_{0}}
+    \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:} Suppose
+          \begin{itemize}
+            \item $\abs*{X_{1}} < \aleph_{0}$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              \abs*{X_{1}} < \aleph_{0}                     \\
+              \Downarrow                                    \\
+              \abs*{\bigcup_{k = 1}^{1} X_{k}} < \aleph_{0} \\
+              \Downarrow                                    \\
+              P(1) \text{ is true}
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose $P(n)$ is true. Suppose
+          \begin{itemize}
+            \item $\forall k \in [1, n + 1]_{\N}, \abs*{X_{k}} < \aleph_{0}$
+          \end{itemize}
+          Since $P(n)$ is true,
+          \[
+            \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              \bigcup_{k = 1}^{n + 1} X_{k} = \paren*{\bigcup_{k = 1}^{n} X_{k}} \cup X_{n + 1} \\
+              \by{\Cref{an:lem:union-of-two-finite-sets-is-finite}} \Downarrow                  \\
+              \abs*{\bigcup_{k = 1}^{n + 1} X_{k}} < \aleph_{0}                                 \\
+              \Downarrow                                                                        \\
+              P(n + 1) \text{ is true}
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an:def:mathematical-induction},
+  \[
+    \forall n \in \N, P(n) \text{ is true}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an:lem:product-of-two-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \times Y} < \aleph_{0}
+  \]
+\end{lemma}

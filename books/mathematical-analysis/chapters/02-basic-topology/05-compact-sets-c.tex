@@ -1,0 +1,180 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\forall \alpha \in A, K_{\alpha} \subseteq X$ is compact
+    \item $\forall B \subseteq A,
+            \bracket*{\begin{gathered}
+                \abs*{B} < \aleph_{0} \\
+                \bigcap_{\alpha \in B} K_{\alpha} \neq \vnot
+              \end{gathered}}$
+  \end{itemize}
+  Assume
+  \[
+    \bigcap_{\alpha \in A} K_{\alpha} = \vnot
+  \]
+  Then
+  \[
+    X = \paren*{\bigcap_{\alpha \in A} K_{\alpha}}^{c} = \bigcup_{\alpha \in A} \paren*{K_{\alpha}}^{c}
+  \]
+  By \cref{an:thm:compact-set-is-closed,an:cor:closed-set-complement-is-open-set},
+  \[
+    \begin{array}{c}
+      \forall \alpha \in A, K_{\alpha} \text{ is compact}           \\
+      \Downarrow                                                    \\
+      \forall \alpha \in A, K_{\alpha} \text{ is closed}            \\
+      \Downarrow                                                    \\
+      \forall \alpha \in A, \paren*{K_{\alpha}}^{c} \text{ is open} \\
+      \Downarrow                                                    \\
+      \set*{\paren*{K_{\alpha}}^{c}}_{\alpha \in A} \text{ is an open cover of } X
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      K_{\alpha} \subseteq X \subseteq \bigcup_{\beta \in A} \paren*{K_{\beta}}^{c} \\
+      \Downarrow                                                                    \\
+      \set*{\paren*{K_{\beta}}^{c}}_{\beta \in A} \text{ is an open cover of } K_{\alpha}
+    \end{array}
+  \]
+  for all $\alpha \in A$. Since $K_{\alpha}$ is compact,
+  \[
+    \begin{array}{c}
+      \exists B_{\alpha} \subseteq A,
+      \bracket*{\begin{gathered}
+          \abs*{B_{\alpha}} < \aleph_{0} \\
+          K_{\alpha} \subseteq \bigcup_{\beta \in B_{\alpha}} \paren*{K_{\beta}}^{c}
+        \end{gathered}}  \\
+      \Downarrow                                                                     \\
+      K_{\alpha} \subseteq \bigcup_{\beta \in B_{\alpha}}
+      \paren*{K_{\beta}}^{c} = \paren*{\bigcap_{\beta \in B_{\alpha}} K_{\beta}}^{c} \\
+      \Downarrow                                                                     \\
+      K_{\alpha} \cap \paren*{\bigcap_{\beta \in B_{\alpha}} K_{\beta}} = \vnot      \\
+      \Downarrow                                                                     \\
+      \bigcap_{\beta \in B_{\alpha} \cup \set*{\alpha}} K_{\beta} = \vnot
+    \end{array}
+  \]
+  for all $\alpha \in A$. By \cref{an:thm:finite-union-of-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \bracket*{\begin{gathered}
+          \abs*{B_{\alpha}} < \aleph_{0} \\
+          \abs*{\set*{\alpha}} < \aleph_{0}
+        \end{gathered}}              \\
+      \Downarrow                                        \\
+      \abs*{B_{\alpha} \cup \set*{\alpha}} < \aleph_{0} \\
+      \Downarrow                                        \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \bigcap_{\alpha \in A} K_{\alpha} \neq \vnot
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:nested-intervals}
+  Suppose
+  \begin{itemize}
+    \item $\paren*{a_{n}}_{n = 1}^{\infty}$ in $\R$
+    \item $\paren*{b_{n}}_{n = 1}^{\infty}$ in $\R$
+    \item $\paren*{I_{n}}_{n = 1}^{\infty}$ in $\mathcal{P}(\R)$
+  \end{itemize}
+  such that
+  \begin{itemize}
+    \item $\forall n \in \N, a_{n} \leq a_{n + 1} \leq b_{n + 1} \leq b_{n}$
+    \item $\forall n \in \N, I_{n} = [a_{n}, b_{n}]$
+  \end{itemize}
+  Then
+  \[
+    \bigcap_{n = 1}^{\infty} I_{n} \neq \vnot
+  \]
+\end{lemma}
+
+\begin{proof}
+  By the \emph{least upper bound property},
+  \[
+    \begin{array}{c}
+      \set*{a_{n}}_{n = 1}^{\infty} \text{ is bounded above}             \\
+      \Downarrow                                                         \\
+      \exists \alpha \in \R, \alpha = \sup \set*{a_{n}}_{n = 1}^{\infty} \\
+      \Downarrow                                                         \\
+      \forall m \in \N, a_{m} \leq \alpha
+    \end{array}
+  \]
+  Suppose $m \in \N$. Then
+  \begin{itemize}
+    \item $\forall n \in \N, n \leq m \implies a_{n} \leq a_{m} \leq b_{m}$
+    \item $\forall n \in \N, n > m \implies a_{n} \leq b_{n} \leq b_{m}$
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      \forall m \in \N, b_{m} \text{ is an upper bound of } \set*{a_{n}}_{n = 1}^{\infty} \\
+      \Downarrow                                                                          \\
+      \forall m \in \N, a_{m} \leq \alpha \leq b_{m}                                      \\
+      \Downarrow                                                                          \\
+      \forall m \in \N, \alpha \in I_{m}                                                  \\
+      \Downarrow                                                                          \\
+      \alpha \in \bigcap_{n = 1}^{\infty} I_{n}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:nested-k-cells}
+  Suppose $k \in \N$. Suppose
+  \begin{itemize}
+    \item $\forall j \in [1, k]_{\N}, \paren*{a_{n, j}}_{n = 1}^{\infty}$ in $\R$
+    \item $\forall j \in [1, k]_{\N}, \paren*{b_{n, j}}_{n = 1}^{\infty}$ in $\R$
+    \item $\paren*{I_{n}}_{n = 1}^{\infty}$ in $\mathcal{P}(\R^{k})$
+  \end{itemize}
+  such that
+  \begin{itemize}
+    \item $\forall n \in \N, \forall j \in [1, k]_{\N}, a_{n, j} \leq a_{n + 1, j} \leq b_{n + 1, j} \leq b_{n, j}$
+    \item $\forall n \in \N, I_{n} = \setbuilder*{\bm{x} \in \R^{k}}{\forall j \in [1, k]_{\N}, a_{n, j} \leq x_{j} \leq b_{n, j}}$
+  \end{itemize}
+  Then
+  \[
+    \bigcap_{n = 1}^{\infty} I_{n} \neq \vnot
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in \N, \forall j \in [1, k]_{\N}, I_{n, j} = [a_{n, j}, b_{n, j}]
+  \]
+  By \cref{an:lem:nested-intervals},
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \forall j \in [1, k]_{\N}, a_{n, j} \leq a_{n + 1, j} \leq b_{n + 1, j} \leq b_{n, j} \\
+      \Downarrow                                                                                              \\
+      \forall j \in [1, k]_{\N}, \bigcap_{n = 1}^{\infty} I_{n, j} \neq \vnot                                 \\
+      \Downarrow                                                                                              \\
+      \forall j \in [1, k]_{\N}, \exists \alpha_{j} \in \bigcap_{n = 1}^{\infty} I_{n, j}                     \\
+      \Downarrow                                                                                              \\
+      \forall n \in \N, \forall j \in [1, k]_{\N}, a_{n, j} \leq \alpha_{j} \leq b_{n, j}
+    \end{array}
+  \]
+  Define
+  \[
+    \bm{\alpha} \coloneqq (\alpha_{1}, \alpha_{2}, \dots, \alpha_{k}) \in \R^{k}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \bm{\alpha} \in I_{n} \\
+      \Downarrow                              \\
+      \bm{\alpha} \in \bigcap_{n = 1}^{\infty} I_{n}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:k-cell-is-compact}
+  Suppose $k \in \N$. Then every $k$-cell is compact in $\paren*{\R^{k}, \norm*{\cdot}}$.
+\end{theorem}

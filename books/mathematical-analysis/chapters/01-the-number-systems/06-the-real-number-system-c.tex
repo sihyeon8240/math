@@ -1,0 +1,248 @@
+\begin{proof}
+  Suppose $y \in [0, 1)$. Define
+  \begin{itemize}
+    \item $\paren*{t_{n}}_{n = 1}^{\infty}$ in $[0, b)$
+    \item $\paren*{T_{n}}_{n = 1}^{\infty}$ in $\mathcal{P}([0, b - 1]_{\N})$
+    \item $\paren*{a_{n}}_{n = 1}^{\infty}$ in $[0, b - 1]_{\N}$
+  \end{itemize}
+  as
+  \[
+    \begin{array}{c@{\quad}c@{\quad}c}
+      t_{1} \coloneqq by
+       & T_{1} \coloneqq \setbuilder*{t \in [0, b - 1]_{\N}}{t \leq t_{1}}
+       & a_{1} \coloneqq \max T_{1}                                        \\
+      t_{2} \coloneqq b^{2}y - ba_{1}
+       & T_{2} \coloneqq \setbuilder*{t \in [0, b - 1]_{\N}}{t \leq t_{2}}
+       & a_{2} \coloneqq \max T_{2}                                        \\
+      \vdots
+       & \vdots
+       & \vdots                                                            \\
+      t_{n} \coloneqq b^{n}y - \sum_{k = 1}^{n - 1} a_{k}b^{n - k}
+       & T_{n} \coloneqq \setbuilder*{t \in [0, b - 1]_{\N}}{t \leq t_{n}}
+       & a_{n} \coloneqq \max T_{n}                                        \\
+      \vdots
+       & \vdots
+       & \vdots
+    \end{array}
+  \]
+  Define
+  \[
+    \forall n \in \N, P(n): \forall k \in [1, n]_{\N}, 0 \leq t_{k} < b
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:}
+          \[
+            \begin{array}{c}
+              0 \leq y < 1          \\
+              \Downarrow            \\
+              0 \leq t_{1} = by < b \\
+              \Downarrow            \\
+              P(1) \text{ is true}
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose $P(n)$ is true. Then
+          \[
+            \begin{array}{c}
+              \forall k \in [1, n]_{\N}, 0 \in T_{k} \land b - 1 \in \paren*{T_{k}}^{\uparrow} \\
+              \by{\Cref{an:thm:bounded-subset-of-Z-in-Z-has-extremum}} \Downarrow              \\
+              \forall k \in [1, n]_{\N}, \exists M \in [0, b - 1]_{\N}, M = \max T_{k}
+            \end{array}
+          \]
+          Therefore, $a_{1}, a_{2}, \dots, a_{n}$ are well-defined. Then
+          \begin{align*}
+            t_{n + 1} & = b^{n + 1}y - \sum_{k = 1}^{n} a_{k}b^{n + 1 - k}               \\
+                      & = b\paren*{b^{n}y - \sum_{k = 1}^{n} a_{k}b^{n - k}}             \\
+                      & = b\paren*{b^{n}y - \sum_{k = 1}^{n - 1} a_{k}b^{n - k} - a_{n}} \\
+                      & = b\paren*{t_{n} - a_{n}}
+          \end{align*}
+          Since $P(n)$ is true,
+          \[
+            \begin{array}{c}
+              a_{n} \leq t_{n} < a_{n} + 1            \\
+              \Downarrow                              \\
+              0 \leq t_{n} - a_{n} < 1                \\
+              \Downarrow                              \\
+              0 \leq t_{n + 1} = b(t_{n} - a_{n}) < b \\
+              \Downarrow                              \\
+              P(n + 1) \text{ is true}
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an:def:mathematical-induction},
+  \[
+    \forall n \in \N, P(n) \text{ is true}
+  \]
+  Therefore, $\paren*{t_{n}}_{n = 1}^{\infty}$ is well-defined. Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, 0 \in T_{n} \land b - 1 \in \paren*{T_{n}}^{\uparrow} \\
+      \by{\Cref{an:thm:bounded-subset-of-Z-in-Z-has-extremum}} \Downarrow     \\
+      \forall n \in \N, \exists M \in [0, b - 1]_{\N}, M = \max T_{n}
+    \end{array}
+  \]
+  Therefore, $\paren*{a_{n}}_{n = 1}^{\infty}$ is well-defined. Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, a_{n} \leq b^{n}y - \sum_{k = 1}^{n - 1} a_{k}b^{n - k} < a_{n} + 1 \\
+      \Downarrow                                                                            \\
+      \forall n \in \N, 0 \leq b^{n}y - \sum_{k = 1}^{n} a_{k}b^{n - k} < 1                 \\
+      \Downarrow                                                                            \\
+      \forall n \in \N, 0 \leq y - \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}} < \frac{1}{b^{n}}
+    \end{array}
+  \]
+  This guarantees the \emph{existence} of $\GBE_{b}(y)$. Let
+  \begin{itemize}
+    \item $\paren*{a_{n}}_{n = 1}^{\infty} = \GBE_{b}(y)$
+    \item $\paren*{c_{n}}_{n = 1}^{\infty} = \GBE_{b}(y)$
+  \end{itemize}
+  Define
+  \[
+    \forall n \in \N, Q(n): \forall k \in [1, n]_{\N}, a_{k} = c_{k}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:} By \cref{an:def:greedy-base-expansion},
+          \[
+            \begin{array}{c@{\qquad\qquad\qquad}c}
+              0 \leq y - \frac{a_{1}}{b} < \frac{1}{b}     & 0 \leq y - \frac{c_{1}}{b} < \frac{1}{b}     \\
+              \Downarrow                                   & \Downarrow                                   \\
+              \frac{a_{1}}{b} \leq y < \frac{a_{1} + 1}{b} & \frac{c_{1}}{b} \leq y < \frac{c_{1} + 1}{b}
+            \end{array}
+          \]
+          Then
+          \[
+            \begin{array}{c@{\qquad\qquad\qquad}c}
+              \frac{a_{1}}{b} \leq y < \frac{c_{1} + 1}{b} & \frac{c_{1}}{b} \leq y < \frac{a_{1} + 1}{b} \\
+              \Downarrow                                   & \Downarrow                                   \\
+              a_{1} < c_{1} + 1                            & c_{1} < a_{1} + 1                            \\
+              \Downarrow                                   & \Downarrow                                   \\
+              a_{1} \leq c_{1}                             & c_{1} \leq a_{1}
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              a_{1} = c_{1} \\
+              \Downarrow    \\
+              Q(1) \text{ is true}
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose $Q(n)$ is true. By \cref{an:def:greedy-base-expansion},
+          \[
+            \begin{array}{c@{\qquad\quad\qquad}c}
+              0 \leq y - \sum_{k = 1}^{n + 1} \frac{a_{k}}{b^{k}} < \frac{1}{b^{n + 1}} &
+              0 \leq y - \sum_{k = 1}^{n + 1} \frac{c_{k}}{b^{k}} < \frac{1}{b^{n + 1}}              \\
+              \Downarrow                                                                & \Downarrow \\
+              \sum_{k = 1}^{n + 1} \frac{a_{k}}{b^{k}} \leq y <
+              \sum_{k = 1}^{n + 1} \frac{a_{k}}{b^{k}} + \frac{1}{b^{n + 1}}            &
+              \sum_{k = 1}^{n + 1} \frac{c_{k}}{b^{k}} \leq y <
+              \sum_{k = 1}^{n + 1} \frac{c_{k}}{b^{k}} + \frac{1}{b^{n + 1}}
+            \end{array}
+          \]
+          Then
+          \[
+            \begin{array}{c@{\qquad\quad\qquad}c}
+              \sum_{k = 1}^{n + 1} \frac{a_{k}}{b^{k}} \leq y <
+              \sum_{k = 1}^{n + 1} \frac{c_{k}}{b^{k}} + \frac{1}{b^{n + 1}}         &
+              \sum_{k = 1}^{n + 1} \frac{c_{k}}{b^{k}} \leq y <
+              \sum_{k = 1}^{n + 1} \frac{a_{k}}{b^{k}} + \frac{1}{b^{n + 1}}                      \\
+              \Downarrow                                                             & \Downarrow \\
+              \sum_{k = 1}^{n + 1} \frac{a_{k} - c_{k}}{b^{k}} < \frac{1}{b^{n + 1}} &
+              \sum_{k = 1}^{n + 1} \frac{c_{k} - a_{k}}{b^{k}} < \frac{1}{b^{n + 1}}              \\
+            \end{array}
+          \]
+          Since $Q(n)$ is true,
+          \[
+            \begin{array}{c@{\qquad\quad\qquad}c}
+              \frac{a_{n + 1} - c_{n + 1}}{b^{n + 1}} < \frac{1}{b^{n + 1}} &
+              \frac{c_{n + 1} - a_{n + 1}}{b^{n + 1}} < \frac{1}{b^{n + 1}}              \\
+              \Downarrow                                                    & \Downarrow \\
+              a_{n + 1} - c_{n + 1} < 1                                     &
+              c_{n + 1} - a_{n + 1} < 1                                                  \\
+              \Downarrow                                                    & \Downarrow \\
+              a_{n + 1} \leq c_{n + 1}                                      &
+              c_{n + 1} \leq a_{n + 1}
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              a_{n + 1} = c_{n + 1} \\
+              \Downarrow            \\
+              Q(n + 1) \text{ is true}
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an:def:mathematical-induction},
+  \[
+    \forall n \in \N, Q(n) \text{ is true}
+  \]
+  This guarantees the \emph{uniqueness} of $\GBE_{b}(y)$.
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:same-greedy-base-expansion-implies-equality}
+  Suppose
+  \begin{itemize}
+    \item $b \in [2, \infty)_{\N}$
+    \item $a, c \in [0, 1)$
+    \item $\paren*{a_{n}}_{n = 1}^{\infty} = \GBE_{b}(a)$
+    \item $\paren*{c_{n}}_{n = 1}^{\infty} = \GBE_{b}(c)$
+  \end{itemize}
+  Then
+  \[
+    (\forall n \in \N, a_{n} = c_{n}) \implies a = c
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall n \in \N, a_{n} = c_{n}
+  \]
+  Assume $a \neq c$ (\emph{WLOG} $a < c$). By \cref{an:thm:archimedean-property-corollary},
+  \[
+    \exists n \in \N, \frac{1}{b^{n}} < c - a
+  \]
+  By \cref{an:def:greedy-base-expansion},
+  \[
+    \begin{array}{c@{\qquad\qquad\qquad}c}
+      0 \leq a - \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}} < \frac{1}{b^{n}}
+       & 0 \leq c - \sum_{k = 1}^{n} \frac{c_{k}}{b^{k}} < \frac{1}{b^{n}} \\
+      \Downarrow
+       & \Downarrow                                                        \\
+      \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}} + \frac{1}{b^{n}} \leq a + \frac{1}{b^{n}}
+       & c < \sum_{k = 1}^{n} \frac{c_{k}}{b^{k}} + \frac{1}{b^{n}}
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}} + \frac{1}{b^{n}} \leq a + \frac{1}{b^{n}}
+      < c < \sum_{k = 1}^{n} \frac{c_{k}}{b^{k}} + \frac{1}{b^{n}} \\
+      \Downarrow                                                   \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    a = c
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:no-real-number-matching-greedy-base-expansion}
+  Suppose
+  \begin{itemize}
+    \item $b \in [2, \infty)_{\N}$
+    \item $\paren*{a_{n}}_{n = 1}^{\infty}$ in $[0, b - 1]_{\N}$
+  \end{itemize}
+  Then
+  \[
+    \paren*{\nexists y \in [0, 1), \paren*{a_{n}}_{n = 1}^{\infty} = \GBE_{b}(y)}
+    \implies \exists N \in \N, \forall n \in [N, \infty)_{\N}, a_{n} = b - 1
+  \]
+\end{theorem}

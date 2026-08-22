@@ -1,0 +1,91 @@
+\section{Euclidean Spaces}
+
+\begin{definition} \label{an:def:euclidean-space}
+  Suppose $n \in \N$. The \textbf{Euclidean $n$-space} $\R^{n}$ is defined by
+  \[
+    \R^{n} \coloneqq \setbuilder*{\bm{x} = (x_{1}, x_{2}, \dots, x_{n})}{\forall k \in [1, n]_{\N}, x_{k} \in \R}
+  \]
+  $x_{1}, x_{2}, \dots, x_{n}$ are called the \textbf{coordinates} of $\bm{x}$.
+  The elements of $\R^{n}$ for $n > 1$ are called \textbf{points} and are represented by bold symbols.
+\end{definition}
+
+\bigskip
+
+\begin{definition} \label{an:def:operations-on-Rn}
+  The operations on $\R^{n}$ are defined as
+  \begin{itemize}
+    \item $\forall \bm{x}, \bm{y} \in \R^{n},
+            \bm{x} + \bm{y} \coloneqq (x_{1} + y_{1}, x_{2} + y_{2}, \dots, x_{n} + y_{n})$
+    \item $\forall \alpha \in \R, \forall \bm{x} \in \R^{n},
+            \alpha \bm{x} \coloneqq (\alpha x_{1}, \alpha x_{2}, \dots, \alpha x_{n})$
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{definition} \label{an:def:inner-product-norm}
+  Suppose $\bm{x}, \bm{y} \in \R^{n}$.
+  \begin{itemize}
+    \item The \textbf{inner product} of $\bm{x}$ and $\bm{y}$ is defined by
+          \[
+            \bm{x} \cdot \bm{y} \coloneqq \sum_{k = 1}^{n} x_{k}y_{k}
+          \]
+    \item The \textbf{norm} of $\bm{x}$ is defined by
+          \[
+            \norm*{\bm{x}} \coloneqq \sqrt{\bm{x} \cdot \bm{x}} = \sqrt{\sum_{k = 1}^{n} x_{k}^{2}}
+          \]
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-inner-product-norme}
+  Suppose $\bm{x}, \bm{y} \in \R^{n}$. Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\abs*{\bm{x} \cdot \bm{y}} \leq \norm*{\bm{x}} \cdot \norm*{\bm{y}}$
+    \item $\norm*{\bm{x} + \bm{y}} \leq \norm*{\bm{x}} + \norm*{\bm{y}}$
+    \item $\norm*{\bm{x} - \bm{y}} \geq \abs*{\norm*{\bm{x}} - \norm*{\bm{y}}}$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item By \cref{an:cor:cauchy-schwarz-inequality-for-real-numbers},
+          \[
+            \abs*{\bm{x} \cdot \bm{y}}^{2} = \abs*{\sum_{k = 1}^{n} x_{k}y_{k}}^{2} \leq
+            \sum_{k = 1}^{n} x_{k}^{2} \cdot \sum_{k = 1}^{n} y_{k}^{2}
+            = \norm*{\bm{x}}^{2} \cdot \norm*{\bm{y}}^{2}
+          \]
+    \item By part \textbf{(A)},
+          \begin{align*}
+            \norm*{\bm{x} + \bm{y}}^{2}
+             & = (\bm{x} + \bm{y}) \cdot (\bm{x} + \bm{y})                                         \\
+             & = \norm*{\bm{x}}^{2} + 2\bm{x} \cdot \bm{y} + \norm*{\bm{y}}^{2}                    \\
+             & \leq \norm*{\bm{x}}^{2} + 2\abs*{\bm{x} \cdot \bm{y}} + \norm*{\bm{y}}^{2}          \\
+             & \leq \norm*{\bm{x}}^{2} + 2\norm*{\bm{x}} \cdot \norm*{\bm{y}} + \norm*{\bm{y}}^{2} \\
+             & = (\norm*{\bm{x}} + \norm*{\bm{y}})^{2}
+          \end{align*}
+    \item By part \textbf{(B)},
+          \begin{itemize}
+            \item If $\norm*{\bm{x}} \geq \norm*{\bm{y}}$, then
+                  \[
+                    \begin{array}{c}
+                      \norm*{\bm{x}} = \norm*{(\bm{x} - \bm{y}) + \bm{y}}
+                      \leq \norm*{\bm{x} - \bm{y}} + \norm*{\bm{y}} \\
+                      \Downarrow                                    \\
+                      \norm*{\bm{x}} - \norm*{\bm{y}} \leq \norm*{\bm{x} - \bm{y}}
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      \norm*{\bm{y}} = \norm*{(\bm{y} - \bm{x}) + \bm{x}}
+                      \leq \norm*{\bm{y} - \bm{x}} + \norm*{\bm{x}} \\
+                      \Downarrow                                    \\
+                      \norm*{\bm{y}} - \norm*{\bm{x}} \leq \norm*{\bm{x} - \bm{y}}
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{enumerate}
+\end{proof}

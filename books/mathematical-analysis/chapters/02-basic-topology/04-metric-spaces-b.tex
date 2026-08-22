@@ -1,0 +1,215 @@
+\begin{proof}
+  Assume
+  \[
+    \exists p \in E', \exists r \in \R^{+}, \abs*{E \cap N_{r}(p)} < \aleph_{0}
+  \]
+  Define
+  \[
+    S \coloneqq (E \cap N_{r}(p)) \setminus \set*{p} = E \cap \widetilde{N}_{r}(p) \subseteq E \cap N_{r}(p)
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      p \in E'   \\
+      \Downarrow \\
+      S \neq \vnot
+    \end{array}
+  \]
+  By \cref{an:thm:subset-of-finite-set-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{E \cap N_{r}(p)} < \aleph_{0} \\
+      \Downarrow                          \\
+      \abs*{S} < \aleph_{0}
+    \end{array}
+  \]
+  Define
+  \[
+    T \coloneqq \setbuilder*{d(p, q)}{q \in S} \neq \vnot
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      p \notin S \\
+      \Downarrow \\
+      0 \notin T
+    \end{array}
+  \]
+  Define $f: S \twoheadrightarrow T$ as
+  \[
+    f(q) = d(p, q)
+  \]
+  By \cref{an:thm:surjection-from-finite-set-implies-finite},
+  \[
+    \abs*{T} < \aleph_{0}
+  \]
+  By \cref{an:thm:finite-ordered-set-has-extremum},
+  \[
+    \exists \veps \in \R^{+}, \veps = \min T
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \veps < r  \\
+      \Downarrow \\
+      N_{\veps}(p) \subseteq N_{r}(p)
+    \end{array}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      \forall q \in S, d(p, q) \geq \veps     \\
+      \Downarrow                              \\
+      E \cap \widetilde{N}_{\veps}(p) = \vnot \\
+      \Downarrow                              \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{E \cap N_{r}(p)} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:open-set-complement-is-closed-set}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    E \text{ is open} \iff E^{c} \text{ is closed}
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\implies$)} Suppose $E$ is open. Suppose $p \in \paren*{E^{c}}'$. Then
+  \[
+    \forall r \in \R^{+}, E^{c} \cap \widetilde{N}_{r}(p) \neq \vnot
+  \]
+  If $p \in E$, then
+  \[
+    \begin{array}{c}
+      p \in E                                            \\
+      \Downarrow                                         \\
+      \exists \veps \in \R^{+}, N_{\veps}(p) \subseteq E \\
+      \Downarrow                                         \\
+      E^{c} \cap \widetilde{N}_{\veps}(p) = \vnot        \\
+      \Downarrow                                         \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      p \notin E \\
+      \Downarrow \\
+      p \in E^{c}
+    \end{array}
+  \]
+  Since $p$ is arbitrary,
+  \[
+    \begin{array}{c}
+      \paren*{E^{c}}' \subseteq E^{c} \\
+      \Downarrow                      \\
+      E^{c} \text{ is closed}
+    \end{array}
+  \]
+  \textbf{($\impliedby$)} Suppose $E^{c}$ is closed. Suppose $p \in E$. If
+  \[
+    \nexists r \in \R^{+}, N_{r}(p) \subseteq E,
+  \]
+  then
+  \[
+    \forall r \in \R^{+}, E^{c} \cap N_{r}(p) \neq \vnot
+  \]
+  Since $p \in E$,
+  \[
+    \begin{array}{c}
+      p \notin E^{c}                             \\
+      \Downarrow                                 \\
+      E^{c} \cap \widetilde{N}_{r}(p) \neq \vnot \\
+      \Downarrow                                 \\
+      p \in \paren*{E^{c}}'
+    \end{array}
+  \]
+  Since $E^{c}$ is closed,
+  \[
+    \begin{array}{c}
+      p \in \paren*{E^{c}}' \\
+      \Downarrow            \\
+      p \in E^{c}           \\
+      \Downarrow            \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \exists r \in \R^{+}, N_{r}(p) \subseteq E \\
+      \Downarrow                                 \\
+      p \in E^{\circ}
+    \end{array}
+  \]
+  Since $p$ is arbitrary, $E$ is open.
+\end{proof}
+
+\bigskip
+
+\begin{corollary} \label{an:cor:closed-set-complement-is-open-set}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    E \text{ is closed} \iff E^{c} \text{ is open}
+  \]
+\end{corollary}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:arbitrary-union-of-open-sets-is-open}
+  Suppose $(X, d)$ is a metric space.
+  \[
+    \forall Y, \paren*{\forall y \in Y, E_{y} \subseteq X \text{ is open}} \implies \bigcup_{y \in Y} E_{y} \text{ is open}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $p \in \bigcup_{y \in Y} E_{y}$. Then
+  \[
+    \exists y_{0} \in Y, p \in E_{y_{0}}
+  \]
+  Since $E_{y_{0}}$ is open,
+  \[
+    \begin{array}{c}
+      \exists r \in \R^{+}, N_{r}(p) \subseteq E_{y_{0}}             \\
+      \Downarrow                                                     \\
+      N_{r}(p) \subseteq E_{y_{0}} \subseteq \bigcup_{y \in Y} E_{y} \\
+      \Downarrow                                                     \\
+      p \in \paren*{\bigcup_{y \in Y} E_{y}}^{\circ}
+    \end{array}
+  \]
+  Since $p$ is arbitrary, $\bigcup_{y \in Y} E_{y}$ is open.
+\end{proof}
+
+\bigskip
+
+\begin{corollary} \label{an:cor:arbitrary-intersection-of-closed-sets-is-closed}
+  Suppose $(X, d)$ is a metric space.
+  \[
+    \forall Y, \paren*{\forall y \in Y, E_{y} \subseteq X \text{ is closed}} \implies \bigcap_{y \in Y} E_{y} \text{ is closed}
+  \]
+\end{corollary}
+
+\begin{proof}
+  By \cref{an:cor:closed-set-complement-is-open-set},
+  \[
+    \forall y \in Y, (E_{y})^{c} \text{ is open}
+  \]
+  By \cref{an:thm:arbitrary-union-of-open-sets-is-open},
+  \[
+    \bigcup_{y \in Y} (E_{y})^{c} \text{ is open}
+  \]
+  By \cref{an:thm:open-set-complement-is-closed-set},
+  \[
+    \bigcap_{y \in Y} E_{y} = \paren*{\bigcup_{y \in Y} (E_{y})^{c}}^{c} \text{ is closed}
+  \]
+\end{proof}
+
+\bigskip

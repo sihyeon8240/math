@@ -1,0 +1,94 @@
+\bigskip
+
+\begin{remark}
+  Suppose $(X, d)$ is a metric space and $Y \subseteq X$. Then
+  \[
+    d|_{Y \times Y}: Y \times Y \to \R
+  \]
+  satisfies the properties of a metric. Therefore, the pair
+  \[
+    (Y, d|_{Y \times Y})
+  \]
+  is also a metric space, which is called the \textbf{subspace} of $(X, d)$. Since
+  \begin{itemize}
+    \item $d|_{Y \times Y}(p, q)$
+    \item $(Y, d|_{Y \times Y})$
+  \end{itemize}
+  are cumbersome, we will write
+  \begin{itemize}
+    \item $d(p, q)$ instead of $d|_{Y \times Y}(p, q)$
+    \item $(Y, d)$ instead of $(Y, d|_{Y \times Y})$
+  \end{itemize}
+  for the sake of simplicity.
+\end{remark}
+
+\bigskip
+
+\begin{definition} \label{an:def:open-set-relative-to-subspace}
+  Suppose $(X, d)$ is a metric space and $E \subseteq Y \subseteq X$. $E$ is called
+  \textbf{open relative} to $Y$ if $E$ is open in $(Y, d)$. That is,
+  \[
+    \forall p \in E, \exists r \in \R^{+},Y \cap N_{r}(p) \subseteq E
+  \]
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:open-set-relative-to-subspace}
+  Suppose $(X, d)$ is a metric space and $E \subseteq Y \subseteq X$. If $V \subseteq X$ satisfies
+  \begin{itemize}
+    \item $V$ is open in $(X, d)$
+    \item $E = V \cap Y$
+  \end{itemize}
+  then $E$ is open relative to $Y$. The converse is also true.
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\implies$)} Suppose $V \subseteq X$ satisfies
+  \begin{itemize}
+    \item $V$ is open in $(X, d)$
+    \item $E = V \cap Y$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \forall p \in E, \exists r_{p} \in \R^{+}, N_{r_{p}}(p) \subseteq V \\
+      \Downarrow                                                          \\
+      Y \cap N_{r_{p}}(p) \subseteq V \cap Y = E
+    \end{array}
+  \]
+  \textbf{($\impliedby$)} Suppose $E$ is open relative to $Y$. Then
+  \[
+    \forall p \in E, \exists r_{p} \in \R^{+}, Y \cap N_{r_{p}}(p) \subseteq E
+  \]
+  Define
+  \[
+    V \coloneqq \bigcup_{p \in E} N_{r_{p}}(p)
+  \]
+  By \cref{an:thm:neighborhood-is-open,an:thm:arbitrary-union-of-open-sets-is-open}, $V$ is open in $(X, d)$.
+  \[
+    \begin{array}{c}
+      \forall p \in E, p \in N_{r_{p}}(p) \subseteq V \\
+      \Downarrow                                      \\
+      E \subseteq Y \land E \subseteq V               \\
+      \Downarrow                                      \\
+      E \subseteq V \cap Y
+    \end{array}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      \forall p \in E, Y \cap N_{r_{p}}(p) \subseteq E           \\
+      \Downarrow                                                 \\
+      \bigcup_{p \in E} \paren*{Y \cap N_{r_{p}}(p)} \subseteq E \\
+      \Downarrow                                                 \\
+      Y \cap \bigcup_{p \in E} N_{r_{p}}(p) \subseteq E          \\
+      \Downarrow                                                 \\
+      Y \cap V \subseteq E
+    \end{array}
+  \]
+  Therefore,
+  \[
+    E = V \cap Y
+  \]
+\end{proof}

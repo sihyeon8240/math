@@ -1,0 +1,234 @@
+\bigskip
+
+\begin{lemma} \label{an:lem:infinite-subset-of-N-is-countable}
+  \[
+    \forall X \subseteq \N, \abs*{X} \geq \aleph_{0} \implies \abs*{X} = \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $X \subseteq \N$
+    \item $\abs*{X} \geq \aleph_{0}$
+  \end{itemize}
+  Define
+  \begin{itemize}
+    \item $\paren*{X_{n}}_{n = 1}^{\infty}$ in $\mathcal{P}(X)$
+    \item $f: \N \to X$
+  \end{itemize}
+  as
+  \begin{itemize}
+    \item $X_{1} \coloneqq X$
+    \item $\forall n \in \N, X_{n + 1} \coloneqq X_{n} \setminus \set*{f(n)}$
+    \item $\forall n \in \N, f(n) \coloneqq \min X_{n}$
+  \end{itemize}
+  By \cref{an:thm:infinite-set-minus-finite-set-is-infinite},
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} \geq \aleph_{0}              \\
+      \Downarrow                                                  \\
+      \forall n \in \N, X_{n} \neq \vnot                          \\
+      \by{\Cref{an:thm:well-ordering-property}} \Downarrow        \\
+      \forall n \in \N, \exists f(n) \in X_{n}, f(n) = \min X_{n} \\
+    \end{array}
+  \]
+  Therefore, $f$ is well-defined. Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $n_{1}, n_{2} \in \N$
+            \item $n_{1} \neq n_{2}$ (\emph{WLOG} $n_{1} < n_{2}$)
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              X_{n_{2}} \subseteq X_{n_{1}} \setminus \set*{f(n_{1})} \\
+              \Downarrow                                              \\
+              f(n_{2}) \neq f(n_{1})
+            \end{array}
+          \]
+          Therefore,
+          \[
+            f: \N \hookrightarrow X
+          \]
+    \item \textbf{Surjectivity}: Suppose $x \in X$. Define
+          \[
+            S \coloneqq \setbuilder*{n \in X}{n < x} \subseteq [1, x - 1]_{\N}
+          \]
+          By \cref{an:lem:subset-of-Nn-is-finite},
+          \[
+            \begin{array}{c}
+              \abs*{S} < \aleph_{0} \\
+              \Downarrow            \\
+              \exists k \in [0, \infty)_{\N}, \abs*{S} = k
+            \end{array}
+          \]
+          \begin{itemize}
+            \item If $k = 0$, then
+                  \begin{itemize}
+                    \item $S = \vnot$
+                    \item $x = \min X_{1} = f(1)$
+                  \end{itemize}
+            \item Otherwise, let
+                  \begin{itemize}
+                    \item $S = \set*{s_{1}, s_{2}, \dots, s_{k}}$
+                    \item $s_{1} < s_{2} < \dots < s_{k}$
+                  \end{itemize}
+                  Then
+                  \[
+                    \begin{array}{c@{\qquad\qquad\qquad}c}
+                      \min X_{1} = \min S
+                       & X_{2} = X \setminus \set*{s_{1}}        \\
+                      \min X_{2} = \min S \setminus \set*{s_{1}}
+                       & X_{3} = X \setminus \set*{s_{1}, s_{2}} \\
+                      \vdots
+                       & \vdots                                  \\
+                      \min X_{k} = \min S \setminus \set*{s_{1}, s_{2}, \dots, s_{k - 1}}
+                       & X_{k + 1} = X \setminus S
+                    \end{array}
+                  \]
+                  Therefore,
+                  \[
+                    \begin{array}{c}
+                      \forall n \in X_{k + 1}, n \geq x \\
+                      \Downarrow                        \\
+                      x = \min X_{k + 1}                \\
+                      \Downarrow                        \\
+                      f(k + 1) = x
+                    \end{array}
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            f: \N \twoheadrightarrow X
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      f: \N \xrightarrow{\sim} X \\
+      \Downarrow                 \\
+      \abs*{X} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:infinite-subset-of-countable-set-is-countable}
+  \[
+    \forall X \forall Y, Y \subseteq X \land \abs*{Y} \geq \aleph_{0} \land \abs*{X} = \aleph_{0}
+    \implies \abs*{Y} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $Y \subseteq X$
+    \item $\abs*{X} = \aleph_{0}$
+    \item $\abs*{Y} \geq \aleph_{0}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists f: \N \xrightarrow{\sim} X                                \\
+      \by{\Cref{an:thm:properties-of-restriction-functions}} \Downarrow \\
+      f|_{f^{-1}(Y)}^{Y}: f^{-1}(Y) \xrightarrow{\sim} Y
+    \end{array}
+  \]
+  Assume $\abs*{f^{-1}(Y)} < \aleph_{0}$. By \cref{an:thm:surjection-from-finite-set-implies-finite},
+  \[
+    \begin{array}{c}
+      \abs*{Y} < \aleph_{0} \\
+      \Downarrow            \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{f^{-1}(Y)} \geq \aleph_{0}
+  \]
+  By \cref{an:lem:infinite-subset-of-N-is-countable},
+  \[
+    \begin{array}{c}
+      \abs*{f^{-1}(Y)} = \aleph_{0}                                \\
+      \by{\Cref{an:thm:bijection-equivalence-relation}} \Downarrow \\
+      \abs*{Y} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:surjection-from-N}
+  \[
+    \forall X, \abs*{X} \geq \aleph_{0} \land \paren*{\exists f: \N \twoheadrightarrow X}
+    \implies \abs*{X} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\exists f: \N \twoheadrightarrow X$
+  \end{itemize}
+  Define
+  \[
+    \forall k \in X, S_{k} \coloneqq f^{-1}(\set*{k}) \neq \vnot
+  \]
+  By \cref{an:thm:well-ordering-property},
+  \[
+    \forall k \in X, \exists m_{k} \in S_{k}, m_{k} = \min S_{k}
+  \]
+  Define
+  \[
+    T \coloneqq \setbuilder*{m_{k}}{k \in X} \subseteq \N
+  \]
+  Define $g: T \to X$ by
+  \[
+    g \equiv f|_{T}^{X}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $m_{k_{1}}, m_{k_{2}} \in T$
+            \item $g(m_{k_{1}}) = g(m_{k_{2}})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(m_{k_{1}}) = f(m_{k_{2}}) \\
+              \Downarrow                  \\
+              k_{1} = k_{2}               \\
+              \Downarrow                  \\
+              S_{k_{1}} = S_{k_{2}}       \\
+              \Downarrow                  \\
+              m_{k_{1}} = m_{k_{2}}
+            \end{array}
+          \]
+    \item \textbf{Surjectivity}: Suppose $k \in X$. By \cref{an:thm:well-ordering-property},
+          \[
+            \begin{array}{c}
+              \exists m_{k} \in S_{k}, m_{k} = \min S_{k} \\
+              \Downarrow                                  \\
+              g(m_{k}) = k
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      g: T \xrightarrow{\sim} X                                                                                        \\
+      \by{\Cref{an:thm:bijection-equivalence-relation,an:thm:injection-from-infinite-set-implies-infinite}} \Downarrow \\
+      \abs*{T} \geq \aleph_{0}                                                                                         \\
+      \by{\Cref{an:lem:infinite-subset-of-N-is-countable}} \Downarrow                                                  \\
+      \abs*{T} = \aleph_{0}                                                                                            \\
+      \by{\Cref{an:thm:bijection-equivalence-relation}} \Downarrow                                                     \\
+      \abs*{X} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}

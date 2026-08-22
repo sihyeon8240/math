@@ -1,0 +1,216 @@
+\section{Compact Sets}
+
+\begin{definition} \label{an:def:open-cover-compactness}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. The collection
+  $\set*{G_{\alpha}}_{\alpha \in A}$ is called an \textbf{open cover} of $E$ if
+  \begin{itemize}
+    \item $\forall \alpha \in A, G_{\alpha}$ is open
+    \item $E \subseteq \bigcup_{\alpha \in A} G_{\alpha}$
+  \end{itemize}
+  A collection $\set*{G_{\alpha}}_{\alpha \in S}$ is called a \textbf{subcover} of $\set*{G_{\alpha}}_{\alpha \in A}$ of $E$ if
+  \begin{itemize}
+    \item $S \subseteq A$
+    \item $E \subseteq \bigcup_{\alpha \in S} G_{\alpha}$
+  \end{itemize}
+  $E$ is called \textbf{compact} if every open cover of $E$ has a finite subcover. That is,
+  \[
+    \forall \set*{G_{\alpha}}_{\alpha \in A},
+    \bracket*{\begin{gathered}
+        \forall \alpha \in A, G_{\alpha} \text{ is open} \\
+        E \subseteq \bigcup_{\alpha \in A} G_{\alpha}
+      \end{gathered}}
+    \implies \exists S \subseteq A,
+    \bracket*{\begin{gathered}
+        \abs*{S} < \aleph_{0} \\
+        E \subseteq \bigcup_{\alpha \in S} G_{\alpha}
+      \end{gathered}}
+  \]
+
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:compactness-preserved-under-subspace}
+  Suppose $(X, d)$ is a metric space and $E \subseteq Y \subseteq X$. Then
+  \[
+    E \text{ is compact relative to } Y \iff E \text{ is compact relative to } X
+  \]
+\end{theorem}
+
+\begin{proof}
+  \textbf{($\implies$)} Suppose $E$ is compact relative to $Y$. Suppose $\set*{G_{\alpha}}_{\alpha \in A}$ satisfies
+  \begin{itemize}
+    \item $\forall \alpha \in A, G_{\alpha}$ is open relative to $X$
+    \item $E \subseteq \bigcup_{\alpha \in A} G_{\alpha}$
+  \end{itemize}
+  Define
+  \[
+    H_{\alpha} = G_{\alpha} \cap Y
+  \]
+  for each $\alpha \in A$. By \cref{an:thm:open-set-relative-to-subspace},
+  \begin{itemize}
+    \item $\forall \alpha \in A, H_{\alpha}$ is open relative to $Y$
+    \item $E \subseteq \paren*{\bigcup_{\alpha \in A} G_{\alpha}} \cap Y =
+            \bigcup_{\alpha \in A} \paren*{G_{\alpha} \cap Y} = \bigcup_{\alpha \in A} H_{\alpha}$
+  \end{itemize}
+  Since $E$ is compact relative to $Y$,
+  \[
+    \begin{array}{c}
+      \set*{H_{\alpha}}_{\alpha \in A} \text{ is an open cover of } E \text{ relative to } Y     \\
+      \Downarrow                                                                                 \\
+      \exists S \subseteq A,
+      \bracket*{\begin{gathered}
+          \abs*{S} < \aleph_{0} \\
+          E \subseteq \bigcup_{\alpha \in S} H_{\alpha}
+        \end{gathered}}                                           \\
+      \Downarrow                                                                                 \\
+      E \subseteq \bigcup_{\alpha \in S} H_{\alpha} = \bigcup_{\alpha \in S}
+      \paren*{G_{\alpha} \cap Y} \subseteq \bigcup_{\alpha \in S} G_{\alpha}                     \\
+      \Downarrow                                                                                 \\
+      \set*{G_{\alpha}}_{\alpha \in S} \text{ is a finite subcover of } E \text{ relative to } X \\
+      \Downarrow                                                                                 \\
+      E \text{ is compact relative to } X
+    \end{array}
+  \]
+  \textbf{($\impliedby$)} Suppose $E$ is a compact set relative to $X$. Suppose $\set*{H_{\alpha}}_{\alpha \in A}$ satisfies
+  \begin{itemize}
+    \item $\forall \alpha \in A, H_{\alpha}$ is open relative to $Y$
+    \item $E \subseteq \bigcup_{\alpha \in A} H_{\alpha}$
+  \end{itemize}
+  By \cref{an:thm:open-set-relative-to-subspace},
+  \[
+    \begin{array}{c}
+      \forall \alpha \in A, \exists G_{\alpha},
+      \bracket*{\begin{gathered}
+          G_{\alpha} \text{ is open relative to } X \\
+          H_{\alpha} = G_{\alpha} \cap Y
+        \end{gathered}} \\
+      \Downarrow                                    \\
+      E \subseteq \bigcup_{\alpha \in A} H_{\alpha} = \bigcup_{\alpha \in A}
+      \paren*{G_{\alpha} \cap Y} \subseteq \bigcup_{\alpha \in A} G_{\alpha}
+    \end{array}
+  \]
+  Since $E$ is compact relative to $X$,
+  \[
+    \begin{array}{c}
+      \set*{G_{\alpha}}_{\alpha \in A} \text{ is an open cover of } E \text{ relative to } X     \\
+      \Downarrow                                                                                 \\
+      \exists S \subseteq A,
+      \bracket*{\begin{gathered}
+          \abs*{S} < \aleph_{0} \\
+          E \subseteq \bigcup_{\alpha \in S} G_{\alpha}
+        \end{gathered}}                                           \\
+      \Downarrow                                                                                 \\
+      E \subseteq \paren*{\bigcup_{\alpha \in S} G_{\alpha}} \cap Y = \bigcup_{\alpha \in S}
+      \paren*{G_{\alpha} \cap Y} = \bigcup_{\alpha \in S} H_{\alpha}                             \\
+      \Downarrow                                                                                 \\
+      \set*{H_{\alpha}}_{\alpha \in S} \text{ is a finite subcover of } E \text{ relative to } Y \\
+      \Downarrow                                                                                 \\
+      E \text{ is compact relative to } Y
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{remark}
+  \textbf{Compactness} is preserved under the subspace topology, while
+  \textbf{openness} and \textbf{closedness} are not, which is the reason why
+  \[
+    \text{``Suppose $(X, d)$ is a metric space and $E \subseteq X$."}
+  \]
+  this kind of statement is always included in \Cref{an:sec:metric-spaces}.
+  In this textbook, you can assume that
+  \begin{itemize}
+    \item $E$ is open $\implies E$ is open relative to $X$
+    \item $E$ is closed $\implies E$ is closed relative to $X$
+    \item $E$ is compact $\implies E$ is compact relative to $X$
+  \end{itemize}
+  if there is no specific mention of the subspace topology.
+\end{remark}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:compact-set-is-closed}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \[
+    E \text{ is compact } \implies E \text{ is closed}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $E$ is compact. We will show
+  \[
+    \begin{array}{c}
+      E^{c} \text{ is open} \\
+      \Downarrow            \\
+      E \text{ is closed}
+    \end{array}
+  \]
+  Suppose $p \in E^{c}$. Define
+  \[
+    r_{q} \coloneqq \frac{d(p, q)}{2} > 0
+  \]
+  for each $q \in E$. Then
+  \[
+    \begin{array}{c}
+      \forall q \in E, q \in N_{r_{q}}(q)        \\
+      \Downarrow                                 \\
+      E \subseteq \bigcup_{q \in E} N_{r_{q}}(q) \\
+      \Downarrow                                 \\
+      \set*{N_{r_{q}}(q)}_{q \in E} \text{ is an open cover of } E
+    \end{array}
+  \]
+  Since $E$ is compact,
+  \[
+    \exists S \subseteq E,
+    \bracket*{\begin{gathered}
+        \abs*{S} < \aleph_{0} \\
+        E \subseteq \bigcup_{q \in S} N_{r_{q}}(q)
+      \end{gathered}}
+  \]
+  Define
+  \[
+    T \coloneqq \setbuilder*{r_{q}}{q \in S}
+  \]
+  Define $f: S \twoheadrightarrow T$ as
+  \[
+    f(q) = r_{q}
+  \]
+  By \cref{an:thm:surjection-from-finite-set-implies-finite},
+  \[
+    \abs*{T} < \aleph_{0}
+  \]
+  By \cref{an:thm:finite-ordered-set-has-extremum},
+  \[
+    \begin{array}{c}
+      \exists \veps \in T, \veps = \min T > 0 \\
+      \Downarrow                              \\
+      \forall x \in N_{\veps}(p), \forall q \in S, d(x, p) < \veps \leq r_{q}
+    \end{array}
+  \]
+  Assume
+  \[
+    \exists q \in S, x \in N_{r_{q}}(q)
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      x \in N_{r_{q}}(q)                                                \\
+      \Downarrow                                                        \\
+      d(p, q) \leq d(p, x) + d(x, q) < r_{q} + r_{q} = 2r_{q} = d(p, q) \\
+      \Downarrow                                                        \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \begin{itemize}
+    \item $\forall q \in S, N_{\veps}(p) \cap N_{r_{q}}(q) = \vnot$
+    \item $E \subseteq \bigcup_{q \in S} N_{r_{q}}(q)$
+  \end{itemize}
+  This implies
+  \[
+    N_{\veps}(p) \subseteq E^{c}
+  \]
+  Since $p$ is arbitrary, $E^{c}$ is open.
+\end{proof}

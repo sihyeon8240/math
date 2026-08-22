@@ -1,0 +1,242 @@
+\section{Functions}
+
+\begin{definition} \label{an:def:function}
+  A relation $f$ from $X$ to $Y$ is called a \textbf{function} if
+  \[
+    \forall x \in X, \exists! y \in Y, (x, y) \in f
+  \]
+  where
+  \begin{itemize}
+    \item $X$ is called the \textbf{domain} of $f$
+    \item $Y$ is called the \textbf{codomain} of $f$
+  \end{itemize}
+  The notation
+  \begin{itemize}
+    \item $f: X \to Y$ denotes that $f$ is a function from $X$ to $Y$
+    \item $y = f(x)$ denotes $(x, y) \in f$
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{definition} \label{an:def:image-inverse-image}
+  Suppose $f: X \to Y$.
+  \begin{itemize}
+    \item The \textbf{image} of $E \subseteq X$ under $f$ is defined by
+          \[
+            f(E) \coloneqq \setbuilder*{f(x)}{x \in E} \subseteq Y
+          \]
+    \item The \textbf{inverse image} of $E \subseteq Y$ under $f$ is defined by
+          \[
+            f^{-1}(E) \coloneqq \setbuilder*{x \in X}{f(x) \in E} \subseteq X
+          \]
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{definition} \label{an:def:injective-surjective-bijective}
+  Suppose $f: X \to Y$.
+  \begin{itemize}
+    \item $f$ is said to be \textbf{injective} if
+          \[
+            \forall x_{1}, x_{2} \in X, f(x_{1}) = f(x_{2}) \implies x_{1} = x_{2}
+          \]
+          The notation $f: X \hookrightarrow Y$ denotes that $f$ is injective.
+    \item $f$ is said to be \textbf{surjective} if
+          \[
+            \forall y \in Y, \exists x \in X, f(x) = y
+          \]
+          or equivalently,
+          \[
+            f(X) = Y
+          \]
+          The notation $f: X \twoheadrightarrow Y$ denotes that $f$ is surjective.
+    \item $f$ is said to be \textbf{bijective} if
+          \begin{itemize}
+            \item $f$ is injective
+            \item $f$ is surjective
+          \end{itemize}
+          or equivalently,
+          \[
+            \forall y \in Y, \exists! x \in X, f(x) = y
+          \]
+          The notation $f: X \xrightarrow{\sim} Y$ denotes that $f$ is bijective.
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{definition} \label{an:def:inverse-function}
+  Suppose $f: X \xrightarrow{\sim} Y$. The \textbf{inverse function} $f^{-1}: Y \to X$ of $f$ is defined by
+  \[
+    \forall (y, x) \in Y \times X, (y, x) \in f^{-1} \iff f(x) = y
+  \]
+  By \cref{an:def:injective-surjective-bijective},
+  \[
+    \begin{array}{c}
+      \forall y \in Y, \exists! x \in X, f(x) = y \\
+      \Downarrow                                  \\
+      \forall y \in Y, \exists! x \in X, f^{-1}(y) = x
+    \end{array}
+  \]
+  Therefore, $f^{-1}$ is well-defined.
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:inverse-function-is-bijective}
+  Suppose $f: X \xrightarrow{\sim} Y$. Then
+  \[
+    f^{-1}: Y \xrightarrow{\sim} X
+  \]
+\end{theorem}
+
+\begin{proof}
+  By \cref{an:def:function},
+  \[
+    \begin{array}{c}
+      \forall x \in X, \exists! y \in Y, f(x) = y \\
+      \Downarrow                                  \\
+      \forall x \in X, \exists! y \in Y, f^{-1}(y) = x
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{definition} \label{an:def:restriction-function}
+  Suppose
+  \begin{itemize}
+    \item $f: X \to Y$
+    \item $E \subseteq X$
+    \item $F \subseteq Y$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item The \textbf{restriction} $f|_{E}: E \to Y$ of $f$ to $E$ is defined by
+          \[
+            \forall x \in E, f|_{E}(x) = f(x)
+          \]
+    \item The \textbf{corestriction} $f|^{F}: X \to F$ of $f$ to $F \supseteq f(X)$ is defined by
+          \[
+            \forall x \in X, f|^{F}(x) = f(x)
+          \]
+    \item The \textbf{bi-restriction} $f|_{E}^{F}: E \to F$ of $f$ to $E$ and $F \supseteq f(E)$ is defined by
+          \[
+            \forall x \in E, f|_{E}^{F}(x) = f(x)
+          \]
+  \end{itemize}
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-restriction-functions}
+  Suppose
+  \begin{itemize}
+    \item $f: X \to Y$
+    \item $E \subseteq X$
+    \item $f(E) \subseteq F \subseteq Y$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $f: X \hookrightarrow Y \implies f|_{E}^{F}: E \hookrightarrow F$
+    \item $f(E) = F \implies f|_{E}^{F}: E \twoheadrightarrow F$
+    \item $f: X \hookrightarrow Y \land f(E) = F \implies f|_{E}^{F}: E \xrightarrow{\sim} F$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose $x_{1}, x_{2} \in E$.
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose
+          \begin{itemize}
+            \item $f: X \hookrightarrow Y$
+            \item  $f|_{E}^{F}(x_{1}) = f|_{E}^{F}(x_{2})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(x_{1}) = f(x_{2}) \\
+              \Downarrow          \\
+              x_{1} = x_{2}
+            \end{array}
+          \]
+    \item Suppose $f(E) = F$. Then
+          \[
+            \begin{array}{c}
+              \forall y \in F, \exists x \in E, f(x) = y \\
+              \Downarrow                                 \\
+              \forall y \in F, \exists x \in E, f|_{E}^{F}(x) = y
+            \end{array}
+          \]
+    \item follows from \textbf{(A)} and \textbf{(B)}.
+  \end{enumerate}
+\end{proof}
+
+\bigskip
+
+\begin{definition} \label{an:def:composition-function}
+  Suppose
+  \begin{itemize}
+    \item $f: X \to Y$
+    \item $g: Y \to Z$
+  \end{itemize}
+  The \textbf{composition} $g \circ f: X \to Z$ of $g$ with $f$ is defined by
+  \[
+    \forall x \in X, (g \circ f)(x) = g(f(x))
+  \]
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-composition-functions}
+  Suppose
+  \begin{itemize}
+    \item $f: X \to Y$
+    \item $g: Y \to Z$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $f: X \hookrightarrow Y \land g: Y \hookrightarrow Z$ $\implies g \circ f: X \hookrightarrow Z$
+    \item $f: X \twoheadrightarrow Y \land g: Y \twoheadrightarrow Z$ $\implies g \circ f: X \twoheadrightarrow Z$
+    \item $f: X \xrightarrow{\sim} Y \land g: Y \xrightarrow{\sim} Z$ $\implies g \circ f: X \xrightarrow{\sim} Z$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose $x_{1}, x_{2} \in X$.
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose
+          \begin{itemize}
+            \item $f: X \hookrightarrow Y$
+            \item $g: Y \hookrightarrow Z$
+            \item $(g \circ f)(x_{1}) = (g \circ f)(x_{2})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              g(f(x_{1})) = g(f(x_{2})) \\
+              \Downarrow                \\
+              f(x_{1}) = f(x_{2})       \\
+              \Downarrow                \\
+              x_{1} = x_{2}
+            \end{array}
+          \]
+    \item Suppose
+          \begin{itemize}
+            \item $f: X \twoheadrightarrow Y$
+            \item $g: Y \twoheadrightarrow Z$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item $\forall z \in Z, \exists y \in Y, g(y) = z$
+            \item $\forall y \in Y, \exists x \in X, f(x) = y$
+          \end{itemize}
+          Therefore,
+          \[
+            \forall z \in Z, \exists x \in X, (g \circ f)(x) = z
+          \]
+    \item follows from \textbf{(A)} and \textbf{(B)}.
+  \end{enumerate}
+\end{proof}

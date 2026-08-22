@@ -1,0 +1,126 @@
+---
+layout: null
+permalink: /
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Open undergraduate mathematics textbooks.">
+
+    <title>Open Mathematics Textbooks</title>
+    <link rel="stylesheet" href="{{ '/assets/common.css' | relative_url }}">
+    <link rel="stylesheet" href="{{ '/assets/index.css' | relative_url }}">
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a
+          class="brand"
+          href="{{ '/' | relative_url }}"
+          aria-label="Open Mathematics Textbooks home"
+        >
+          <span class="brand__mark" aria-hidden="true">∑</span>
+          <span class="brand__text">
+            OPEN MATHEMATICS <span class="brand__text-line">TEXTBOOKS</span>
+          </span>
+        </a>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero__content">
+            <p class="eyebrow">Undergraduate mathematics · Open access</p>
+            <h1 id="hero-title">Textbook<br>Collection</h1>
+            <p class="hero__lead">
+              Open source LaTeX textbooks with Lean formalizations.
+            </p>
+            <div class="hero__actions">
+              <a class="button button--primary" href="#textbooks">
+                Browse textbooks <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <nav class="link-grid" aria-label="Project links">
+            <a class="project-link" href="{{ site.github.repository_url }}">
+              <span>GitHub source ↗</span>
+              <span>Browse LaTeX and project files</span>
+            </a>
+            <a class="project-link" href="{{ site.github.repository_url }}/releases/latest">
+              <span>Latest official release ↗</span>
+              <span>Download the newest versioned release</span>
+            </a>
+            <a class="project-link" href="{{ site.github.repository_url }}/issues/new/choose">
+              <span>Report an error ↗</span>
+              <span>Typos, math errors, and ideas</span>
+            </a>
+            <a class="project-link" href="{{ site.github.repository_url }}/blob/main/LICENSE-CONTENT">
+              <span>Content license ↗</span>
+              <span>Learn how materials may be reused</span>
+            </a>
+          </nav>
+        </section>
+
+        <section class="section" id="textbooks" aria-labelledby="textbooks-title">
+          <div class="section-heading">
+            <h2 id="textbooks-title">Textbooks</h2>
+            <p>
+              Select a subject and see the details.
+            </p>
+          </div>
+
+          <div class="book-grid">
+            {% assign books = site.pages | where: "layout", "book" | sort: "order" %}
+            {% for book in books %}
+              <article class="book-card">
+                <p class="status status--{{ book.status | default: 'draft' }}">
+                  {{ book.status_label | default: book.status | default: 'Work in progress' }}
+                </p>
+                <h3>{{ book.title }}</h3>
+                {% assign pdf_path = '/pdf/' | append: book.slug | append: '.pdf' %}
+                {% assign book_page_path = '/books/' | append: book.slug | append: '.html' %}
+                <div class="book-card__footer">
+                  <a
+                    class="book-card__action book-card__action--primary"
+                    href="{{ pdf_path | relative_url }}"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <span>Read snapshot</span>
+                    <span aria-hidden="true">↗</span>
+                  </a>
+                  <a
+                    class="book-card__action book-card__action--secondary"
+                    href="{{ book_page_path | relative_url }}"
+                    aria-label="View details for {{ book.title }}"
+                  >
+
+                    <span>Book details</span>
+                    <span class="book-card__action-arrow" aria-hidden="true">→</span>
+                  </a>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        </section>
+
+      </main>
+
+      <footer class="site-footer">
+        <p class="site-footer__brand">
+          <span>Open Mathematics</span>
+          <span>Textbooks</span>
+        </p>
+        <p>
+          <span>This site is open source.</span>
+          <a href="{{ site.github.repository_url }}/edit/main/site/index.html">
+            Improve this page.
+          </a>
+        </p>
+
+      </footer>
+    </div>
+  </body>
+</html>

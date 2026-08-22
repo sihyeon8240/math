@@ -1,0 +1,201 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $a, b \in \R^{+}$
+    \item $ a < b$
+  \end{itemize}
+  Then
+  \[
+    b^{n} - a^{n} = (b - a)\sum_{k = 0}^{n - 1} b^{n - 1 - k} a^{k} \leq (b - a)nb^{n - 1}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:nth-power-is-monotone}
+  \[
+    \forall n \in \N, \forall a, b \in \R^{+}, a < b \iff a^{n} < b^{n}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $a, b \in \R^{+}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      b^{n} - a^{n} = (b - a)\sum_{k = 0}^{n - 1} b^{n - 1 - k} a^{k} \\
+      \Downarrow                                                      \\
+      a < b \iff a^{n} < b^{n}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:existence-and-uniqueness-of-nth-roots}
+  \[
+    \forall x \in \R^{+}, \forall n \in \N, \exists! y \in \R^{+}, y^{n} = x
+  \]
+  Such an $y$ is denoted by
+  \begin{itemize}
+    \item $y = \sqrt[n]{x}$
+    \item $y = x^{\frac{1}{n}}$
+  \end{itemize}
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $x \in \R^{+}$
+    \item $n \in \N$
+  \end{itemize}
+  Define
+  \[
+    E \coloneqq \setbuilder*{t \in \R^{+}}{t^{n} < x} \subseteq \R
+  \]
+  \begin{itemize}
+    \item If $x \geq 1$, then
+          \[
+            \begin{array}{c}
+              2^{-n} < 1 \leq x \\
+              \Downarrow        \\
+              2^{-1} \in E
+            \end{array}
+          \]
+          Also,
+          \[
+            \begin{array}{c}
+              \forall t \in E, t^{n} < x \leq x^{n}               \\
+              \by{\Cref{an:lem:nth-power-is-monotone}} \Downarrow \\
+              \forall t \in E, t < x                              \\
+              \Downarrow                                          \\
+              x \in E^{\uparrow}
+            \end{array}
+          \]
+    \item Otherwise,
+          \[
+            \begin{array}{c}
+              x < 1      \\
+              \Downarrow \\
+              x^{2n} < x \\
+              \Downarrow \\
+              x^{2} \in E
+            \end{array}
+          \]
+          Also,
+          \[
+            \begin{array}{c}
+              \forall t \in E, t^{n} < x < 1 = 1^{n}              \\
+              \by{\Cref{an:lem:nth-power-is-monotone}} \Downarrow \\
+              \forall t \in E, t < 1                              \\
+              \Downarrow                                          \\
+              1 \in E^{\uparrow}
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      E \neq \vnot \land E^{\uparrow} \neq \vnot \\
+      \by{\Cref{an:ax:completeness}} \Downarrow  \\
+      \exists \alpha \in \R^{+}, \alpha = \sup E
+    \end{array}
+  \]
+  We will show
+  \[
+    \begin{array}{c}
+      \alpha^{n} \not< x \land \alpha^{n} \not> x \\
+      \Downarrow                                  \\
+      \alpha^{n} = x
+    \end{array}
+  \]
+  \begin{itemize}
+    \item Assume $\alpha^{n} < x$. By \cref{an:thm:Q-is-dense-in-R},
+          \[
+            \begin{array}{c}
+              \exists h \in \Q, 0 < h < \min\set*{1, \frac{x - \alpha^{n}}{n(\alpha + 1)^{n - 1}}}       \\
+              \by{\Cref{an:lem:nth-power-is-lipschitz}} \Downarrow                                       \\
+              (\alpha + h)^{n} - \alpha^{n} \leq hn(\alpha + h)^{n - 1} < hn(\alpha + 1)^{n - 1}         \\
+              \Downarrow                                                                                 \\
+              (\alpha + h)^{n} < \alpha^{n} + hn(\alpha + 1)^{n - 1} < \alpha^{n} + (x - \alpha^{n}) = x \\
+              \Downarrow                                                                                 \\
+              \alpha + h \in E                                                                           \\
+              \by{\ensuremath{\alpha = \sup E}} \Downarrow                                               \\
+              \bot
+            \end{array}
+          \]
+    \item Assume $\alpha^{n} > x$. By \cref{an:thm:Q-is-dense-in-R},
+          \[
+            \begin{array}{c}
+              \exists h \in \Q, 0 < h < \min\set*{\alpha, \frac{\alpha^{n} - x}{n\alpha^{n - 1}}}     \\
+              \by{\Cref{an:lem:nth-power-is-lipschitz}} \Downarrow                                    \\
+              \alpha^{n} - (\alpha - h)^{n} \leq hn\alpha^{n - 1}                                     \\
+              \Downarrow                                                                              \\
+              (\alpha - h)^{n} \geq \alpha^{n} - hn\alpha^{n - 1} > \alpha^{n} - (\alpha^{n} - x) = x \\
+              \Downarrow                                                                              \\
+              \forall t \in E, t^{n} < x < (\alpha - h)^{n}                                           \\
+              \by{\Cref{an:lem:nth-power-is-monotone}} \Downarrow                                     \\
+              \forall t \in E, t < \alpha - h                                                         \\
+              \Downarrow                                                                              \\
+              \alpha - h \in E^{\uparrow}                                                             \\
+              \by{\ensuremath{\alpha = \sup E}} \Downarrow                                            \\
+              \bot
+            \end{array}
+          \]
+  \end{itemize}
+  This guarantees the \emph{existence} of $y$. Let
+  \begin{itemize}
+    \item $y_{1}, y_{2} \in \R^{+}$
+    \item $\paren*{y_{1}}^{n} = x$
+    \item $\paren*{y_{2}}^{n} = x$
+  \end{itemize}
+  Assume $y_{1} \neq y_{2}$ (\emph{WLOG} $y_{1} < y_{2}$). Then
+  \[
+    \begin{array}{c}
+      y_{1} < y_{2}                                       \\
+      \by{\Cref{an:lem:nth-power-is-monotone}} \Downarrow \\
+      \paren*{y_{1}}^{n} < \paren*{y_{2}}^{n}             \\
+      \Downarrow                                          \\
+      x < x                                               \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    y_{1} = y_{2}
+  \]
+  This guarantees the \emph{uniqueness} of $y$.
+\end{proof}
+
+\bigskip
+
+\begin{definition} \label{an:def:greedy-base-expansion}
+  Suppose
+  \begin{itemize}
+    \item $y \in [0, 1)$
+    \item $b \in [2, \infty)_{\N}$
+  \end{itemize}
+  A sequence $\paren*{a_{n}}_{n = 1}^{\infty}$ in $[0, b - 1]_{\N}$ is called a \textbf{greedy base $b$ expansion} of $y$ if
+  \[
+    \forall n \in \N, 0 \leq y - \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}} < \frac{1}{b^{n}}
+  \]
+  Such an $\paren*{a_{n}}_{n = 1}^{\infty}$ is denoted by
+  \[
+    \paren*{a_{n}}_{n = 1}^{\infty} = \GBE_{b}(y)
+  \]
+\end{definition}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:existence-and-uniqueness-of-greedy-base-expansion}
+  Suppose $b \in [2, \infty)_{\N}$. Then
+  \[
+    \forall y \in [0, 1), \exists! \paren*{a_{n}}_{n = 1}^{\infty} \in \prod_{n = 1}^{\infty} [0, b - 1]_{\N},
+    \paren*{a_{n}}_{n = 1}^{\infty} = \GBE_{b}(y)
+  \]
+\end{theorem}

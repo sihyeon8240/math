@@ -1,0 +1,11 @@
+book: mathematical-analysis
+chapter: 01-the-number-systems
+
+# LaTeX theorem labels are stable identifiers. Add an entry only after its
+# statement and proof compile without `sorry`; see docs/formalization.md.
+proofs:
+  - id: an:thm:well-ordering-property
+    tex: chapters/01-the-number-systems/01-the-natural-number-systems.tex
+    declaration: Textbooks.MathematicalAnalysis.Chapter01.wellOrderingProperty
+    foundations:
+      - set-theory

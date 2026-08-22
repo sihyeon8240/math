@@ -1,0 +1,37 @@
+schema_version: 1
+
+defaults:
+  build: true
+  check: true
+  release: false
+  site: false
+
+books:
+  - slug: elementary-number-theory
+    title: Elementary Number Theory
+    short_title: Number Theory
+    label_prefix: nt
+    lean_module: ElementaryNumberTheory
+    status: draft
+    order: 10
+    release: false
+    site: true
+
+  - slug: linear-algebra
+    title: Linear Algebra
+    label_prefix: la
+    lean_module: LinearAlgebra
+    status: draft
+    order: 20
+    release: false
+    site: true
+
+  - slug: mathematical-analysis
+    title: Mathematical Analysis
+    short_title: Mathematical Analysis
+    label_prefix: an
+    lean_module: MathematicalAnalysis
+    status: review
+    order: 30
+    release: true
+    site: true

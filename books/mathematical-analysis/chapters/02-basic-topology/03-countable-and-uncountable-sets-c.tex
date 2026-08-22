@@ -1,0 +1,256 @@
+\bigskip
+
+\begin{theorem} \label{an:thm:countable-union-of-finite-sets-is-at-most-countable}
+  \[
+    \forall \paren*{X_{n}}_{n = 1}^{\infty},
+    \paren*{\forall n \in \N, \abs*{X_{n}} < \aleph_{0}}
+    \implies \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \leq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} < \aleph_{0} \\
+      \Downarrow                                  \\
+      \forall n \in \N, \exists m_{n} \in [0, \infty)_{\N}, \exists g_{n}: [1, m_{n}]_{\N} \xrightarrow{\sim} X_{n}
+    \end{array}
+  \]
+  \begin{itemize}
+    \item If $\abs*{\bigcup_{n = 1}^{\infty} X_{n}} < \aleph_{0}$, then the proof is complete.
+    \item Otherwise, define $h: \N \to \bigcup_{n = 1}^{\infty} X_{n}$ as
+          \begin{itemize}
+            \item $\forall m \in [1, m_{1}]_{\N}, h(m) = g_{1}(m)$
+            \item $\forall n \in [2, \infty)_{\N}, \forall m \in [1, m_{n}]_{\N}, h\paren*{\sum_{k = 1}^{n - 1} m_{k} + m} = g_{n}(m)$
+          \end{itemize}
+          Suppose $x \in \bigcup_{n = 1}^{\infty} X_{n}$. Then
+          \[
+            \begin{array}{c}
+              \exists n \in \N, x \in X_{n}                                                \\
+              \by{\ensuremath{g_{n}: [1, m_{n}]_{\N} \xrightarrow{\sim} X_{n}}} \Downarrow \\
+              \exists m \in [1, m_{n}]_{\N}, g_{n}(m) = x                                  \\
+            \end{array}
+          \]
+          Consider
+          \begin{itemize}
+            \item If $n = 1$, then
+                  \[
+                    h(m) = x
+                  \]
+            \item Otherwise,
+                  \[
+                    h\paren*{\sum_{k = 1}^{n - 1} m_{k} + m} = x
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            \begin{array}{c}
+              h: \N \twoheadrightarrow \bigcup_{n = 1}^{\infty} X_{n} \\
+              \by{\Cref{an:thm:surjection-from-N}} \Downarrow         \\
+              \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\bigskip
+
+\begin{remark}
+  Strictly speaking, \cref{an:thm:countable-union-of-finite-sets-is-at-most-countable} requires the
+  \textbf{axiom of choice} to prove. In this textbook, the \textbf{axiom of choice} is not discussed,
+  so we will just assume that the proof is valid. The same issue arises for
+  \cref{an:thm:countable-union-of-countable-sets-is-countable}.
+\end{remark}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:countable-union-of-countable-sets-is-countable}
+  \[
+    \forall \paren*{X_{n}}_{n = 1}^{\infty},
+    \paren*{\forall n \in \N, \abs*{X_{n}} = \aleph_{0}}
+    \implies \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} = \aleph_{0} \\
+      \Downarrow                                  \\
+      \forall n \in \N, \exists f_{n}: \N \xrightarrow{\sim} X_{n}
+    \end{array}
+  \]
+  Assume
+  \[
+    \abs*{\bigcup_{n = 1}^{\infty} X_{n}} < \aleph_{0}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      X_{1} \subseteq \bigcup_{n = 1}^{\infty} X_{n}               \\
+      \by{\Cref{an:thm:subset-of-finite-set-is-finite}} \Downarrow \\
+      \abs*{X_{1}} < \aleph_{0}                                    \\
+      \by{\Cref{an:thm:countable-set-is-infinite}} \Downarrow      \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \geq \aleph_{0}
+  \]
+  Define
+  \[
+    \forall n \in \N, T_{n} \coloneqq \setbuilder*{k \in \N}{n \leq \frac{k(k + 1)}{2}} \subseteq \N
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, 2n \in T_{n}                       \\
+      \by{\Cref{an:thm:well-ordering-property}} \Downarrow \\
+      \forall n \in \N, \exists t_{n} \in T_{n}, t_{n} = \min T_{n}
+    \end{array}
+  \]
+  Define
+  \[
+    \forall n \in \N, s_{n} \coloneqq n - \frac{t_{n}(t_{n} - 1)}{2}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      t_{n} - 1 \notin T_{n}         \\
+      \Downarrow                     \\
+      n > \frac{t_{n}(t_{n} - 1)}{2} \\
+      \Downarrow                     \\
+      s_{n} \in \N
+    \end{array}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      t_{n} - s_{n} + 1 = \frac{t_{n}(t_{n} + 1)}{2} - n + 1 \\
+      \by{\ensuremath{t_{n} \in T_{n}}} \Downarrow           \\
+      t_{n} - s_{n} + 1 \geq 1                               \\
+      \Downarrow                                             \\
+      t_{n} - s_{n} + 1 \in \N
+    \end{array}
+  \]
+  Define $g: \N \to \bigcup_{n = 1}^{\infty} X_{n}$ by
+  \[
+    \forall n \in \N, g(n) = f_{s_{n}}(t_{n} - s_{n} + 1)
+  \]
+  Suppose $x \in \bigcup_{n = 1}^{\infty} X_{n}$. Then
+  \[
+    \begin{array}{c}
+      \exists m \in \N, x \in X_{m}                                   \\
+      \by{\ensuremath{f_{m}: \N \xrightarrow{\sim} X_{m}}} \Downarrow \\
+      \exists l \in \N, f_{m}(l) = x                                  \\
+    \end{array}
+  \]
+  Define
+  \[
+    k \coloneqq \frac{(l + m - 1)(l + m - 2)}{2} + m \in \N
+  \]
+  Consider
+  \begin{itemize}
+    \item $k - \frac{(l + m - 2)(l + m - 1)}{2} = m > 0$
+    \item $k - \frac{(l + m - 1)(l + m)}{2} = 1 - l \leq 0$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      l + m - 2 \notin T_{k} \land l + m - 1 \in T_{k} \\
+      \Downarrow                                       \\
+      t_{k} = l + m - 1                                \\
+      \Downarrow                                       \\
+      s_{k} = m                                        \\
+      \Downarrow                                       \\
+      g(k) = f_{m}(l) = x
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      g: \N \twoheadrightarrow \bigcup_{n = 1}^{\infty} X_{n} \\
+      \by{\Cref{an:thm:surjection-from-N}} \Downarrow         \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{corollary} \label{an:cor:finite-union-of-countable-sets-is-countable}
+  \[
+    \forall n \in \N, \forall X_{1}, X_{2}, \ldots, X_{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} = \aleph_{0}}
+    \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} = \aleph_{0}
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall k \in [1, n]_{\N}, \abs*{X_{k}} = \aleph_{0}
+  \]
+  Define
+  \[
+    \forall k \in [n + 1, \infty)_{\N}, X_{k} \coloneqq X_{n}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} = \aleph_{0}                                  \\
+      \by{\Cref{an:thm:countable-union-of-countable-sets-is-countable}} \Downarrow \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}                           \\
+      \Downarrow                                                                   \\
+      \abs*{\bigcup_{k = 1}^{n} X_{k}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an:thm:at-most-countable-union-of-at-most-countable-sets-is-at-most-countable}
+  \[
+    \forall \paren*{X_{n}}_{n = 1}^{\infty},
+    \paren*{\forall n \in \N, \abs*{X_{n}} \leq \aleph_{0}}
+    \implies \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \leq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall n \in \N, \abs*{X_{n}} \leq \aleph_{0}
+  \]
+  Define
+  \[
+    \forall n \in \N, Y_{n} \coloneqq
+    \begin{cases}
+      X_{n},                   & \text{if } \abs*{X_{n}} = \aleph_{0} \\
+      X_{n} \cup \set*{y_{n}}, & \text{otherwise}
+    \end{cases}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, Y_{n} = X_{n} \lor Y_{n} = X_{n} \cup \set*{y_{n}}                                      \\
+      \Downarrow                                                                                                \\
+      \forall n \in \N, X_{n} = Y_{n} - Y_{n} \lor X_{n} = Y_{n} - \set*{y_{n}}                                 \\
+      \Downarrow                                                                                                \\
+      \forall n \in \N, \abs*{X_{n}} \leq \abs*{Y_{n}} \land \abs*{Y_{n}} = \aleph_{0}                          \\
+      \Downarrow                                                                                                \\
+      \forall n \in \N, \abs*{X_{n}} \leq \abs*{Y_{n}} \land \abs*{\bigcup_{n = 1}^{\infty} Y_{n}} = \aleph_{0} \\
+      \by{\Cref{an:thm:countable-union-of-countable-sets-is-countable}} \Downarrow                              \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \leq \abs*{\bigcup_{n = 1}^{\infty} Y_{n}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:N-times-N-is-countable}
+  \[
+    \abs*{\N \times \N} = \aleph_{0}
+  \]
+\end{lemma}

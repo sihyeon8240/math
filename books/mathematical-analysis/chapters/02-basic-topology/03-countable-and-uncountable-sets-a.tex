@@ -1,0 +1,223 @@
+\section{Countable and Uncountable Sets}
+
+\begin{theorem} \label{an:thm:infinite-set-minus-finite-set-is-infinite}
+  \[
+    \forall X \forall Y, \abs*{X} \geq \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \setminus Y} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Assume
+  \[
+    \begin{array}{c}
+      \abs*{X \setminus Y} < \aleph_{0}                                \\
+      \by{\Cref{an:lem:union-of-two-finite-sets-is-finite}} \Downarrow \\
+      \abs*{(X \setminus Y) \cup Y} < \aleph_{0}
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      X = (X \setminus Y) \cup (X \cap Y)                          \\
+      \Downarrow                                                   \\
+      X \subseteq (X \setminus Y) \cup Y                           \\
+      \by{\Cref{an:thm:subset-of-finite-set-is-finite}} \Downarrow \\
+      \abs*{X} < \aleph_{0}                                        \\
+      \Downarrow                                                   \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{X \setminus Y} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:injection-from-infinite-set-implies-infinite}
+  \[
+    \forall X \forall Y, \abs*{X} \geq \aleph_{0} \land \exists f: X \hookrightarrow Y
+    \implies \abs*{Y} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\exists f: X \hookrightarrow Y$
+  \end{itemize}
+  Assume
+  \[
+    \abs*{Y} < \aleph_{0}
+  \]
+  Define $h: f(X) \to X$ by
+  \[
+    h \equiv \paren*{f|^{f(X)}}^{-1}
+  \]
+  Define $g: Y \to X$ by
+  \[
+    \forall y \in Y, g(y) = \begin{dcases}
+      h(y),     & \text{if } y \in f(X) \\
+      h(y_{0}), & \text{otherwise}
+    \end{dcases}
+  \]
+  where $y_{0} \in f(X)$ is fixed. By \cref{an:thm:inverse-function-is-bijective},
+  \[
+    \begin{array}{c}
+      h: f(X) \xrightarrow{\sim} X                                            \\
+      \Downarrow                                                              \\
+      g: Y \twoheadrightarrow X                                               \\
+      \by{\Cref{an:thm:surjection-from-finite-set-implies-finite}} \Downarrow \\
+      \abs*{X} < \aleph_{0}                                                   \\
+      \Downarrow                                                              \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{Y} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{lemma} \label{an:lem:N-is-infinite}
+  \[
+    \abs*{\N} \geq \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Assume
+  \[
+    \abs*{\N} < \aleph_{0}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      1 \in \N                                                      \\
+      \Downarrow                                                    \\
+      0 < \abs*{\N}                                                 \\
+      \by{\Cref{an:thm:finite-ordered-set-has-extremum}} \Downarrow \\
+      \exists M \in \N, M = \max(\N)
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      M < M + 1                          \\
+      \Downarrow                         \\
+      M + 1 \notin \N                    \\
+      \by{\Cref{an:ax:peano}} \Downarrow \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{\N} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:countable-set-is-infinite}
+  \[
+    \forall X, \abs*{X} = \aleph_{0} \implies \abs*{X} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $\abs*{X} = \aleph_{0}$. Then
+  \[
+    \begin{array}{c}
+      \exists f: \N \xrightarrow{\sim} X                                                              \\
+      \by{\Cref{an:thm:injection-from-infinite-set-implies-infinite,an:lem:N-is-infinite}} \Downarrow \\
+      \abs*{X} \geq \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:Z-is-countable}
+  \[
+    \abs*{\Z} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define $f: \N \to \Z$ by
+  \[
+    \forall n \in \N, f(n) = \begin{dcases}
+      - \frac{n}{2},   & \text{if } n \text{ is even} \\
+      \frac{n - 1}{2}, & \text{if } n \text{ is odd}
+    \end{dcases}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $n_{1}, n_{2} \in \N$
+            \item $f(n_{1}) = f(n_{2})$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item $n$ is even $\implies f(n) = - \frac{n}{2} < 0$
+            \item $n$ is odd $\implies f(n) = \frac{n - 1}{2} \geq 0$
+          \end{itemize}
+          Therefore, $n_{1}$ and $n_{2}$ are both even or both odd.
+          \begin{itemize}
+            \item If both $n_{1}$ and $n_{2}$ are even, then
+                  \[
+                    \begin{array}{c}
+                      - \frac{n_{1}}{2} = - \frac{n_{2}}{2} \\
+                      \Downarrow                            \\
+                      n_{1} = n_{2}
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      \frac{n_{1} - 1}{2} = \frac{n_{2} - 1}{2} \\
+                      \Downarrow                                \\
+                      n_{1} = n_{2}
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{Surjectivity}: Suppose $k \in \Z$.
+          \begin{itemize}
+            \item If $k \geq 0$, then
+                  \[
+                    \begin{array}{c}
+                      2k + 1 \in \N \\
+                      \Downarrow    \\
+                      f(2k + 1) = \frac{(2k + 1) - 1}{2} = \frac{2k}{2} = k
+                    \end{array}
+                  \]
+            \item If $k < 0$, then
+                  \[
+                    \begin{array}{c}
+                      -2k \in \N \\
+                      \Downarrow \\
+                      f(-2k) = - \frac{-2k}{2} = k
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      f: \N \xrightarrow{\sim} \Z \\
+      \Downarrow                  \\
+      \abs*{\Z} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}

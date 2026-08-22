@@ -1,0 +1,208 @@
+\begin{theorem} \label{an:thm:finite-intersection-of-open-sets-is-open}
+  Suppose $(X, d)$ is a metric space.
+  \[
+    \paren*{\forall k \in [1, n]_{\N}, E_{k} \subseteq X \text{ is open}} \implies \bigcap_{k = 1}^{n} E_{k} \text{ is open}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $p \in \bigcap_{k = 1}^{n} E_{k}$. Then
+  \[
+    \forall j \in [1, n]_{\N}, p \in E_{j}
+  \]
+  Since each $E_{j}$ is open,
+  \[
+    \exists r_{j} \in \R^{+}, N_{r_{j}}(p) \subseteq E_{j}
+  \]
+  for each $j \in [1, n]_{\N}$. Define
+  \[
+    R \coloneqq \setbuilder*{r_{j}}{j \in [1, n]_{\N}} \subseteq \R^{+}
+  \]
+  Define $f: [1, n]_{\N} \twoheadrightarrow R$ as
+  \[
+    f(j) = r_{j}
+  \]
+  By \cref{an:lem:subset-of-Nn-is-finite,an:thm:surjection-from-finite-set-implies-finite},
+  \[
+    \abs*{R} < \aleph_{0}
+  \]
+  By \cref{an:thm:finite-ordered-set-has-extremum},
+  \[
+    \exists r \in \R^{+}, r = \min R
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall j \in [1, n]_{\N}, N_{r}(p) \subseteq N_{r_{j}}(p) \subseteq E_{j} \\
+      \Downarrow                                                                 \\
+      N_{r}(p) \subseteq \bigcap_{k = 1}^{n} E_{k}                               \\
+      \Downarrow                                                                 \\
+      p \in \paren*{\bigcap_{k = 1}^{n} E_{k}}^{\circ}
+    \end{array}
+  \]
+  Since $p$ is arbitrary, $\bigcap_{k = 1}^{n} E_{k}$ is open.
+\end{proof}
+
+\bigskip
+
+\begin{corollary} \label{an:cor:finite-union-of-closed-sets-is-closed}
+  Suppose $(X, d)$ is a metric space.
+  \[
+    \paren*{\forall k \in [1, n]_{\N}, E_{k} \subseteq X \text{ is closed}} \implies \bigcup_{k = 1}^{n} E_{k} \text{ is closed}
+  \]
+\end{corollary}
+
+\begin{proof}
+  By \cref{an:cor:closed-set-complement-is-open-set},
+  \[
+    \forall k \in [1, n]_{\N}, (E_{k})^{c} \text{ is open}
+  \]
+  By \cref{an:thm:finite-intersection-of-open-sets-is-open},
+  \[
+    \bigcap_{k = 1}^{n} (E_{k})^{c} \text{ is open}
+  \]
+  By \cref{an:thm:open-set-complement-is-closed-set},
+  \[
+    \bigcup_{k = 1}^{n} E_{k} = \paren*{\bigcap_{k = 1}^{n} (E_{k})^{c}}^{c} \text{ is closed}
+  \]
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:properties-of-closure}
+  Suppose $(X, d)$ is a metric space and $E \subseteq X$. Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\overline{E}$ is closed
+    \item $E = \overline{E} \iff E$ is closed
+    \item If $F \subseteq X$ satisfies
+          \begin{itemize}
+            \item $E \subseteq F$
+            \item $F$ is closed
+          \end{itemize}
+          then $\overline{E} \subseteq F$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose $p \in \paren*{\overline{E}}^{c}$. Then
+          \[
+            \begin{array}{c}
+              p \notin E \land p \notin E'                              \\
+              \Downarrow                                                \\
+              \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(p) = \vnot \\
+              \Downarrow                                                \\
+              E \cap N_{r}(p) = \vnot                                   \\
+              \Downarrow                                                \\
+              N_{r}(p) \subseteq E^{c}
+            \end{array}
+          \]
+          By \cref{an:thm:neighborhood-is-open}, $N_{r}(p)$ is open. Then
+          \[
+            \begin{array}{c}
+              \forall q \in N_{r}(p), \exists \veps \in \R^{+}, N_{\veps}(q) \subseteq N_{r}(p) \subseteq E^{c} \\
+              \Downarrow                                                                                        \\
+              E \cap N_{\veps}(q) = \vnot                                                                       \\
+              \Downarrow                                                                                        \\
+              E \cap \widetilde{N}_{\veps}(q) = \vnot                                                           \\
+              \Downarrow                                                                                        \\
+              q \notin E'
+            \end{array}
+          \]
+          Since $q$ is arbitrary,
+          \[
+            \begin{array}{c}
+              N_{r}(p) \subseteq \paren*{E'}^{c}                                        \\
+              \Downarrow                                                                \\
+              N_{r}(p) \subseteq \paren*{\overline{E}}^{c} = E^{c} \cap \paren*{E'}^{c} \\
+              \Downarrow                                                                \\
+              p \in \paren*{\paren*{\overline{E}}^{c}}^{\circ}
+            \end{array}
+          \]
+          Since $p$ is arbitrary,
+          \[
+            \paren*{\overline{E}}^{c} \text{ is open}
+          \]
+          By \cref{an:cor:closed-set-complement-is-open-set},
+          \[
+            \overline{E} \text{ is closed}
+          \]
+    \item $E$ is closed $\iff E' \subseteq E \iff E \cup E' = E \iff \overline{E} = E$
+    \item Suppose $F \subseteq X$ satisfies
+          \begin{itemize}
+            \item $E \subseteq F$
+            \item $F$ is closed
+          \end{itemize}
+          Suppose $p \in E'$. Then,
+          \[
+            \begin{array}{c}
+              \forall r \in \R^{+}, E \cap \widetilde{N}_{r}(p) \neq \vnot \\
+              \Downarrow                                                   \\
+              F \cap \widetilde{N}_{r}(p) \neq \vnot                       \\
+              \Downarrow                                                   \\
+              p \in F' \subseteq F
+            \end{array}
+          \]
+          Since $p$ is arbitrary,
+          \[
+            \begin{array}{c}
+              E' \subseteq F' \subseteq F \\
+              \Downarrow                  \\
+              \overline{E} = E \cup E' \subseteq F
+            \end{array}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\bigskip
+
+\begin{theorem} \label{an:thm:supremum-in-closure}
+  Suppose $E \subseteq \R$ satisfies
+  \begin{itemize}
+    \item $E \neq \vnot$
+    \item $E$ is bounded above
+  \end{itemize}
+  then
+  \[
+    \exists \sup E \in \overline{E}
+  \]
+  Also,
+  \[
+    E \text{ is closed} \implies \exists \sup E \in E
+  \]
+\end{theorem}
+
+\begin{proof}
+  By the \emph{least upper bound property},
+  \[
+    \exists \alpha \in \R, \alpha = \sup E
+  \]
+  If $\alpha \in E$, then
+  \[
+    \begin{array}{c}
+      E \subseteq \overline{E} \\
+      \Downarrow               \\
+      \alpha \in \overline{E}
+    \end{array}
+  \]
+  Otherwise,
+  \[
+    \begin{array}{c}
+      \forall x \in \R^{+}, \alpha - x \text{ is not an upper bound of } E \\
+      \Downarrow                                                           \\
+      \exists p \in E, \alpha - x < p < \alpha                             \\
+      \Downarrow                                                           \\
+      p \in \widetilde{N}_{x}(\alpha) \cap E                               \\
+      \Downarrow                                                           \\
+      \alpha \in E'
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      E' \subseteq \overline{E} \\
+      \Downarrow                \\
+      \alpha \in \overline{E}
+    \end{array}
+  \]
+\end{proof}
