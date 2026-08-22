@@ -1,19 +1,24 @@
 \section{Functions}
 
 \begin{definition} \label{an:def:function}
-  A relation $f$ from $X$ to $Y$ is called a \textbf{function} if
+  Suppose a relation $G$ from $X$ to $Y$ satisfies
   \[
-    \forall x \in X, \exists! y \in Y, (x, y) \in f
+    \forall x \in X, \exists! y \in Y, (x, y) \in G
   \]
-  where
+  Then the ordered triple
+  \[
+    f \coloneqq (X, Y, G)
+  \]
+  is called a \textbf{function}, where
   \begin{itemize}
     \item $X$ is called the \textbf{domain} of $f$
     \item $Y$ is called the \textbf{codomain} of $f$
+    \item $G$ is called the \textbf{graph} of $f$
   \end{itemize}
   The notation
   \begin{itemize}
-    \item $f: X \to Y$ denotes that $f$ is a function from $X$ to $Y$
-    \item $y = f(x)$ denotes $(x, y) \in f$
+    \item $f:X \to Y$ denotes that $f$ is a function from $X$ to $Y$
+    \item $f(x) = y$ denotes $(x, y)\in G$
   \end{itemize}
 \end{definition}
 
@@ -70,7 +75,7 @@
 \begin{definition} \label{an:def:inverse-function}
   Suppose $f: X \xrightarrow{\sim} Y$. The \textbf{inverse function} $f^{-1}: Y \to X$ of $f$ is defined by
   \[
-    \forall (y, x) \in Y \times X, (y, x) \in f^{-1} \iff f(x) = y
+    \forall (y, x) \in Y \times X, f^{-1}(y) = x \iff f(x) = y
   \]
   By \cref{an:def:injective-surjective-bijective},
   \[
