@@ -1,0 +1,67 @@
+name: Deploy static site
+on:
+  workflow_call:
+    inputs:
+      source_sha:
+        required: true
+        type: string
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve source commit
+        id: source
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          CALL_SHA: ${{ inputs.source_sha }}
+        shell: bash
+        run: |
+          if [[ "$EVENT_NAME" == workflow_call ]]; then
+            echo "sha=$CALL_SHA" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=main" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: generated-pdfs
+          path: pdf-snapshot
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: .github/requirements-ci.txt
+      - run: >-
+          python3 -m pip install --disable-pip-version-check
+          --requirement .github/requirements-ci.txt
+      - name: Validate and generate site from books.yml
+        run: make site
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - uses: actions/jekyll-build-pages@44a6e6beabd48582f863aeeb6cb2151cc1716697 # v1
+        with:
+          source: site
+          destination: _site
+      - name: Prepare PDF destination
+        run: sudo install -d -o "$(id -u)" -g "$(id -g)" _site/pdf
+      - name: Validate and add the complete PDF snapshot
+        run: python3 scripts/stage-site-pdfs.py pdf-snapshot _site/pdf
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5

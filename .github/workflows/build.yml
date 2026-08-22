@@ -1,0 +1,176 @@
+name: Build textbooks
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.books.outputs.matrix }}
+      count: ${{ steps.books.outputs.count }}
+      site_changed: ${{ steps.books.outputs.site_changed }}
+      snapshot_changed: ${{ steps.books.outputs.snapshot_changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: .github/requirements-ci.txt
+      - run: >-
+          python3 -m pip install --disable-pip-version-check
+          --requirement .github/requirements-ci.txt
+      - name: Validate manifest before creating the matrix
+        run: python3 scripts/books.py validate
+      - name: Read last snapshot source
+        if: github.event_name == 'push'
+        id: snapshot
+        run: ./scripts/snapshot-base.sh
+      - name: Create cumulative build matrix
+        id: books
+        env:
+          BASE_SHA: >-
+            ${{
+              github.event_name == 'push'
+              && steps.snapshot.outputs.base
+              || (
+                github.event_name == 'pull_request'
+                && github.event.pull_request.base.sha
+                || ''
+              )
+            }}
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == workflow_dispatch ]]; then
+            python3 scripts/affected-books.py --all --format github >> "$GITHUB_OUTPUT"
+          else
+            python3 scripts/affected-books.py --base "$BASE_SHA" --format github >> "$GITHUB_OUTPUT"
+          fi
+  book:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    name: Build ${{ matrix.book }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Build and strictly check in the pinned TeX Live 2026 image
+        uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          docker_image: ghcr.io/sihyeon8240/latex@sha256:2f91bda5f4330df41e006c455a356b485b68f923f002ca5b12861b76dc1f0a0f
+          run: |
+            ./scripts/build-book.sh "${{ matrix.book }}"
+            python3 scripts/check-log.py --strict "build/${{ matrix.book }}/book.log"
+            cp "build/${{ matrix.book }}/book.pdf" "build/${{ matrix.book }}/${{ matrix.book }}.pdf"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.book }}-pdf
+          path: build/${{ matrix.book }}/${{ matrix.book }}.pdf
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    name: Publish latest PDF snapshot
+    needs: [plan, book]
+    if: >-
+      always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      needs.plan.result == 'success' &&
+      (needs.book.result == 'success' || needs.book.result == 'skipped') &&
+      (needs.plan.outputs.count != '0' || needs.plan.outputs.site_changed == 'true' ||
+      needs.plan.outputs.snapshot_changed == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      current: ${{ steps.publish.outputs.current }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: needs.plan.outputs.count != '0'
+        with:
+          pattern: '*-pdf'
+          path: updated-pdfs
+          merge-multiple: true
+      - id: publish
+        name: Update generated-pdfs snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          if [[ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]]; then
+            echo "A newer main commit exists; its cumulative workflow will publish."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if git ls-remote --exit-code --heads origin generated-pdfs >/dev/null 2>&1; then
+            git fetch --no-tags origin generated-pdfs
+            git worktree add snapshot origin/generated-pdfs
+          else
+            git worktree add --detach snapshot
+            git -C snapshot switch --orphan generated-pdfs
+            git -C snapshot rm -r --ignore-unmatch .
+          fi
+          mkdir -p snapshot/pdf
+          shopt -s nullglob
+          updated_pdfs=(updated-pdfs/*.pdf)
+          for pdf in "${updated_pdfs[@]}"; do
+            slug="${pdf##*/}"
+            slug="${slug%.pdf}"
+            if [[ ! -s "$pdf" ]]; then
+              echo "error: PDF artifact is missing or empty: $pdf" >&2
+              exit 1
+            fi
+            python3 scripts/books.py require "$slug" >/dev/null
+            cp "$pdf" "snapshot/pdf/$slug.pdf"
+          done
+          mapfile -t expected < <(python3 scripts/books.py list --for site)
+          while IFS= read -r -d '' pdf; do
+            slug="${pdf##*/}"
+            slug="${slug%.pdf}"
+            [[ " ${expected[*]} " == *" $slug "* ]] || rm "$pdf"
+          done < <(find snapshot/pdf -maxdepth 1 -type f -name '*.pdf' -print0)
+          for slug in "${expected[@]}"; do
+            test -s "snapshot/pdf/$slug.pdf" || {
+              echo "error: snapshot lacks site PDF $slug;" \
+                "dispatch Build textbooks once to bootstrap all PDFs" >&2
+              exit 1
+            }
+          done
+          printf '%s\n' "$GITHUB_SHA" > snapshot/.source-sha
+          cp .github/generated-pdfs-README.md snapshot/README.md
+          git -C snapshot add .source-sha README.md pdf
+          if ! git -C snapshot diff --cached --quiet; then
+            git -C snapshot commit -m "Update PDFs from ${GITHUB_SHA}"
+            git -C snapshot push origin HEAD:generated-pdfs
+          fi
+          echo "current=true" >> "$GITHUB_OUTPUT"
+  pages:
+    needs: [plan, publish]
+    if: >-
+      always() && needs.publish.outputs.current == 'true' &&
+      (needs.plan.outputs.count != '0' || needs.plan.outputs.site_changed == 'true')
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
+    with:
+      source_sha: ${{ github.sha }}

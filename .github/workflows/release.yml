@@ -1,0 +1,58 @@
+name: Release textbooks
+on:
+  push:
+    tags:
+      - '*-v*'
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: .github/requirements-ci.txt
+      - name: Install repository check dependencies
+        run: |
+          if ! command -v rg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends --yes ripgrep
+          fi
+          command -v rg
+      - run: >-
+          python3 -m pip install --disable-pip-version-check
+          --requirement .github/requirements-ci.txt
+      - name: Require the tagged commit to be on main
+        shell: bash
+        run: |
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor HEAD origin/main || {
+            echo "error: release tag must point to a commit contained in main" >&2
+            exit 1
+          }
+      - name: Check repository sources
+        run: ./scripts/check-repository.sh
+      - name: Validate tag and metadata versions
+        shell: bash
+        run: ./scripts/release-plan.sh "${GITHUB_REF_NAME}"
+  release:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3
+        with:
+          draft: true
+          generate_release_notes: true

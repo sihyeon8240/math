@@ -1,0 +1,75 @@
+{
+  "name": "Undergraduate Mathematics Textbooks",
+  "image": "ghcr.io/sihyeon8240/latex@sha256:2f91bda5f4330df41e006c455a356b485b68f923f002ca5b12861b76dc1f0a0f",
+
+  "containerEnv": {
+    "TEXINPUTS": "${containerWorkspaceFolder}/common/styles//:"
+  },
+
+  "postCreateCommand": "./scripts/check-environment.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "james-yu.latex-workshop",
+        "eamodio.gitlens",
+        "github.vscode-github-actions",
+        "leanprover.lean4",
+        "openai.chatgpt",
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.vscode-python-envs",
+        "charliermarsh.ruff",
+        "editorconfig.editorconfig"
+      ],
+
+      "settings": {
+        "latex-workshop.latex.outDir": "%WORKSPACE_FOLDER%/vscode-build/%RELATIVE_DIR%",
+
+        "latex-workshop.latex.autoBuild.run": "onSave",
+        "latex-workshop.view.pdf.viewer": "tab",
+        "latex-workshop.latex.recipe.default": "latexmk (LuaLaTeX)",
+
+        "latex-workshop.latex.tools": [
+          {
+            "name": "latexmk",
+            "command": "latexmk",
+            "args": [
+              "-r",
+              "%WORKSPACE_FOLDER%/latexmkrc",
+              "-outdir=%OUTDIR%",
+              "%DOC%"
+            ]
+          },
+          {
+            "name": "latexmk-shell-escape",
+            "command": "latexmk",
+            "args": [
+              "-r",
+              "%WORKSPACE_FOLDER%/latexmkrc",
+              "-outdir=%OUTDIR%",
+              "-shell-escape",
+              "%DOC%"
+            ]
+          }
+        ],
+
+        "latex-workshop.latex.recipes": [
+          {
+            "name": "latexmk (LuaLaTeX)",
+            "tools": [
+              "latexmk"
+            ]
+          },
+          {
+            "name": "latexmk (LuaLaTeX + shell escape)",
+            "tools": [
+              "latexmk-shell-escape"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
