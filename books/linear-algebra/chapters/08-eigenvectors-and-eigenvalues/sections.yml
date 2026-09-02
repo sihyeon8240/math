@@ -1,0 +1,14 @@
+schema_version: 1
+sections:
+- slug: eigenvectors-and-eigenvalues
+  title: Eigenvectors and Eigenvalues
+- slug: the-characteristic-polynomial
+  title: The Characteristic Polynomial
+- slug: eigenvalues-and-eigenvectors-of-symmetric-matrices
+  title: Eigenvalues and Eigenvectors of Symmetric Matrices
+- slug: diagonalizations-of-a-symmetric-linear-map
+  title: Diagonalizations of a Symmetric Linear Map
+- slug: the-hermitian-case
+  title: The Hermitian Case
+- slug: unitary-operators
+  title: Unitary Operators

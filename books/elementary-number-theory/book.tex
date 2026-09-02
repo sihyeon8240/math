@@ -1,0 +1,51 @@
+% Generated from books.yml, chapters.yml, and common/templates/book.tex; do not edit.
+\documentclass[11pt, a4paper, oneside]{book}
+
+\usepackage{textbook}
+\IfFileExists{local-style.sty}{\usepackage{local-style}}{}
+\addbibresource{references.bib}
+% BEGIN GENERATED METADATA
+\newcommand{\name}{MUHO CHOI}
+\newcommand{\displaytitle}{Elementary Number Theory}
+\newcommand{\version}{0.1.0}
+\newcommand{\slug}{elementary-number-theory}
+\title{\displaytitle}
+\author{\name}
+\hypersetup{pdftitle={\displaytitle},pdfauthor={\name}}
+% END GENERATED METADATA
+
+\begin{document}
+
+\frontmatter
+\InputIfFileExists{frontmatter/title-and-copyright.tex}{}{\input{title-and-copyright}}
+\tableofcontents
+\InputIfFileExists{frontmatter/preface.tex}{}{\input{preface}}
+
+\mainmatter
+% BEGIN GENERATED CHAPTERS
+\include{chapters/01-preliminaries/index}
+\include{chapters/02-divisibility-theory-in-the-integers/index}
+\include{chapters/03-primes-and-their-distribution/index}
+\include{chapters/04-the-theory-of-congruences/index}
+\include{chapters/05-fermats-theorem/index}
+\include{chapters/06-number-theoretic-functions/index}
+\include{chapters/07-eulers-generalization-of-fermats-theorem/index}
+\include{chapters/08-primitive-roots-and-indices/index}
+\include{chapters/09-the-quadratic-reciprocity-law/index}
+\include{chapters/10-introduction-to-cryptography/index}
+\include{chapters/11-numbers-of-special-form/index}
+\include{chapters/12-certain-nonlinear-diophantine-equations/index}
+\include{chapters/13-representation-of-integers-as-sums-of-squares/index}
+\include{chapters/14-fibonacci-numbers/index}
+\include{chapters/15-continued-fractions/index}
+\include{chapters/16-some-modern-developments/index}
+% END GENERATED CHAPTERS
+
+\backmatter
+% BEGIN GENERATED APPENDICES
+% END GENERATED APPENDICES
+
+\nocite{*}
+\printbibliography
+
+\end{document}

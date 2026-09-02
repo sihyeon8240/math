@@ -1,0 +1,303 @@
+\begin{theorem} \label{an1:thm:infinite-set-minus-finite-set-is-infinite}
+  \[
+    \forall X \forall Y, \abs*{X} \geq \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \setminus Y} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Assume $\abs*{X \setminus Y} < \aleph_{0}$. By \cref{an1:lem:union-of-two-finite-sets-is-finite},
+  \[
+    \abs*{(X \setminus Y) \cup Y} < \aleph_{0}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      X = (X \setminus Y) \cup (X \cap Y)                           \\
+      \Downarrow                                                    \\
+      X \subseteq (X \setminus Y) \cup Y                            \\
+      \by{\Cref{an1:thm:subset-of-finite-set-is-finite}} \Downarrow \\
+      \abs*{X} < \aleph_{0}                                         \\
+      \Downarrow                                                    \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{X \setminus Y} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:injection-from-infinite-set-implies-infinite}
+  \[
+    \forall X \forall Y, \abs*{X} \geq \aleph_{0} \land \exists f: X \hookrightarrow Y
+    \implies \abs*{Y} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\exists f: X \hookrightarrow Y$
+  \end{itemize}
+  Assume $\abs*{Y} < \aleph_{0}$. By \cref{an1:thm:properties-of-restriction-functions},
+  \[
+    f|^{f(X)}: X \xrightarrow{\sim} f(X)
+  \]
+  Define $h: f(X) \to X$ by
+  \[
+    h \equiv \paren*{f|^{f(X)}}^{-1}
+  \]
+  Define $g: Y \to X$ by
+  \[
+    \forall y \in Y, g(y) \coloneqq \begin{dcases}
+      h(y),     & \text{if } y \in f(X) \\
+      h(y_{0}), & \text{otherwise}
+    \end{dcases}
+  \]
+  where $y_{0} \in f(X)$ is fixed. By \cref{an1:thm:inverse-function-is-bijective},
+  \[
+    \begin{array}{c}
+      h: f(X) \xrightarrow{\sim} X                                             \\
+      \Downarrow                                                               \\
+      g: Y \twoheadrightarrow X                                                \\
+      \by{\Cref{an1:thm:surjection-from-finite-set-implies-finite}} \Downarrow \\
+      \abs*{X} < \aleph_{0}                                                    \\
+      \Downarrow                                                               \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{Y} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:N-is-infinite}
+  \[
+    \abs*{\N} \geq \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Assume $\abs*{\N} < \aleph_{0}$. By \cref{an1:thm:finite-ordered-set-has-extremum},
+  \[
+    \exists M \in \N, M = \max\N
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      M < M + 1                           \\
+      \Downarrow                          \\
+      M + 1 \notin \N                     \\
+      \by{\Cref{an1:ax:peano}} \Downarrow \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{\N} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:countable-set-is-infinite}
+  \[
+    \forall X, \abs*{X} = \aleph_{0} \implies \abs*{X} \geq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $\abs*{X} = \aleph_{0}$. Then
+  \[
+    \begin{array}{c}
+      \exists f: \N \xrightarrow{\sim} X                                                                \\
+      \by{\Cref{an1:thm:injection-from-infinite-set-implies-infinite,an1:lem:N-is-infinite}} \Downarrow \\
+      \abs*{X} \geq \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:Z-is-countable}
+  \[
+    \abs*{\Z} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define $f: \N \to \Z$ by
+  \[
+    \forall n \in \N, f(n) \coloneqq \begin{dcases}
+      - \frac{n}{2},   & \text{if } n \equiv 0 \pmod{2} \\
+      \frac{n - 1}{2}, & \text{if } n \equiv 1 \pmod{2}
+    \end{dcases}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $n_{1}, n_{2} \in \N$
+            \item $f(n_{1}) = f(n_{2})$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item $n \equiv 0 \pmod{2} \implies f(n) = - \frac{n}{2} < 0$
+            \item $n \equiv 1 \pmod{2} \implies f(n) = \frac{n - 1}{2} \geq 0$
+          \end{itemize}
+          This implies $n_{1} \equiv n_{2} \pmod{2}$.
+          \begin{itemize}
+            \item If $n_{1} \equiv n_{2} \equiv 0 \pmod{2}$, then
+                  \[
+                    \begin{array}{c}
+                      - \frac{n_{1}}{2} = - \frac{n_{2}}{2} \\
+                      \Downarrow                            \\
+                      n_{1} = n_{2}
+                    \end{array}
+                  \]
+            \item If $n_{1} \equiv n_{2} \equiv 1 \pmod{2}$, then
+                  \[
+                    \begin{array}{c}
+                      \frac{n_{1} - 1}{2} = \frac{n_{2} - 1}{2} \\
+                      \Downarrow                                \\
+                      n_{1} = n_{2}
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{Surjectivity}: Suppose $k \in \Z$.
+          \begin{itemize}
+            \item If $k \geq 0$, then
+                  \[
+                    \begin{array}{c}
+                      2k + 1 \in \N \\
+                      \Downarrow    \\
+                      f(2k + 1) = \frac{(2k + 1) - 1}{2} = \frac{2k}{2} = k
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      -2k \in \N \\
+                      \Downarrow \\
+                      f(-2k) = - \frac{-2k}{2} = k
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      f: \N \xrightarrow{\sim} \Z \\
+      \Downarrow                  \\
+      \abs*{\Z} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:infinite-subset-of-N-is-countable}
+  \[
+    \forall X \subseteq \N, \abs*{X} \geq \aleph_{0} \implies \abs*{X} = \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $X \subseteq \N$
+    \item $\abs*{X} \geq \aleph_{0}$
+  \end{itemize}
+  Define
+  \begin{itemize}
+    \item $\paren*{X_{n}}_{n = 1}^{\infty}$ in $\mathcal{P}(X)$
+    \item $f: \N \to X$
+  \end{itemize}
+  by
+  \begin{itemize}
+    \item $X_{1} \coloneqq X$
+    \item $\forall n \in \N, X_{n + 1} \coloneqq X_{n} \setminus \set*{f(n)}$
+    \item $\forall n \in \N, f(n) \coloneqq \min X_{n}$
+  \end{itemize}
+  By \cref{an1:thm:infinite-set-minus-finite-set-is-infinite},
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} \geq \aleph_{0}              \\
+      \by{\Cref{an1:thm:well-ordering-property}} \Downarrow       \\
+      \forall n \in \N, \exists f(n) \in X_{n}, f(n) = \min X_{n} \\
+    \end{array}
+  \]
+  Therefore, $f$ is well-defined.
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $n_{1}, n_{2} \in \N$
+            \item $n_{1} \neq n_{2}$ (\emph{WLOG} $n_{1} < n_{2}$)
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              X_{n_{2}} \subseteq X_{n_{1}} \setminus \set*{f(n_{1})} \\
+              \Downarrow                                              \\
+              f(n_{2}) \neq f(n_{1})
+            \end{array}
+          \]
+    \item \textbf{Surjectivity}: Suppose $x \in X$. Define
+          \[
+            S \coloneqq \setbuilder*{n \in X}{n < x} \subseteq [1, x - 1]_{\N}
+          \]
+          By \cref{an1:lem:subset-of-Nn-is-finite},
+          \[
+            \begin{array}{c}
+              \abs*{S} < \aleph_{0} \\
+              \Downarrow            \\
+              \exists k \in [0, \infty)_{\N}, \abs*{S} = k
+            \end{array}
+          \]
+          \begin{itemize}
+            \item If $k = 0$, then
+                  \begin{itemize}
+                    \item $S = \vnot$
+                    \item $x = \min X_{1} = f(1)$
+                  \end{itemize}
+            \item Otherwise, let
+                  \begin{itemize}
+                    \item $S = \set*{s_{1}, s_{2}, \dots, s_{k}}$
+                    \item $s_{1} < s_{2} < \dots < s_{k}$
+                  \end{itemize}
+                  Then
+                  \[
+                    \begin{array}{c@{\quad\quad}c}
+                      \min X_{1} = \min S
+                       & X_{2} = X \setminus \set*{s_{1}}                                          \\
+                      \min X_{2} = \min S \setminus \set*{s_{1}}
+                       & X_{3} = X \setminus \set*{s_{1}, s_{2}}                                   \\
+                      \vdots
+                       & \vdots                                                                    \\
+                      \min X_{k} = \min S \setminus \set*{s_{1}, s_{2}, \dots, s_{k - 1}}
+                       & X_{k + 1} = X \setminus \set*{s_{1}, s_{2}, \dots, s_{k}} = X \setminus S
+                    \end{array}
+                  \]
+                  Therefore,
+                  \[
+                    \begin{array}{c}
+                      \forall n \in X_{k + 1}, n \geq x \\
+                      \Downarrow                        \\
+                      x = \min X_{k + 1}                \\
+                      \Downarrow                        \\
+                      f(k + 1) = x
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      f: \N \xrightarrow{\sim} X \\
+      \Downarrow                 \\
+      \abs*{X} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}

@@ -1,0 +1,30 @@
+schema_version: 1
+sections:
+- slug: convergent-sequences
+  title: Convergent Sequences
+- slug: subsequences
+  title: Subsequences
+- slug: cauchy-sequences
+  title: Cauchy Sequences
+- slug: upper-and-lower-limits
+  title: Upper and Lower Limits
+- slug: some-special-sequences
+  title: Some Special Sequences
+- slug: series
+  title: Series
+- slug: series-of-nonnegative-terms
+  title: Series of Nonnegative Terms
+- slug: the-number-e
+  title: The Number \texorpdfstring{$\bm{e}$}{e}
+- slug: the-root-and-ratio-tests
+  title: The Root and Ratio Tests
+- slug: power-series
+  title: Power Series
+- slug: summation-by-parts
+  title: Summation by Parts
+- slug: absolute-convergence
+  title: Absolute Convergence
+- slug: addition-and-multiplication-of-series
+  title: Addition and Multiplication of Series
+- slug: rearrangements
+  title: Rearrangements

@@ -1,0 +1,286 @@
+\begin{theorem} \label{an1:thm:bijection-equivalence-relation}
+  Define $\sim$ by
+  \[
+    \forall X \forall Y, X \sim Y \iff \exists f: X \xrightarrow{\sim} Y
+  \]
+  Then $\sim$ is an equivalence relation.
+\end{theorem}
+
+\begin{proof}
+  By \cref{an1:def:equivalence-relation},
+  \begin{itemize}
+    \item \textbf{Reflexivity}: Define $f: X \to X$ by
+          \[
+            \forall x \in X, f(x) \coloneqq x
+          \]
+          Then
+          \begin{itemize}
+            \item \textbf{Injectivity}: Suppose
+                  \begin{itemize}
+                    \item $x_{1}, x_{2} \in X$
+                    \item $f(x_{1}) = f(x_{2})$
+                  \end{itemize}
+                  Then
+                  \[
+                    x_{1} = x_{2}
+                  \]
+            \item \textbf{Surjectivity}: Suppose $y \in X$. Then
+                  \[
+                    f(y) = y
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            \begin{array}{c}
+              f: X \xrightarrow{\sim} X \\
+              \Downarrow                \\
+              X \sim X
+            \end{array}
+          \]
+    \item \textbf{Symmetry}: Suppose $X \sim Y$. Then
+          \[
+            \begin{array}{c}
+              \exists f: X \xrightarrow{\sim} Y                            \\
+              \by{\Cref{an1:thm:inverse-function-is-bijective}} \Downarrow \\
+              f^{-1}: Y \xrightarrow{\sim} X                               \\
+              \Downarrow                                                   \\
+              Y \sim X
+            \end{array}
+          \]
+    \item \textbf{Transitivity}: Suppose
+          \begin{itemize}
+            \item $X \sim Y$
+            \item $Y \sim Z$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item $\exists f: X \xrightarrow{\sim} Y$
+            \item $\exists g: Y \xrightarrow{\sim} Z$
+          \end{itemize}
+          By \cref{an1:thm:properties-of-composition-functions},
+          \[
+            \begin{array}{c}
+              g \circ f: X \xrightarrow{\sim} Z \\
+              \Downarrow                        \\
+              X \sim Z
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{remark}
+  Since there is no \textbf{set of all sets} in the underlying set theory, the relation defined in
+  \cref{an1:thm:bijection-equivalence-relation} is a \textbf{proper-class} relation rather than a set.
+  Its restriction to any set $S$ becomes an equivalence relation on $S$.
+\end{remark}
+
+\begin{definition} \label{an1:def:finite-sets}
+  Recall the relation $\sim$ defined in \cref{an1:thm:bijection-equivalence-relation}.
+  A set $X$ is said to be \textbf{finite} if
+  \[
+    \exists n \in [0, \infty)_{\N}, [1, n]_{\N} \sim X
+  \]
+  Such an $n$ is called a \textbf{cardinality} of $X$, and is denoted by
+  \[
+    \abs*{X} = n
+  \]
+  The notation $\abs*{X} < \aleph_{0}$ denotes that $X$ is finite.
+\end{definition}
+
+\begin{definition} \label{an1:def:infinite-countable-uncountable-sets}
+  A set $X$ is said to be
+  \begin{itemize}
+    \item \textbf{infinite} if $\neg\paren*{\abs*{X} < \aleph_{0}}$
+    \item \textbf{countable} if $\N \sim X$
+    \item \textbf{at most countable} if $\abs*{X} < \aleph_{0} \lor \N \sim X$
+    \item \textbf{uncountable} if $\neg\paren*{\abs*{X} < \aleph_{0} \lor \N \sim X}$
+  \end{itemize}
+  The notation
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$ denotes that $X$ is infinite
+    \item $\abs*{X} = \aleph_{0}$ denotes that $X$ is countable
+    \item $\abs*{X} \leq \aleph_{0}$ denotes that $X$ is at most countable
+    \item $\abs*{X} > \aleph_{0}$ denotes that $X$ is uncountable
+  \end{itemize}
+  The order symbols above are not \textbf{total orders}; they are just convenient notations.
+\end{definition}
+
+\begin{lemma} \label{an1:lem:subset-of-Nn-is-finite}
+  \[
+    \forall n \in [0, \infty)_{\N}, \forall A \subseteq [1, n]_{\N}, \abs*{A} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n) \iff \forall A \subseteq [1, n]_{\N}, \abs*{A} < \aleph_{0}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:} Define $f: [1, 0]_{\N} \to [1, 0]_{\N}$ by
+          \[
+            \forall k \in [1, 0]_{\N}, f(k) \coloneqq k
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              [1, 0]_{\N} = \vnot                           \\
+              \Downarrow                                    \\
+              f: [1, 0]_{\N} \xrightarrow{\sim} [1, 0]_{\N} \\
+              \Downarrow                                    \\
+              \abs*{[1, 0]_{\N}} < \aleph_{0}
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              \forall A \subseteq [1, 0]_{\N}, A = [1, 0]_{\N}       \\
+              \Downarrow                                             \\
+              \forall A \subseteq [1, 0]_{\N}, \abs*{A} < \aleph_{0} \\
+              \Downarrow                                             \\
+              P(0)
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose
+          \begin{itemize}
+            \item $P(n)$
+            \item $A \subseteq [1, n + 1]_{\N}$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item If $n + 1 \notin A$, then
+                  \[
+                    \begin{array}{c}
+                      A \subseteq [1, n]_{\N}           \\
+                      \by{\ensuremath{P(n)}} \Downarrow \\
+                      \abs*{A} < \aleph_{0}             \\
+                    \end{array}
+                  \]
+            \item Otherwise, define
+                  \[
+                    B \coloneqq A \setminus \set*{n + 1} \subseteq [1, n]_{\N}
+                  \]
+                  Since $P(n)$,
+                  \[
+                    \begin{array}{c}
+                      \abs*{B} < \aleph_{0} \\
+                      \Downarrow            \\
+                      \exists m \in [0, \infty)_{\N}, \exists f: [1, m]_{\N} \xrightarrow{\sim} B
+                    \end{array}
+                  \]
+                  Define $g: [1, m + 1]_{\N} \to A$ by
+                  \[
+                    \forall k \in [1, m + 1]_{\N}, g(k) \coloneqq \begin{dcases}
+                      n + 1, & \text{if } k = m + 1 \\
+                      f(k),  & \text{otherwise}
+                    \end{dcases}
+                  \]
+                  Then
+                  \begin{itemize}
+                    \item \textbf{Injectivity}: Suppose
+                          \begin{itemize}
+                            \item $k_{1}, k_{2} \in [1, m + 1]_{\N}$
+                            \item $g(k_{1}) = g(k_{2})$
+                          \end{itemize}
+                          Then
+                          \begin{itemize}
+                            \item If $k_{1} = m + 1$, then
+                                  \[
+                                    \begin{array}{c}
+                                      g(k_{1}) = n + 1                            \\
+                                      \Downarrow                                  \\
+                                      g(k_{2}) = n + 1                            \\
+                                      \by{\ensuremath{n + 1 \notin B}} \Downarrow \\
+                                      k_{2} = m + 1
+                                    \end{array}
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    \begin{array}{c}
+                                      k_{1} \in [1, m]_{\N}                                            \\
+                                      \Downarrow                                                       \\
+                                      g(k_{1}) = f(k_{1})                                              \\
+                                      \Downarrow                                                       \\
+                                      g(k_{2}) = f(k_{1})                                              \\
+                                      \by{\ensuremath{f(k_{1}) \neq n + 1}} \Downarrow                 \\
+                                      g(k_{2}) = f(k_{2}) = f(k_{1})                                   \\
+                                      \by{\ensuremath{f: [1, m]_{\N} \xrightarrow{\sim} B}} \Downarrow \\
+                                      k_{1} = k_{2}
+                                    \end{array}
+                                  \]
+                          \end{itemize}
+                    \item \textbf{Surjectivity}: Suppose $a \in A$.
+                          \begin{itemize}
+                            \item If $a = n + 1$, then
+                                  \[
+                                    g(m + 1) = a
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    \begin{array}{c}
+                                      a \in B                                                          \\
+                                      \by{\ensuremath{f: [1, m]_{\N} \xrightarrow{\sim} B}} \Downarrow \\
+                                      \exists k \in [1, m]_{\N}, f(k) = a                              \\
+                                      \Downarrow                                                       \\
+                                      g(k) = f(k) = a
+                                    \end{array}
+                                  \]
+                          \end{itemize}
+                  \end{itemize}
+                  Therefore,
+                  \[
+                    \begin{array}{c}
+                      g: [1, m + 1]_{\N} \xrightarrow{\sim} A \\
+                      \Downarrow                              \\
+                      \abs*{A} < \aleph_{0}                   \\
+                    \end{array}
+                  \]
+          \end{itemize}
+          Therefore, $P(n + 1)$.
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n)
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:subset-of-finite-set-is-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land Y \subseteq X \implies \abs*{Y} < \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $Y \subseteq X$
+  \end{itemize}
+  Then
+  \[
+    \exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \xrightarrow{\sim} X
+  \]
+  Define
+  \[
+    Z \coloneqq f^{-1}(Y) \subseteq [1, n]_{\N}
+  \]
+  By \cref{an1:lem:subset-of-Nn-is-finite},
+  \[
+    \abs*{Z} < \aleph_{0}
+  \]
+  By \cref{an1:thm:properties-of-restriction-functions},
+  \[
+    \begin{array}{c}
+      f|_{Z}^{Y}: Z \xrightarrow{\sim} Y                            \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow \\
+      \abs*{Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:infinite-subset-implies-infinite}
+  \[
+    \forall X \forall Y, \abs*{Y} \geq \aleph_{0} \land Y \subseteq X \implies \abs*{X} \geq \aleph_{0}
+  \]
+\end{corollary}

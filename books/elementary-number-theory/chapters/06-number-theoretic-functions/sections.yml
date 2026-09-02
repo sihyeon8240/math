@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: the-sum-and-number-of-divisors
+  title: The Sum and Number of Divisors
+- slug: the-mobius-inversion-formula
+  title: The M\"obius Inversion Formula
+- slug: the-greatest-integer-function
+  title: The Greatest Integer Function
+- slug: an-application-to-the-calendar
+  title: An Application to the Calendar

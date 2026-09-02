@@ -1,0 +1,40 @@
+% Generated from books.yml, chapters.yml, and common/templates/book.tex; do not edit.
+\documentclass[11pt, a4paper, oneside]{book}
+
+\usepackage{textbook}
+\IfFileExists{local-style.sty}{\usepackage{local-style}}{}
+\addbibresource{references.bib}
+% BEGIN GENERATED METADATA
+\newcommand{\name}{MUHO CHOI}
+\newcommand{\displaytitle}{Mathematical Analysis II}
+\newcommand{\version}{0.1.0}
+\newcommand{\slug}{mathematical-analysis-2}
+\title{\displaytitle}
+\author{\name}
+\hypersetup{pdftitle={\displaytitle},pdfauthor={\name}}
+% END GENERATED METADATA
+
+\begin{document}
+
+\frontmatter
+\InputIfFileExists{frontmatter/title-and-copyright.tex}{}{\input{title-and-copyright}}
+\tableofcontents
+\InputIfFileExists{frontmatter/preface.tex}{}{\input{preface}}
+
+\mainmatter
+% BEGIN GENERATED CHAPTERS
+\include{chapters/01-sequences-and-series-of-functions/index}
+\include{chapters/02-some-special-functions/index}
+\include{chapters/03-functions-of-several-variables/index}
+\include{chapters/04-integration-of-differential-forms/index}
+\include{chapters/05-the-lebesgue-theory/index}
+% END GENERATED CHAPTERS
+
+\backmatter
+% BEGIN GENERATED APPENDICES
+% END GENERATED APPENDICES
+
+\nocite{*}
+\printbibliography
+
+\end{document}

@@ -1,0 +1,16 @@
+schema_version: 1
+sections:
+- slug: limits-of-functions
+  title: Limits of Functions
+- slug: continuous-functions
+  title: Continuous Functions
+- slug: continuity-and-compactness
+  title: Continuity and Compactness
+- slug: continuity-and-connectedness
+  title: Continuity and Connectedness
+- slug: discontinuities
+  title: Discontinuities
+- slug: monotonic-functions
+  title: Monotonic Functions
+- slug: infinite-limits-and-limits-at-infinity
+  title: Infinite Limits and Limits at Infinity

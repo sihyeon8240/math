@@ -1,0 +1,309 @@
+\begin{proof}
+  Suppose $n, m \in [0, \infty)_{\N}$. Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Define
+          \[
+            \forall n \in [0, \infty)_{\N}, P(n) \iff \forall m \in [0, \infty)_{\N}, \paren*{\exists f_{n}:
+              [1, n]_{\N} \hookrightarrow [1, m]_{\N}} \implies n \leq m
+          \]
+          Then
+          \begin{itemize}
+            \item \textbf{Base case:}
+                  \[
+                    \begin{array}{c}
+                      \forall m \in [0, \infty)_{\N}, 0 \leq m \\
+                      \Downarrow                               \\
+                      P(0)
+                    \end{array}
+                  \]
+            \item \textbf{Inductive step:} Suppose
+                  \begin{itemize}
+                    \item $P(n)$
+                    \item $\exists f_{n + 1}: [1, n + 1]_{\N} \hookrightarrow [1, m]_{\N}$
+                  \end{itemize}
+                  Then $m \geq 1$. Let
+                  \[
+                    f_{n + 1}(n + 1) = x \in [1, m]_{\N}
+                  \]
+                  Define $g_{m}: [1, m]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall y \in [1, m]_{\N}, g_{m}(y) \coloneqq \begin{dcases}
+                      x, & \text{if } y = m \\
+                      m, & \text{if } y = x \\
+                      y, & \text{otherwise}
+                    \end{dcases}
+                  \]
+                  Then
+                  \begin{itemize}
+                    \item \textbf{Injectivity}: Suppose
+                          \begin{itemize}
+                            \item $y_{1}, y_{2} \in [1, m]_{\N}$
+                            \item $g_{m}(y_{1}) = g_{m}(y_{2})$
+                          \end{itemize}
+                          Then
+                          \begin{itemize}
+                            \item If $y_{1} = m$, then
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m}(y_{1}) = x \\
+                                      \Downarrow       \\
+                                      g_{m}(y_{2}) = x \\
+                                      \Downarrow       \\
+                                      y_{2} = m
+                                    \end{array}
+                                  \]
+                            \item If $y_{1} = x$, then
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m}(y_{1}) = m \\
+                                      \Downarrow       \\
+                                      g_{m}(y_{2}) = m \\
+                                      \Downarrow       \\
+                                      y_{2} = x
+                                    \end{array}
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m}(y_{1}) = y_{1}                                         \\
+                                      \Downarrow                                                   \\
+                                      g_{m}(y_{2}) = y_{1}                                         \\
+                                      \by{\ensuremath{y_{1} \neq m \land y_{1} \neq x}} \Downarrow \\
+                                      g_{m}(y_{2}) = y_{2}                                         \\
+                                      \Downarrow                                                   \\
+                                      y_{2} = y_{1}
+                                    \end{array}
+                                  \]
+                          \end{itemize}
+                    \item \textbf{Surjectivity}: Suppose $k \in [1, m]_{\N}$. Then
+                          \begin{itemize}
+                            \item If $k = m$, then
+                                  \[
+                                    g_{m}(x) = k
+                                  \]
+                            \item If $k = x$, then
+                                  \[
+                                    g_{m}(m) = k
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    g_{m}(k) = k
+                                  \]
+                          \end{itemize}
+                  \end{itemize}
+                  Therefore,
+                  \[
+                    g_{m}: [1, m]_{\N} \xrightarrow{\sim} [1, m]_{\N}
+                  \]
+                  Also,
+                  \begin{itemize}
+                    \item $g_{m} \circ f_{n + 1}(n + 1) = m$
+                    \item $(g_{m} \circ f_{n + 1})\paren*{[1, n]_{\N}} \subseteq [1, m - 1]_{\N}$
+                  \end{itemize}
+                  Define $f_{n}: [1, n]_{\N} \to [1, m - 1]_{\N}$ by
+                  \[
+                    f_{n} \equiv (g_{m} \circ f_{n + 1})|_{[1, n]_{\N}}^{[1, m - 1]_{\N}}
+                  \]
+                  By \cref{an1:thm:properties-of-composition-functions,an1:thm:properties-of-restriction-functions},
+                  \[
+                    \begin{array}{c}
+                      f_{n}: [1, n]_{\N} \hookrightarrow [1, m - 1]_{\N} \\
+                      \by{\ensuremath{P(n)}} \Downarrow                  \\
+                      n \leq m - 1                                       \\
+                      \Downarrow                                         \\
+                      n + 1 \leq m                                       \\
+                    \end{array}
+                  \]
+                  Therefore, $P(n + 1)$.
+          \end{itemize}
+          By \cref{an1:thm:mathematical-induction},
+          \[
+            \forall n \in [0, \infty)_{\N}, P(n)
+          \]
+    \item Define
+          \[
+            \begin{gathered}
+              \forall m \in [0, \infty)_{\N}, Q(m) \iff \forall n \in [0, \infty)_{\N}, \\ \paren*{\exists
+                f_{m}: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}} \implies n \geq m \geq 1 \lor n = m = 0
+            \end{gathered}
+          \]
+          Then
+          \begin{itemize}
+            \item \textbf{Base case:}
+                  \begin{itemize}
+                    \item \textbf{($m = 0$)} Suppose $n \in [0, \infty)_{\N}$.
+                          \[
+                            \begin{array}{c}
+                              \neg(m \geq 1) \\
+                              \Downarrow     \\
+                              n \geq m \geq 1 \lor n = m = 0 \iff n = m = 0 \iff n = 0
+                            \end{array}
+                          \]
+                          Then
+                          \[
+                            \begin{array}{c}
+                              n \neq 0 \implies \nexists f_{m}: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \\
+                              \Downarrow                                                                   \\
+                              Q(0)
+                            \end{array}
+                          \]
+                    \item \textbf{($m = 1$)} Suppose $n \in [0, \infty)_{\N}$.
+                          \[
+                            \begin{array}{c}
+                              \neg(m = 0) \\
+                              \Downarrow  \\
+                              n \geq m \geq 1 \lor n = m = 0 \iff n \geq m \geq 1 \iff n \geq 1
+                            \end{array}
+                          \]
+                          Then
+                          \[
+                            \begin{array}{c}
+                              n < 1 \implies \nexists f_{m}: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \\
+                              \Downarrow                                                                \\
+                              Q(1)
+                            \end{array}
+                          \]
+                  \end{itemize}
+            \item \textbf{Inductive step:} Let $m \geq 1$. Suppose
+                  \begin{itemize}
+                    \item $Q(m)$
+                    \item $\exists f_{m + 1}: [1, n]_{\N} \twoheadrightarrow [1, m + 1]_{\N}$
+                  \end{itemize}
+                  Then $n \geq 1$. Let
+                  \[
+                    f_{m + 1}(n) = x \in [1, m + 1]_{\N}
+                  \]
+                  Define $g_{m + 1}: [1, m + 1]_{\N} \to [1, m + 1]_{\N}$ by
+                  \[
+                    \forall y \in [1, m + 1]_{\N}, g_{m + 1}(y) \coloneqq \begin{dcases}
+                      x,     & \text{if } y = m + 1 \\
+                      m + 1, & \text{if } y = x     \\
+                      y,     & \text{otherwise}
+                    \end{dcases}
+                  \]
+                  Then
+                  \begin{itemize}
+                    \item \textbf{Injectivity}: Suppose
+                          \begin{itemize}
+                            \item $y_{1}, y_{2} \in [1, m + 1]_{\N}$
+                            \item $g_{m + 1}(y_{1}) = g_{m + 1}(y_{2})$
+                          \end{itemize}
+                          Then
+                          \begin{itemize}
+                            \item If $y_{1} = m + 1$, then
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m + 1}(y_{1}) = x \\
+                                      \Downarrow           \\
+                                      g_{m + 1}(y_{2}) = x \\
+                                      \Downarrow           \\
+                                      y_{2} = m + 1
+                                    \end{array}
+                                  \]
+                            \item If $y_{1} = x$, then
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m + 1}(y_{1}) = m + 1 \\
+                                      \Downarrow               \\
+                                      g_{m + 1}(y_{2}) = m + 1 \\
+                                      \Downarrow               \\
+                                      y_{2} = x
+                                    \end{array}
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    \begin{array}{c}
+                                      g_{m + 1}(y_{1}) = y_{1}                                         \\
+                                      \Downarrow                                                       \\
+                                      g_{m + 1}(y_{2}) = y_{1}                                         \\
+                                      \by{\ensuremath{y_{1} \neq m + 1 \land y_{1} \neq x}} \Downarrow \\
+                                      g_{m + 1}(y_{2}) = y_{2}                                         \\
+                                      \Downarrow                                                       \\
+                                      y_{2} = y_{1}
+                                    \end{array}
+                                  \]
+                          \end{itemize}
+                    \item \textbf{Surjectivity}: Suppose $k \in [1, m + 1]_{\N}$. Then
+                          \begin{itemize}
+                            \item If $k = m + 1$, then
+                                  \[
+                                    g_{m + 1}(x) = k
+                                  \]
+                            \item If $k = x$, then
+                                  \[
+                                    g_{m + 1}(m + 1) = k
+                                  \]
+                            \item Otherwise,
+                                  \[
+                                    g_{m + 1}(k) = k
+                                  \]
+                          \end{itemize}
+                  \end{itemize}
+                  Therefore,
+                  \[
+                    g_{m + 1}: [1, m + 1]_{\N} \xrightarrow{\sim} [1, m + 1]_{\N}
+                  \]
+                  Also,
+                  \[
+                    \paren*{g_{m + 1} \circ f_{m + 1}}(n) = m + 1
+                  \]
+                  Define
+                  \[
+                    K_{m + 1} \coloneqq (g_{m + 1} \circ f_{m + 1})^{-1}(\set*{m + 1}) \subseteq [1, n]_{\N}
+                  \]
+                  Then
+                  \[
+                    (g_{m + 1} \circ f_{m + 1})\paren*{[1, n - 1]_{\N} \setminus K_{m + 1}} = [1, m]_{\N}
+                  \]
+                  Define $f_{m}: [1, n - 1]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall y \in [1, n - 1]_{\N}, f_{m}(y) \coloneqq \begin{dcases}
+                      m,                              & \text{if } y \in K_{m + 1} \\
+                      (g_{m + 1} \circ f_{m + 1})(y), & \text{otherwise}
+                    \end{dcases}
+                  \]
+                  By \cref{an1:thm:properties-of-composition-functions,an1:thm:properties-of-restriction-functions},
+                  \[
+                    \begin{array}{c}
+                      \paren*{g_{m + 1} \circ f_{m + 1}}|_{[1, n - 1]_{\N} \setminus K_{m + 1}}^{[1, m]_{\N}}:
+                      [1, n - 1]_{\N} \setminus K_{m + 1} \twoheadrightarrow [1, m]_{\N} \\
+                      \Downarrow                                                         \\
+                      f_{m}: [1, n - 1]_{\N} \twoheadrightarrow [1, m]_{\N}              \\
+                      \by{\ensuremath{Q(m)}} \Downarrow                                  \\
+                      n - 1 \geq m                                                       \\
+                      \Downarrow                                                         \\
+                      n \geq m + 1 \geq 1                                                \\
+                    \end{array}
+                  \]
+                  Therefore, $Q(m + 1)$.
+          \end{itemize}
+          By \cref{an1:thm:mathematical-induction},
+          \[
+            \forall m \in [0, \infty)_{\N}, Q(m)
+          \]
+    \item follows from \textbf{(A)} and \textbf{(B)}.
+  \end{enumerate}
+\end{proof}
+
+\begin{corollary} \label{an1:cor:cardinality-is-unique}
+  \[
+    \forall X, \abs*{X} < \aleph_{0} \implies \exists! n \in [0, \infty)_{\N}, \abs*{X} = n
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose $\abs*{X} < \aleph_{0}$. Then
+  \[
+    \exists n \in [0, \infty)_{\N}, \abs*{X} = n
+  \]
+  Suppose $\abs*{X} = m \in [0, \infty)_{\N}$. Then
+  \[
+    \begin{array}{c}
+      [1, n]_{\N} \sim X \land [1, m]_{\N} \sim X                   \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow \\
+      \bracket*{1, n}_{\N} \sim [1, m]_{\N}                         \\
+      \by{\Cref{an1:lem:properties-of-Nm-Nn}} \Downarrow            \\
+      n = m
+    \end{array}
+  \]
+\end{proof}

@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: eulers-criterion
+  title: Euler's Criterion
+- slug: the-legendre-symbol-and-its-properties
+  title: The Legendre Symbol and Its Properties
+- slug: quadratic-reciprocity
+  title: Quadratic Reciprocity
+- slug: quadratic-congruences-with-composite-moduli
+  title: Quadratic Congruences with Composite Moduli

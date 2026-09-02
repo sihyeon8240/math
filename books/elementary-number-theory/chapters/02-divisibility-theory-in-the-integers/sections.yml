@@ -1,0 +1,12 @@
+schema_version: 1
+sections:
+- slug: early-number-theory
+  title: Early Number Theory
+- slug: the-division-algorithm
+  title: The Division Algorithm
+- slug: the-greatest-common-divisor
+  title: The Greatest Common Divisor
+- slug: the-euclidean-algorithm
+  title: The Euclidean Algorithm
+- slug: the-diophantine-equation-ax-plus-by-equals-c
+  title: The Diophantine Equation \texorpdfstring{$\bm{ax + by = c}$}{ax + by = c}

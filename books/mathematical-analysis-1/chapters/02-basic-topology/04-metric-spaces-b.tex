@@ -1,0 +1,278 @@
+\begin{proof}
+  \textbf{($\implies$)} Suppose
+  \begin{itemize}
+    \item $E \in \mathcal{O}(X)$
+    \item $p \in \paren*{E^{c}}'$
+  \end{itemize}
+  Assume $p \in E$. Then
+  \[
+    \begin{array}{c}
+      \exists \veps \in \R^{+}, N_{\veps}(p) \subseteq E \\
+      \Downarrow                                         \\
+      E^{c} \cap \widetilde{N}_{\veps}(p) = \vnot        \\
+      \Downarrow                                         \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    p \in E^{c}
+  \]
+  Since $p \in \paren*{E^{c}}'$ was arbitrary,
+  \[
+    \begin{array}{c}
+      \paren*{E^{c}}' \subseteq E^{c} \\
+      \Downarrow                      \\
+      E^{c} \in \mathcal{C}(X)
+    \end{array}
+  \]
+  \textbf{($\impliedby$)} Suppose
+  \begin{itemize}
+    \item $E^{c} \in \mathcal{C}(X)$
+    \item $p \in E$
+  \end{itemize}
+  Assume
+  \[
+    \nexists r \in \R^{+}, N_{r}(p) \subseteq E,
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      p \notin E^{c}                                                   \\
+      \Downarrow                                                       \\
+      \forall r \in \R^{+}, E^{c} \cap \widetilde{N}_{r}(p) \neq \vnot \\
+      \Downarrow                                                       \\
+      p \in \paren*{E^{c}}'                                            \\
+      \by{\ensuremath{E^{c} \in \mathcal{C}(X)}}\Downarrow             \\
+      p \in E^{c}                                                      \\
+      \Downarrow                                                       \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \exists r \in \R^{+}, N_{r}(p) \subseteq E \\
+      \Downarrow                                 \\
+      p \in E^{\circ}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:arbitrary-union-of-open-sets-is-open}
+  \[
+    \forall \set*{E_{y}}_{y \in Y} \subseteq \mathcal{O}(\abs*{(X, d)}), \bigcup_{y \in Y} E_{y} \in \mathcal{O}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\set*{E_{y}}_{y \in Y} \subseteq \mathcal{O}(X)$
+    \item $p \in \bigcup_{y \in Y} E_{y}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists y_{0} \in Y, p \in E_{y_{0}}               \\
+      \Downarrow                                         \\
+      \exists r \in \R^{+}, N_{r}(p) \subseteq E_{y_{0}} \\
+      \Downarrow                                         \\
+      N_{r}(p) \subseteq \bigcup_{y \in Y} E_{y}         \\
+      \Downarrow                                         \\
+      p \in \paren*{\bigcup_{y \in Y} E_{y}}^{\circ}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:arbitrary-intersection-of-closed-sets-is-closed}
+  \[
+    \forall \set*{E_{y}}_{y \in Y} \subseteq \mathcal{C}(\abs*{(X, d)}), \bigcap_{y \in Y} E_{y} \in \mathcal{C}(X)
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose $\set*{E_{y}}_{y \in Y} \subseteq \mathcal{C}(X)$. By \cref{an1:thm:complement-of-open-set-is-closed},
+  \[
+    \begin{array}{c}
+      \forall y \in Y, (E_{y})^{c} \in \mathcal{O}(X)                     \\
+      \by{\Cref{an1:thm:arbitrary-union-of-open-sets-is-open}} \Downarrow \\
+      \bigcup_{y \in Y} (E_{y})^{c} \in \mathcal{O}(X)                    \\
+      \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow     \\
+      \bigcap_{y \in Y} E_{y} = \paren*{\bigcup_{y \in Y} (E_{y})^{c}}^{c} \in \mathcal{C}(X)
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:finite-intersection-of-open-sets-is-open}
+  \[
+    \forall n \in \N, \forall \set*{E_{k}}_{k = 1}^{n} \subseteq \mathcal{O}(\abs*{(X, d)}),
+    \bigcap_{k = 1}^{n} E_{k} \in \mathcal{O}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $\set*{E_{k}}_{k = 1}^{n} \subseteq \mathcal{O}(X)$
+    \item $p \in \bigcap_{k = 1}^{n} E_{k}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \forall j \in [1, n]_{\N}, p \in E_{j} \\
+      \Downarrow                             \\
+      \forall j \in [1, n]_{\N}, \exists r_{j} \in \R^{+}, N_{r_{j}}(p) \subseteq E_{j}
+    \end{array}
+  \]
+  Define
+  \[
+    R \coloneqq \setbuilder*{r_{j}}{j \in [1, n]_{\N}} \subseteq \R^{+}
+  \]
+  Define $f: [1, n]_{\N} \to R$ by
+  \[
+    \forall j \in [1, n]_{\N}, f(j) \coloneqq r_{j}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall \veps \in R, \exists j \in [1, n]_{\N}, \veps = r_{j}                                           \\
+      \Downarrow                                                                                              \\
+      f: [1, n]_{\N} \twoheadrightarrow R                                                                     \\
+      \by{\Cref{an1:lem:subset-of-Nn-is-finite,an1:thm:surjection-from-finite-set-implies-finite}} \Downarrow \\
+      \abs*{R} < \aleph_{0}                                                                                   \\
+      \by{\Cref{an1:thm:finite-ordered-set-has-extremum}} \Downarrow                                          \\
+      \exists r \in \R^{+}, r = \min R                                                                        \\
+      \Downarrow                                                                                              \\
+      \forall j \in [1, n]_{\N}, N_{r}(p) \subseteq E_{j}                                                     \\
+      \Downarrow                                                                                              \\
+      N_{r}(p) \subseteq \bigcap_{k = 1}^{n} E_{k}                                                            \\
+      \Downarrow                                                                                              \\
+      p \in \paren*{\bigcap_{k = 1}^{n} E_{k}}^{\circ}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:finite-union-of-closed-sets-is-closed}
+  \[
+    \forall n \in \N, \forall \set*{E_{k}}_{k = 1}^{n} \subseteq \mathcal{C}(\abs*{(X, d)}),
+    \bigcup_{k = 1}^{n} E_{k} \in \mathcal{C}(X)
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $\set*{E_{k}}_{k = 1}^{n} \subseteq \mathcal{C}(X)$
+  \end{itemize}
+  By \cref{an1:thm:complement-of-open-set-is-closed},
+  \[
+    \begin{array}{c}
+      \forall k \in [1, n]_{\N}, (E_{k})^{c} \in \mathcal{O}(X)               \\
+      \by{\Cref{an1:thm:finite-intersection-of-open-sets-is-open}} \Downarrow \\
+      \bigcap_{k = 1}^{n} (E_{k})^{c} \in \mathcal{O}(X)                      \\
+      \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow         \\
+      \bigcup_{k = 1}^{n} E_{k} = \paren*{\bigcap_{k = 1}^{n} (E_{k})^{c}}^{c} \in \mathcal{C}(X)
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:properties-of-closure}
+  Suppose $E \subseteq \abs*{(X, d)}$. Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\overline{E} \in \mathcal{C}(X)$
+    \item $E = \overline{E} \iff E \in \mathcal{C}(X)$
+    \item $\forall F \in \mathcal{C}(X), E \subseteq F \implies \overline{E} \subseteq F$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose $p \in \paren*{\overline{E}}^{c}$. Then
+          \[
+            \begin{array}{c}
+              p \notin E'                                               \\
+              \Downarrow                                                \\
+              \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(p) = \vnot \\
+              \by{\ensuremath{p \notin E}} \Downarrow                   \\
+              E \cap N_{r}(p) = \vnot                                   \\
+              \Downarrow                                                \\
+              N_{r}(p) \subseteq E^{c}
+            \end{array}
+          \]
+          Suppose $q \in N_{r}(p)$. By \cref{an1:thm:neighborhood-is-open},
+          \[
+            \begin{array}{c}
+              \exists \veps \in \R^{+}, N_{\veps}(q) \subseteq N_{r}(p) \\
+              \Downarrow                                                \\
+              E \cap N_{\veps}(q) = \vnot                               \\
+              \Downarrow                                                \\
+              E \cap \widetilde{N}_{\veps}(q) = \vnot                   \\
+              \Downarrow                                                \\
+              q \notin E'
+            \end{array}
+          \]
+          Since $q \in N_{r}(p)$ was arbitrary,
+          \[
+            \begin{array}{c}
+              N_{r}(p) \subseteq \paren*{E'}^{c}                    \\
+              \by{\ensuremath{N_{r}(p) \subseteq E^{c}}} \Downarrow \\
+              N_{r}(p) \subseteq \paren*{\overline{E}}^{c}          \\
+              \Downarrow                                            \\
+              p \in \paren*{\paren*{\overline{E}}^{c}}^{\circ}
+            \end{array}
+          \]
+          Since $p \in \paren*{\overline{E}}^{c}$ was arbitrary,
+          \[
+            \begin{array}{c}
+              \paren*{\overline{E}}^{c} \in \mathcal{O}(X)                    \\
+              \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow \\
+              \overline{E} \in \mathcal{C}(X)
+            \end{array}
+          \]
+    \item $E \in \mathcal{C}(X) \iff E' \subseteq E \iff E \cup E' = E \iff \overline{E} = E$
+    \item Suppose
+          \begin{itemize}
+            \item $F \in \mathcal{C}(X)$
+            \item $E \subseteq F$
+            \item $p \in E'$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              \forall r \in \R^{+}, E \cap \widetilde{N}_{r}(p) \neq \vnot \\
+              \Downarrow                                                   \\
+              \forall r \in \R^{+}, F \cap \widetilde{N}_{r}(p) \neq \vnot \\
+              \Downarrow                                                   \\
+              p \in F'
+            \end{array}
+          \]
+          Since $p \in E'$ was arbitrary,
+          \[
+            \begin{array}{c}
+              E' \subseteq F'                                   \\
+              \by{\ensuremath{F \in \mathcal{C}(X)}} \Downarrow \\
+              E' \subseteq F                                    \\
+              \Downarrow                                        \\
+              \overline{E} \subseteq F
+            \end{array}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem} \label{an1:thm:supremum-in-closure}
+  Suppose
+  \begin{itemize}
+    \item $E \subseteq \R$
+    \item $E \neq \vnot$
+    \item $E^{u} \neq \vnot$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\exists \alpha \in \overline{E}, \alpha = \sup E$
+    \item $E \in \mathcal{C}(\R) \implies \exists \alpha \in E, \alpha = \sup E$
+  \end{enumerate}
+\end{theorem}

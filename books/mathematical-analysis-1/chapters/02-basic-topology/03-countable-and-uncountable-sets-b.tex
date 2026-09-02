@@ -1,0 +1,281 @@
+\begin{theorem} \label{an1:thm:infinite-subset-of-countable-set-is-countable}
+  \[
+    \forall X \forall Y, Y \subseteq X \land \abs*{Y} \geq \aleph_{0} \land \abs*{X} = \aleph_{0}
+    \implies \abs*{Y} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $Y \subseteq X$
+    \item $\abs*{X} = \aleph_{0}$
+    \item $\abs*{Y} \geq \aleph_{0}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists f: \N \xrightarrow{\sim} X                                 \\
+      \by{\Cref{an1:thm:properties-of-restriction-functions}} \Downarrow \\
+      f|_{f^{-1}(Y)}^{Y}: f^{-1}(Y) \xrightarrow{\sim} Y
+    \end{array}
+  \]
+  Assume $\abs*{f^{-1}(Y)} < \aleph_{0}$. By \cref{an1:thm:bijection-equivalence-relation},
+  \[
+    \begin{array}{c}
+      \abs*{Y} < \aleph_{0} \\
+      \Downarrow            \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{f^{-1}(Y)} \geq \aleph_{0}
+  \]
+  By \cref{an1:lem:infinite-subset-of-N-is-countable},
+  \[
+    \begin{array}{c}
+      \abs*{f^{-1}(Y)} = \aleph_{0}                                 \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow \\
+      \abs*{Y} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:uncountable-subset-implies-uncountable}
+  \[
+    \forall X \forall Y, Y \subseteq X \land \abs*{Y} > \aleph_{0} \implies \abs*{X} > \aleph_{0}
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $Y \subseteq X$
+    \item $\abs*{Y} > \aleph_{0}$
+  \end{itemize}
+  By \cref{an1:cor:infinite-subset-implies-infinite},
+  \[
+    \abs*{X} \geq \aleph_{0}
+  \]
+  Suppose $\abs*{X} = \aleph_{0}$. By \cref{an1:thm:infinite-subset-of-countable-set-is-countable},
+  \[
+    \begin{array}{c}
+      \abs*{Y} = \aleph_{0} \\
+      \Downarrow            \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{X} > \aleph_{0}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:surjection-from-N}
+  \[
+    \forall X, \abs*{X} \geq \aleph_{0} \land \paren*{\exists f: \N \twoheadrightarrow X}
+    \implies \abs*{X} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} \geq \aleph_{0}$
+    \item $\exists f: \N \twoheadrightarrow X$
+  \end{itemize}
+  Define
+  \[
+    \forall k \in X, S_{k} \coloneqq f^{-1}(\set*{k}) \neq \vnot
+  \]
+  By \cref{an1:thm:well-ordering-property},
+  \[
+    \forall k \in X, \exists m_{k} \in S_{k}, m_{k} = \min S_{k}
+  \]
+  Define
+  \[
+    T \coloneqq \setbuilder*{m_{k}}{k \in X} \subseteq \N
+  \]
+  Define $g: T \to X$ by
+  \[
+    g \equiv f|_{T}^{X}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $m_{k_{1}}, m_{k_{2}} \in T$
+            \item $g(m_{k_{1}}) = g(m_{k_{2}})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(m_{k_{1}}) = f(m_{k_{2}}) \\
+              \Downarrow                  \\
+              k_{1} = k_{2}               \\
+              \Downarrow                  \\
+              S_{k_{1}} = S_{k_{2}}       \\
+              \Downarrow                  \\
+              m_{k_{1}} = m_{k_{2}}
+            \end{array}
+          \]
+    \item \textbf{Surjectivity}: Suppose $k \in X$. Then
+          \[
+            g(m_{k}) = k
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      g: T \xrightarrow{\sim} X                                                                                          \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation,an1:thm:injection-from-infinite-set-implies-infinite}} \Downarrow \\
+      \abs*{T} \geq \aleph_{0}                                                                                           \\
+      \by{\Cref{an1:lem:infinite-subset-of-N-is-countable}} \Downarrow                                                   \\
+      \abs*{T} = \aleph_{0}                                                                                              \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow                                                      \\
+      \abs*{X} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:countable-union-of-finite-sets-is-at-most-countable}
+  \[
+    \forall \set*{X_{n}}_{n = 1}^{\infty},
+    \paren*{\forall n \in \N, \abs*{X_{n}} < \aleph_{0}}
+    \implies \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \leq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall n \in \N, \abs*{X_{n}} < \aleph_{0}
+  \]
+  Then
+  \[
+    \forall n \in \N, \exists m_{n} \in [0, \infty)_{\N}, \exists g_{n}: [1, m_{n}]_{\N} \xrightarrow{\sim} X_{n}
+  \]
+  Suppose $\abs*{\bigcup_{n = 1}^{\infty} X_{n}} \geq \aleph_{0}$. Define
+  \begin{itemize}
+    \item $s_{0} \coloneqq 0$
+    \item $\forall n \in \N, s_{n} \coloneqq \sum_{k = 1}^{n} m_{k}$
+  \end{itemize}
+  Then
+  \[
+    \forall n, m \in \N, n \leq m \implies s_{n} \leq s_{m}
+  \]
+  Assume
+  \[
+    \exists N \in \N, \forall n \in \N, s_{n} \leq N
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \set*{s_{n}}_{n = 1}^{\infty} \subseteq [0, N]_{\N}                  \\
+      \by{\Cref{an1:thm:bounded-subset-of-Z-in-Z-has-extremum}} \Downarrow \\
+      \exists n_{0} \in \N, s_{n_{0}} = \max \set*{s_{n}}_{n = 1}^{\infty} \\
+      \Downarrow                                                           \\
+      \forall n \in [n_{0} + 1, \infty)_{\N}, m_{n} = 0                    \\
+      \Downarrow                                                           \\
+      \bigcup_{n = 1}^{\infty} X_{n} = \bigcup_{n = 1}^{n_{0}} X_{n}       \\
+      \by{\Cref{an1:thm:finite-union-of-finite-sets-is-finite}} \Downarrow \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} < \aleph_{0}                   \\
+      \Downarrow                                                           \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \forall N \in \N, \exists n \in \N, s_{n} > N
+  \]
+  First, we will show
+  \[
+    \N = \bigcup_{n = 1}^{\infty} [s_{n - 1} + 1, s_{n}]_{\N}
+  \]
+  \begin{itemize}
+    \item \textbf{($\subseteq$)} Suppose $k \in \N$.  Define
+          \[
+            S_{k} \coloneqq \setbuilder*{n \in \N}{s_{n} > k} \neq \vnot
+          \]
+          By \cref{an1:thm:well-ordering-property},
+          \[
+            \exists n_{k} \in S_{k}, n_{k} = \min S_{k}
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              s_{n_{k} - 1} \leq k < s_{n_{k}} \\
+              \Downarrow                       \\
+              k \in [s_{n_{k} - 1} + 1, s_{n_{k}}]_{\N}
+            \end{array}
+          \]
+    \item \textbf{($\supseteq$)} Suppose $k \in \bigcup_{n = 1}^{\infty} [s_{n - 1} + 1, s_{n}]_{\N}$. Then
+          \[
+            \begin{array}{c}
+              \exists n \in \N, k \in [s_{n - 1} + 1, s_{n}]_{\N} \\
+              \Downarrow                                          \\
+              k \in \N
+            \end{array}
+          \]
+  \end{itemize}
+  Next, we will show
+  \[
+    \forall i, j \in \N, i \neq j \implies [s_{i - 1} + 1, s_{i}]_{\N} \cap [s_{j - 1} + 1, s_{j}]_{\N} = \vnot
+  \]
+  Suppose
+  \begin{itemize}
+    \item $i, j \in \N$
+    \item $i \neq j$ (\emph{WLOG} $i < j$)
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      s_{i} \leq s_{j - 1} \\
+      \Downarrow           \\
+      \bracket*{s_{i - 1} + 1, s_{i}}_{\N} \cap [s_{j - 1} + 1, s_{j}]_{\N} = \vnot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \forall k \in \N, \exists! n \in \N, \exists! m \in [1, m_{n}]_{\N}, k = s_{n - 1} + m
+  \]
+  Define $h: \N \to \bigcup_{n = 1}^{\infty} X_{n}$ by
+  \[
+    \forall n \in \N, \forall m \in [1, m_{n}]_{\N},
+    h\paren*{s_{n - 1} + m} \coloneqq g_{n}(m)
+  \]
+  Suppose $x \in \bigcup_{n = 1}^{\infty} X_{n}$. Then
+  \[
+    \begin{array}{c}
+      \exists n \in \N, x \in X_{n}                                                \\
+      \by{\ensuremath{g_{n}: [1, m_{n}]_{\N} \xrightarrow{\sim} X_{n}}} \Downarrow \\
+      \exists m \in [1, m_{n}]_{\N}, g_{n}(m) = x                                  \\
+      \Downarrow                                                                   \\
+      h\paren*{s_{n - 1} + m} = x
+    \end{array}
+  \]
+  Since $x \in \bigcup_{n = 1}^{\infty} X_{n}$ was arbitrary,
+  \[
+    \begin{array}{c}
+      h: \N \twoheadrightarrow \bigcup_{n = 1}^{\infty} X_{n} \\
+      \by{\Cref{an1:thm:surjection-from-N}} \Downarrow        \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{remark}
+  Strictly speaking, \cref{an1:thm:countable-union-of-finite-sets-is-at-most-countable} requires the
+  \textbf{axiom of choice} to prove. In this textbook, the \textbf{axiom of choice} is not discussed,
+  so we will just assume that the proof is valid. Similar issues arise for
+  \cref{an1:thm:countable-union-of-countable-sets-is-countable,an1:thm:at-most-countable-union-of-at-most-countable-sets-is-at-most-countable}.
+\end{remark}
+
+\begin{theorem} \label{an1:thm:countable-union-of-countable-sets-is-countable}
+  \[
+    \forall \set*{X_{n}}_{n = 1}^{\infty},
+    \paren*{\forall n \in \N, \abs*{X_{n}} = \aleph_{0}}
+    \implies \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+  \]
+\end{theorem}

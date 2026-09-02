@@ -1,0 +1,88 @@
+\begin{proof}
+  Define
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n) \iff \forall \set*{X_{k}}_{k = 1}^{n}, \paren*{\forall k \in [1, n]_{\N},
+      \abs*{X_{k}} < \aleph_{0}} \implies \abs*{\prod_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:}
+          \[
+            \begin{array}{c}
+              \prod_{k = 1}^{0} X_{k} = \set*{()}         \\
+              \Downarrow                                  \\
+              \abs*{\prod_{k = 1}^{0} X_{k}} < \aleph_{0} \\
+              \Downarrow                                  \\
+              P(0)
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose
+          \begin{itemize}
+            \item $P(n)$
+            \item $\forall k \in [1, n + 1]_{\N}, \abs*{X_{k}} < \aleph_{0}$
+          \end{itemize}
+          Since $P(n)$,
+          \[
+            \abs*{\prod_{k = 1}^{n} X_{k}} < \aleph_{0}
+          \]
+          By \cref{an1:lem:separated-product-is-similar-to-original-product},
+          \[
+            \begin{array}{c}
+              \prod_{k = 1}^{n + 1} X_{k} \sim \paren*{\prod_{k = 1}^{n} X_{k}} \times X_{n + 1} \\
+              \by{\Cref{an1:lem:product-of-two-finite-sets-is-finite}} \Downarrow                \\
+              \abs*{\prod_{k = 1}^{n + 1} X_{k}} < \aleph_{0}                                    \\
+              \Downarrow                                                                         \\
+              P(n + 1)
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n)
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:cantors-theorem}
+  \[
+    \forall X, \nexists f: X \twoheadrightarrow \mathcal{P}(X)
+  \]
+  This theorem is called \textbf{Cantor's theorem}.
+\end{theorem}
+
+\begin{proof}
+  Assume
+  \[
+    \exists X, \exists f: X \twoheadrightarrow \mathcal{P}(X)
+  \]
+  Define
+  \[
+    S \coloneqq \setbuilder*{x \in X}{x \notin f(x)} \in \mathcal{P}(X)
+  \]
+  Then
+  \[
+    \exists x \in X, f(x) = S
+  \]
+  This implies
+  \begin{itemize}
+    \item If $x \in S$, then
+          \[
+            \begin{array}{c}
+              x \notin f(x) = S \\
+              \Downarrow        \\
+              \bot
+            \end{array}
+          \]
+    \item Otherwise,
+          \[
+            \begin{array}{c}
+              x \in f(x) = S \\
+              \Downarrow     \\
+              \bot
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \forall X, \nexists f: X \twoheadrightarrow \mathcal{P}(X)
+  \]
+\end{proof}

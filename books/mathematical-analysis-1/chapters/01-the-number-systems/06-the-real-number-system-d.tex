@@ -1,0 +1,157 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $b \in [2, \infty)_{\N}$
+    \item $\paren*{a_{n}}_{n = 1}^{\infty} \in \prod_{n = 1}^{\infty} [0, b - 1]_{\N}$
+    \item $\forall N \in \N, \exists n \in [N, \infty)_{\N}, a_{n} \neq b - 1$
+  \end{itemize}
+  Define
+  \[
+    \forall n \in \N, x_{n} \coloneqq \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}}
+  \]
+  Then
+  \begin{itemize}
+    \item Suppose
+          \begin{itemize}
+            \item $n, m \in \N$
+            \item $n \leq m$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              \forall k \in \N, a_{k} \geq 0 \\
+              \Downarrow                     \\
+              x_{n} \leq x_{m}
+            \end{array}
+          \]
+    \item Suppose
+          \begin{itemize}
+            \item $n, m \in \N$
+            \item $n > m$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              x_{n} = x_{m} + \sum_{k = m + 1}^{n} \frac{a_{k}}{b^{k}}
+              \leq x_{m} + \sum_{k = m + 1}^{n} \frac{b - 1}{b^{k}} \\
+              \Downarrow                                            \\
+              x_{n} \leq x_{m} + \frac{1}{b^{m}} - \frac{1}{b^{n}}
+            \end{array}
+          \]
+  \end{itemize}
+  Let $N = 1$. Then
+  \[
+    \begin{array}{c}
+      \exists m \in \N, a_{m} \neq b - 1 \\
+      \Downarrow                         \\
+      a_{m} + 1 \leq b - 1
+    \end{array}
+  \]
+  This implies
+  \begin{align*}
+    x_{m} + \frac{1}{b^{m}} & = \sum_{k = 1}^{m - 1} \frac{a_{k}}{b^{k}} + \frac{a_{m} + 1}{b^{m}} \\
+                            & \leq \sum_{k = 1}^{m - 1} \frac{a_{k}}{b^{k}} + \frac{b - 1}{b^{m}}  \\
+                            & \leq \sum_{k = 1}^{m} \frac{b - 1}{b^{k}} = 1 - \frac{1}{b^{m}}
+  \end{align*}
+  Then
+  \begin{itemize}
+    \item $\forall n \in [1, m]_{\N}, x_{n} \leq x_{m}$
+    \item $\forall n \in [m + 1, \infty)_{\N}, x_{n} < x_{m} + \frac{1}{b^{m}} \leq 1 - \frac{1}{b^{m}}$
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      1 - \frac{1}{b^{m}} \in \paren*{\set*{x_{n}}_{n = 1}^{\infty}}^{u} \\
+      \by{\Cref{an1:ax:completeness}} \Downarrow                         \\
+      \exists y \in \R, y = \sup \set*{x_{n}}_{n = 1}^{\infty}           \\
+      \Downarrow                                                         \\
+      y \leq 1 - \frac{1}{b^{m}} < 1                                     \\
+      \by{\ensuremath{0 \leq x_{1} \leq y}} \Downarrow                   \\
+      y \in [0, 1)
+    \end{array}
+  \]
+  Suppose $k \in \N$. Then
+  \[
+    \begin{array}{c}
+      \exists m \in [k + 1, \infty)_{\N}, a_{m} \neq b - 1                                                        \\
+      \Downarrow                                                                                                  \\
+      x_{m} = x_{k} + \sum_{n = k + 1}^{m} \frac{a_{n}}{b^{n}} < x_{k} + \sum_{n = k + 1}^{m} \frac{b - 1}{b^{n}} \\
+      \Downarrow                                                                                                  \\
+      x_{m} < x_{k} + \frac{1}{b^{k}} - \frac{1}{b^{m}}                                                           \\
+      \Downarrow                                                                                                  \\
+      x_{m} + \frac{1}{b^{m}} < x_{k} + \frac{1}{b^{k}}
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      x_{m} + \frac{1}{b^{m}} \in \paren*{\set*{x_{n}}_{n = 1}^{\infty}}^{u} \\
+      \by{\ensuremath{y = \sup \set*{x_{n}}_{n = 1}^{\infty}}} \Downarrow    \\
+      x_{k} \leq y \leq x_{m} + \frac{1}{b^{m}}                              \\
+      \Downarrow                                                             \\
+      0 \leq y - x_{k} < \frac{1}{b^{k}}
+    \end{array}
+  \]
+  Since $k \in \N$ was arbitrary,
+  \[
+    \paren*{a_{n}}_{n = 1}^{\infty} = \mathcal{G}_{b}(y)
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:no-real-number-matching-greedy-base-expansion-converse}
+  \[
+    \begin{gathered}
+      \forall b \in [2, \infty)_{\N}, \forall \paren*{a_{n}}_{n = 1}^{\infty}
+      \in \prod_{n = 1}^{\infty} [0, b - 1]_{\N}, \\
+      \paren*{\exists N \in \N, \forall n \in [N, \infty)_{\N}, a_{n} = b - 1}
+      \implies \nexists y \in [0, 1), \paren*{a_{n}}_{n = 1}^{\infty} = \mathcal{G}_{b}(y)
+    \end{gathered}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $b \in [2, \infty)_{\N}$
+    \item $\paren*{a_{n}}_{n = 1}^{\infty} \in \prod_{n = 1}^{\infty} [0, b - 1]_{\N}$
+    \item $\exists N \in \N, \forall n \in [N, \infty)_{\N}, a_{n} = b - 1$
+  \end{itemize}
+  Assume
+  \[
+    \exists y \in [0, 1), \paren*{a_{n}}_{n = 1}^{\infty} = \mathcal{G}_{b}(y)
+  \]
+  Define
+  \[
+    \forall n \in \N, x_{n} \coloneqq \sum_{k = 1}^{n} \frac{a_{k}}{b^{k}}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in [N + 1, \infty)_{\N}, x_{n} = x_{N} + \sum_{k = N + 1}^{n}
+      \frac{b - 1}{b^{k}} = x_{N} + \frac{1}{b^{N}} - \frac{1}{b^{n}}                                       \\
+      \Downarrow                                                                                            \\
+      \forall n \in [N + 1, \infty)_{\N},  y - x_{n} = y - x_{N} - \frac{1}{b^{N}} + \frac{1}{b^{n}} \geq 0 \\
+      \Downarrow                                                                                            \\
+      \forall n \in [N + 1, \infty)_{\N},  \frac{1}{b^{n}} \geq x_{N} + \frac{1}{b^{N}} - y
+    \end{array}
+  \]
+  By \cref{an1:def:greedy-base-expansion},
+  \[
+    \begin{array}{c}
+      0 \leq y - x_{N} < \frac{1}{b^{N}}                               \\
+      \Downarrow                                                       \\
+      x_{N} + \frac{1}{b^{N}} - y > 0                                  \\
+      \by{\Cref{an1:thm:archimedean-property-corollary}} \Downarrow    \\
+      \exists m \in \N, \frac{1}{b^{m}} < x_{N} + \frac{1}{b^{N}} - y  \\
+      \Downarrow                                                       \\
+      \forall n \in [\max{\set*{m, N}} + 1, \infty)_{\N},
+      \frac{1}{b^{n}} < \frac{1}{b^{m}} <  x_{N} + \frac{1}{b^{N}} - y \\
+      \Downarrow                                                       \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \nexists y \in [0, 1), \paren*{a_{n}}_{n = 1}^{\infty} = \mathcal{G}_{b}(y)
+  \]
+\end{proof}

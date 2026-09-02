@@ -1,0 +1,271 @@
+\begin{proof}
+  Define $f: \N \times \N \to \N$ by
+  \[
+    \forall m, n \in \N, f(m, n) \coloneqq \frac{(m + n - 1)(m + n - 2)}{2} + m
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $(m_{1}, n_{1}), (m_{2}, n_{2}) \in \N \times \N$
+            \item $(m_{1}, n_{1}) \neq (m_{2}, n_{2})$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item If $m_{1} + n_{1} \neq m_{2} + n_{2}$ (\emph{WLOG} $m_{1} + n_{1} < m_{2} + n_{2}$), then
+                  \begin{align*}
+                    f(m_{1}, n_{1}) & = \frac{(m_{1} + n_{1} - 1)(m_{1} + n_{1} - 2)}{2} + m_{1}                   \\
+                                    & \leq \frac{(m_{1} + n_{1} - 1)(m_{1} + n_{1} - 2)}{2} + (m_{1} + n_{1} - 1)  \\
+                                    & = \frac{(m_{1} + n_{1})(m_{1} + n_{1} - 1)}{2}                               \\
+                                    & \leq \frac{(m_{2} + n_{2} - 1)(m_{2} + n_{2} - 2)}{2}                        \\
+                                    & < \frac{(m_{2} + n_{2} - 1)(m_{2} + n_{2} - 2)}{2} + m_{2} = f(m_{2}, n_{2})
+                  \end{align*}
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      m_{1} \neq m_{2} \\
+                      \Downarrow       \\
+                      f(m_{1}, n_{1}) \neq f(m_{2}, n_{2})
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{Surjectivity}: Suppose $k \in \N$. Define $t_{k}, s_{k}$ as
+          \cref{an1:thm:countable-union-of-countable-sets-is-countable}. Then
+          \[
+            f(s_{k}, t_{k} - s_{k} + 1) =  k
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      f: \N \times \N \xrightarrow{\sim} \N                         \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow \\
+      \abs*{\N \times \N} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:product-of-two-countable-sets-is-countable}
+  \[
+    \forall X \forall Y, \abs*{X} = \aleph_{0} \land \abs*{Y} = \aleph_{0}
+    \implies \abs*{X \times Y} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} = \aleph_{0}$
+    \item $\abs*{Y} = \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists f: \N \xrightarrow{\sim} X$
+    \item $\exists g: \N \xrightarrow{\sim} Y$
+  \end{itemize}
+  Define $h: \N \times \N \to X \times Y$ by
+  \[
+    \forall m, n \in \N, h(m, n) \coloneqq (f(m), g(n))
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $(m_{1}, n_{1}), (m_{2}, n_{2}) \in \N \times \N$
+            \item $h(m_{1}, n_{1}) = h(m_{2}, n_{2})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(m_{1}) = f(m_{2}) \land g(n_{1}) = g(n_{2}) \\
+              \Downarrow                                    \\
+              m_{1} = m_{2} \land n_{1} = n_{2}             \\
+              \Downarrow                                    \\
+              (m_{1}, n_{1}) = (m_{2}, n_{2})
+            \end{array}
+          \]
+    \item \textbf{Surjectivity}: Suppose $(x, y) \in X \times Y$. Then
+          \[
+            \begin{array}{c}
+              \exists m, n \in \N, f(m) = x \land g(n) = y \\
+              \Downarrow                                   \\
+              h(m, n) = (x, y)
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      h: \N \times \N \xrightarrow{\sim} X \times Y                                                \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation,an1:lem:N-times-N-is-countable}} \Downarrow \\
+      \abs*{X \times Y} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:product-of-finite-countable-sets-is-countable}
+  \[
+    \forall n \in \N, \forall \set*{X_{k}}_{k = 1}^{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} = \aleph_{0}}
+    \implies \abs*{\prod_{k = 1}^{n} X_{k}} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in \N, P(n) \iff \forall \set*{X_{k}}_{k = 1}^{n}, \paren*{\forall k \in [1, n]_{\N},
+      \abs*{X_{k}} = \aleph_{0}} \implies \abs*{\prod_{k = 1}^{n} X_{k}} = \aleph_{0}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:} Suppose $\abs*{X_{1}} = \aleph_{0}$. Then
+          \[
+            \begin{array}{c}
+              X_{1} = \prod_{k = 1}^{1} X_{k}             \\
+              \Downarrow                                  \\
+              \abs*{\prod_{k = 1}^{1} X_{k}} = \aleph_{0} \\
+              \Downarrow                                  \\
+              P(1)
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose
+          \begin{itemize}
+            \item $P(n)$
+            \item $\forall k \in [1, n + 1]_{\N}, \abs*{X_{k}} = \aleph_{0}$
+          \end{itemize}
+          Since $P(n)$,
+          \[
+            \abs*{\prod_{k = 1}^{n} X_{k}} = \aleph_{0}
+          \]
+          By \cref{an1:lem:separated-product-is-similar-to-original-product},
+          \[
+            \begin{array}{c}
+              \prod_{k = 1}^{n + 1} X_{k} \sim \paren*{\prod_{k = 1}^{n} X_{k}} \times X_{n + 1} \\
+              \by{\Cref{an1:thm:product-of-two-countable-sets-is-countable}} \Downarrow          \\
+              \abs*{\prod_{k = 1}^{n + 1} X_{k}} = \aleph_{0}                                    \\
+              \Downarrow                                                                         \\
+              P(n + 1)
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in \N, P(n)
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:Q-is-countable}
+  \[
+    \abs*{\Q} = \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define $f: \Z \times \N \to \Q$ by
+  \[
+    \forall (m, n) \in \Z \times \N, f(m, n) \coloneqq \frac{m}{n}
+  \]
+  Then
+  \[
+    f: \Z \times \N \twoheadrightarrow \Q
+  \]
+  By \cref{an1:thm:Z-is-countable,an1:thm:product-of-two-countable-sets-is-countable},
+  \[
+    \begin{array}{c}
+      \abs*{\Z \times \N} = \aleph_{0} \\
+      \Downarrow                       \\
+      \exists g: \N \xrightarrow{\sim} \Z \times \N
+    \end{array}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      \N \subseteq \Q                                                                       \\
+      \by{\Cref{an1:cor:infinite-subset-implies-infinite,an1:lem:N-is-infinite}} \Downarrow \\
+      \abs*{\Q} \geq \aleph_{0}
+    \end{array}
+  \]
+  By \cref{an1:thm:properties-of-composition-functions},
+  \[
+    \begin{array}{c}
+      f \circ g: \N \twoheadrightarrow \Q              \\
+      \by{\Cref{an1:thm:surjection-from-N}} \Downarrow \\
+      \abs*{\Q} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:infinite-product-of-binary-set-is-uncountable}
+  \[
+    \abs*{\prod_{n = 1}^{\infty} \set*{0, 1}} > \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Define
+  \[
+    \forall n, m \in \N, e_{nm} \coloneqq \begin{dcases}
+      1, & \text{if } m = n \\
+      0, & \text{otherwise}
+    \end{dcases}
+  \]
+  Define $f: \N \to \prod_{n = 1}^{\infty} \set*{0, 1}$ by
+  \[
+    \forall n \in \N, f(n) \coloneqq \paren*{e_{nm}}_{m = 1}^{\infty}
+  \]
+  Suppose
+  \begin{itemize}
+    \item $n_{1}, n_{2} \in \N$
+    \item $f(n_{1}) = f(n_{2})$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \forall m \in \N, e_{n_{1}m} = e_{n_{2}m} \\
+      \Downarrow                                \\
+      e_{n_{1}n_{1}} = e_{n_{2}n_{1}} = 1       \\
+      \Downarrow                                \\
+      n_{2} = n_{1}
+    \end{array}
+  \]
+  Therefore,
+  \[
+    f: \N \hookrightarrow \prod_{n = 1}^{\infty} \set*{0, 1}
+  \]
+  By \cref{an1:thm:injection-from-infinite-set-implies-infinite,an1:lem:N-is-infinite},
+  \[
+    \abs*{\prod_{n = 1}^{\infty} \set*{0, 1}} \geq \aleph_{0}
+  \]
+  Assume $\abs*{\prod_{n = 1}^{\infty} \set*{0, 1}} = \aleph_{0}$. Then
+  \[
+    \exists f: \N \xrightarrow{\sim} \prod_{n = 1}^{\infty} \set*{0, 1}
+  \]
+  Define
+  \begin{itemize}
+    \item $\forall n \in \N, f(n) = \paren*{a_{nm}}_{m = 1}^{\infty}$
+    \item $\forall m \in \N, b_{m} \coloneqq 1 - a_{mm}$
+  \end{itemize}
+  Then
+  \[
+    \paren*{b_{m}}_{m = 1}^{\infty} \in \prod_{n = 1}^{\infty} \set*{0, 1}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \paren*{b_{m}}_{m = 1}^{\infty} \neq f(n)                              \\
+      \by{\ensuremath{f: \N \xrightarrow{\sim} \prod_{n = 1}^{\infty} \set*{0, 1}}} \Downarrow \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{\prod_{n = 1}^{\infty} \set*{0, 1}} > \aleph_{0}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:R-is-uncountable}
+  \[
+    \abs*{\R} > \aleph_{0}
+  \]
+\end{theorem}

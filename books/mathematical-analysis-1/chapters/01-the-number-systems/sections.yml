@@ -1,0 +1,21 @@
+schema_version: 1
+sections:
+- slug: the-natural-number-systems
+  title: The Natural Number System
+- slug: relations
+  title: Relations
+- slug: the-integer-and-rational-number-systems
+  title: The Integer and Rational Number Systems
+- slug: ordered-sets
+  title: Ordered Sets
+- slug: fields-and-ordered-fields
+  title: Fields and Ordered Fields
+- slug: the-real-number-system
+  title: The Real Number System
+  split: 4
+- slug: the-extended-real-number-system
+  title: The Extended Real Number System
+- slug: the-complex-number-system
+  title: The Complex Number System
+- slug: euclidean-spaces
+  title: Euclidean Spaces

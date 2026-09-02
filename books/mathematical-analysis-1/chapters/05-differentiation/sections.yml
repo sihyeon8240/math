@@ -1,0 +1,16 @@
+schema_version: 1
+sections:
+- slug: the-derivative-of-a-real-function
+  title: The Derivative of a Real Function
+- slug: mean-value-theorems
+  title: Mean Value Theorems
+- slug: the-continuity-of-derivatives
+  title: The Continuity of Derivatives
+- slug: lhospitals-rule
+  title: L'Hospital's Rule
+- slug: derivatives-of-higher-order
+  title: Derivatives of Higher Order
+- slug: taylors-theorem
+  title: Taylor's Theorem
+- slug: differentiation-of-vector-valued-functions
+  title: Differentiation of Vector-valued Functions

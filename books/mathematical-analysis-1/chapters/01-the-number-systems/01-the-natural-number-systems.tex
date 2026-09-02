@@ -1,0 +1,157 @@
+\begin{axiom} \label{an1:ax:peano}
+  The set of \textbf{natural numbers} $\N$ satisfies the following axioms:
+  \begin{itemize}
+    \item $1 \in \N$
+    \item $\forall n \in \N, s(n) \in \N$
+    \item $\nexists n \in \N, s(n) = 1$
+    \item $\forall m, n \in \N, s(m) = s(n) \implies m = n$
+    \item $\forall S \subseteq \N, (1 \in S \land (\forall n \in S, s(n) \in S)) \implies S = \N$
+  \end{itemize}
+  $s(n)$ is called the \textbf{successor} of $n$. These axioms are called the \textbf{Peano axioms}.
+\end{axiom}
+
+\begin{remark}
+  The \textbf{Peano axioms} do not guarantee the \emph{existence} of $\N$, which is guaranteed by the
+  \textbf{axiom of infinity} in the \textbf{ZFC axioms}. In this textbook, the \textbf{ZFC axioms}
+  are not discussed, so we will just assume that $\N$ exists.
+\end{remark}
+
+\begin{theorem} \label{an1:thm:mathematical-induction}
+  Suppose $P$ is a predicate with domain $\N$. Then
+  \[
+    P(1) \land (\forall n \in \N, P(n) \implies P(s(n))) \implies \forall n \in \N, P(n)
+  \]
+  This method of proof is called the \textbf{principle of mathematical induction}.
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $P(1)$
+    \item $\forall n \in \N, P(n) \implies P(s(n))$
+  \end{itemize}
+  Define
+  \[
+    S \coloneqq \setbuilder*{n \in \N}{P(n)} \subseteq \N
+  \]
+  Then
+  \begin{itemize}
+    \item $1 \in S$
+    \item $\forall n \in S, s(n) \in S$
+  \end{itemize}
+  By \cref{an1:ax:peano},
+  \[
+    \begin{array}{c}
+      S = \N     \\
+      \Downarrow \\
+      \forall n \in \N, P(n)
+    \end{array}
+  \]
+\end{proof}
+
+\begin{definition} \label{an1:def:operations-on-N}
+  Suppose $n, m \in \N$.
+  \begin{itemize}
+    \item \textbf{Addition} $+$ on $\N$ is defined by
+          \begin{itemize}
+            \item $n + 1 \coloneqq s(n)$
+            \item $n + s(m) \coloneqq s(n + m)$
+          \end{itemize}
+    \item \textbf{Multiplication} $\cdot$ on $\N$ is defined by
+          \begin{itemize}
+            \item $n \cdot 1 \coloneqq n$
+            \item $n \cdot s(m) \coloneqq n \cdot m + n$
+          \end{itemize}
+  \end{itemize}
+\end{definition}
+
+\begin{remark}
+  Strictly speaking, \cref{an1:def:operations-on-N} requires the \textbf{recursion theorem} to be strictly defined.
+  In this textbook, the \textbf{recursion theorem} is not discussed, so we will just assume that the operations
+  on $\N$ are \textbf{well-defined}.
+\end{remark}
+
+\begin{theorem} \label{an1:thm:well-ordering-property}
+  $\N$ has the \textbf{well-ordering property}, which states
+  \[
+    \forall S \subseteq \N, S \neq \vnot \implies \exists m \in S, m = \min S
+  \]
+\end{theorem}
+
+\begin{proof}
+  Assume
+  \[
+    \exists S \subseteq \N, S \neq \vnot \land (\nexists m \in S, m = \min S)
+  \]
+  Define
+  \begin{itemize}
+    \item $T \coloneqq \N \setminus S \subseteq \N$
+    \item $L \coloneqq \setbuilder*{n \in \N}{\set*{1, 2, \dots, n} \subseteq T} \subseteq \N$
+  \end{itemize}
+  We will show
+  \[
+    \begin{array}{c}
+      L = \N     \\
+      \Downarrow \\
+      T = \N     \\
+      \Downarrow \\
+      S = \vnot  \\
+      \Downarrow \\
+      \bot
+    \end{array}
+  \]
+  \begin{itemize}
+    \item \textbf{Base case:} Assume $1 \in S$. Then
+          \[
+            \begin{array}{c}
+              1 = \min S \\
+              \Downarrow \\
+              \bot
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              1 \notin S \\
+              \Downarrow \\
+              1 \in T    \\
+              \Downarrow \\
+              1 \in L
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose $n \in L$. Then
+          \[
+            \begin{array}{c}
+              n \in L                           \\
+              \Downarrow                        \\
+              \set*{1, 2, \dots, n} \subseteq T \\
+              \Downarrow                        \\
+              \set*{1, 2, \dots, n} \cap S = \vnot
+            \end{array}
+          \]
+          Assume $n + 1 \in S$. Then
+          \[
+            \begin{array}{c}
+              n + 1 = \min S \\
+              \Downarrow     \\
+              \bot
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              n + 1 \notin S                        \\
+              \Downarrow                            \\
+              n + 1 \in T                           \\
+              \Downarrow                            \\
+              \set*{1, 2, \dots, n + 1} \subseteq T \\
+              \Downarrow                            \\
+              n + 1 \in L
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    L = \N
+  \]
+\end{proof}

@@ -1,0 +1,296 @@
+\begin{definition} \label{an1:def:open-cover}
+  Suppose $E \subseteq \abs*{(X, d)}$.
+  \begin{itemize}
+    \item A collection $\set*{G_{\alpha}}_{\alpha \in A}$ is called an \textbf{open cover} of $E$ if
+          \begin{itemize}
+            \item $\forall \alpha \in A, G_{\alpha} \in \mathcal{O}(X)$
+            \item $E \subseteq \bigcup_{\alpha \in A} G_{\alpha}$
+          \end{itemize}
+    \item A collection $\set*{G_{\alpha}}_{\alpha \in S}$ is called
+          a \textbf{subcover} of $\set*{G_{\alpha}}_{\alpha \in A}$ if
+          \begin{itemize}
+            \item $S \subseteq A$
+            \item $E \subseteq \bigcup_{\alpha \in S} G_{\alpha}$
+          \end{itemize}
+  \end{itemize}
+\end{definition}
+
+\begin{definition} \label{an1:def:compact}
+  Suppose $E \subseteq (X, d)$. Then $E$ is called \textbf{compact} if
+  \[
+    \forall \set*{G_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(X),
+    E \subseteq \bigcup_{\alpha \in A} G_{\alpha} \implies \exists S \subseteq A,
+    \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{\alpha \in S} G_{\alpha}
+  \]
+  The set of all compact sets in $X$ is denoted by
+  \[
+    \mathcal{K}(X) \coloneqq \setbuilder*{E \subseteq X}{
+      \begin{gathered}
+        \forall \set*{G_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(X),
+        E \subseteq \bigcup_{\alpha \in A} G_{\alpha} \\
+        \implies \exists S \subseteq A, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{\alpha \in S} G_{\alpha}
+      \end{gathered}
+    }
+  \]
+\end{definition}
+
+\begin{theorem} \label{an1:thm:compactness-preserved-under-subspace}
+  \[
+    \forall Y \subseteq \abs*{(X, d)}, \forall E \subseteq Y,
+    E \in \mathcal{K}(\abs*{(Y, d)}) \iff E \in \mathcal{K}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $E \subseteq Y \subseteq X$. Then
+  \begin{itemize}
+    \item \textbf{($\implies$)} Suppose
+          \begin{itemize}
+            \item $E \in \mathcal{K}(Y)$
+            \item $\set*{G_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(X)$
+            \item $E \subseteq \bigcup_{\alpha \in A} G_{\alpha}$
+          \end{itemize}
+          Define
+          \[
+            \forall \alpha \in A, H_{\alpha} \coloneqq G_{\alpha} \cap Y \subseteq Y
+          \]
+          By \cref{an1:thm:open-set-relative-to-subspace},
+          \[
+            \forall \alpha \in A, H_{\alpha} \in \mathcal{O}(Y)
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              E \subseteq \paren*{\bigcup_{\alpha \in A} G_{\alpha}} \cap Y =
+              \bigcup_{\alpha \in A} \paren*{G_{\alpha} \cap Y} = \bigcup_{\alpha \in A} H_{\alpha}                     \\
+              \Downarrow                                                                                                \\
+              \exists S \subseteq A, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{\alpha \in S} H_{\alpha}          \\
+              \Downarrow                                                                                                \\
+              E \subseteq \bigcup_{\alpha \in S} \paren*{G_{\alpha} \cap Y} \subseteq \bigcup_{\alpha \in S} G_{\alpha} \\
+            \end{array}
+          \]
+    \item \textbf{($\impliedby$)} Suppose
+          \begin{itemize}
+            \item $E \in \mathcal{K}(X)$
+            \item $\set*{H_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(Y)$
+            \item $E \subseteq \bigcup_{\alpha \in A} H_{\alpha}$
+          \end{itemize}
+          By \cref{an1:thm:open-set-relative-to-subspace},
+          \[
+            \forall \alpha \in A, \exists G_{\alpha} \in \mathcal{O}(X), H_{\alpha} = G_{\alpha} \cap Y
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              E \subseteq \bigcup_{\alpha \in A} \paren*{G_{\alpha} \cap Y} \subseteq \bigcup_{\alpha \in A} G_{\alpha} \\
+              \Downarrow                                                                                                \\
+              \exists S \subseteq A, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{\alpha \in S} G_{\alpha}          \\
+              \Downarrow                                                                                                \\
+              E \subseteq \paren*{\bigcup_{\alpha \in S} G_{\alpha}} \cap Y = \bigcup_{\alpha \in S}
+              \paren*{G_{\alpha} \cap Y} = \bigcup_{\alpha \in S} H_{\alpha}
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{theorem} \label{an1:thm:compact-set-is-closed}
+  \[
+    \forall E \in \mathcal{K}(\abs*{(X, d)}), E \in \mathcal{C}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \in \mathcal{K}(X)$
+    \item $E \neq \vnot$
+    \item $p \in E^{c}$
+  \end{itemize}
+  Define
+  \[
+    \forall q \in E, r_{q} \coloneqq \frac{d(p, q)}{2} \in \R^{+}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall q \in E, q \in N_{r_{q}}(q)                 \\
+      \Downarrow                                          \\
+      E \subseteq \bigcup_{q \in E} N_{r_{q}}(q)          \\
+      \by{\Cref{an1:thm:neighborhood-is-open}} \Downarrow \\
+      \exists S \subseteq E, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{q \in S} N_{r_{q}}(q)
+    \end{array}
+  \]
+  Define
+  \[
+    T \coloneqq \setbuilder*{r_{q}}{q \in S} \neq \vnot
+  \]
+  Define $f: S \to T$ by
+  \[
+    f(q) \coloneqq r_{q}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall t \in T, \exists q \in S, r_{q} = t                              \\
+      \Downarrow                                                               \\
+      f: S \twoheadrightarrow T                                                \\
+      \by{\Cref{an1:thm:surjection-from-finite-set-implies-finite}} \Downarrow \\
+      \abs*{T} < \aleph_{0}                                                    \\
+      \by{\Cref{an1:thm:finite-ordered-set-has-extremum}} \Downarrow           \\
+      \exists \veps \in T, \veps = \min T                                      \\
+      \Downarrow                                                               \\
+      \forall x \in N_{\veps}(p), \forall q \in S, d(x, p) < \veps \leq r_{q}
+    \end{array}
+  \]
+  Assume
+  \[
+    \exists x \in N_{\veps}(p), \exists q \in S, x \in N_{r_{q}}(q)
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      d(p, q) \leq d(p, x) + d(x, q) < r_{q} + r_{q} = d(p, q) \\
+      \Downarrow                                               \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \forall x \in N_{\veps}(p), \forall q \in S, x \notin N_{r_{q}}(q)                     \\
+      \Downarrow                                                                             \\
+      \forall q \in S, N_{\veps}(p) \cap N_{r_{q}}(q) = \vnot                                \\
+      \Downarrow                                                                             \\
+      N_{\veps}(p) \cap E \subseteq N_{\veps}(p) \cap \bigcup_{q \in S} N_{r_{q}}(q) = \vnot \\
+      \Downarrow                                                                             \\
+      N_{\veps}(p) \subseteq E^{c}
+    \end{array}
+  \]
+  Since $p \in E^{c}$ was arbitrary,
+  \[
+    \begin{array}{c}
+      E^{c} \in \mathcal{O}(X)                                        \\
+      \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow \\
+      E \in \mathcal{C}(X)
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:compact-set-is-bounded}
+  \[
+    \forall E \in \mathcal{K}(\abs*{(X, d)}), E \in \mathcal{B}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \in \mathcal{K}(X)$
+    \item $E \neq \vnot$
+  \end{itemize}
+  Let $p \in E$. By \cref{an1:thm:archimedean-property},
+  \[
+    \begin{array}{c}
+      \forall q \in E, \exists n \in \N, d(p, q) < n                                             \\
+      \Downarrow                                                                                 \\
+      E \subseteq \bigcup_{n = 1}^{\infty} N_{n}(p)                                              \\
+      \by{\Cref{an1:thm:neighborhood-is-open}} \Downarrow                                        \\
+      \exists S \subseteq \N, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{n \in S} N_{n}(p) \\
+      \by{\Cref{an1:thm:finite-ordered-set-has-extremum}} \Downarrow                             \\
+      \exists m \in S, m = \max S                                                                \\
+      \Downarrow                                                                                 \\
+      E \subseteq N_{m}(p)                                                                       \\
+      \Downarrow                                                                                 \\
+      E \in \mathcal{B}(X)
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:closed-subset-of-compact-set-is-compact}
+  \[
+    \forall E \in \mathcal{K}(\abs*{(X, d)}), \forall F \in \mathcal{C}(X), F \subseteq E \implies F \in \mathcal{K}(X)
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \in \mathcal{K}(X)$
+    \item $F \in \mathcal{C}(X)$
+    \item $F \subseteq E$
+    \item $\set*{H_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(X)$
+    \item $F \subseteq \bigcup_{\alpha \in A} H_{\alpha}$
+  \end{itemize}
+  Then
+  \[
+    X = F \cup F^{c} \subseteq \paren*{\bigcup_{\alpha \in A} H_{\alpha}} \cup F^{c}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      E \subseteq \paren*{\bigcup_{\alpha \in A} H_{\alpha}} \cup F^{c}                                                    \\
+      \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow                                                      \\
+      \exists B \subseteq A, \abs*{B} < \aleph_{0} \land E \subseteq \paren*{\bigcup_{\alpha \in B} H_{\alpha}} \cup F^{c} \\
+      \Downarrow                                                                                                           \\
+      F \subseteq \paren*{\bigcup_{\alpha \in B} H_{\alpha}} \cup F^{c}                                                    \\
+      \Downarrow                                                                                                           \\
+      F \subseteq \bigcup_{\alpha \in B} H_{\alpha}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:infinite-subset-of-compact-set-has-limit-point}
+  \[
+    \forall E \in \mathcal{K}(\abs*{(X, d)}), \forall F \subseteq E, \abs*{F} \geq \aleph_{0} \implies F' \cap E \neq \vnot
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \in \mathcal{K}(X)$
+    \item $F \subseteq E$
+    \item $\abs*{F} \geq \aleph_{0}$
+  \end{itemize}
+  Assume $F' \cap E = \vnot$. Then
+  \[
+    \begin{array}{c}
+      \forall p \in E, \exists r_{p} \in \R^{+}, \widetilde{N}_{r_{p}}(p) \cap F = \vnot \\
+      \Downarrow                                                                         \\
+      \forall p \in E, N_{r_{p}}(p) \cap F \subseteq \set*{p}
+    \end{array}
+  \]
+  This implies
+  \[
+    \begin{array}{c}
+      \forall \alpha \in E, \alpha \in N_{r_{\alpha}}(\alpha)                                                      \\
+      \Downarrow                                                                                                   \\
+      E \subseteq \bigcup_{\alpha \in E} N_{r_{\alpha}}(\alpha)                                                    \\
+      \by{\Cref{an1:thm:neighborhood-is-open}} \Downarrow                                                          \\
+      \exists S \subseteq E, \abs*{S} < \aleph_{0} \land E \subseteq \bigcup_{\alpha \in S} N_{r_{\alpha}}(\alpha) \\
+      \Downarrow                                                                                                   \\
+      F \subseteq \bigcup_{\alpha \in S} N_{r_{\alpha}}(\alpha)                                                    \\
+      \Downarrow                                                                                                   \\
+      F = \paren*{\bigcup_{\alpha \in S} N_{r_{\alpha}}(\alpha)} \cap F = \bigcup_{\alpha \in S}
+      \paren*{N_{r_{\alpha}}(\alpha) \cap F} \subseteq \bigcup_{\alpha \in S} \set*{\alpha} = S                    \\
+      \by{\Cref{an1:thm:subset-of-finite-set-is-finite}} \Downarrow                                                \\
+      \abs*{F} < \aleph_{0}                                                                                        \\
+      \Downarrow                                                                                                   \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    F' \cap E \neq \vnot
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:finite-compact-intersection-property}
+  \[
+    \begin{gathered}
+      \forall \set*{K_{\alpha}}_{\alpha \in A} \subseteq \mathcal{K}(\abs*{(X, d)}), \\
+      \paren*{\forall B \subseteq A, \abs*{B} < \aleph_{0} \implies \bigcap_{\alpha \in B} K_{\alpha} \neq \vnot}
+      \implies \bigcap_{\alpha \in A} K_{\alpha} \neq \vnot
+    \end{gathered}
+  \]
+\end{theorem}

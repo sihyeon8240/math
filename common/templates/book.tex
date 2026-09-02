@@ -1,0 +1,29 @@
+% Generated from books.yml, chapters.yml, and common/templates/book.tex; do not edit.
+\documentclass[11pt, a4paper, oneside]{book}
+
+\usepackage{textbook}
+\IfFileExists{local-style.sty}{\usepackage{local-style}}{}
+\addbibresource{references.bib}
+% BEGIN GENERATED METADATA
+% END GENERATED METADATA
+
+\begin{document}
+
+\frontmatter
+\InputIfFileExists{frontmatter/title-and-copyright.tex}{}{\input{title-and-copyright}}
+\tableofcontents
+\InputIfFileExists{frontmatter/preface.tex}{}{\input{preface}}
+
+\mainmatter
+% BEGIN GENERATED CHAPTERS
+\include{chapters/01-introduction/index}
+% END GENERATED CHAPTERS
+
+\backmatter
+% BEGIN GENERATED APPENDICES
+% END GENERATED APPENDICES
+
+\nocite{*}
+\printbibliography
+
+\end{document}

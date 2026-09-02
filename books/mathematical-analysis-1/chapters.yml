@@ -1,0 +1,14 @@
+schema_version: 1
+chapters:
+- slug: the-number-systems
+  title: The Number Systems
+- slug: basic-topology
+  title: Basic Topology
+- slug: sequences-and-series
+  title: Sequences and Series
+- slug: continuity
+  title: Continuity
+- slug: differentiation
+  title: Differentiation
+- slug: the-riemann-stieltjes-integral
+  title: The Riemann-Stieltjes Integral

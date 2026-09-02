@@ -1,0 +1,100 @@
+\begin{definition} \label{an1:def:extended-real-number-system}
+  The extended real number system $\overline{\R}$ is defined by
+  \[
+    \overline{\R} \coloneqq \R \cup \set*{- \infty, + \infty}
+  \]
+  $(\overline{\R}, <)$ is an ordered set with
+  \[
+    \forall x \in \R, - \infty < x < + \infty
+  \]
+\end{definition}
+
+\begin{definition} \label{an1:def:operations-on-extended-real-number-system}
+  Operations on $\overline{\R}$ are defined by
+  \begin{itemize}
+    \item $\forall x \in (- \infty, + \infty], x + (+ \infty) = (+ \infty) + x \coloneqq + \infty$
+    \item $\forall x \in [- \infty, + \infty), x + (- \infty) = (- \infty) + x \coloneqq - \infty$
+    \item $\forall x \in (0, + \infty], x \cdot (\pm \infty) = (\pm \infty) \cdot x \coloneqq \pm \infty$
+    \item $\forall x \in [- \infty, 0), x \cdot (\pm \infty) = (\pm \infty) \cdot x \coloneqq \mp \infty$
+    \item $\forall x \in \R, \frac{x}{\pm \infty} \coloneqq 0$
+  \end{itemize}
+  Undefined operations in $\overline{\R}$ are
+  \begin{itemize}
+    \item $(\pm \infty) + (\mp \infty)$
+    \item $0 \cdot (\pm \infty)$
+    \item $\frac{(\pm \infty)}{(\pm \infty)}, \frac{(\pm \infty)}{(\mp \infty)}$
+    \item $\forall x \in \overline{\R}, \frac{x}{0}$
+  \end{itemize}
+\end{definition}
+
+\begin{theorem} \label{an1:thm:supremum-infimum-in-extended-real-number-system}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall E \subseteq \overline{\R}, \exists x \in \overline{\R}, x = \sup E$
+    \item $\forall E \subseteq \overline{\R}, \exists y \in \overline{\R}, y = \inf E$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose $E \subseteq \overline{\R}$. Then
+  \begin{itemize}
+    \item If $E = \vnot$, then
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item $\sup E = - \infty$
+            \item $\inf E = + \infty$
+          \end{enumerate}
+    \item If $E = \set*{- \infty}$, then
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item $\sup E = - \infty$
+            \item $\inf E = - \infty$
+          \end{enumerate}
+    \item If $E = \set*{+ \infty}$, then
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item $\sup E = + \infty$
+            \item $\inf E = + \infty$
+          \end{enumerate}
+    \item Otherwise,
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item \begin{itemize}
+                    \item If
+                          \[
+                            \exists \beta \in \R, \forall x \in E, x \leq \beta
+                          \]
+                          then
+                          \[
+                            \begin{array}{c}
+                              E \setminus \set*{- \infty} \subseteq \R               \\
+                              \by{\Cref{an1:ax:completeness}} \Downarrow             \\
+                              \exists x \in \R, x = \sup E \setminus \set*{- \infty} \\
+                              \Downarrow                                             \\
+                              x = \sup E
+                            \end{array}
+                          \]
+                    \item Otherwise,
+                          \[
+                            \sup E = + \infty
+                          \]
+                  \end{itemize}
+            \item \begin{itemize}
+                    \item If
+                          \[
+                            \exists \alpha \in \R, \forall x \in E, \alpha \leq x
+                          \]
+                          then
+                          \[
+                            \begin{array}{c}
+                              E \setminus \set*{+ \infty} \subseteq \R                     \\
+                              \by{\Cref{an1:thm:greatest-lower-bound-property}} \Downarrow \\
+                              \exists x \in \R, x = \inf E \setminus \set*{+ \infty}       \\
+                              \Downarrow                                                   \\
+                              x = \inf E
+                            \end{array}
+                          \]
+                    \item Otherwise,
+                          \[
+                            \inf E = - \infty
+                          \]
+                  \end{itemize}
+          \end{enumerate}
+  \end{itemize}
+\end{proof}

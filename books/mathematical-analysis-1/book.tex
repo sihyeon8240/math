@@ -1,0 +1,41 @@
+% Generated from books.yml, chapters.yml, and common/templates/book.tex; do not edit.
+\documentclass[11pt, a4paper, oneside]{book}
+
+\usepackage{textbook}
+\IfFileExists{local-style.sty}{\usepackage{local-style}}{}
+\addbibresource{references.bib}
+% BEGIN GENERATED METADATA
+\newcommand{\name}{MUHO CHOI}
+\newcommand{\displaytitle}{Mathematical Analysis I}
+\newcommand{\version}{0.1.0}
+\newcommand{\slug}{mathematical-analysis-1}
+\title{\displaytitle}
+\author{\name}
+\hypersetup{pdftitle={\displaytitle},pdfauthor={\name}}
+% END GENERATED METADATA
+
+\begin{document}
+
+\frontmatter
+\InputIfFileExists{frontmatter/title-and-copyright.tex}{}{\input{title-and-copyright}}
+\tableofcontents
+\InputIfFileExists{frontmatter/preface.tex}{}{\input{preface}}
+
+\mainmatter
+% BEGIN GENERATED CHAPTERS
+\include{chapters/01-the-number-systems/index}
+\include{chapters/02-basic-topology/index}
+\include{chapters/03-sequences-and-series/index}
+\include{chapters/04-continuity/index}
+\include{chapters/05-differentiation/index}
+\include{chapters/06-the-riemann-stieltjes-integral/index}
+% END GENERATED CHAPTERS
+
+\backmatter
+% BEGIN GENERATED APPENDICES
+% END GENERATED APPENDICES
+
+\nocite{*}
+\printbibliography
+
+\end{document}

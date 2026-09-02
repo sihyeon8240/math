@@ -1,0 +1,1 @@
+ghcr.io/sihyeon8240/latex@sha256:7441e29c371eebd1ef290289070cf429f9a0d127916d362bc8ade348fddad4eb

@@ -1,0 +1,52 @@
+\begin{definition} \label{an1:def:field}
+  Suppose two operations
+  \begin{itemize}
+    \item \textbf{Addition} $+$
+    \item \textbf{Multiplication} $\cdot$
+  \end{itemize}
+  on $F$ satisfy the following axioms:
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Axioms for \textbf{addition}
+          \begin{itemize}
+            \item $\forall x, y \in F, x + y \in F$
+            \item $\forall x, y \in F, x + y = y + x$
+            \item $\forall x, y, z \in F, (x + y) + z = x + (y + z)$
+            \item $\exists \alpha \in F, \forall x \in F, x + \alpha = x$
+            \item $\forall x \in F, \exists \beta \in F, x + \beta = \alpha$
+          \end{itemize}
+    \item Axioms for \textbf{multiplication}
+          \begin{itemize}
+            \item $\forall x, y \in F, x \cdot y \in F$
+            \item $\forall x, y \in F, x \cdot y = y \cdot x$
+            \item $\forall x, y, z \in F, (x \cdot y) \cdot z = x \cdot (y \cdot z)$
+            \item $\exists \gamma \in F, \gamma \neq \alpha \land (\forall x \in F, x \cdot \gamma = x)$
+            \item $\forall x \in F, x \neq \alpha \implies \exists \omega \in F, x \cdot \omega = \gamma$
+          \end{itemize}
+    \item The \textbf{distributive law}
+          \begin{itemize}
+            \item $\forall x, y, z \in F, x \cdot (y + z) = x \cdot y + x \cdot z$
+          \end{itemize}
+  \end{enumerate}
+  Then the structure $(F, +, \cdot)$ is called a \textbf{field}.
+\end{definition}
+
+\begin{definition} \label{an1:def:ordered-field}
+  Suppose
+  \begin{itemize}
+    \item $(F, +, \cdot)$
+    \item $(F, <)$
+  \end{itemize}
+  satisfy the following axioms:
+  \begin{itemize}
+    \item $\forall x, y, z \in F, x < y \implies x + z < y + z$
+    \item $\forall x, y \in F, x > 0 \land y > 0 \implies x \cdot y > 0$
+  \end{itemize}
+  Then the structure $(F, +, \cdot, <)$ is called an \textbf{ordered field}.
+\end{definition}
+
+\begin{remark}
+  $(\Q, +, \cdot, <)$ is an ordered field. Also, there exists an ordered field $(\R, +, \cdot, <)$
+  which has the \hyperref[an1:def:least-upper-bound-property]{\emph{least upper bound property}}.
+  In this textbook, the construction of $\R$ is not discussed, so we will just assume that
+  $(\R, +, \cdot, <)$ exists and satisfies \cref{an1:ax:completeness}.
+\end{remark}

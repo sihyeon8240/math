@@ -1,0 +1,16 @@
+schema_version: 1
+sections:
+- slug: discussion-of-main-problem
+  title: Discussion of Main Problem
+- slug: uniform-convergence
+  title: Uniform Convergence
+- slug: uniform-convergence-and-continuity
+  title: Uniform Convergence and Continuity
+- slug: uniform-convergence-and-integration
+  title: Uniform Convergence and Integration
+- slug: uniform-convergence-and-differentiation
+  title: Uniform Convergence and Differentiation
+- slug: equicontinuous-families-of-functions
+  title: Equicontinuous Families of Functions
+- slug: the-stone-weierstrass-theorem
+  title: The Stone-Weierstrass Theorem

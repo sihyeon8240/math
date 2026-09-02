@@ -1,0 +1,12 @@
+schema_version: 1
+sections:
+- slug: mappings
+  title: Mappings
+- slug: linear-mappings
+  title: Linear Mappings
+- slug: the-kernel-and-image-of-a-linear-map
+  title: The Kernel and Image of a Linear Map
+- slug: composition-and-inverse-of-linear-mappings
+  title: Composition and Inverse of Linear Mappings
+- slug: geometric-applications
+  title: Geometric Applications

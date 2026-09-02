@@ -1,0 +1,186 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{Y} \geq \aleph_{0}$
+    \item $Y \subseteq X$
+  \end{itemize}
+  Assume $\abs*{X} < \aleph_{0}$. By \cref{an1:thm:subset-of-finite-set-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{Y} < \aleph_{0} \\
+      \Downarrow            \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{X} \geq \aleph_{0}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:surjection-from-Nn-implies-finite}
+  \[
+    \forall Y, \paren*{\exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \twoheadrightarrow Y}
+    \implies \abs*{Y} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \[
+    \exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \twoheadrightarrow Y
+  \]
+  Define
+  \[
+    \forall y \in Y, N_{y} \coloneqq f^{-1}(\set*{y}) \neq \vnot
+  \]
+  By \cref{an1:thm:well-ordering-property},
+  \[
+    \forall y \in Y, \exists n_{y} \in N_{y}, n_{y} = \min N_{y}
+  \]
+  Define
+  \begin{itemize}
+    \item $M \coloneqq \setbuilder*{n_{y}}{y \in Y} \subseteq [1, n]_{\N}$
+    \item $g: M \to Y$ by $g \equiv f|_{M}^{Y}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $n_{y_{1}}, n_{y_{2}} \in M$
+            \item $g(n_{y_{1}}) = g(n_{y_{2}})$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(n_{y_{1}}) = f(n_{y_{2}}) \\
+              \Downarrow                  \\
+              y_{1} = y_{2}               \\
+              \Downarrow                  \\
+              N_{y_{1}} = N_{y_{2}}       \\
+              \Downarrow                  \\
+              n_{y_{1}} = n_{y_{2}}
+            \end{array}
+          \]
+    \item \textbf{Surjectivity}: Suppose $y \in Y$. Then
+          \[
+            \begin{array}{c}
+              \exists n_{y} \in N_{y}, n_{y} = \min N_{y} \\
+              \Downarrow                                  \\
+              g(n_{y}) = y
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    g: M \xrightarrow{\sim} Y
+  \]
+  By \cref{an1:lem:subset-of-Nn-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{M} < \aleph_{0}                                         \\
+      \by{\Cref{an1:thm:bijection-equivalence-relation}} \Downarrow \\
+      \abs*{Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:surjection-from-finite-set-implies-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \exists f: X \twoheadrightarrow Y
+    \implies \abs*{Y} < \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\exists f: X \twoheadrightarrow Y$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists n \in [0, \infty)_{\N}, \exists g: [1, n]_{\N} \xrightarrow{\sim} X \\
+      \by{\Cref{an1:thm:properties-of-composition-functions}} \Downarrow          \\
+      f \circ g: [1, n]_{\N} \twoheadrightarrow Y                                 \\
+      \by{\Cref{an1:lem:surjection-from-Nn-implies-finite}} \Downarrow            \\
+      \abs*{Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{remark}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $X \neq \vnot$
+  \end{itemize}
+  Then
+  \[
+    \exists n \in \N, \exists f: [1, n]_{\N} \xrightarrow{\sim} X
+  \]
+  This implies
+  \[
+    X = \set*{f(1), f(2), \dots, f(n)}
+  \]
+  where
+  \[
+    \forall i, j \in [1, n]_{\N}, i \neq j \implies f(i) \neq f(j)
+  \]
+\end{remark}
+
+\begin{theorem} \label{an1:thm:finite-ordered-set-has-extremum}
+  \[
+    \forall (X, <), \abs*{X} < \aleph_{0} \land X \neq \vnot \implies \exists m, M \in X, m = \min X \land M = \max X
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in \N, P(n) \iff \forall (X, <), \abs*{X} = n \implies \exists m, M \in X, m = \min X \land M = \max X
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:} Suppose $X = \set*{a_{1}}$. Then
+          \begin{itemize}
+            \item $\forall x \in X, a_{1} \leq x$
+            \item $\forall x \in X, x \leq a_{1}$
+          \end{itemize}
+          Therefore, $P(1)$.
+    \item \textbf{Inductive step:} Suppose
+          \begin{itemize}
+            \item $P(n)$
+            \item $X = \set*{a_{1}, a_{2}, \dots, a_{n + 1}}$
+            \item $Y = \set*{a_{1}, a_{2}, \dots, a_{n}} \subseteq X$
+          \end{itemize}
+          Since $P(n)$,
+          \begin{itemize}
+            \item $\exists k \in [1, n]_{\N}, \forall y \in Y, a_{k} \leq y$
+            \item $\exists K \in [1, n]_{\N}, \forall y \in Y, y \leq a_{K}$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item $\forall x \in X, \min\set*{{a_{k}, a_{n + 1}}} \leq x$
+            \item $\forall x \in X, x \leq \max\set*{{a_{K}, a_{n + 1}}}$
+          \end{itemize}
+          Therefore, $P(n + 1)$.
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in \N, P(n)
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:properties-of-Nm-Nn}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall n, m \in [0, \infty)_{\N}, \paren*{\exists f: [1, n]_{\N}
+              \hookrightarrow [1, m]_{\N}} \implies n \leq m$
+    \item $\forall n, m \in [0, \infty)_{\N}, \paren*{\exists f: [1, n]_{\N}
+              \twoheadrightarrow [1, m]_{\N}} \implies n \geq m \geq 1 \lor n = m = 0$
+    \item $\forall n, m \in [0, \infty)_{\N}, \paren*{\exists f: [1, n]_{\N}
+              \xrightarrow{\sim} [1, m]_{\N}} \implies n = m$
+  \end{enumerate}
+\end{lemma}

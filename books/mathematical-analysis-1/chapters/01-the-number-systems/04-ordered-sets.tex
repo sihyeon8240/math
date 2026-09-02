@@ -1,0 +1,284 @@
+\begin{definition} \label{an1:def:ordered-set}
+  Suppose a relation $<$ on $S$ satisfies the following axioms:
+  \begin{itemize}
+    \item $\forall x, y, z \in S, x < y \land y < z \implies x < z$
+    \item $\forall x, y \in S, x \neq y \implies x < y \oplus y < x$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item The relation $<$ is called an \textbf{(total) order} on $S$
+    \item The structure $(S, <)$ is called an \textbf{(totally) ordered set}
+  \end{itemize}
+  The notation
+  \begin{itemize}
+    \item $x > y$ denotes $y < x$
+    \item $x \geq y$ denotes $x > y \lor x = y$
+    \item $x \leq y$ denotes $y \geq x$
+  \end{itemize}
+\end{definition}
+
+\begin{remark}
+  An ordered set $(S, <)$ is a \textbf{structure}, distinct from its \textbf{underlying set} $S$.
+  For any structure $\mathcal{S}$, the notation $\abs*{\mathcal{S}}$ denotes its underlying set,
+  not its \textbf{cardinality}. That is,
+  \[
+    S = \abs*{(S, <)} \neq (S, <)
+  \]
+\end{remark}
+
+\begin{example} \label{an1:ex:number-systems-are-ordered-sets}
+  $(\N, <), (\Z, <), (\Q, <)$ are ordered sets with
+  \begin{itemize}
+    \item $\forall n, m \in \N, m < n \iff \exists k \in \N, n = m + k$
+    \item $\forall n, m \in \Z, m < n \iff \exists k \in \Z^{+}, n = m + k$
+    \item $\forall p, q \in \Q, q < p \iff \exists r \in \Q^{+}, p = q + r$
+  \end{itemize}
+  where
+  \[
+    \Q^{+} \coloneqq \setbuilder*{[(p, q)] \in \Q}{p, q \in \Z^{+}} \subseteq \Q
+  \]
+  Throughout this textbook, the \textbf{number systems} use the
+  \textbf{standard order relations} above, unless otherwise specified.
+\end{example}
+
+\begin{definition} \label{an1:def:boundedness}
+  Suppose $E \subseteq \abs*{(S, <)}$. Then
+  \begin{itemize}
+    \item An element $m \in S$ is called a \textbf{lower bound} of $E$ if
+          \[
+            \forall x \in E, m \leq x
+          \]
+          The set of all lower bounds of $E$ is denoted by
+          \[
+            E^{\ell} \coloneqq \setbuilder*{m \in S}{\forall x \in E, m \leq x}
+          \]
+          $E$ is said to be \textbf{bounded below} if
+          \[
+            E^{\ell} \neq \vnot
+          \]
+    \item An element $M \in S$ is called an \textbf{upper bound} of $E$ if
+          \[
+            \forall x \in E, x \leq M
+          \]
+          The set of all upper bounds of $E$ is denoted by
+          \[
+            E^{u} \coloneqq \setbuilder*{M \in S}{\forall x \in E, x \leq M}
+          \]
+          $E$ is said to be \textbf{bounded above} if
+          \[
+            E^{u} \neq \vnot
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{definition} \label{an1:def:extremum}
+  Suppose $E \subseteq \abs*{(S, <)}$. Then
+  \begin{itemize}
+    \item An element $m \in E$ is called a \textbf{minimum} of $E$ if
+          \[
+            m \in E^{\ell}
+          \]
+          Such an $m$ is denoted by
+          \[
+            m = \min E
+          \]
+    \item An element $M \in E$ is called a \textbf{maximum} of $E$ if
+          \[
+            M \in E^{u}
+          \]
+          Such an $M$ is denoted by
+          \[
+            M = \max E
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{theorem} \label{an1:thm:bounded-subset-of-Z-in-Z-has-extremum}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall E \subseteq \Z, E \neq \vnot \land E^{\ell} \neq \vnot \implies \exists m \in E, m = \min E$
+    \item $\forall E \subseteq \Z, E \neq \vnot \land E^{u} \neq \vnot \implies \exists M \in E, M = \max E$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \subseteq \Z$
+    \item $E \neq \vnot$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose $E^{\ell} \neq \vnot$. Then
+          \[
+            \exists k \in \Z, \forall \alpha \in E, k \leq \alpha
+          \]
+          Define
+          \[
+            F \coloneqq \setbuilder*{\alpha - k + 1}{\alpha \in E} \subseteq \N
+          \]
+          By \cref{an1:thm:well-ordering-property},
+          \[
+            \begin{array}{c}
+              \exists n \in F, n = \min F                 \\
+              \Downarrow                                  \\
+              \forall \alpha \in E, n \leq \alpha - k + 1 \\
+              \Downarrow                                  \\
+              \forall \alpha \in E, n + k - 1 \leq \alpha
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              \exists m \in E, n = m - k + 1 \\
+              \Downarrow                     \\
+              m = n + k - 1 = \min E
+            \end{array}
+          \]
+    \item Suppose $E^{u} \neq \vnot$. Then
+          \[
+            \exists k \in \Z, \forall \alpha \in E, \alpha \leq k
+          \]
+          Define
+          \[
+            F \coloneqq \setbuilder*{- \alpha + k + 1}{\alpha \in E} \subseteq \N
+          \]
+          By \cref{an1:thm:well-ordering-property},
+          \[
+            \begin{array}{c}
+              \exists n \in F, n = \min F                   \\
+              \Downarrow                                    \\
+              \forall \alpha \in E, n \leq - \alpha + k + 1 \\
+              \Downarrow                                    \\
+              \forall \alpha \in E, \alpha \leq k - n + 1   \\
+            \end{array}
+          \]
+          Therefore,
+          \[
+            \begin{array}{c}
+              \exists M \in E, n = - M + k + 1 \\
+              \Downarrow                       \\
+              M = k - n + 1 = \max E
+            \end{array}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\begin{definition} \label{an1:def:supremum-infimum}
+  Suppose $E \subseteq \abs*{(S, <)}$. Then
+  \begin{itemize}
+    \item Suppose $E^{u} \neq \vnot$. An element $\alpha \in S$ is called a \textbf{supremum} of $E$ if
+          \[
+            \alpha = \min E^{u}
+          \]
+          Such an $\alpha$ is denoted by
+          \[
+            \alpha = \sup E
+          \]
+    \item Suppose $E^{\ell} \neq \vnot$. An element $\alpha \in S$ is called an \textbf{infimum} of $E$ if
+          \[
+            \alpha = \max E^{\ell}
+          \]
+          Such an $\alpha$ is denoted by
+          \[
+            \alpha = \inf E
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{definition} \label{an1:def:least-upper-bound-property}
+  An ordered set $(S, <)$ is said to have the \textbf{least upper bound property} if
+  \[
+    \forall E \subseteq S, E \neq \vnot \land E^{u} \neq \vnot \implies \exists \alpha \in S, \alpha = \sup E
+  \]
+\end{definition}
+
+\begin{example} \label{an1:ex:Q-is-not-complete}
+  Define
+  \begin{itemize}
+    \item $S \coloneqq \setbuilder*{p \in \Q^{+}}{p^{2} < 2} \subseteq \Q$
+    \item $\forall p \in \Q^{+}, q \coloneqq p - \frac{p^{2} - 2}{p + 2} = \frac{2p + 2}{p + 2}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item If $p \in S$, then
+          \[
+            \begin{array}{c}
+              q^{2} - 2 = \frac{2(p^{2} - 2)}{(p + 2)^{2}} < 0 \\
+              \Downarrow                                       \\
+              q \in S                                          \\
+              \by{\ensuremath{q > p}} \Downarrow               \\
+              p \notin S^{u}
+            \end{array}
+          \]
+    \item Otherwise,
+          \[
+            \begin{array}{c}
+              p^{2} \geq 2                                                  \\
+              \by{\ensuremath{\nexists p \in \Q^{+}, p^{2} = 2}} \Downarrow \\
+              p^{2} > 2
+            \end{array}
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              q^{2} - 2 = \frac{2(p^{2} - 2)}{(p + 2)^{2}} > 0 \\
+              \Downarrow                                       \\
+              q \in S^{u}                                      \\
+              \by{\ensuremath{q < p}} \Downarrow               \\
+              p \neq \min S^{u}
+            \end{array}
+          \]
+  \end{itemize}
+  Therefore, $(\Q, <)$ does not have the \hyperref[an1:def:least-upper-bound-property]{least upper bound property}.
+\end{example}
+
+\begin{theorem} \label{an1:thm:greatest-lower-bound-property}
+  Suppose $(S, <)$ have the \hyperref[an1:def:least-upper-bound-property]{least upper bound property}. Then
+  \[
+    \forall E \subseteq S, E \neq \vnot \land E^{\ell} \neq \vnot \implies \exists \alpha \in S, \alpha = \inf E
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \subseteq S$
+    \item $E \neq \vnot$
+    \item $E^{\ell} \neq \vnot$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists x \in E                  \\
+      \Downarrow                       \\
+      \forall y \in E^{\ell}, y \leq x \\
+      \Downarrow                       \\
+      x \in \paren*{E^{\ell}}^{u}      \\
+      \Downarrow                       \\
+      \exists \alpha \in S, \alpha = \sup E^{\ell}
+    \end{array}
+  \]
+  Assume $\alpha \notin E^{\ell}$. Then
+  \[
+    \begin{array}{c}
+      \exists \beta \in E, \beta < \alpha                 \\
+      \by{\ensuremath{\alpha = \sup E^{\ell}}} \Downarrow \\
+      \beta \notin \paren*{E^{\ell}}^{u}                  \\
+      \Downarrow                                          \\
+      \exists \gamma \in E^{\ell}, \beta < \gamma         \\
+      \by{\ensuremath{\beta \in E}} \Downarrow            \\
+      \gamma \leq \beta                                   \\
+      \Downarrow                                          \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \alpha \in E^{\ell}                                 \\
+      \by{\ensuremath{\alpha = \sup E^{\ell}}} \Downarrow \\
+      \alpha = \max E^{\ell}
+    \end{array}
+  \]
+\end{proof}

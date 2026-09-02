@@ -1,0 +1,5 @@
+# LaTeX theorem labels are stable identifiers. Add an entry only after its
+# statement and proof compile without `sorry`; see docs/formalization.md.
+proofs:
+  - id: an1:thm:well-ordering-property
+    declaration: Textbooks.MathematicalAnalysis1.Chapter01.wellOrderingProperty

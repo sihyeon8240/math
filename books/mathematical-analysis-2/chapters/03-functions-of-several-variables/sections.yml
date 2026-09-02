@@ -1,0 +1,20 @@
+schema_version: 1
+sections:
+- slug: linear-transformations
+  title: Linear Transformations
+- slug: differentiation
+  title: Differentiation
+- slug: the-contraction-principle
+  title: The Contraction Principle
+- slug: the-inverse-function-theorem
+  title: The Inverse Function Theorem
+- slug: the-implicit-function-theorem
+  title: The Implicit Function Theorem
+- slug: the-rank-theorem
+  title: The Rank Theorem
+- slug: determinants
+  title: Determinants
+- slug: derivatives-of-higher-order
+  title: Derivatives of Higher Order
+- slug: differentiation-of-integrals
+  title: Differentiation of Integrals

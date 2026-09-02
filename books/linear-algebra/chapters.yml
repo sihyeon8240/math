@@ -1,0 +1,26 @@
+schema_version: 1
+chapters:
+- slug: vector-spaces
+  title: Vector Spaces
+- slug: matrices
+  title: Matrices
+- slug: linear-mappings
+  title: Linear Mappings
+- slug: linear-maps-and-matrices
+  title: Linear Maps and Matrices
+- slug: scalar-products-and-orthogonality
+  title: Scalar Products and Orthogonality
+- slug: determinants
+  title: Determinants
+- slug: symmetric-hermitian-and-unitary-operators
+  title: Symmetric, Hermitian, and Unitary Operators
+- slug: eigenvectors-and-eigenvalues
+  title: Eigenvectors and Eigenvalues
+- slug: polynomials-and-matrices
+  title: Polynomials and Matrices
+- slug: triangulation-of-matrices-and-linear-maps
+  title: Triangulation of Matrices and Linear Maps
+- slug: polynomials-and-primary-decomposition
+  title: Polynomials and Primary Decomposition
+- slug: convex-sets
+  title: Convex Sets

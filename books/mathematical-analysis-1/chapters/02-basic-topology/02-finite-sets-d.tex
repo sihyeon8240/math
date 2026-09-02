@@ -1,0 +1,296 @@
+\begin{lemma} \label{an1:lem:properties-of-Nm-Nn-converse}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall n, m \in [0, \infty)_{\N}, n \leq m
+            \implies \exists f: [1, n]_{\N} \hookrightarrow [1, m]_{\N}$
+    \item $\forall n, m \in [0, \infty)_{\N}, n \geq m \geq 1 \lor n = m = 0
+            \implies \exists f: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}$
+    \item $\forall n, m \in [0, \infty)_{\N}, n = m
+            \implies \exists f: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N}$
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  Suppose $n, m \in [0, \infty)_{\N}$. Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose $n \leq m$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            \forall i \in [1, n]_{\N}, f(i) \coloneqq i
+          \]
+          Suppose
+          \begin{itemize}
+            \item $i, j \in [1, n]_{\N}$
+            \item $f(i) = f(j)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              f(i) = f(j) \\
+              \Downarrow  \\
+              i = j
+            \end{array}
+          \]
+    \item \begin{itemize}
+            \item Suppose $n = m = 0$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall i \in [1, n]_{\N}, f(i) \coloneqq i
+                  \]
+                  Then
+                  \[
+                    \begin{array}{c}
+                      [1, m]_{\N} = \vnot \\
+                      \Downarrow          \\
+                      f: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}
+                    \end{array}
+                  \]
+            \item Suppose $n \geq m \geq 1$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+                  \[
+                    \forall i \in [1, n]_{\N}, f(i) \coloneqq \begin{dcases}
+                      i, & \text{if } i < m \\
+                      m, & \text{otherwise}
+                    \end{dcases}
+                  \]
+                  Suppose $j \in [1, m]_{\N}$. Then
+                  \begin{itemize}
+                    \item If $j = m$, then
+                          \[
+                            f(n) = j
+                          \]
+                    \item Otherwise,
+                          \[
+                            f(j) = j
+                          \]
+                  \end{itemize}
+          \end{itemize}
+    \item Suppose $n = m$. Define $f: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            \forall i \in [1, n]_{\N}, f(i) \coloneqq i
+          \]
+          Then
+          \begin{itemize}
+            \item \textbf{Injectivity}: Suppose
+                  \begin{itemize}
+                    \item $i, j \in [1, m]_{\N}$
+                    \item $f(i) = f(j)$
+                  \end{itemize}
+                  Then
+                  \[
+                    i = j
+                  \]
+            \item \textbf{Surjectivity}: Suppose $j \in [1, m]_{\N}$. Then
+                  \[
+                    f(j) = j
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            f: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem} \label{an1:thm:properties-of-cardinality}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0} \implies
+            \paren*{\abs*{X} \leq \abs*{Y} \iff \exists f: X \hookrightarrow Y}$
+    \item $\forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0} \implies$
+          \[
+            \paren*{\abs*{X} \geq \abs*{Y} > 0 \lor \abs*{X} = \abs*{Y} = 0 \iff \exists f: X \twoheadrightarrow Y}
+          \]
+    \item $\forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0} \implies
+            \paren*{\abs*{X} = \abs*{Y} \iff \exists f: X \xrightarrow{\sim} Y}$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} = n \in [0, \infty)_{\N}$
+    \item $\abs*{Y} = m \in [0, \infty)_{\N}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists f_{X}: [1, n]_{\N} \xrightarrow{\sim} X$
+    \item $\exists f_{Y}: [1, m]_{\N} \xrightarrow{\sim} Y$
+  \end{itemize}
+  This implies
+  \begin{itemize}
+    \item \textbf{($\impliedby$)} Suppose $f: X \to Y$. Define $F: [1, n]_{\N} \to [1, m]_{\N}$ by
+          \[
+            F \equiv (f_{Y})^{-1} \circ f \circ f_{X}
+          \]
+          By \cref{an1:thm:inverse-function-is-bijective,an1:thm:properties-of-composition-functions},
+          \begin{itemize}
+            \item $f: X \hookrightarrow Y \implies F: [1, n]_{\N} \hookrightarrow [1, m]_{\N}$
+            \item $f: X \twoheadrightarrow Y \implies F: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N}$
+          \end{itemize}
+          By \cref{an1:lem:properties-of-Nm-Nn},
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item Suppose $\exists f: X \hookrightarrow Y$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists F: [1, n]_{\N} \hookrightarrow [1, m]_{\N} \\
+                      \Downarrow                                         \\
+                      n \leq m
+                    \end{array}
+                  \]
+            \item Suppose $\exists f: X \twoheadrightarrow Y$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists F: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \\
+                      \Downarrow                                            \\
+                      n \geq m \geq 1 \lor n = m = 0
+                    \end{array}
+                  \]
+            \item Suppose $\exists f: X \xrightarrow{\sim} Y$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists F: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N} \\
+                      \Downarrow                                            \\
+                      n = m
+                    \end{array}
+                  \]
+          \end{enumerate}
+    \item \textbf{($\implies$)} Suppose $G: [1, n]_{\N} \to [1, m]_{\N}$. Define $f: X \to Y$ by
+          \[
+            f \equiv f_{Y} \circ G \circ (f_{X})^{-1}
+          \]
+          By \cref{an1:thm:inverse-function-is-bijective,an1:thm:properties-of-composition-functions},
+          \begin{itemize}
+            \item $G: [1, n]_{\N} \hookrightarrow [1, m]_{\N} \implies f: X \hookrightarrow Y$
+            \item $G: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \implies f: X \twoheadrightarrow Y$
+          \end{itemize}
+          By \cref{an1:lem:properties-of-Nm-Nn-converse},
+          \begin{enumerate}[label=\textbf{(\Alph*)}]
+            \item Suppose $n \leq m$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists G: [1, n]_{\N} \hookrightarrow [1, m]_{\N} \\
+                      \Downarrow                                         \\
+                      \exists f: X \hookrightarrow Y
+                    \end{array}
+                  \]
+            \item Suppose $n \geq m \geq 1 \lor n = m = 0$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists G: [1, n]_{\N} \twoheadrightarrow [1, m]_{\N} \\
+                      \Downarrow                                            \\
+                      \exists f: X \twoheadrightarrow Y
+                    \end{array}
+                  \]
+            \item Suppose $n = m$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists G: [1, n]_{\N} \xrightarrow{\sim} [1, m]_{\N} \\
+                      \Downarrow                                            \\
+                      \exists f: X \xrightarrow{\sim} Y
+                    \end{array}
+                  \]
+          \end{enumerate}
+  \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{an1:lem:union-of-two-disjoint-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, X \cap Y = \vnot \land \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \cup Y} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $X \cap Y = \vnot$
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \xrightarrow{\sim} X$
+    \item $\exists m \in [0, \infty)_{\N}, \exists g: [1, m]_{\N} \xrightarrow{\sim} Y$
+  \end{itemize}
+  Define $h: [1, m + n]_{\N} \to X \cup Y$ by
+  \[
+    \forall i \in [1, m + n]_{\N}, h(i) \coloneqq \begin{dcases}
+      f(i),     & \text{if } i \leq n \\
+      g(i - n), & \text{otherwise}
+    \end{dcases}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $i, j \in [1, m + n]_{\N}$
+            \item $h(i) = h(j)$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item If $i \leq n$, then
+                  \[
+                    \begin{array}{c}
+                      h(i) = f(i)                                                      \\
+                      \Downarrow                                                       \\
+                      f(i) = h(j) \in X                                                \\
+                      \by{\ensuremath{X \cap Y = \vnot}} \Downarrow                    \\
+                      j \leq n                                                         \\
+                      \Downarrow                                                       \\
+                      h(j) = f(j)                                                      \\
+                      \Downarrow                                                       \\
+                      f(i) = f(j)                                                      \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      i = j
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      h(i) = g(i - n)                                                  \\
+                      \Downarrow                                                       \\
+                      g(i - n) = h(j) \in Y                                            \\
+                      \by{\ensuremath{X \cap Y = \vnot}} \Downarrow                    \\
+                      j > n                                                            \\
+                      \Downarrow                                                       \\
+                      h(j) = g(j - n)                                                  \\
+                      \Downarrow                                                       \\
+                      g(i - n) = g(j - n)                                              \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow \\
+                      i - n = j - n                                                    \\
+                      \Downarrow                                                       \\
+                      i = j
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{Surjectivity}: Suppose $k \in X \cup Y$. Then
+          \begin{itemize}
+            \item If $k \in X$, then
+                  \[
+                    \begin{array}{c}
+                      k \in X                                                          \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      \exists i \in [1, n]_{\N}, f(i) = k                              \\
+                      \Downarrow                                                       \\
+                      h(i) = k
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \begin{array}{c}
+                      k \in Y                                                          \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow \\
+                      \exists j \in [1, m]_{\N}, g(j) = k                              \\
+                      \Downarrow                                                       \\
+                      h(j + n) = k
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      h: [1, m + n]_{\N} \xrightarrow{\sim} X \cup Y \\
+      \Downarrow                                     \\
+      \abs*{X \cup Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}

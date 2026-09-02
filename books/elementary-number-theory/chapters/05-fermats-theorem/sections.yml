@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: pierre-de-fermat
+  title: Pierre de Fermat
+- slug: fermats-little-theorem-and-pseudoprimes
+  title: Fermat's Little Theorem and Pseudoprimes
+- slug: wilson-s-theorem
+  title: Wilson;s Theorem
+- slug: the-fermat-kraitchik-factorization-method
+  title: The Fermat-Kraitchik Factorization Method

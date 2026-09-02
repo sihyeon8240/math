@@ -1,0 +1,47 @@
+% Generated from books.yml, chapters.yml, and common/templates/book.tex; do not edit.
+\documentclass[11pt, a4paper, oneside]{book}
+
+\usepackage{textbook}
+\IfFileExists{local-style.sty}{\usepackage{local-style}}{}
+\addbibresource{references.bib}
+% BEGIN GENERATED METADATA
+\newcommand{\name}{MUHO CHOI}
+\newcommand{\displaytitle}{Linear Algebra}
+\newcommand{\version}{0.1.0}
+\newcommand{\slug}{linear-algebra}
+\title{\displaytitle}
+\author{\name}
+\hypersetup{pdftitle={\displaytitle},pdfauthor={\name}}
+% END GENERATED METADATA
+
+\begin{document}
+
+\frontmatter
+\InputIfFileExists{frontmatter/title-and-copyright.tex}{}{\input{title-and-copyright}}
+\tableofcontents
+\InputIfFileExists{frontmatter/preface.tex}{}{\input{preface}}
+
+\mainmatter
+% BEGIN GENERATED CHAPTERS
+\include{chapters/01-vector-spaces/index}
+\include{chapters/02-matrices/index}
+\include{chapters/03-linear-mappings/index}
+\include{chapters/04-linear-maps-and-matrices/index}
+\include{chapters/05-scalar-products-and-orthogonality/index}
+\include{chapters/06-determinants/index}
+\include{chapters/07-symmetric-hermitian-and-unitary-operators/index}
+\include{chapters/08-eigenvectors-and-eigenvalues/index}
+\include{chapters/09-polynomials-and-matrices/index}
+\include{chapters/10-triangulation-of-matrices-and-linear-maps/index}
+\include{chapters/11-polynomials-and-primary-decomposition/index}
+\include{chapters/12-convex-sets/index}
+% END GENERATED CHAPTERS
+
+\backmatter
+% BEGIN GENERATED APPENDICES
+% END GENERATED APPENDICES
+
+\nocite{*}
+\printbibliography
+
+\end{document}

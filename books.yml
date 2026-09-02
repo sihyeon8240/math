@@ -1,0 +1,48 @@
+schema_version: 1
+
+defaults:
+  author: MUHO CHOI
+  build: true
+  check: true
+  release: false
+  site: false
+
+books:
+  - slug: mathematical-analysis-1
+    title: Mathematical Analysis I
+    version: 0.1.0
+    label_prefix: an1
+    lean_module: MathematicalAnalysis1
+    status: review
+    order: 10
+    release: true
+    site: true
+
+  - slug: mathematical-analysis-2
+    title: Mathematical Analysis II
+    version: 0.1.0
+    label_prefix: an2
+    lean_module: MathematicalAnalysis2
+    status: draft
+    order: 20
+    release: false
+    site: true
+
+  - slug: elementary-number-theory
+    title: Elementary Number Theory
+    version: 0.1.0
+    short_title: Number Theory
+    label_prefix: nt
+    lean_module: ElementaryNumberTheory
+    status: draft
+    order: 30
+    site: true
+
+  - slug: linear-algebra
+    title: Linear Algebra
+    version: 0.1.0
+    label_prefix: la
+    lean_module: LinearAlgebra
+    status: draft
+    order: 40
+    site: true

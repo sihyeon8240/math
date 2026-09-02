@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: leonhard-euler
+  title: Leonhard Euler
+- slug: eulers-phi-function
+  title: Euler's Phi-Function
+- slug: eulers-theorem
+  title: Euler's Theorem
+- slug: some-properties-of-the-phi-function
+  title: Some Properties of the Phi-Function

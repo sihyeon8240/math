@@ -1,0 +1,295 @@
+\begin{proof}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item By \cref{an1:ax:completeness},
+          \[
+            \exists \alpha \in \R, \alpha = \sup E
+          \]
+          Suppose $\alpha \notin E$. Then
+          \[
+            \begin{array}{c}
+              \forall x \in \R^{+}, \alpha - x \notin E^{u}                          \\
+              \Downarrow                                                             \\
+              \forall x \in \R^{+}, \exists p_{x} \in E, \alpha - x < p_{x} < \alpha \\
+              \Downarrow                                                             \\
+              \forall x \in \R^{+}, p_{x} \in \widetilde{N}_{x}(\alpha) \cap E       \\
+              \Downarrow                                                             \\
+              \alpha \in E'
+            \end{array}
+          \]
+    \item follows from \textbf{(A)}.
+  \end{enumerate}
+\end{proof}
+
+\begin{theorem} \label{an1:thm:isolated-points-are-self-minus-limit-points}
+  \[
+    \forall E \subseteq \abs*{(X, d)}, E^{i} = E \setminus E'
+  \]
+\end{theorem}
+
+\begin{proof}
+  \leavevmode\par
+  \begin{itemize}
+    \item \textbf{($\subseteq$)} Suppose $p \in E^{i}$. Then
+          \[
+            \begin{array}{c}
+              \exists r \in \R^{+}, E \cap N_{r}(p) = \set*{p}  \\
+              \Downarrow                                        \\
+              p \in E \land E \cap \widetilde{N}_{r}(p) = \vnot \\
+              \Downarrow                                        \\
+              p \notin E'                                       \\
+              \Downarrow                                        \\
+              p \in E \setminus E'
+            \end{array}
+          \]
+    \item \textbf{($\supseteq$)} Suppose $p \in E \setminus E'$. Then
+          \[
+            \begin{array}{c}
+              p \notin E'                                               \\
+              \Downarrow                                                \\
+              \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(p) = \vnot \\
+              \by{\ensuremath{p \in E}} \Downarrow                      \\
+              E \cap N_{r}(p) = \set*{p}                                \\
+              \Downarrow                                                \\
+              p \in E^{i}
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{an1:lem:complement-of-interior-is-closure-of-complement}
+  \[
+    \forall E \subseteq \abs*{(X, d)}, \paren*{E^{\circ}}^{c} = \overline{E^{c}}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose $p \in X$. Then
+  \begin{align*}
+    p \in \paren*{E^{\circ}}^{c} & \iff p \notin E^{\circ}                                   \\
+                                 & \iff \forall r \in \R^{+}, N_{r}(p) \not\subseteq E       \\
+                                 & \iff \forall r \in \R^{+}, N_{r}(p) \cap E^{c} \neq \vnot \\
+                                 & \iff p \in \overline{E^{c}}
+  \end{align*}
+\end{proof}
+
+\begin{definition} \label{an1:def:boundary}
+  Suppose $E \subseteq \abs*{(X, d)}$. The \textbf{boundary} $\partial E$ of $E$ is defined by
+  \[
+    \partial E \coloneqq \overline{E} \cap \overline{E^{c}}
+  \]
+  or equivalently, by \cref{an1:lem:complement-of-interior-is-closure-of-complement},
+  \[
+    \partial E = \overline{E} \setminus E^{\circ}
+  \]
+\end{definition}
+
+\begin{lemma} \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
+  \[
+    \forall n \in \N, \forall \bm{p} \in \R^{n}, \forall r \in \R^{+}, \widetilde{N}_{r}(\bm{p}) \neq \vnot
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $\bm{p} \in \R^{n}$
+    \item $r \in \R^{+}$
+  \end{itemize}
+  By \cref{an1:def:inner-product-norm},
+  \[
+    \begin{array}{c}
+      \norm*{\paren*{\bm{p} + \frac{r}{2} \bm{e_{1}}} - \bm{p}} = \norm*{\frac{r}{2} \bm{e_{1}}} = \frac{r}{2} < r \\
+      \Downarrow                                                                                                   \\
+      \bm{p} + \frac{r}{2} \bm{e_{1}} \in \widetilde{N}_{r}(\bm{p})
+    \end{array}
+  \]
+  where $\bm{e_{1}} \coloneqq (1, 0, 0, \dots, 0) \in \R^{n}$.
+\end{proof}
+
+\begin{theorem} \label{an1:thm:properties-of-boundary-in-rn}
+  \[
+    \forall n \in \N, \forall E \subseteq \R^{n}, \partial E = E^{i} \cup (E^{c})^{i} \cup \paren*{E' \cap (E^{c})'}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $E \subseteq \R^{n}$
+  \end{itemize}
+  By \cref{an1:def:boundary},
+  \begin{align*}
+    \partial E & = \overline{E} \cap \overline{E^{c}}                   \\
+               & = \paren*{E \cup E'} \cap \paren*{E^{c} \cup (E^{c})'} \\
+               & = \paren*{E \cap E^{c}} \cup \paren*{E \cap (E^{c})'}
+    \cup \paren*{E' \cap E^{c}} \cup \paren*{E' \cap (E^{c})'}
+  \end{align*}
+  Consider
+  \begin{itemize}
+    \item $E = \paren*{E \setminus E'} \cup \paren*{E \cap E'}$
+    \item $E^{c} = \paren*{E^{c} \setminus (E^{c})'} \cup \paren*{E^{c} \cap (E^{c})'}$
+  \end{itemize}
+  This implies
+  \begin{itemize}
+    \item $E \cap (E^{c})' = \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+            \cup \paren*{\paren*{E \cap E'} \cap (E^{c})'}$
+    \item $E' \cap E^{c} = \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}}
+            \cup \paren*{E' \cap \paren*{E^{c} \cap (E^{c})'}}$
+  \end{itemize}
+  Consider
+  \begin{itemize}
+    \item $\paren*{\paren*{E \cap E'} \cap (E^{c})'} \subseteq E' \cap (E^{c})'$
+    \item $\paren*{E' \cap \paren*{E^{c} \cap (E^{c})'}} \subseteq E' \cap (E^{c})'$
+  \end{itemize}
+  This implies
+  \begin{align*}
+    \partial E & = \vnot \cup \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+    \cup \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}} \cup \paren*{E' \cap (E^{c})'} \\
+               & = \paren*{\paren*{E \setminus E'} \cap (E^{c})'}
+    \cup \paren*{E' \cap \paren*{E^{c} \setminus (E^{c})'}} \cup \paren*{E' \cap (E^{c})'}
+  \end{align*}
+  Suppose $\bm{p} \in E \setminus E'$. Then
+  \[
+    \begin{array}{c}
+      \exists r \in \R^{+}, E \cap \widetilde{N}_{r}(\bm{p}) = \vnot \\
+      \Downarrow                                                     \\
+      \widetilde{N}_{r}(\bm{p}) \subseteq E^{c}
+    \end{array}
+  \]
+  By \cref{an1:lem:deleted-neighborhood-in-Rn-is-non-empty},
+  \[
+    \begin{array}{c}
+      \forall s \in \R^{+}, \widetilde{N}_{s}(\bm{p}) \cap \widetilde{N}_{r}(\bm{p}) =
+      \widetilde{N}_{\min(s,r)}(\bm{p}) \neq \vnot                                            \\
+      \Downarrow                                                                              \\
+      \widetilde{N}_{s}(\bm{p}) \cap \paren*{\widetilde{N}_{r}(\bm{p}) \cap E^{c}} \neq \vnot \\
+      \Downarrow                                                                              \\
+      E^{c} \cap \widetilde{N}_{s}(\bm{p}) \neq \vnot                                         \\
+      \Downarrow                                                                              \\
+      \bm{p} \in (E^{c})'
+    \end{array}
+  \]
+  Since $\bm{p} \in E \setminus E'$ was arbitrary,
+  \[
+    \begin{array}{c}
+      E \setminus E' \subseteq (E^{c})' \\
+      \Downarrow                        \\
+      \paren*{E \setminus E'} \cap (E^{c})' = E \setminus E'
+    \end{array}
+  \]
+  Similarly,
+  \[
+    \begin{array}{c}
+      E^{c} \setminus (E^{c})' \subseteq E' \\
+      \Downarrow                            \\
+      E' \cap \paren*{E^{c} \setminus (E^{c})'} = E^{c} \setminus (E^{c})'
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \partial E = \paren*{E \setminus E'} \cup \paren*{E^{c} \setminus (E^{c})'} \cup \paren*{E' \cap (E^{c})'} \\
+      \by{\Cref{an1:thm:isolated-points-are-self-minus-limit-points}} \Downarrow                                 \\
+      \partial E = E^{i} \cup (E^{c})^{i} \cup \paren*{E' \cap (E^{c})'}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{remark}
+  Suppose $Y \subseteq \abs*{(X, d)}$. Then one can verify
+  \[
+    d|_{Y \times Y}: Y \times Y \to [0, \infty)
+  \]
+  is a metric on $Y$. Therefore, the structure
+  \[
+    (Y, d|_{Y \times Y})
+  \]
+  is a metric space, which is called the \textbf{subspace} of $(X, d)$.
+  \begin{itemize}
+    \item $(Y, d)$ denotes $(Y, d|_{Y \times Y})$
+    \item $d(p, q)$ denotes $d|_{Y \times Y}(p, q)$
+  \end{itemize}
+  for the sake of simplicity.
+\end{remark}
+
+\begin{definition} \label{an1:def:relative-open-closed-sets}
+  Suppose $E \subseteq Y \subseteq \abs*{(X, d)}$. Then
+  \begin{itemize}
+    \item $E$ is said to be \textbf{open relative to} $Y$ if
+          \[
+            \forall p \in E, \exists r \in \R^{+}, Y \cap N_{r}(p) \subseteq E
+          \]
+          or equivalently,
+          \[
+            E \in \mathcal{O}(\abs*{(Y, d)})
+          \]
+    \item $E$ is said to be \textbf{closed relative to} $Y$ if
+          \[
+            E' \cap Y \subseteq E
+          \]
+          or equivalently,
+          \[
+            E \in \mathcal{C}(\abs*{(Y, d)})
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{theorem} \label{an1:thm:open-set-relative-to-subspace}
+  \[
+    \forall E, Y \subseteq \abs*{(X, d)}, E \in \mathcal{O}(\abs*{(Y, d)})
+    \iff \exists V \in \mathcal{O}(X), E = V \cap Y
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose $E, Y \subseteq X$. Then
+  \begin{itemize}
+    \item \textbf{($\implies$)} Suppose $E \in \mathcal{O}(\abs*{(Y, d)})$. Then
+          \[
+            \forall p \in E, \exists r_{p} \in \R^{+}, Y \cap N_{r_{p}}(p) \subseteq E
+          \]
+          Define
+          \[
+            V \coloneqq \bigcup_{p \in E} N_{r_{p}}(p) \subseteq X
+          \]
+          By \cref{an1:thm:neighborhood-is-open,an1:thm:arbitrary-union-of-open-sets-is-open},
+          \[
+            V \in \mathcal{O}(X)
+          \]
+          We will show $E = V \cap Y$.
+          \begin{itemize}
+            \item \textbf{($\subseteq$)}
+                  \[
+                    \begin{array}{c}
+                      \forall p \in E, p \in N_{r_{p}}(p) \subseteq V \\
+                      \Downarrow                                      \\
+                      E \subseteq V
+                    \end{array}
+                  \]
+            \item \textbf{($\supseteq$)}
+                  \[
+                    \begin{array}{c}
+                      \bigcup_{p \in E} \paren*{Y \cap N_{r_{p}}(p)} \subseteq E \\
+                      \Downarrow                                                 \\
+                      Y \cap V = Y \cap \bigcup_{p \in E} N_{r_{p}}(p) \subseteq E
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \textbf{($\impliedby$)} Suppose
+          \begin{itemize}
+            \item $V \in \mathcal{O}(X)$
+            \item $E = V \cap Y$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              \forall p \in E, \exists r_{p} \in \R^{+}, N_{r_{p}}(p) \subseteq V \\
+              \Downarrow                                                          \\
+              \forall p \in E, Y \cap N_{r_{p}}(p) \subseteq V \cap Y = E
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}

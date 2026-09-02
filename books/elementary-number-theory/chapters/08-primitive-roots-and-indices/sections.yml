@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: the-order-of-an-integer-modulo-n
+  title: The Order of an Integer Modulo \texorpdfstring{$\bm{n}$}{n}
+- slug: primitive-roots-for-primes
+  title: Primitive Roots for Primes
+- slug: composite-numbers-having-primitive-roots
+  title: Composite Numbers Having Primitive Roots
+- slug: the-theory-of-indices
+  title: The Theory of Indices

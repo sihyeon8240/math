@@ -1,0 +1,223 @@
+\begin{theorem} \label{an1:thm:integer-construction-relation-is-equivalence}
+  Define $\sim$ on $\N \times \N$ by
+  \[
+    \forall (a, b), (c, d) \in \N \times \N, (a, b) \sim (c, d) \iff a + d = b + c
+  \]
+  Then $\sim$ is an equivalence relation on $\N \times \N$.
+\end{theorem}
+
+\begin{proof}
+  By \cref{an1:def:equivalence-relation},
+  \begin{itemize}
+    \item \textbf{Reflexivity}: Suppose $(a, b) \in \N \times \N$. Then
+          \[
+            \begin{array}{c}
+              a + b = b + a \\
+              \Downarrow    \\
+              (a, b) \sim (a, b)
+            \end{array}
+          \]
+    \item \textbf{Symmetry}: Suppose
+          \begin{itemize}
+            \item $(a, b), (c, d) \in \N \times \N$
+            \item $(a, b) \sim (c, d)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              a + d = b + c \\
+              \Downarrow    \\
+              c + b = d + a \\
+              \Downarrow    \\
+              (c, d) \sim (a, b)
+            \end{array}
+          \]
+    \item \textbf{Transitivity}: Suppose
+          \begin{itemize}
+            \item $(a, b), (c, d), (e, f) \in \N \times \N$
+            \item $(a, b) \sim (c, d)$
+            \item $(c, d) \sim (e, f)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              a + d = b + c \land c + f = d + e \\
+              \Downarrow                        \\
+              a + d + f = b + c + f = b + d + e \\
+              \Downarrow                        \\
+              a + f = b + e                     \\
+              \Downarrow                        \\
+              (a, b) \sim (e, f)
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{remark}
+  Strictly speaking, \cref{an1:thm:integer-construction-relation-is-equivalence} requires several
+  \textbf{properties} of operations on $\N$. In this textbook, the properties are not discussed, so just
+  \textbf{accepted} as true. The same issue arises for \cref{an1:thm:rational-construction-relation-is-equivalence}.
+\end{remark}
+
+\begin{definition} \label{an1:def:integer-number-system}
+  Recall the relation $\sim$ defined in \cref{an1:thm:integer-construction-relation-is-equivalence}.
+  The set of \textbf{integers} $\Z$ is defined by
+  \[
+    \Z \coloneqq (\N \times \N) / \sim
+  \]
+\end{definition}
+
+\begin{definition} \label{an1:def:operations-on-Z}
+  Suppose $[(a, b)], [(c, d)] \in \Z$.
+  \begin{itemize}
+    \item \textbf{Addition} $+$ on $\Z$ is defined by
+          \[
+            [(a, b)] + [(c, d)] \coloneqq [(a + c, b + d)]
+          \]
+    \item \textbf{Multiplication} $\cdot$ on $\Z$ is defined by
+          \[
+            [(a, b)] \cdot [(c, d)] \coloneqq [(a \cdot c + b \cdot d, a \cdot d + b \cdot c)]
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{remark}
+  The operations on $\Z$ are \textbf{well-defined}; that is, they do not depend on the
+  \textbf{choice of representatives} of the equivalence classes. Indeed, if
+  \begin{itemize}
+    \item $(a, b) \sim (a', b')$
+    \item $(c, d) \sim (c', d')$
+  \end{itemize}
+  then one can verify that
+  \begin{itemize}
+    \item $(a + c, b + d) \sim (a' + c', b' + d')$
+    \item $(a \cdot c + b \cdot d, a \cdot d + b \cdot c)
+            \sim (a' \cdot c' + b' \cdot d', a' \cdot d' + b' \cdot c')$
+  \end{itemize}
+  The same issue arises for operations on $\Q$, whose \textbf{well-definedness}
+  could be verified in exactly the same manner.
+\end{remark}
+
+\begin{theorem} \label{an1:thm:rational-construction-relation-is-equivalence}
+  Define
+  \[
+    \Z^{+} \coloneqq \setbuilder*{[(n + 1, 1)] \in \Z}{n \in \N} \subseteq \Z
+  \]
+  Define $\sim$ on $\Z \times \Z^{+}$ by
+  \[
+    \forall (a, b), (c, d) \in \Z \times \Z^{+}, (a, b) \sim (c, d) \iff a \cdot d = b \cdot c
+  \]
+  Then $\sim$ is an equivalence relation on $\Z \times \Z^{+}$.
+\end{theorem}
+
+\begin{proof}
+  By \cref{an1:def:equivalence-relation},
+  \begin{itemize}
+    \item \textbf{Reflexivity}: Suppose $(a, b) \in \Z \times \Z^{+}$. Then
+          \[
+            \begin{array}{c}
+              a \cdot b = b \cdot a \\
+              \Downarrow            \\
+              (a, b) \sim (a, b)
+            \end{array}
+          \]
+    \item \textbf{Symmetry}: Suppose
+          \begin{itemize}
+            \item $(a, b), (c, d) \in \Z \times \Z^{+}$
+            \item $(a, b) \sim (c, d)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              a \cdot d = b \cdot c \\
+              \Downarrow            \\
+              c \cdot b = d \cdot a \\
+              \Downarrow            \\
+              (c, d) \sim (a, b)
+            \end{array}
+          \]
+    \item \textbf{Transitivity}: Suppose
+          \begin{itemize}
+            \item $(a, b), (c, d), (e, f) \in \Z \times \Z^{+}$
+            \item $(a, b) \sim (c, d)$
+            \item $(c, d) \sim (e, f)$
+          \end{itemize}
+          Then
+          \[
+            \begin{array}{c}
+              a \cdot d = b \cdot c \land c \cdot f = d \cdot e         \\
+              \Downarrow                                                \\
+              a \cdot d \cdot f = b \cdot c \cdot f = b \cdot d \cdot e \\
+              \Downarrow                                                \\
+              a \cdot f = b \cdot e                                     \\
+              \Downarrow                                                \\
+              (a, b) \sim (e, f)
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{definition} \label{an1:def:rational-number-system}
+  Recall the relation $\sim$ defined in \cref{an1:thm:rational-construction-relation-is-equivalence}.
+  The set of \textbf{rational numbers} $\Q$ is defined by
+  \[
+    \Q \coloneqq (\Z \times \Z^{+}) / \sim
+  \]
+\end{definition}
+
+\begin{definition} \label{an1:def:operations-on-Q}
+  Suppose $[(a, b)], [(c, d)] \in \Q$.
+  \begin{itemize}
+    \item \textbf{Addition} $+$ on $\Q$ is defined by
+          \[
+            [(a, b)] + [(c, d)] \coloneqq [(ad + bc, bd)]
+          \]
+    \item \textbf{Multiplication} $\cdot$ on $\Q$ is defined by
+          \[
+            [(a, b)] \cdot [(c, d)] \coloneqq [(ac, bd)]
+          \]
+  \end{itemize}
+\end{definition}
+
+\begin{remark}
+  Strictly speaking, the constructions of $\N$, $\Z$, and $\Q$
+  produce \textbf{different kind} of sets. For example,
+  \begin{itemize}
+    \item $n \in \N$
+    \item $[(n + 1, 1)] \in \Z$
+    \item $[(n, [(2, 1)])] \in \Q$
+  \end{itemize}
+  are distinct objects in the underlying set-theoretic construction.
+  Nevertheless, there are \textbf{canonical embeddings}
+  \begin{itemize}
+    \item $\N \to \Z$ such that $n \mapsto [(n + 1, 1)]$
+    \item $\Z \to \Q$ such that $a \mapsto [(a, [(2, 1)])]$
+  \end{itemize}
+  which preserve the \textbf{algebraic operations}. Therefore, we identify
+  each number system with its image in the next larger one and write
+  \[
+    \N \subseteq \Z \subseteq \Q
+  \]
+  This identification is justified by the fact that the embeddings are canonical,
+  requiring \textbf{no arbitrary choices}. Throughout this textbook, inclusions such as
+  \[
+    \N \subseteq \Z \subseteq \Q \subseteq \R \subseteq \C
+  \]
+  should be understood as canonical identifications rather than
+  literal inclusions arising directly from the set-theoretic constructions.
+\end{remark}
+
+\begin{remark}
+  Define
+  \[
+    0 \coloneqq [(1, 1)] \in \Z
+  \]
+  The notations below denote subsets of $\Z$:
+  \begin{itemize}
+    \item $[0, \infty)_{\N} \coloneqq \N \cup \set*{0} \subseteq \Z$
+    \item $\forall n \in [0, \infty)_{\N}, [n, \infty)_{\N}
+            \coloneqq \setbuilder*{k \in [0, \infty)_{\N}}{k \geq n}$
+    \item $\forall n, m \in [0, \infty)_{\N}, [n, m]_{\N}
+            \coloneqq \setbuilder*{k \in [n, \infty)_{\N}}{k \leq m}$
+  \end{itemize}
+\end{remark}

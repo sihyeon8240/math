@@ -1,0 +1,251 @@
+\begin{definition} \label{an1:def:relation}
+  A \textbf{relation} $R$ from $A$ to $B$ is defined by
+  \[
+    R \subseteq A \times B
+  \]
+  In particular, a relation $R$ on $A$ is defined by
+  \[
+    R \subseteq A \times A
+  \]
+  The notation $xRy$ denotes $(x, y) \in R$.
+\end{definition}
+
+\begin{definition} \label{an1:def:equivalence-relation}
+  A relation $\sim$ on $S$ is called an \textbf{equivalence relation} if it satisfies
+  \begin{itemize}
+    \item \textbf{Reflexivity}: $\forall x \in S, x \sim x$
+    \item \textbf{Symmetry}: $\forall x, y \in S, x \sim y \implies y \sim x$
+    \item \textbf{Transitivity}: $\forall x, y, z \in S, x \sim y \land y \sim z \implies x \sim z$
+  \end{itemize}
+\end{definition}
+
+\begin{definition} \label{an1:def:partition}
+  A collection $\set*{A_{\alpha}}_{\alpha \in I}$ is called a \textbf{partition} of $S$ if
+  \begin{itemize}
+    \item \textbf{Nonemptiness}: $\forall \alpha \in I, \vnot \neq A_{\alpha} \subseteq S$
+    \item \textbf{Disjointness}: $\forall \alpha, \beta \in I, \alpha \neq \beta \implies A_{\alpha} \cap A_{\beta} = \vnot$
+    \item \textbf{Exhaustivity}: $\bigcup_{\alpha \in I} A_{\alpha} = S$
+  \end{itemize}
+\end{definition}
+
+\begin{definition} \label{an1:def:equivalence-class}
+  Suppose
+  \begin{itemize}
+    \item $\sim$ is an equivalence relation on $S$
+    \item $x \in S$
+  \end{itemize}
+  The \textbf{equivalence class} of $x$ is defined by
+  \[
+    [x] \coloneqq \setbuilder*{y \in S}{y \sim x}
+  \]
+  The set of all equivalence classes of $S$ is denoted by
+  \[
+    S / \sim \; \coloneqq \setbuilder*{[x]}{x \in S}
+  \]
+\end{definition}
+
+\begin{lemma} \label{an1:lem:equivalence-class-intersection}
+  Suppose $\sim$ is an equivalence relation on $S$. Then
+  \[
+    \forall x, y \in S, [x] \cap [y] \neq \vnot \implies [x] = [y]
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $x, y \in S$
+    \item $[x] \cap [y] \neq \vnot$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \exists z \in S, z \in [x] \cap [y] \\
+      \Downarrow                          \\
+      z \sim x \land z \sim y             \\
+      \Downarrow                          \\
+      x \sim z \land z \sim y             \\
+      \Downarrow                          \\
+      x \sim y
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \forall w \in S, w \sim x \implies w \sim y \\
+      \Downarrow                                  \\
+      \forall w \in [x], w \in [y]                \\
+      \Downarrow                                  \\
+      \bracket*{x} \subseteq [y]
+    \end{array}
+  \]
+  Similarly,
+  \[
+    [y] \subseteq [x]
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:equivalence-relation-defines-partition}
+  Suppose $\sim$ is an equivalence relation on $S$. Then
+  \[
+    \set*{[\alpha]}_{[\alpha] \in S / \sim} = S / \sim
+  \]
+  is a partition of $S$.
+\end{theorem}
+
+\begin{proof}
+  By \cref{an1:def:partition},
+  \begin{itemize}
+    \item \textbf{Nonemptiness}:
+          \[
+            \forall [\alpha] \in S / \sim, \alpha \in [\alpha] \subseteq S
+          \]
+    \item \textbf{Disjointness}: By \cref{an1:lem:equivalence-class-intersection},
+          \[
+            \forall [\alpha], [\beta] \in S / \sim, [\alpha] \neq [\beta] \implies [\alpha] \cap [\beta] = \vnot
+          \]
+    \item \textbf{Exhaustivity}:
+          \begin{itemize}
+            \item \textbf{($\subseteq$)}
+                  \[
+                    \begin{array}{c}
+                      \forall [\alpha] \in S / \sim, [\alpha] \subseteq S \\
+                      \Downarrow                                          \\
+                      \bigcup_{[\alpha] \in S / \sim} [\alpha] \subseteq S
+                    \end{array}
+                  \]
+            \item \textbf{($\supseteq$)}
+                  \[
+                    \begin{array}{c}
+                      \forall \beta \in S, [\beta] \in S / \sim \\
+                      \Downarrow                                \\
+                      \forall\beta \in S, \beta \in [\beta] \subseteq \bigcup_{[\alpha] \in S / \sim} [\alpha]
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+\end{proof}
+
+\begin{theorem} \label{an1:thm:partition-defines-equivalence-relation}
+  Suppose $\set*{A_{\alpha}}_{\alpha \in I}$ is a partition of $S$. Define $\sim$ on $S$ by
+  \[
+    \forall x, y \in S, x \sim y \iff \exists \alpha \in I, x \in A_{\alpha} \land y \in A_{\alpha}
+  \]
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\sim$ is an equivalence relation on $S$
+    \item \begin{itemize}
+            \item $\forall x \in S, \exists \beta \in I, [x] = A_{\beta}$
+            \item $\forall \beta \in I, \exists x \in S, [x] = A_{\beta}$
+          \end{itemize}
+    \item $\set*{A_{\alpha}}_{\alpha \in I} = S / \sim$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item By \cref{an1:def:equivalence-relation},
+          \begin{itemize}
+            \item \textbf{Reflexivity}: Suppose $x \in S$. Then
+                  \[
+                    \begin{array}{c}
+                      x \in \bigcup_{\alpha \in I} A_{\alpha} \\
+                      \Downarrow                              \\
+                      \exists \beta \in I, x \in A_{\beta}    \\
+                      \Downarrow                              \\
+                      x \sim x
+                    \end{array}
+                  \]
+            \item \textbf{Symmetry}: Suppose
+                  \begin{itemize}
+                    \item $x, y \in S$
+                    \item $x \sim y$
+                  \end{itemize}
+                  Then
+                  \[
+                    \begin{array}{c}
+                      \exists \alpha \in I, x \in A_{\alpha} \land y \in A_{\alpha} \\
+                      \Downarrow                                                    \\
+                      y \in A_{\alpha} \land x \in A_{\alpha}                       \\
+                      \Downarrow                                                    \\
+                      y \sim x
+                    \end{array}
+                  \]
+            \item \textbf{Transitivity}: Suppose
+                  \begin{itemize}
+                    \item $x, y, z \in S$
+                    \item $x \sim y$
+                    \item $y \sim z$
+                  \end{itemize}
+                  Then
+                  \begin{itemize}
+                    \item $\exists \alpha \in I, x \in A_{\alpha} \land y \in A_{\alpha}$
+                    \item $\exists \beta \in I, y \in A_{\beta} \land z \in A_{\beta}$
+                  \end{itemize}
+                  Therefore,
+                  \[
+                    \begin{array}{c}
+                      y \in A_{\alpha} \land y \in A_{\beta}  \\
+                      \Downarrow                              \\
+                      A_{\alpha} \cap A_{\beta} \neq \vnot    \\
+                      \Downarrow                              \\
+                      \alpha = \beta                          \\
+                      \Downarrow                              \\
+                      x \in A_{\alpha} \land z \in A_{\alpha} \\
+                      \Downarrow                              \\
+                      x \sim z
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item \begin{itemize}
+            \item Suppose $x \in S$. Then
+                  \[
+                    \begin{array}{c}
+                      x \in \bigcup_{\alpha \in I} A_{\alpha} \\
+                      \Downarrow                              \\
+                      \exists \beta \in I, x \in A_{\beta}    \\
+                    \end{array}
+                  \]
+            \item Suppose $\beta \in I$. Then
+                  \[
+                    \exists x \in A_{\beta} \subseteq S
+                  \]
+          \end{itemize}
+          We will show $[x] = A_{\beta}$.
+          \begin{itemize}
+            \item \textbf{($\subseteq$)} Suppose $y \in [x]$. Then
+                  \[
+                    \begin{array}{c}
+                      \exists \gamma \in I, y \in A_{\gamma} \land x \in A_{\gamma} \\
+                      \Downarrow                                                    \\
+                      x \in A_{\gamma} \cap A_{\beta}                               \\
+                      \Downarrow                                                    \\
+                      \gamma = \beta                                                \\
+                      \Downarrow                                                    \\
+                      y \in A_{\beta}
+                    \end{array}
+                  \]
+            \item \textbf{($\supseteq$)} Suppose $y \in A_{\beta}$. Then
+                  \[
+                    \begin{array}{c}
+                      y \sim x   \\
+                      \Downarrow \\
+                      y \in [x]
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item By \cref{an1:thm:partition-defines-equivalence-relation},
+          \begin{itemize}
+            \item \textbf{($\subseteq$)}
+                  \[
+                    \forall A_{\beta} \in \set*{A_{\alpha}}_{\alpha \in I},
+                    \exists x \in S, A_{\beta} = [x] \in S / \sim
+                  \]
+            \item \textbf{($\supseteq$)}
+                  \[
+                    \forall [x] \in S / \sim, \exists \beta \in I, [x] = A_{\beta} \in \set*{A_{\alpha}}_{\alpha \in I}
+                  \]
+          \end{itemize}
+  \end{enumerate}
+\end{proof}

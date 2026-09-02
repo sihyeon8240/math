@@ -1,0 +1,120 @@
+\begin{proof}
+  Define $f: \N \to [0, 1)$ by
+  \[
+    \forall n \in \N, f(n) \coloneqq \frac{1}{n + 1}
+  \]
+  Suppose
+  \begin{itemize}
+    \item $n_{1}, n_{2} \in \N$
+    \item $f(n_{1}) = f(n_{2})$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \frac{1}{n_{1} + 1} = \frac{1}{n_{2} + 1} \\
+      \Downarrow                                \\
+      n_{1} = n_{2}
+    \end{array}
+  \]
+  Therefore,
+  \[
+    f: \N \hookrightarrow [0, 1)
+  \]
+  By \cref{an1:lem:N-is-infinite,an1:thm:injection-from-infinite-set-implies-infinite},
+  \[
+    \abs*{[0, 1)} \geq \aleph_{0}
+  \]
+  Define $g: [0, 1) \to \prod_{n = 1}^{\infty} \set*{0, 1}$ by
+  \[
+    \forall x \in [0, 1), g(x) \coloneqq \mathcal{G}_{2}(x)
+  \]
+  By \cref{an1:thm:greedy-base-expansion-exists-uniquely}, $g$ is well-defined.
+  By \cref{an1:thm:same-greedy-base-expansion-implies-equality},
+  \[
+    g: [0, 1) \hookrightarrow \prod_{n = 1}^{\infty} \set*{0, 1}
+  \]
+  Define
+  \[
+    Y \coloneqq g([0, 1)) \subseteq \prod_{n = 1}^{\infty} \set*{0, 1}
+  \]
+  By \cref{an1:thm:properties-of-restriction-functions},
+  \[
+    g|^{Y}: [0, 1) \xrightarrow{\sim} Y
+  \]
+  Assume $\abs*{[0, 1)} = \aleph_{0}$. By \cref{an1:thm:bijection-equivalence-relation},
+  \[
+    \abs*{Y} = \aleph_{0}
+  \]
+  Define
+  \[
+    Z \coloneqq \prod_{n = 1}^{\infty} \set*{0, 1} \setminus Y
+  \]
+  By \cref{an1:thm:no-real-number-matching-greedy-base-expansion,an1:thm:no-real-number-matching-greedy-base-expansion-converse},
+  \[
+    Z = \setbuilder*{\paren*{a_{n}}_{n = 1}^{\infty} \in \prod_{n = 1}^{\infty}
+    \set*{0, 1}}{\exists N \in \N, \forall n \in [N, \infty)_{\N}, a_{n} = 1}
+  \]
+  Define
+  \[
+    \forall N \in \N, Z_{N} \coloneqq \setbuilder*{\paren*{a_{n}}_{n = 1}^{\infty} \in
+    \prod_{n = 1}^{\infty} \set*{0, 1}}{\forall n \in [N, \infty)_{\N}, a_{n} = 1} \neq \vnot
+  \]
+  Define
+  \[
+    \forall N \in \N, F_{N}: \prod_{n = 1}^{N - 1} \set*{0, 1} \to Z_{N}
+  \]
+  by
+  \[
+    \begin{gathered}
+      \forall N \in \N, \forall \paren*{a_{1}, \ldots, a_{N - 1}} \in \prod_{n = 1}^{N - 1} \set*{0, 1}, \\
+      F_{N}\paren*{a_{1}, \ldots, a_{N - 1}} = \paren*{a_{1}, \ldots, a_{N - 1}, 1, 1, 1, \ldots}
+    \end{gathered}
+  \]
+  Suppose
+  \begin{itemize}
+    \item $N \in \N$
+    \item $\paren*{a_{1}, \ldots, a_{N - 1}, 1, 1, 1, \ldots} \in Z_{N}$
+  \end{itemize}
+  Then
+  \[
+    F_{N}\paren*{a_{1}, \ldots, a_{N - 1}} = \paren*{a_{1}, \ldots, a_{N - 1}, 1, 1, 1, \ldots}
+  \]
+  Therefore,
+  \[
+    \forall N \in \N, F_{N}: \prod_{n = 1}^{N - 1} \set*{0, 1} \twoheadrightarrow Z_{N}
+  \]
+  By \cref{an1:thm:product-of-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \forall N \in \N, \abs*{\prod_{n = 1}^{N - 1} \set*{0, 1}} < \aleph_{0}  \\
+      \by{\Cref{an1:thm:surjection-from-finite-set-implies-finite}} \Downarrow \\
+      \forall N \in \N, \abs*{Z_{N}} < \aleph_{0}
+    \end{array}
+  \]
+  This implies
+  \[
+    \begin{array}{c}
+      Z = \bigcup_{N = 1}^{\infty} Z_{N}                                                 \\
+      \by{\Cref{an1:thm:countable-union-of-finite-sets-is-at-most-countable}} \Downarrow \\
+      \abs*{Z} \leq \aleph_{0}
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \prod_{n = 1}^{\infty} \set*{0, 1} = Y \cup Z                                                         \\
+      \by{\Cref{an1:thm:at-most-countable-union-of-at-most-countable-sets-is-at-most-countable}} \Downarrow \\
+      \abs*{\prod_{n = 1}^{\infty} \set*{0, 1}} \leq \aleph_{0}                                             \\
+      \by{\Cref{an1:lem:infinite-product-of-binary-set-is-uncountable}} \Downarrow                          \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \begin{array}{c}
+      \abs*{[0, 1)} > \aleph_{0}                                            \\
+      \by{\Cref{an1:cor:uncountable-subset-implies-uncountable}} \Downarrow \\
+      \abs*{\R} > \aleph_{0}
+    \end{array}
+  \]
+\end{proof}

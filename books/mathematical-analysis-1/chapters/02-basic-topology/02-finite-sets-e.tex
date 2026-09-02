@@ -1,0 +1,291 @@
+\begin{lemma} \label{an1:lem:union-of-two-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \cup Y} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Define
+  \begin{itemize}
+    \item $A \coloneqq X \setminus Y \subseteq X$
+    \item $B \coloneqq Y \setminus X \subseteq Y$
+    \item $C \coloneqq X \cap Y \subseteq X$
+  \end{itemize}
+  By \cref{an1:thm:subset-of-finite-set-is-finite},
+  \begin{itemize}
+    \item $\abs*{A} < \aleph_{0}$
+    \item $\abs*{B} < \aleph_{0}$
+    \item $\abs*{C} < \aleph_{0}$
+  \end{itemize}
+  Also,
+  \begin{itemize}
+    \item $A \cap B = B \cap C = C \cap A = \vnot$
+    \item $X = (X \setminus Y) \cup (X \cap Y) = A \cup C$
+    \item $Y = (Y \setminus X) \cup (X \cap Y) = B \cup C$
+    \item $X \cup Y = (X \setminus Y) \cup (Y \setminus X) \cup (X \cap Y) = A \cup B \cup C$
+  \end{itemize}
+  By \cref{an1:lem:union-of-two-disjoint-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{A \cup B} < \aleph_{0}          \\
+      \Downarrow                            \\
+      \abs*{(A \cup B) \cup C} < \aleph_{0} \\
+      \Downarrow                            \\
+      \abs*{X \cup Y} < \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:finite-union-of-finite-sets-is-finite}
+  \[
+    \forall n \in [0, \infty)_{\N}, \forall \set*{X_{k}}_{k = 1}^{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} < \aleph_{0}}
+    \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Define
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n) \iff \forall \set*{X_{k}}_{k = 1}^{n}, \paren*{\forall k \in [1, n]_{\N},
+      \abs*{X_{k}} < \aleph_{0}} \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base case:}
+          \[
+            \begin{array}{c}
+              \bigcup_{k = 1}^{0} X_{k} = \vnot             \\
+              \Downarrow                                    \\
+              \abs*{\bigcup_{k = 1}^{0} X_{k}} < \aleph_{0} \\
+              \Downarrow                                    \\
+              P(0)
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose
+          \begin{itemize}
+            \item $P(n)$
+            \item $\forall k \in [1, n + 1]_{\N}, \abs*{X_{k}} < \aleph_{0}$
+          \end{itemize}
+          Since $P(n)$,
+          \[
+            \abs*{\bigcup_{k = 1}^{n} X_{k}} < \aleph_{0}
+          \]
+          Then
+          \[
+            \begin{array}{c}
+              \bigcup_{k = 1}^{n + 1} X_{k} = \paren*{\bigcup_{k = 1}^{n} X_{k}} \cup X_{n + 1} \\
+              \by{\Cref{an1:lem:union-of-two-finite-sets-is-finite}} \Downarrow                 \\
+              \abs*{\bigcup_{k = 1}^{n + 1} X_{k}} < \aleph_{0}                                 \\
+              \Downarrow                                                                        \\
+              P(n + 1)
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in [0, \infty)_{\N}, P(n)
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:product-of-two-finite-sets-is-finite}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} < \aleph_{0}
+    \implies \abs*{X \times Y} < \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} < \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \xrightarrow{\sim} X$
+    \item $\exists m \in [0, \infty)_{\N}, \exists g: [1, m]_{\N} \xrightarrow{\sim} Y$
+  \end{itemize}
+  This implies
+  \begin{itemize}
+    \item If $n = 0$ or $m = 0$, then
+          \[
+            \begin{array}{c}
+              X \times Y = \varnothing \\
+              \Downarrow               \\
+              \abs*{X \times Y} < \aleph_{0}
+            \end{array}
+          \]
+    \item Otherwise, define $h: [1, nm]_{\N} \to X \times Y$ by
+          \[
+            \forall k \in [1, nm]_{\N}, h(k) \coloneqq \paren*{f\paren*{\ceil*{\frac{k}{m}}},
+              g\paren*{k - m\paren*{\ceil*{\frac{k}{m}} - 1}}}
+          \]
+          Suppose
+          \begin{itemize}
+            \item $k \in [1, nm]_{\N}$
+            \item $j_{k} = \ceil*{\frac{k}{m}} \in \Z$
+          \end{itemize}
+          Then
+          \begin{itemize}
+            \item Since $k \in [1, nm]_{\N}$,
+                  \[
+                    \begin{array}{c}
+                      1 \leq k \leq nm                  \\
+                      \Downarrow                        \\
+                      1 \leq \ceil*{\frac{k}{m}} \leq n \\
+                      \Downarrow                        \\
+                      j_{k} \in [1, n]_{\N}
+                    \end{array}
+                  \]
+            \item By \cref{an1:def:floor-ceiling-functions},
+                  \[
+                    \begin{array}{c}
+                      j_{k} = \min\setbuilder*{i \in \Z}{i \geq \frac{k}{m}} \\
+                      \Downarrow                                             \\
+                      j_{k} - 1 < \frac{k}{m} \leq j_{k}                     \\
+                      \Downarrow                                             \\
+                      0 < k - m(j_{k} - 1) \leq m                            \\
+                      \Downarrow                                             \\
+                      k - m(j_{k} - 1) \in [1, m]_{\N}
+                    \end{array}
+                  \]
+          \end{itemize}
+          Therefore, $h$ is well-defined. Then
+          \begin{itemize}
+            \item \textbf{Injectivity}: Suppose
+                  \begin{itemize}
+                    \item $k_{1}, k_{2} \in [1, nm]_{\N}$
+                    \item $h(k_{1}) = h(k_{2})$
+                  \end{itemize}
+                  Then
+                  \[
+                    \begin{array}{c}
+                      f\paren*{j_{k_{1}}} = f\paren*{j_{k_{2}}}                        \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      j_{k_{1}} = j_{k_{2}}
+                    \end{array}
+                  \]
+                  Therefore,
+                  \[
+                    \begin{array}{c}
+                      g\paren*{k_{1} - m(j_{k_{1}} - 1)} = g\paren*{k_{2} - m(j_{k_{2}} - 1)} \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow        \\
+                      k_{1} - m(j_{k_{1}} - 1) = k_{2} - m(j_{k_{2}} - 1)                     \\
+                      \by{\ensuremath{j_{k_{1}} = j_{k_{2}}}} \Downarrow                      \\
+                      k_{1} = k_{2}
+                    \end{array}
+                  \]
+            \item \textbf{Surjectivity}: Suppose $(x, y) \in X \times Y$. Then
+                  \[
+                    \begin{array}{c}
+                      x \in X                                                          \\
+                      \by{\ensuremath{f: [1, n]_{\N} \xrightarrow{\sim} X}} \Downarrow \\
+                      \exists j \in [1, n]_{\N}, f(j) = x
+                    \end{array}
+                  \]
+                  Also,
+                  \[
+                    \begin{array}{c}
+                      y \in Y                                                          \\
+                      \by{\ensuremath{g: [1, m]_{\N} \xrightarrow{\sim} Y}} \Downarrow \\
+                      \exists i \in [1, m]_{\N}, g(i) = y
+                    \end{array}
+                  \]
+                  Define
+                  \[
+                    k \coloneqq m(j - 1) + i \in [1, nm]_{\N}
+                  \]
+                  Then
+                  \[
+                    h(k) = \paren*{f(j), g(i)} = (x, y)
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            \begin{array}{c}
+              h: [1, nm]_{\N} \xrightarrow{\sim} X \times Y \\
+              \Downarrow                                    \\
+              \abs*{X \times Y} < \aleph_{0}
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{an1:lem:separated-product-is-similar-to-original-product}
+  \[
+    \forall n, m \in [0, \infty)_{\N}, \forall \set*{X_{k}}_{k = 1}^{n + m}, \prod_{k = 1}^{n + m} X_{k}
+    \sim \paren*{\prod_{k = 1}^{n} X_{k}} \times \paren*{\prod_{k = n + 1}^{n + m} X_{k}}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose $n, m \in [0, \infty)_{\N}$. Define
+  \[
+    h: \prod_{k = 1}^{n + m} X_{k} \to
+    \paren*{\prod_{k = 1}^{n} X_{k}} \times \paren*{\prod_{k = n + 1}^{n + m} X_{k}}
+  \]
+  by
+  \[
+    h\paren*{x_{1}, x_{2}, \ldots, x_{n + m}} =
+    \paren*{\paren*{x_{1}, x_{2}, \ldots, x_{n}}, \paren*{x_{n + 1}, x_{n + 2}, \ldots, x_{n + m}}}
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Injectivity}: Suppose
+          \begin{itemize}
+            \item $\paren*{x_{1}, x_{2}, \ldots, x_{n + m}},
+                    \paren*{y_{1}, y_{2}, \ldots, y_{n + m}} \in \prod_{k = 1}^{n + m} X_{k}$
+            \item $h\paren*{x_{1}, x_{2}, \ldots, x_{n + m}} = h\paren*{y_{1}, y_{2}, \ldots, y_{n + m}}$
+          \end{itemize}
+          Then
+          \[
+            \begin{gathered}
+              \paren*{\paren*{x_{1}, x_{2}, \ldots, x_{n}}, \paren*{x_{n + 1}, x_{n + 2}, \ldots, x_{n + m}}} \\
+              = \paren*{\paren*{y_{1}, y_{2}, \ldots, y_{n}}, \paren*{y_{n + 1}, y_{n + 2}, \ldots, y_{n + m}}}
+            \end{gathered}
+          \]
+          This implies
+          \begin{itemize}
+            \item $\paren*{x_{1}, x_{2}, \ldots, x_{n}} = \paren*{y_{1}, y_{2}, \ldots, y_{n}}$
+            \item $\paren*{x_{n + 1}, x_{n + 2}, \ldots, x_{n + m}} = \paren*{y_{n + 1}, y_{n + 2}, \ldots, y_{n + m}}$
+          \end{itemize}
+          Therefore,
+          \[
+            (x_{1}, x_{2}, \ldots, x_{n + m}) = (y_{1}, y_{2}, \ldots, y_{n + m}) \\
+          \]
+    \item \textbf{Surjectivity}: Suppose
+          \[
+            \paren*{\paren*{x_{1}, x_{2}, \ldots, x_{n}}, \paren*{x_{n + 1}, x_{n + 2}, \ldots, x_{n + m}}}
+            \in \paren*{\prod_{k = 1}^{n} X_{k}} \times \paren*{\prod_{k = n + 1}^{n + m} X_{k}}
+          \]
+          Then
+          \[
+            h(x_{1}, x_{2}, \ldots, x_{n + m}) = \paren*{\paren*{x_{1}, x_{2}, \ldots, x_{n}},
+              \paren*{x_{n + 1}, x_{n + 2}, \ldots, x_{n + m}}}
+          \]
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      h: \prod_{k = 1}^{n + m} X_{k} \xrightarrow{\sim} \paren*{\prod_{k = 1}^{n} X_{k}}
+      \times \paren*{\prod_{k = n + 1}^{n + m} X_{k}} \\
+      \Downarrow                                      \\
+      \prod_{k = 1}^{n + m} X_{k} \sim \paren*{\prod_{k = 1}^{n} X_{k}} \times \paren*{\prod_{k = n + 1}^{n + m} X_{k}}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:product-of-finite-sets-is-finite}
+  \[
+    \forall n \in [0, \infty)_{\N}, \forall \set*{X_{k}}_{k = 1}^{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} < \aleph_{0}}
+    \implies \abs*{\prod_{k = 1}^{n} X_{k}} < \aleph_{0}
+  \]
+\end{theorem}

@@ -1,0 +1,6 @@
+schema_version: 1
+sections:
+- slug: mathematical-induction
+  title: Mathematical Induction
+- slug: the-binomial-theorem
+  title: The Binomial Theorem

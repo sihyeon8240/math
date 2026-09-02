@@ -1,0 +1,308 @@
+\begin{axiom} \label{an1:ax:completeness}
+  $(\R, +, \cdot, <)$ has the \hyperref[an1:def:least-upper-bound-property]{\emph{least upper bound property}}.
+\end{axiom}
+
+\begin{theorem} \label{an1:thm:archimedean-property}
+  $(\R, +, \cdot, <)$ has the \textbf{Archimedean property}, which states
+  \[
+    \forall x \in \R^{+}, \forall y \in \R, \exists n \in \N, nx > y
+  \]
+  where
+  \[
+    \R^{+} \coloneqq \setbuilder*{x \in \R}{x > 0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $x \in \R^{+}$
+    \item $y \in \R$
+  \end{itemize}
+  Define
+  \[
+    E \coloneqq \setbuilder*{nx}{nx \leq y, \; n \in \N} \subseteq \R
+  \]
+  Then
+  \begin{itemize}
+    \item If $E = \vnot$, then
+          \[
+            \begin{array}{c}
+              1 \cdot x \notin E \\
+              \Downarrow         \\
+              1 \cdot x > y      \\
+            \end{array}
+          \]
+    \item Otherwise,
+          \[
+            \begin{array}{c}
+              E \neq \vnot \land y \in E^{u}               \\
+              \by{\Cref{an1:ax:completeness}} \Downarrow   \\
+              \exists \alpha \in \R, \alpha = \sup E       \\
+              \Downarrow                                   \\
+              \alpha - x \notin E^{u}                      \\
+              \Downarrow                                   \\
+              \exists m \in \N, mx > \alpha - x            \\
+              \Downarrow                                   \\
+              (m + 1)x > \alpha                            \\
+              \by{\ensuremath{\alpha = \sup E}} \Downarrow \\
+              (m + 1)x \notin E                            \\
+              \Downarrow                                   \\
+              (m + 1)x > y
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{an1:lem:bernoullis-inequality}
+  \[
+    \forall x \in [-1, + \infty), \forall n \in \N, (1 + x)^{n} \geq 1 + nx
+  \]
+  This inequality is called \textbf{Bernoulli's inequality}.
+\end{lemma}
+
+\begin{proof}
+  Suppose $x \in [-1, + \infty)$. Define
+  \[
+    \forall n \in \N, P(n) \iff (1 + x)^{n} \geq 1 + nx
+  \]
+  Then
+  \begin{itemize}
+    \item \textbf{Base Case:}
+          \[
+            \begin{array}{c}
+              (1 + x)^{1} = 1 + 1 \cdot x \\
+              \Downarrow                  \\
+              P(1)
+            \end{array}
+          \]
+    \item \textbf{Inductive step:} Suppose $P(n)$. Then
+          \[
+            \begin{array}{c}
+              (1 + x)^{n} \geq 1 + nx                                      \\
+              \by{\ensuremath{1 + x \geq 0}} \Downarrow                    \\
+              (1 + x)^{n + 1} \geq (1 + nx)(1 + x) = 1 + (n + 1)x + nx^{2} \\
+              \by{\ensuremath{x^{2} \geq 0}} \Downarrow                    \\
+              (1 + x)^{n + 1} \geq 1 + (n + 1)x                            \\
+              \Downarrow                                                   \\
+              P(n + 1)
+            \end{array}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:mathematical-induction},
+  \[
+    \forall n \in \N, P(n)
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:archimedean-property-corollary}
+  \[
+    \forall \veps \in \R^{+}, \forall b \in (1, + \infty), \exists n \in \N, b^{-n} < \veps
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\veps \in \R^{+}$
+    \item $b \in (1, + \infty)$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      b - 1 \in \R^{+}                                      \\
+      \by{\Cref{an1:thm:archimedean-property}} \Downarrow   \\
+      \exists n \in \N, n(b - 1) > \frac{1}{\veps}          \\
+      \by{\Cref{an1:lem:bernoullis-inequality}} \Downarrow  \\
+      (1 + (b - 1))^{n} \geq 1 + n(b - 1) > \frac{1}{\veps} \\
+      \Downarrow                                            \\
+      (1 + (b - 1))^{-n} < \veps                            \\
+      \Downarrow                                            \\
+      b^{-n} < \veps
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:bounded-subset-of-Z-in-R-has-extremum}
+  \leavevmode\par
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item $\forall E \subseteq \Z, E \neq \vnot \land \paren*{\exists \alpha \in \R,
+              \forall x \in E, \alpha \leq x} \implies \exists m \in E, m = \min E$
+    \item $\forall E \subseteq \Z, E \neq \vnot \land \paren*{\exists \beta \in \R,
+              \forall x \in E, x \leq \beta} \implies \exists M \in E, M = \max E$
+  \end{enumerate}
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $E \subseteq \Z$
+    \item $E \neq \vnot$
+  \end{itemize}
+  Then
+  \begin{enumerate}[label=\textbf{(\Alph*)}]
+    \item Suppose
+          \[
+            \exists \alpha \in \R, \forall x \in E, \alpha \leq x
+          \]
+          Then
+          \begin{itemize}
+            \item If $\alpha \geq 0$, then
+                  \[
+                    \begin{array}{c}
+                      \forall x \in E, 0 \leq \alpha \leq x \\
+                      \Downarrow                            \\
+                      0 \in E^{\ell}
+                    \end{array}
+                  \]
+            \item Otherwise, by \cref{an1:thm:archimedean-property},
+                  \[
+                    \begin{array}{c}
+                      \exists n \in \N, n > - \alpha       \\
+                      \Downarrow                           \\
+                      \forall x \in E, - n < \alpha \leq x \\
+                      \Downarrow                           \\
+                      -n \in E^{\ell}
+                    \end{array}
+                  \]
+          \end{itemize}
+          Therefore,
+          \[
+            \begin{array}{c}
+              E^{\ell} \neq \vnot                                                  \\
+              \by{\Cref{an1:thm:bounded-subset-of-Z-in-Z-has-extremum}} \Downarrow \\
+              \exists m \in E, m = \min E
+            \end{array}
+          \]
+    \item Suppose
+          \[
+            \exists \beta \in \R, \forall x \in E, x \leq \beta
+          \]
+          By \cref{an1:thm:archimedean-property},
+          \[
+            \begin{array}{c}
+              \exists n \in \N, n > \beta                                          \\
+              \Downarrow                                                           \\
+              \forall x \in E, x \leq \beta < n                                    \\
+              \Downarrow                                                           \\
+              n \in E^{u}                                                          \\
+              \by{\Cref{an1:thm:bounded-subset-of-Z-in-Z-has-extremum}} \Downarrow \\
+              \exists M \in E, M = \max E
+            \end{array}
+          \]
+  \end{enumerate}
+\end{proof}
+
+\begin{definition} \label{an1:def:floor-ceiling-functions}
+  Suppose $x \in \R$.
+  \begin{itemize}
+    \item The \textbf{floor function} $\floor{x}$ is defined by
+          \[
+            \floor{x} \coloneqq \max\setbuilder*{k \in \Z}{k \leq x}
+          \]
+    \item The \textbf{ceiling function} $\ceil{x}$ is defined by
+          \[
+            \ceil{x} \coloneqq \min\setbuilder*{k \in \Z}{k \geq x}
+          \]
+  \end{itemize}
+  By \cref{an1:thm:bounded-subset-of-Z-in-R-has-extremum},
+  \[
+    \forall x \in \R, \exists k, m \in \Z, k = \floor{x} \land m = \ceil{x}
+  \]
+\end{definition}
+
+\begin{theorem} \label{an1:thm:Q-is-dense-in-R}
+  $\Q$ is \textbf{dense} in $\R$, which states
+  \[
+    \forall x,y \in \R, x < y \implies \exists p \in \Q, x < p < y
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $x, y \in \R$
+    \item $x < y$
+  \end{itemize}
+  Define
+  \[
+    \veps \coloneqq y - x > 0
+  \]
+  By \cref{an1:thm:archimedean-property},
+  \[
+    \exists n \in \N, \frac{1}{n} < \veps
+  \]
+  Define
+  \[
+    S \coloneqq \setbuilder*{k \in \Z}{\frac{k}{n} \leq x} \subseteq \Z
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \floor{x} \leq x < \floor{x} + 1    \\
+      \Downarrow                          \\
+      n\floor{x} \leq nx < n\floor{x} + n \\
+      \Downarrow                          \\
+      n\floor{x} \in S
+    \end{array}
+  \]
+  Also,
+  \[
+    \forall k \in S, k \leq nx
+  \]
+  By \cref{an1:thm:bounded-subset-of-Z-in-R-has-extremum},
+  \[
+    \exists M \in \Z, M = \max S
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      M \in S \land M + 1 \notin S         \\
+      \Downarrow                           \\
+      \frac{M}{n} \leq x < \frac{M + 1}{n} \\
+      \Downarrow                           \\
+      x < \frac{M + 1}{n} \leq x + \frac{1}{n} < x + \veps = y
+    \end{array}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:nth-power-is-lipschitz}
+  \[
+    \forall n \in \N, \forall a, b \in \R^{+}, a < b \implies b^{n} - a^{n} \leq (b - a)nb^{n - 1}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $a, b \in \R^{+}$
+    \item $ a < b$
+  \end{itemize}
+  Then
+  \[
+    b^{n} - a^{n} = (b - a)\sum_{k = 0}^{n - 1} b^{n - 1 - k} a^{k} \leq (b - a)nb^{n - 1}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:nth-power-is-monotone}
+  \[
+    \forall n \in \N, \forall a, b \in \R^{+}, a < b \iff a^{n} < b^{n}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $n \in \N$
+    \item $a, b \in \R^{+}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      b^{n} - a^{n} = (b - a)\sum_{k = 0}^{n - 1} b^{n - 1 - k} a^{k} \\
+      \Downarrow                                                      \\
+      a < b \iff a^{n} < b^{n}
+    \end{array}
+  \]
+\end{proof}

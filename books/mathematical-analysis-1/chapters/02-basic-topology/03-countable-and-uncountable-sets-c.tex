@@ -1,0 +1,284 @@
+\begin{proof}
+  Suppose
+  \[
+    \forall n \in \N, \abs*{X_{n}} = \aleph_{0}
+  \]
+  Then
+  \[
+    \forall n \in \N, \exists f_{n}: \N \xrightarrow{\sim} X_{n}
+  \]
+  Assume $\abs*{\bigcup_{n = 1}^{\infty} X_{n}} < \aleph_{0}$. Then
+  \[
+    \begin{array}{c}
+      X_{1} \subseteq \bigcup_{n = 1}^{\infty} X_{n}                \\
+      \by{\Cref{an1:thm:subset-of-finite-set-is-finite}} \Downarrow \\
+      \abs*{X_{1}} < \aleph_{0}                                     \\
+      \by{\Cref{an1:thm:countable-set-is-infinite}} \Downarrow      \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \abs*{\bigcup_{n = 1}^{\infty} X_{n}} \geq \aleph_{0}
+  \]
+  Define
+  \[
+    \forall n \in \N, T_{n} \coloneqq \setbuilder*{k \in \N}{n \leq \frac{k(k + 1)}{2}} \subseteq \N
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, 2n \in T_{n}                        \\
+      \by{\Cref{an1:thm:well-ordering-property}} \Downarrow \\
+      \forall n \in \N, \exists t_{n} \in T_{n}, t_{n} = \min T_{n}
+    \end{array}
+  \]
+  Define
+  \[
+    \forall n \in \N, s_{n} \coloneqq n - \frac{t_{n}(t_{n} - 1)}{2}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      t_{n} - 1 \notin T_{n}         \\
+      \Downarrow                     \\
+      n > \frac{t_{n}(t_{n} - 1)}{2} \\
+      \Downarrow                     \\
+      s_{n} \in \N
+    \end{array}
+  \]
+  Also,
+  \[
+    \begin{array}{c}
+      t_{n} - s_{n} + 1 = \frac{t_{n}(t_{n} + 1)}{2} - n + 1 \\
+      \by{\ensuremath{t_{n} \in T_{n}}} \Downarrow           \\
+      t_{n} - s_{n} + 1 \geq 1                               \\
+      \Downarrow                                             \\
+      t_{n} - s_{n} + 1 \in \N
+    \end{array}
+  \]
+  Define $g: \N \to \bigcup_{n = 1}^{\infty} X_{n}$ by
+  \[
+    \forall n \in \N, g(n) \coloneqq f_{s_{n}}(t_{n} - s_{n} + 1)
+  \]
+  Suppose $x \in \bigcup_{n = 1}^{\infty} X_{n}$. Then
+  \[
+    \begin{array}{c}
+      \exists m \in \N, x \in X_{m}                                   \\
+      \by{\ensuremath{f_{m}: \N \xrightarrow{\sim} X_{m}}} \Downarrow \\
+      \exists l \in \N, f_{m}(l) = x                                  \\
+    \end{array}
+  \]
+  Define
+  \[
+    k \coloneqq \frac{(l + m - 1)(l + m - 2)}{2} + m \in \N
+  \]
+  Then
+  \begin{itemize}
+    \item $k - \frac{(l + m - 2)(l + m - 1)}{2} = m > 0$
+    \item $k - \frac{(l + m - 1)(l + m)}{2} = 1 - l \leq 0$
+  \end{itemize}
+  This implies
+  \[
+    \begin{array}{c}
+      l + m - 2 \notin T_{k} \land l + m - 1 \in T_{k} \\
+      \Downarrow                                       \\
+      t_{k} = l + m - 1                                \\
+      \Downarrow                                       \\
+      s_{k} = m                                        \\
+      \Downarrow                                       \\
+      g(k) = f_{m}(l) = x
+    \end{array}
+  \]
+  Since $x \in \bigcup_{n = 1}^{\infty} X_{n}$ was arbitrary,
+  \[
+    \begin{array}{c}
+      g: \N \twoheadrightarrow \bigcup_{n = 1}^{\infty} X_{n} \\
+      \by{\Cref{an1:thm:surjection-from-N}} \Downarrow        \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:finite-union-of-countable-sets-is-countable}
+  \[
+    \forall n \in \N, \forall \set*{X_{k}}_{k = 1}^{n},
+    \paren*{\forall k \in [1, n]_{\N}, \abs*{X_{k}} = \aleph_{0}}
+    \implies \abs*{\bigcup_{k = 1}^{n} X_{k}} = \aleph_{0}
+  \]
+\end{corollary}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall k \in [1, n]_{\N}, \abs*{X_{k}} = \aleph_{0}
+  \]
+  Define
+  \[
+    \forall k \in [n + 1, \infty)_{\N}, X_{k} \coloneqq X_{n}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      \forall n \in \N, \abs*{X_{n}} = \aleph_{0}                                   \\
+      \by{\Cref{an1:thm:countable-union-of-countable-sets-is-countable}} \Downarrow \\
+      \abs*{\bigcup_{n = 1}^{\infty} X_{n}} = \aleph_{0}                            \\
+      \Downarrow                                                                    \\
+      \abs*{\bigcup_{k = 1}^{n} X_{k}} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:union-of-finite-set-and-countable-set-is-countable}
+  \[
+    \forall X \forall Y, \abs*{X} < \aleph_{0} \land \abs*{Y} = \aleph_{0} \implies \abs*{X \cup Y} = \aleph_{0}
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{X} < \aleph_{0}$
+    \item $\abs*{Y} = \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item $\exists f: \N \xrightarrow{\sim} Y$
+    \item $\exists m \in [0, \infty)_{\N}, \exists g: [1, m]_{\N} \xrightarrow{\sim} X$
+  \end{itemize}
+  Also,
+  \[
+    \begin{array}{c}
+      Y \subseteq X \cup Y                                                                              \\
+      \by{\Cref{an1:cor:infinite-subset-implies-infinite,an1:thm:countable-set-is-infinite}} \Downarrow \\
+      \abs*{X \cup Y} \geq \aleph_{0}
+    \end{array}
+  \]
+  Define $h: \N \to X \cup Y$ by
+  \begin{itemize}
+    \item $\forall n \in [1, m]_{\N}, h(n) \coloneqq g(n)$
+    \item $\forall n \in [m + 1, \infty)_{\N}, h(n) \coloneqq f(n - m)$
+  \end{itemize}
+  Suppose $x \in X \cup Y$. Then
+  \begin{itemize}
+    \item If $x \in X$, then
+          \[
+            \exists n \in [1, m]_{\N}, g(n) = x
+          \]
+          This implies
+          \[
+            h(n) = x
+          \]
+    \item Otherwise,
+          \[
+            \exists n \in \N, f(n) = x
+          \]
+          This implies
+          \[
+            h(n + m) = x
+          \]
+  \end{itemize}
+  Since $x \in X \cup Y$ was arbitrary,
+  \[
+    \begin{array}{c}
+      h: \N \twoheadrightarrow X \cup Y                \\
+      \by{\Cref{an1:thm:surjection-from-N}} \Downarrow \\
+      \abs*{X \cup Y} = \aleph_{0}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:at-most-countable-union-of-at-most-countable-sets-is-at-most-countable}
+  \[
+    \forall Y, \forall \paren*{X_{\alpha}}_{\alpha \in Y}, \abs*{Y} \leq \aleph_{0}
+    \land \paren*{\forall \alpha \in Y, \abs*{X_{\alpha}} \leq \aleph_{0}}
+    \implies \abs*{\bigcup_{\alpha \in Y} X_{\alpha}} \leq \aleph_{0}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\abs*{Y} \leq \aleph_{0}$
+    \item $\forall \alpha \in Y, \abs*{X_{\alpha}} \leq \aleph_{0}$
+  \end{itemize}
+  Then
+  \begin{itemize}
+    \item If
+          \[
+            \forall \alpha \in Y, \abs*{X_{\alpha}} < \aleph_{0}
+          \]
+          then
+          \begin{itemize}
+            \item If $\abs*{Y} < \aleph_{0}$, then
+                  \[
+                    \exists n \in [0, \infty)_{\N}, \exists f: [1, n]_{\N} \xrightarrow{\sim} Y
+                  \]
+                  This implies
+                  \[
+                    \begin{array}{c}
+                      \bigcup_{\alpha \in Y} X_{\alpha} = \bigcup_{k = 1}^{n} X_{f(k)}     \\
+                      \by{\Cref{an1:thm:finite-union-of-finite-sets-is-finite}} \Downarrow \\
+                      \abs*{\bigcup_{\alpha \in Y} X_{\alpha}} < \aleph_{0}
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \exists g: \N \xrightarrow{\sim} Y
+                  \]
+                  This implies
+                  \[
+                    \begin{array}{c}
+                      \bigcup_{\alpha \in Y} X_{\alpha} = \bigcup_{n = 1}^{\infty} X_{g(n)}              \\
+                      \by{\Cref{an1:thm:countable-union-of-finite-sets-is-at-most-countable}} \Downarrow \\
+                      \abs*{\bigcup_{\alpha \in Y} X_{\alpha}} \leq \aleph_{0}
+                    \end{array}
+                  \]
+          \end{itemize}
+    \item Otherwise,
+          \[
+            \exists \beta \in Y, \abs*{X_{\beta}} = \aleph_{0}
+          \]
+          Define
+          \[
+            \forall \alpha \in Y, Y_{\alpha} \coloneqq X_{\alpha} \cup X_{\beta}
+          \]
+          By \cref{an1:cor:finite-union-of-countable-sets-is-countable,an1:lem:union-of-finite-set-and-countable-set-is-countable},
+          \[
+            \forall \alpha \in Y, \abs*{Y_{\alpha}} = \aleph_{0}
+          \]
+          Then
+          \begin{itemize}
+            \item If $\abs*{Y} < \aleph_{0}$, then
+                  \[
+                    \exists n \in \N, \exists f: [1, n]_{\N} \xrightarrow{\sim} Y
+                  \]
+                  This implies
+                  \[
+                    \begin{array}{c}
+                      \bigcup_{\alpha \in Y} X_{\alpha} = \bigcup_{\alpha \in Y} Y_{\alpha} = \bigcup_{k = 1}^{n} Y_{f(k)} \\
+                      \by{\Cref{an1:cor:finite-union-of-countable-sets-is-countable}} \Downarrow                           \\
+                      \abs*{\bigcup_{\alpha \in Y} X_{\alpha}} = \aleph_{0}
+                    \end{array}
+                  \]
+            \item Otherwise,
+                  \[
+                    \exists g: \N \xrightarrow{\sim} Y
+                  \]
+                  This implies
+                  \[
+                    \begin{array}{c}
+                      \bigcup_{\alpha \in Y} X_{\alpha} = \bigcup_{\alpha \in Y} Y_{\alpha} = \bigcup_{n = 1}^{\infty} Y_{g(n)} \\
+                      \by{\Cref{an1:thm:countable-union-of-countable-sets-is-countable}} \Downarrow                             \\
+                      \abs*{\bigcup_{\alpha \in Y} X_{\alpha}} = \aleph_{0}
+                    \end{array}
+                  \]
+          \end{itemize}
+  \end{itemize}
+\end{proof}
+
+\begin{lemma} \label{an1:lem:N-times-N-is-countable}
+  \[
+    \abs*{\N \times \N} = \aleph_{0}
+  \]
+\end{lemma}

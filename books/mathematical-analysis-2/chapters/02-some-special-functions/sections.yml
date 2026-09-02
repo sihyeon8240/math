@@ -1,0 +1,14 @@
+schema_version: 1
+sections:
+- slug: power-series
+  title: Power Series
+- slug: the-exponential-and-logarithmic-functions
+  title: The Exponential and Logarithmic Functions
+- slug: the-trigonometric-functions
+  title: The Trigonometric Functions
+- slug: the-algebraic-completeness-of-the-complex-field
+  title: The Algebraic Completeness of the Complex Field
+- slug: fourier-series
+  title: Fourier Series
+- slug: the-gamma-function
+  title: The Gamma Function

@@ -1,0 +1,6 @@
+schema_version: 1
+sections:
+- slug: pythagorean-equation
+  title: The Equation \texorpdfstring{$\bm{x^2 + y^2 = z^2}$}{x² + y² = z²}
+- slug: fermats-last-theorem
+  title: Fermat's Last Theorem

@@ -1,0 +1,335 @@
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $\set*{K_{\alpha}}_{\alpha \in A} \subseteq \mathcal{K}(X)$
+    \item $\forall B \subseteq A, \abs*{B} < \aleph_{0} \implies \bigcap_{\alpha \in B} K_{\alpha} \neq \vnot$
+    \item $A \neq \vnot$
+  \end{itemize}
+  By \cref{an1:thm:compact-set-is-closed},
+  \[
+    \begin{array}{c}
+      \forall \alpha \in A, K_{\alpha} \in \mathcal{C}(X)              \\
+      \by{\Cref{an1:thm:complement-of-open-set-is-closed}} \Downarrow  \\
+      \forall \alpha \in A, \paren*{K_{\alpha}}^{c} \in \mathcal{O}(X) \\
+    \end{array}
+  \]
+  Assume $\bigcap_{\alpha \in A} K_{\alpha} = \vnot$. Then
+  \[
+    X = \paren*{\bigcap_{\alpha \in A} K_{\alpha}}^{c} = \bigcup_{\alpha \in A} \paren*{K_{\alpha}}^{c}
+  \]
+  Let $\beta \in A$. Then
+  \[
+    \begin{array}{c}
+      K_{\beta} \subseteq \bigcup_{\alpha \in A} \paren*{K_{\alpha}}^{c} \\
+      \Downarrow                                                         \\
+      \exists B \subseteq A, \abs*{B} < \aleph_{0} \land
+      K_{\beta} \subseteq \bigcup_{\alpha \in B} \paren*{K_{\alpha}}^{c} \\
+      \Downarrow                                                         \\
+      K_{\beta} \subseteq \paren*{\bigcap_{\alpha \in B} K_{\alpha}}^{c} \\
+      \Downarrow                                                         \\
+      K_{\beta} \cap \paren*{\bigcap_{\alpha \in B} K_{\alpha}} = \vnot  \\
+      \Downarrow                                                         \\
+      \bigcap_{\alpha \in B \cup \set*{\beta}} K_{\alpha} = \vnot
+    \end{array}
+  \]
+  By \cref{an1:thm:finite-union-of-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{B \cup \set*{\beta}} < \aleph_{0} \\
+      \Downarrow                              \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \bigcap_{\alpha \in A} K_{\alpha} \neq \vnot
+  \]
+\end{proof}
+
+\begin{lemma} \label{an1:lem:nested-intervals}
+  \[
+    \paren*{\forall n \in \N, - \infty < a_{n} \leq a_{n + 1} \leq b_{n + 1} \leq b_{n} < + \infty}
+    \implies \bigcap_{n = 1}^{\infty} [a_{n}, b_{n}] \neq \vnot
+  \]
+\end{lemma}
+
+\begin{proof}
+  Suppose
+  \[
+    \forall n \in \N, - \infty < a_{n} \leq a_{n + 1} \leq b_{n + 1} \leq b_{n} < + \infty
+  \]
+  Then
+  \begin{itemize}
+    \item $\forall n, m \in \N, n \leq m \implies a_{n} \leq a_{m} \leq b_{m}$
+    \item $\forall n, m \in \N, n > m \implies a_{n} \leq b_{n} \leq b_{m}$
+  \end{itemize}
+  Therefore,
+  \[
+    \begin{array}{c}
+      \forall m \in \N, b_{m} \in \paren*{\set*{a_{n}}_{n = 1}^{\infty}}^{u} \\
+      \by{\Cref{an1:ax:completeness}} \Downarrow                             \\
+      \exists \alpha \in \R, \alpha = \sup \set*{a_{n}}_{n = 1}^{\infty}     \\
+      \Downarrow                                                             \\
+      \forall m \in \N, a_{m} \leq \alpha \leq b_{m}                         \\
+      \Downarrow                                                             \\
+      \alpha \in \bigcap_{n = 1}^{\infty} [a_{n}, b_{n}]
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:nested-k-cells}
+  \[
+    \begin{gathered}
+      \forall k \in \N, \paren*{
+        \forall n \in \N, \forall j \in [1, k]_{\N}, - \infty < a_{n, j}
+        \leq a_{n + 1, j} \leq b_{n + 1, j} \leq b_{n, j} < + \infty
+      } \\
+      \implies \bigcap_{n = 1}^{\infty} \paren*{\prod_{j = 1}^{k} [a_{n, j}, b_{n, j}]} \neq \vnot
+    \end{gathered}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $k \in \N$
+    \item $\forall n \in \N, \forall j \in [1, k]_{\N}, - \infty < a_{n, j}
+            \leq a_{n + 1, j} \leq b_{n + 1, j} \leq b_{n, j} < + \infty$
+  \end{itemize}
+  By \cref{an1:lem:nested-intervals},
+  \[
+    \begin{array}{c}
+      \forall j \in [1, k]_{\N}, \bigcap_{n = 1}^{\infty} [a_{n, j}, b_{n, j}] \neq \vnot             \\
+      \Downarrow                                                                                      \\
+      \forall j \in [1, k]_{\N}, \exists \alpha_{j} \in \bigcap_{n = 1}^{\infty} [a_{n, j}, b_{n, j}] \\
+      \Downarrow                                                                                      \\
+      (\alpha_{1}, \alpha_{2}, \dots, \alpha_{k}) \in \bigcap_{n = 1}^{\infty}
+      \paren*{\prod_{j = 1}^{k} [a_{n, j}, b_{n, j}]}
+    \end{array}
+  \]
+\end{proof}
+
+\begin{theorem} \label{an1:thm:k-cell-is-compact}
+  \[
+    \begin{gathered}
+      \forall k \in \N, \paren*{\forall j \in [1, k]_{\N}, - \infty < a_{j} \leq b_{j} < + \infty} \\
+      \implies \prod_{j = 1}^{k} [a_{j}, b_{j}] \in \mathcal{K}(\R^{k})
+    \end{gathered}
+  \]
+\end{theorem}
+
+\begin{proof}
+  Suppose
+  \begin{itemize}
+    \item $k \in \N$
+    \item $\forall j \in [1, k]_{\N}, - \infty < a_{j} \leq b_{j} < + \infty$
+  \end{itemize}
+  Define
+  \begin{itemize}
+    \item $\forall j \in [1, k]_{\N}, (a_{1, j}, b_{1, j}) \coloneqq (a_{j}, b_{j})$
+    \item $I_{1} \coloneqq \prod_{j = 1}^{k} [a_{1, j}, b_{1, j}] \subseteq \R^{k}$
+    \item $\forall j \in [1, k]_{\N}, \forall m \in \set*{0, 1}, I_{1, j, m} \coloneqq
+            \begin{dcases}
+              \bracket*{a_{1, j}, \frac{a_{1, j} + b_{1, j}}{2}}, & \text{if } m = 0 \\
+              \bracket*{\frac{a_{1, j} + b_{1, j}}{2}, b_{1, j}}, & \text{otherwise}
+            \end{dcases}$
+    \item $S \coloneqq \prod_{j = 1}^{k} \set*{0, 1} = \setbuilder*{
+              \bm{m} \in \R^{k}}{\forall j \in [1, k]_{\N}, m_{j} \in \set*{0, 1}
+            }$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \forall \bm{m} \in S, \forall j \in [1, k]_{\N}, I_{1, j, m_{j}} \subseteq [a_{1, j}, b_{1, j}] \\
+      \Downarrow                                                                                      \\
+      \forall \bm{m} \in S, \prod_{j = 1}^{k} I_{1, j, m_{j}} \subseteq I_{1}
+    \end{array}
+  \]
+  Suppose
+  \begin{itemize}
+    \item $\set*{G_{\alpha}}_{\alpha \in A} \subseteq \mathcal{O}(\R^{k})$
+    \item $I_{1} \subseteq \bigcup_{\alpha \in A} G_{\alpha}$
+  \end{itemize}
+  Assume
+  \begin{itemize}
+    \item $\nexists B \subseteq A, \abs*{B} < \aleph_{0} \land I_{1} \subseteq \bigcup_{\alpha \in B} G_{\alpha}$
+    \item $\forall \bm{m} \in S, \exists A_{1, \bm{m}} \subseteq A, \abs*{A_{1, \bm{m}}} < \aleph_{0}
+            \land \prod_{j = 1}^{k} I_{1, j, m_{j}} \subseteq \bigcup_{\alpha \in A_{1, \bm{m}}} G_{\alpha}$
+  \end{itemize}
+  Define
+  \[
+    B_{1} \coloneqq \bigcup_{\bm{m} \in S} A_{1, \bm{m}}
+  \]
+  By \cref{an1:thm:product-of-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{S} < \aleph_{0}                                                \\
+      \by{\Cref{an1:thm:finite-union-of-finite-sets-is-finite}} \Downarrow \\
+      \abs*{B_{1}} < \aleph_{0}
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      I_{1} = \bigcup_{\bm{m} \in S} \paren*{\prod_{j = 1}^{k} I_{1, j, m_{j}}} \\
+      \Downarrow                                                                \\
+      I_{1} \subseteq \bigcup_{\bm{m} \in S} \paren*{\bigcup_{\alpha \in A_{1, \bm{m}}} G_{\alpha}}
+      = \bigcup_{\alpha \in B_{1}} G_{\alpha}                                   \\
+      \Downarrow                                                                \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \exists \bm{m_{1}} \in S, \nexists A_{1, \bm{m_{1}}} \subseteq A, \abs*{A_{1, \bm{m_{1}}}} < \aleph_{0} \land
+    \prod_{j = 1}^{k} I_{1, j, \paren*{m_{1}}_{j}} \subseteq \bigcup_{\alpha \in A_{1, \bm{m_{1}}}} G_{\alpha}
+  \]
+  Define
+  \begin{itemize}
+    \item $\forall j \in [1, k]_{\N}, a_{2, j} \coloneqq
+            \begin{dcases}
+              a_{1, j},                      & \text{if } \paren*{m_{1}}_{j} = 0 \\
+              \frac{a_{1, j} + b_{1, j}}{2}, & \text{otherwise}
+            \end{dcases}$
+    \item $\forall j \in [1, k]_{\N}, b_{2, j} \coloneqq
+            \begin{dcases}
+              \frac{a_{1, j} + b_{1, j}}{2}, & \text{if } \paren*{m_{1}}_{j} = 0 \\
+              b_{1, j},                      & \text{otherwise}
+            \end{dcases}$
+    \item $I_{2} \coloneqq \prod_{j = 1}^{k} \bracket{a_{2, j}, b_{2, j}} \subseteq \R^{k}$
+    \item $I_{2, j, m} \coloneqq
+            \begin{dcases}
+              \bracket*{a_{2, j}, \frac{a_{2, j} + b_{2, j}}{2}}, & \text{if } m = 0 \\
+              \bracket*{\frac{a_{2, j} + b_{2, j}}{2}, b_{2, j}}, & \text{otherwise}
+            \end{dcases}$
+  \end{itemize}
+  Then
+  \[
+    \begin{array}{c}
+      \forall j \in [1, k]_{\N}, \bracket*{a_{2, j}, b_{2, j}} = I_{1, j, \paren*{m_{1}}_{j}} \\
+      \Downarrow                                                                              \\
+      I_{2} \subseteq I_{1}
+    \end{array}
+  \]
+  Assume
+  \[
+    \forall \bm{m} \in S, \exists A_{2, \bm{m}} \subseteq A, \abs*{A_{2, \bm{m}}} < \aleph_{0}
+    \land \prod_{j = 1}^{k} I_{2, j, m_{j}} \subseteq \bigcup_{\alpha \in A_{2, \bm{m}}} G_{\alpha}
+  \]
+  Define
+  \[
+    B_{2} \coloneqq \bigcup_{\bm{m} \in S} A_{2, \bm{m}}
+  \]
+  By \cref{an1:thm:product-of-finite-sets-is-finite},
+  \[
+    \begin{array}{c}
+      \abs*{S} < \aleph_{0}                                                \\
+      \by{\Cref{an1:thm:finite-union-of-finite-sets-is-finite}} \Downarrow \\
+      \abs*{B_{2}} < \aleph_{0}
+    \end{array}
+  \]
+  Then
+  \[
+    \begin{array}{c}
+      I_{2} = \bigcup_{\bm{m} \in S} \paren*{\prod_{j = 1}^{k} I_{2, j, m_{j}}} \\
+      \Downarrow                                                                \\
+      I_{2} \subseteq \bigcup_{\bm{m} \in S} \paren*{\bigcup_{\alpha \in A_{2, \bm{m}}} G_{\alpha}}
+      = \bigcup_{\alpha \in B_{2}} G_{\alpha}                                   \\
+      \Downarrow                                                                \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \exists \bm{m_{2}} \in S, \nexists A_{\bm{m_{2}}} \subseteq A, \abs*{A_{\bm{m_{2}}}} < \aleph_{0} \land
+    \prod_{j = 1}^{k} I_{2, j, \paren*{m_{2}}_{j}} \subseteq \bigcup_{\alpha \in A_{\bm{m_{2}}}} G_{\alpha}
+  \]
+  By repeating this process,
+  \begin{itemize}
+    \item $\forall n \in \N, \forall j \in [1, k]_{\N}, a_{n, j} \leq a_{n + 1, j} \leq b_{n + 1, j} \leq b_{n, j}$
+    \item $\forall n \in \N, \forall j \in [1, k]_{\N}, b_{n + 1, j} - a_{n + 1, j} = \frac{1}{2}(b_{n, j} - a_{n, j})$
+    \item $\forall n \in \N, \nexists A_{n} \subseteq A, \abs*{A_{n}} < \aleph_{0}
+            \land I_{n} \subseteq \bigcup_{\alpha \in A_{n}} G_{\alpha}$
+  \end{itemize}
+  Define
+  \[
+    \delta \coloneqq \sqrt{\sum_{j = 1}^{k} (b_{1, j} - a_{1, j})^{2}} \in [0, + \infty)
+  \]
+  Suppose $\delta \neq 0$. Then
+  \[
+    \forall n \in \N, \forall \bm{x}, \bm{y} \in I_{n}, \norm*{\bm{x} - \bm{y}}
+    \leq \sqrt{\sum_{j = 1}^{k} (b_{n, j} - a_{n, j})^{2}} = \frac{\delta}{2^{n - 1}}
+  \]
+  By \cref{an1:thm:nested-k-cells},
+  \[
+    \bigcap_{n = 1}^{\infty} I_{n} \neq \vnot
+  \]
+  Let $\bm{\beta} \in \bigcap_{n = 1}^{\infty} I_{n}$. Then
+  \[
+    \begin{array}{c}
+      \bm{\beta} \in \bigcup_{\alpha \in A} G_{\alpha}                         \\
+      \Downarrow                                                               \\
+      \exists \alpha_{0} \in A, \bm{\beta} \in G_{\alpha_{0}}                  \\
+      \Downarrow                                                               \\
+      \exists \veps \in \R^{+}, N_{\veps}(\bm{\beta}) \subseteq G_{\alpha_{0}} \\
+      \by{\Cref{an1:thm:archimedean-property-corollary}} \Downarrow            \\
+      \exists N \in \N, \frac{1}{2^{N}} < \frac{\veps}{2\delta}                \\
+      \by{\ensuremath{\bm{\beta} \in I_{N}}} \Downarrow                        \\
+      \forall \bm{\gamma} \in I_{N}, \norm*{\bm{\beta} - \bm{\gamma}}
+      \leq \frac{\delta}{2^{N - 1}} < \veps                                    \\
+      \Downarrow                                                               \\
+      I_{N} \subseteq N_{\veps}(\bm{\beta})                                    \\
+      \Downarrow                                                               \\
+      I_{N} \subseteq \bigcup_{\alpha \in \set*{\alpha_{0}}} G_{\alpha}        \\
+      \Downarrow                                                               \\
+      \bot
+    \end{array}
+  \]
+  Therefore,
+  \[
+    \exists B \subseteq A, \abs*{B} < \aleph_{0} \land I_{1} \subseteq \bigcup_{\alpha \in B} G_{\alpha}
+  \]
+\end{proof}
+
+\begin{corollary} \label{an1:cor:closed-interval-in-R-is-compact}
+  \[
+    \forall a, b \in \R, a \leq b \implies [a, b] \in \mathcal{K}(\R)
+  \]
+\end{corollary}
+
+\begin{theorem} \label{an1:thm:heine-borel-theorem}
+  \[
+    \forall n \in \N, \forall E \subseteq \R^{n}, E \in \mathcal{K}(\R^{n})
+    \iff E \in \mathcal{C}(\R^{n}) \land E \in \mathcal{B}(\R^{n})
+  \]
+  This theorem is called the \textbf{Heine-Borel Theorem}.
+\end{theorem}
+
+\begin{proof}
+  Suppose $n \in \N$.
+  \begin{itemize}
+    \item \textbf{($\implies$)} The proof follows directly from
+          \cref{an1:thm:compact-set-is-closed,an1:thm:compact-set-is-bounded}.
+    \item \textbf{($\impliedby$)} Suppose
+          \begin{itemize}
+            \item $E \in \mathcal{C}(\R^{n})$
+            \item $E \in \mathcal{B}(\R^{n})$
+          \end{itemize}
+          Then
+          \[
+            \exists r \in \R^{+}, \exists \bm{p} \in \R^{n}, E \subseteq N_{r}(\bm{p})
+          \]
+          Define
+          \[
+            I \coloneqq \prod_{j = 1}^{n} \bracket*{p_{j} - r, p_{j} + r} \subseteq \R^{n}
+          \]
+          By \cref{an1:thm:k-cell-is-compact},
+          \[
+            \begin{array}{c}
+              I \in \mathcal{K}(\R^{n})                                              \\
+              \by{\Cref{an1:thm:closed-subset-of-compact-set-is-compact}} \Downarrow \\
+              E \in \mathcal{K}(\R^{n})
+            \end{array}
+          \]
+  \end{itemize}
+\end{proof}
