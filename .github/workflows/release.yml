@@ -1,61 +1,45 @@
 name: Release textbooks
 on:
-  push:
-    tags:
-      - '*-v*'
+  workflow_call:
+    inputs:
+      matrix:
+        description: Books enabled for release or with version increases in this main push
+        required: true
+        type: string
 permissions:
   contents: read
-concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: false
 jobs:
-  validate:
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(inputs.matrix) }}
+    concurrency:
+      group: textbook-release-${{ matrix.book }}-${{ github.sha }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
-      - name: Load repository configuration
-        id: config
+      - id: config
         run: ./scripts/export-config.sh
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: ${{ steps.config.outputs.python }}
           cache: pip
           cache-dependency-path: .github/requirements-ci.txt
-      - name: Install repository check dependencies
-        run: |
-          if ! command -v rg >/dev/null 2>&1; then
-            sudo apt-get update
-            sudo apt-get install --no-install-recommends --yes ripgrep
-          fi
-          command -v rg
-      - run: >-
-          python3 -m pip install --disable-pip-version-check
-          --requirement .github/requirements-ci.txt
-      - name: Require the tagged commit to be on main
-        shell: bash
-        run: |
-          git fetch --no-tags origin main
-          git merge-base --is-ancestor HEAD origin/main || {
-            echo "error: release tag must point to a commit contained in main" >&2
-            exit 1
-          }
-      - name: Check repository sources
-        run: ./scripts/check-repository.sh
-      - name: Validate tag and manifest versions
-        shell: bash
-        run: ./scripts/release-plan.sh "${GITHUB_REF_NAME}"
-  release:
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      contents: write
-    steps:
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+      - run: python3 -m pip install --disable-pip-version-check --requirement .github/requirements-ci.txt
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          draft: true
-          generate_release_notes: true
+          name: ${{ matrix.book }}-release
+          path: build/release/${{ matrix.book }}
+      - name: Publish the validated package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BOOK: ${{ matrix.book }}
+        run: ./scripts/publish-release.sh "$BOOK" "build/release/$BOOK"

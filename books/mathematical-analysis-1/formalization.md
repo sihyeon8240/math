@@ -34,8 +34,8 @@ conjugation, and modulus.
 
 Accept the least-upper-bound and greatest-lower-bound properties of the reals,
 the Archimedean property, density of the rationals, existence and uniqueness of
-positive real nth roots, and geometric decay in the form: for every b > 1 and
-epsilon > 0, some positive integer n satisfies b^(-n) < epsilon. Accept the
+positive real nth roots, and geometric decay in the form: for every $b > 1$ and
+$\varepsilon > 0$, some positive integer $n$ satisfies $b^{-n} < \varepsilon$. Accept the
 standard extended-real order, including suprema and infima of arbitrary subsets
 and the empty-set conventions. These replace the removed number-systems chapter.
 Do not infer acceptance of other equivalent completeness formulations or of

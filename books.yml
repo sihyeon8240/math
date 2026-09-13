@@ -15,7 +15,7 @@ books:
     lean_module: MathematicalAnalysis1
     status: review
     order: 10
-    release: true
+    release: false
     site: true
 
   - slug: mathematical-analysis-2
@@ -36,6 +36,7 @@ books:
     lean_module: ElementaryNumberTheory
     status: draft
     order: 30
+    release: false
     site: true
 
   - slug: linear-algebra
@@ -45,4 +46,5 @@ books:
     lean_module: LinearAlgebra
     status: draft
     order: 40
+    release: false
     site: true

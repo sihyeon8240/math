@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -41,6 +42,10 @@ SITE_FILES = {"scripts/generate-site-pages.py", "scripts/stage-site-pdfs.py"}
 SNAPSHOT_FILES = {".github/generated-pdfs-README.md"}
 CI_ONLY_FILES = {
     "scripts/verified-build.py",
+    "scripts/releases.py",
+    "scripts/release-plan.sh",
+    "scripts/publish-release.sh",
+    "scripts/package-book.sh",
     "scripts/check-image-reference.py",
     "scripts/check-image-tag.sh",
     "scripts/config_sync.py",
@@ -258,6 +263,13 @@ def main() -> int:
     args = parser.parse_args()
     paths = None if args.all else changed_paths(args.base, args.head)
     result = plan(paths, manifest_at(args.base))
+
+    requested = json.loads(os.environ.get("RELEASE_MATRIX", '{"book":[]}'))["book"]
+    registered = {book["slug"] for book in load_manifest()["books"] if book["build"]}
+    if not set(requested) <= registered:
+        raise ValueError("release matrix contains a book not enabled for building")
+    result["book"] = sorted(set(result["book"]) | set(requested))
+    result["count"] = len(result["book"])
 
     if args.format == "github":
         print("matrix=" + json.dumps({"book": result["book"]}, separators=(",", ":")))

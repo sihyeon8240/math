@@ -9,7 +9,7 @@ permissions:
   packages: write
   actions: read
 concurrency:
-  group: build-${{ github.workflow }}-${{ github.ref }}
+  group: build-${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   source:
@@ -175,6 +175,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
+      release_matrix: ${{ steps.releases.outputs.matrix }}
+      release_count: ${{ steps.releases.outputs.count }}
       matrix: ${{ steps.books.outputs.matrix }}
       count: ${{ steps.books.outputs.count }}
       site_changed: ${{ steps.books.outputs.site_changed }}
@@ -196,6 +198,16 @@ jobs:
           --requirement .github/requirements-ci.txt
       - name: Validate manifest before creating the matrix
         run: python3 scripts/books.py validate
+      - id: releases
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            echo 'matrix={"book":[]}' >> "$GITHUB_OUTPUT"
+            echo 'count=0' >> "$GITHUB_OUTPUT"
+          else
+            python3 scripts/releases.py plan --base "$BASE_SHA" >> "$GITHUB_OUTPUT"
+          fi
       - name: Read last snapshot source
         if: github.event_name == 'push'
         id: snapshot
@@ -203,6 +215,7 @@ jobs:
       - name: Create cumulative build matrix
         id: books
         env:
+          RELEASE_MATRIX: ${{ steps.releases.outputs.matrix }}
           BASE_SHA: >-
             ${{
               github.event_name == 'push'
@@ -268,6 +281,20 @@ jobs:
         env:
           BOOK: ${{ matrix.book }}
         run: cp "build/$BOOK/book.pdf" "build/$BOOK/$BOOK.pdf"
+      - name: Package the release PDF and checksum
+        if: github.event_name == 'push' && contains(fromJSON(needs.plan.outputs.release_matrix).book, matrix.book)
+        uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          docker_image: ${{ needs.prepare-image.outputs.image }}
+          run: ./scripts/package-book.sh "${{ matrix.book }}" "build/release/${{ matrix.book }}"
+      - name: Preserve the release package for publication and retries
+        if: github.event_name == 'push' && contains(fromJSON(needs.plan.outputs.release_matrix).book, matrix.book)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.book }}-release
+          path: build/release/${{ matrix.book }}/
+          if-no-files-found: error
+          retention-days: 90
       - name: Record the verified build
         if: github.event_name == 'pull_request'
         env:
@@ -329,6 +356,9 @@ jobs:
           fi
   publish:
     name: Publish latest PDF snapshot
+    concurrency:
+      group: development-pdf-snapshot
+      cancel-in-progress: false
     needs: [plan, book, check, build-check]
     if: >-
       always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
@@ -421,3 +451,16 @@ jobs:
     uses: ./.github/workflows/pages.yml
     with:
       source_sha: ${{ github.sha }}
+  release:
+    name: Publish reviewed textbook versions
+    needs: [plan, check, build-check, book]
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.plan.outputs.release_count != '0' &&
+      needs.check.result == 'success' && needs.build-check.result == 'success'
+    permissions:
+      contents: write
+      actions: read
+    uses: ./.github/workflows/release.yml
+    with:
+      matrix: ${{ needs.plan.outputs.release_matrix }}

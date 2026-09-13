@@ -1,6 +1,7 @@
 # Maintainer guide
 
-Use [the architecture guide](ARCHITECTURE.md) as policy and [design-decisions.md](design-decisions.md) for rationale.
+Use [the architecture guide](ARCHITECTURE.md) for repository structure and
+ownership, and the [documentation map](README.md) to find task-specific policies.
 
 ## Reviewing changes
 
@@ -25,15 +26,18 @@ public interfaces and test every affected consumer.
 
 ## Release checklist
 
-- Version and tag agree; the change is reviewed and merged into remote `main`
-  through a pull request, and local `HEAD` exactly matches `origin/main`.
-- Release and site flags are intentional.
-- Source checks, builds, and log checks pass.
-- The tag is annotated; artifacts and checksums have expected names; existing release assets remain untouched.
-- `make publish` has staged a draft. Download and review its PDF and verify the
-  checksum before manually publishing it; follow the
-  [recovery procedure](developer-workflow.md#recovering-an-interrupted-release)
-  if preparation was interrupted.
+- Prepare the first or an increasing version on a development branch with
+  `make release-prepare BOOK=<slug> VERSION=<version>` and review its generated
+  assembly changes in the normal PR.
+- Confirm `build: true`. Enabling `release: true` requests first publication;
+  subsequent releases require a version increase.
+- Review the PR PDF before merging. Merging the release preparation authorizes
+  automatic publication after main CI succeeds.
+- Confirm the public release contains the versioned PDF and `SHA256SUMS`, and
+  that its annotated tag points to the validated main commit.
+- Preserve existing tags and assets. Recover failures through the original
+  workflow's failed jobs using the
+  [recovery procedure](developer-workflow.md#recovering-an-interrupted-release).
 
 ## Site publication checklist
 

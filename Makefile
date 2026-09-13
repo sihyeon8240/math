@@ -2,6 +2,7 @@ PYTHON ?= python3
 BOOK ?=
 SLUG ?=
 TITLE ?=
+VERSION ?=
 empty :=
 space := $(empty) $(empty)
 TREE_IGNORE_PATTERNS ?= \
@@ -41,7 +42,7 @@ STRICT_REQUESTED := $(filter strict,$(MAKECMDGOALS))
 	config \
 	generated \
 	new-book \
-	publish \
+	release-prepare \
 	image-pin
 
 help:
@@ -71,13 +72,14 @@ help:
 		'  make generated [check]                          Regenerate or check all generated content' \
 		'' \
 		'  make new-book SLUG=<slug> TITLE="<title>"       Scaffold and register a new textbook' \
-		'  make publish BOOK=<slug>                        Prepare an eligible textbook draft release' \
+		'  make release-prepare BOOK=<slug> VERSION=<version>  Prepare a release for review' \
 		'  make image-pin DIGEST=<sha256>                  Automation/recovery: pin a tested image' \
 		'' \
 		'Variables:' \
 		'  BOOK=<slug>                                     Select one registered textbook' \
 		'  SLUG=<slug>                                     Set the slug for make new-book' \
 		'  TITLE=<title>                                   Set the title for make new-book' \
+		'  VERSION=<version>                               Set the version for release-prepare' \
 		'  BOOK_BUILD_JOBS=<n>                             Limit parallel bulk builds' \
 		'  PYTHON=<command>                                Override the Python interpreter' \
 		'  TREE_IGNORE=<pattern>                           Customize exclusions for make tree' \
@@ -274,12 +276,10 @@ new-book:
 		(echo "error: TITLE is required" >&2; exit 2)
 	@PYTHON="$(PYTHON)" ./scripts/new-book.sh "$(SLUG)" "$(TITLE)"
 
-publish:
-	@test -n "$(BOOK)" || \
-		(echo "error: BOOK is required \
-		(example: make publish BOOK=mathematical-analysis-1)" >&2; \
-		exit 2)
-	@./scripts/publish-release.sh "$(BOOK)"
+release-prepare:
+	@test -n "$(strip $(BOOK))" && test -n "$(strip $(VERSION))" || \
+		(echo "usage: make release-prepare BOOK=<slug> VERSION=<version>" >&2; exit 2)
+	@$(PYTHON) scripts/releases.py prepare --book "$(BOOK)" --version "$(VERSION)"
 
 image-pin:
 	@test -n "$(DIGEST)" || \

@@ -49,6 +49,10 @@ required=(
   scripts/export-config.sh
   scripts/repository_config.py
   scripts/upload-release-assets.sh
+  scripts/releases.py
+  scripts/release-plan.sh
+  scripts/package-book.sh
+  scripts/publish-release.sh
   lean/lean-toolchain
   lean/lakefile.toml
   lean/Textbooks.lean

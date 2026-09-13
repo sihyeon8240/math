@@ -2,7 +2,9 @@
 
 ## Registry fields
 
-`books.yml` is the canonical source for repository title, short title, label prefix, optional Lean module, status, ordering, and the `build`, `check`, `release`, and `site` flags. The flags control participation in the all-books build, repository-wide validation, official releases, and site publication respectively. An explicit `make books BOOK=<slug>` may build a registered book even when `build` is false, while `make publish` requires `release: true`.
+`books.yml` is the canonical source for repository title, short title, label prefix, optional Lean module, status, ordering, and the `build`, `check`, `release`, and `site` flags. The flags control participation in the all-books build, repository-wide validation, official releases, and site publication respectively. An explicit `make books BOOK=<slug>` may build a registered book even when `build` is false, while release preparation requires `build: true` and enables `release: true`.
+A reviewed transition to `release: true` publishes the current version; subsequent
+version increases publish new releases after main CI succeeds. See [Releases](developer-workflow.md#releases).
 
 Statuses describe publication state:
 
@@ -25,6 +27,13 @@ books as `pdf/<slug>.pdf`; PDFs for registered books with `site: false` are
 ignored. The snapshot README comes from `.github/generated-pdfs-README.md`. Book-page presentation rules live in `site/assets/book.css`; edit that stylesheet when changing the shared book layout appearance or responsive behavior.
 
 The index discovers generated book pages through `site.pages`, sorts their front matter by manifest order, and renders canonical titles and status labels. The common book layout reads the same page front matter, including Lean coverage generated from the proof index. No separate Jekyll data file is generated or consumed, and generated pages are not tracked by Git. Separate book descriptions are intentionally not supported.
+
+Lean coverage is the number of results registered in the proof index for a book
+divided by its LaTeX theorem, lemma, proposition, and corollary count, expressed
+as a percentage rounded to one decimal place. It may exceed 100% as Lean-first
+authoring advances ahead of the natural-language exposition. It counts registered
+results, not every Lean declaration. When the LaTeX count is zero, the percentage
+remains 0.0% to avoid division by zero; the registered count is still displayed.
 
 Status labels and the `short_title` fallback are defined once in the generator. See [Repository architecture](ARCHITECTURE.md#metadata-and-automation) for metadata ownership and automation policy.
 

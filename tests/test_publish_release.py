@@ -1,7 +1,9 @@
-"""Early safety-guard tests for local release publication."""
+"""Publication integration tests using a local Git remote and a fake GitHub API."""
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -12,152 +14,189 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
-class PublishReleaseGuardTests(unittest.TestCase):
-    def setUp(self) -> None:
+class PublishReleaseTests(unittest.TestCase):
+    def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
-        scripts = self.root / "scripts"
+        self.repo = self.root / "repo"
+        self.repo.mkdir()
+        self.git("init", "-b", "main")
+        self.git("config", "user.name", "Test")
+        self.git("config", "user.email", "test@example.invalid")
+        scripts = self.repo / "scripts"
         scripts.mkdir()
-        shutil.copy2(
-            ROOT / "scripts/publish-release.sh", scripts / "publish-release.sh"
+        for name in ["publish-release.sh", "upload-release-assets.sh"]:
+            shutil.copy2(ROOT / "scripts" / name, scripts / name)
+        (scripts / "books.py").write_text('print("1.1.0")\n')
+        validator = scripts / "release-plan.sh"
+        validator.write_text("#!/usr/bin/env bash\nexit 0\n")
+        validator.chmod(0o755)
+        self.git("add", ".")
+        self.git("commit", "-m", "Initial")
+        self.sha = self.git("rev-parse", "HEAD")
+        origin = self.root / "origin.git"
+        subprocess.run(
+            ["git", "init", "--bare", str(origin)], check=True, capture_output=True
         )
+        self.git("remote", "add", "origin", str(origin))
+        self.git("push", "origin", "main")
+        self.package = self.repo / "build" / "release"
+        self.package.mkdir(parents=True)
+        self.tag = "alpha-v1.1.0"
+        self.pdf = self.package / f"{self.tag}.pdf"
+        self.pdf.write_bytes(b"%PDF-test")
+        self.checksum = self.package / "SHA256SUMS"
+        self.checksum.write_text(
+            f"{hashlib.sha256(self.pdf.read_bytes()).hexdigest()}  {self.pdf.name}\n"
+        )
+        self.bin = self.root / "bin"
+        self.bin.mkdir()
+        self.state = self.root / "state.json"
+        self.state.write_text(json.dumps({"draft": None, "assets": {}, "calls": []}))
+        gh = self.bin / "gh"
+        gh.write_text("""#!/usr/bin/env python3
+import json, os, pathlib, sys
+path = pathlib.Path(os.environ["FAKE_GH_STATE"])
+s = json.loads(path.read_text())
+a = sys.argv[1:]
+s["calls"].append(a)
+path.write_text(json.dumps(s))
+if os.environ.get("FAIL_GH") == " ".join(a[:2]):
+    sys.exit(1)
+if a[0] == "api":
+    if s["draft"] is not None:
+        print(str(s["draft"]).lower())
+elif a[:2] == ["release", "create"]:
+    s["draft"] = True
+elif a[:2] == ["release", "view"]:
+    print("\\n".join(s["assets"]))
+elif a[:2] == ["release", "upload"]:
+    for name in a[3:]:
+        p = pathlib.Path(name)
+        s["assets"][p.name] = p.read_bytes().hex()
+elif a[:2] == ["release", "download"]:
+    dest = pathlib.Path(a[a.index("--dir") + 1])
+    for i, arg in enumerate(a):
+        if arg == "--pattern":
+            name = a[i + 1]
+            (dest / name).write_bytes(bytes.fromhex(s["assets"][name]))
+elif a[:2] == ["release", "edit"]:
+    assert "--draft=false" in a
+    s["draft"] = False
+else:
+    sys.exit(98)
+path.write_text(json.dumps(s))
+""")
+        gh.chmod(0o755)
 
-    def tearDown(self) -> None:
+    def tearDown(self):
         self.temporary.cleanup()
 
-    def run_publish(
-        self, *, path: str | None = None
-    ) -> subprocess.CompletedProcess[str]:
-        environment = dict(os.environ)
-        if path is not None:
-            environment["PATH"] = path
+    def git(self, *args):
+        return subprocess.check_output(
+            ["git", *args], cwd=self.repo, text=True, stderr=subprocess.DEVNULL
+        ).strip()
+
+    def run_publish(self, **env):
         return subprocess.run(
-            [str(self.root / "scripts/publish-release.sh"), "alpha"],
-            cwd=self.root,
-            env=environment,
-            capture_output=True,
+            [str(self.repo / "scripts/publish-release.sh"), "alpha", str(self.package)],
+            cwd=self.repo,
+            env={
+                **os.environ,
+                "PATH": f"{self.bin}:{os.environ['PATH']}",
+                "GITHUB_ACTIONS": "true",
+                "GITHUB_EVENT_NAME": "push",
+                "GITHUB_REF": "refs/heads/main",
+                "GITHUB_SHA": self.sha,
+                "GITHUB_REPOSITORY": "owner/test",
+                "FAKE_GH_STATE": str(self.state),
+                **env,
+            },
             text=True,
-            check=False,
+            capture_output=True,
         )
 
-    def test_success_uploads_to_a_draft_without_publishing(self) -> None:
-        binary = self.root / "bin"
-        binary.mkdir()
-        scripts = self.root / "scripts"
-        executables = {
-            binary / "git": """#!/usr/bin/env bash
-case "$1 $2" in
-  "status --porcelain"|"fetch --no-tags"|"tag -a"|"push origin") exit 0 ;;
-  "branch --show-current") echo main ;;
-  "rev-parse HEAD"|"rev-parse origin/main") echo commit ;;
-  "rev-parse --verify") exit 1 ;;
-  *) echo "unexpected git call: $*" >&2; exit 98 ;;
-esac
-""",
-            binary / "gh": """#!/usr/bin/env bash
-echo "$*" >> gh-calls
-case "$1 $2" in
-  "run list") echo 7 ;;
-  "run watch") exit 0 ;;
-  "release view") cat draft-state ;;
-  *) echo "unexpected gh call: $*" >&2; exit 98 ;;
-esac
-""",
-            scripts / "build-book.sh": "#!/usr/bin/env bash\nexit 0\n",
-            scripts / "release-plan.sh": "#!/usr/bin/env bash\nexit 0\n",
-            scripts
-            / "package-book.sh": '#!/usr/bin/env bash\necho pdf > "$2/alpha-v1.2.3.pdf"\n',
-            scripts
-            / "upload-release-assets.sh": '#!/usr/bin/env bash\ntest -f "$2" && test -f "$3" && touch uploaded\n',
-        }
-        for path, content in executables.items():
-            path.write_text(content)
-            path.chmod(0o755)
-        (scripts / "books.py").write_text(
-            'import sys\nif sys.argv[1] == "version": print("1.2.3")\n'
-        )
-        (self.root / "draft-state").write_text("true\n")
-        result = self.run_publish(path=f"{binary}:{os.environ['PATH']}")
+    def test_success_publishes_verified_assets_and_retry_is_noop(self):
+        result = self.run_publish()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertTrue((self.root / "uploaded").exists())
-        self.assertIn("remains a draft", result.stdout)
-        self.assertNotIn("release edit", (self.root / "gh-calls").read_text())
-        (self.root / "uploaded").unlink()
-        (self.root / "draft-state").write_text("false\n")
-        result = self.run_publish(path=f"{binary}:{os.environ['PATH']}")
+        state = json.loads(self.state.read_text())
+        self.assertFalse(state["draft"])
+        self.assertEqual(set(state["assets"]), {self.pdf.name, "SHA256SUMS"})
+        self.assertEqual(self.git("cat-file", "-t", f"refs/tags/{self.tag}"), "tag")
+        self.assertEqual(self.git("rev-list", "-n", "1", self.tag), self.sha)
+        count = len(state["calls"])
+        result = self.run_publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        calls = json.loads(self.state.read_text())["calls"][count:]
+        self.assertTrue(all(c[0] == "api" for c in calls))
+
+    def test_interrupted_upload_resumes_original_package(self):
+        failed = self.run_publish(FAIL_GH="release upload")
+        self.assertNotEqual(failed.returncode, 0)
+        self.assertTrue(json.loads(self.state.read_text())["draft"])
+        resumed = self.run_publish()
+        self.assertEqual(resumed.returncode, 0, resumed.stderr)
+        self.assertFalse(json.loads(self.state.read_text())["draft"])
+
+    def test_conflicting_asset_is_not_overwritten_or_published(self):
+        self.state.write_text(
+            json.dumps(
+                {
+                    "draft": True,
+                    "assets": {self.pdf.name: b"different".hex()},
+                    "calls": [],
+                }
+            )
+        )
+        result = self.run_publish()
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("already public", result.stderr)
-        self.assertFalse((self.root / "uploaded").exists())
-
-    def test_dirty_worktree_is_rejected_before_branch_lookup(self) -> None:
-        binary = self.root / "bin"
-        binary.mkdir()
-        git = binary / "git"
-        git.write_text(
-            """#!/usr/bin/env bash
-case "$1 $2" in
-  "status --porcelain") echo " M README.md"; exit 0 ;;
-  "status --short") echo " M README.md"; exit 0 ;;
-  "branch --show-current") echo "unexpected branch lookup" >&2; exit 99 ;;
-  *) exit 98 ;;
-esac
-""",
-            encoding="utf-8",
+        self.assertIn("different content", result.stderr)
+        state = json.loads(self.state.read_text())
+        self.assertTrue(state["draft"])
+        self.assertFalse(
+            any(
+                c[:2] in [["release", "edit"], ["release", "upload"]]
+                for c in state["calls"]
+            )
         )
-        git.chmod(0o755)
 
-        result = self.run_publish(path=f"{binary}:{os.environ['PATH']}")
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("repository must be clean", result.stderr)
-        self.assertIn("M README.md", result.stderr)
-        self.assertNotIn("unexpected branch lookup", result.stderr)
+    def test_non_main_and_wrong_checkout_fail_before_remote_writes(self):
+        for env in [
+            {"GITHUB_REF": "refs/heads/local-work"},
+            {"GITHUB_EVENT_NAME": "pull_request"},
+            {"GITHUB_SHA": "0" * 40},
+        ]:
+            result = self.run_publish(**env)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(json.loads(self.state.read_text())["calls"], [])
+            self.assertEqual(self.git("tag", "--list"), "")
 
-    def test_non_main_branch_is_rejected_before_fetch(self) -> None:
-        binary = self.root / "bin"
-        binary.mkdir()
-        git = binary / "git"
-        git.write_text(
-            """#!/usr/bin/env bash
-case "$1 $2" in
-  "status --porcelain") exit 0 ;;
-  "branch --show-current") echo feature; exit 0 ;;
-  fetch*) echo "unexpected fetch" >&2; exit 99 ;;
-  *) exit 98 ;;
-esac
-""",
-            encoding="utf-8",
-        )
-        git.chmod(0o755)
+    def test_conflicting_tag_fails(self):
+        self.git("tag", self.tag)
+        self.git("push", "origin", self.tag)
+        result = self.run_publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("not annotated", result.stderr)
+        self.assertEqual(json.loads(self.state.read_text())["calls"], [])
 
-        result = self.run_publish(path=f"{binary}:{os.environ['PATH']}")
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("main branch", result.stderr)
-        self.assertNotIn("unexpected fetch", result.stderr)
+    def test_tampered_package_fails_before_tagging(self):
+        self.pdf.write_bytes(b"changed")
+        result = self.run_publish()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(self.git("tag", "--list"), "")
 
-    def test_remote_main_mismatch_is_rejected_before_manifest_validation(self) -> None:
-        binary = self.root / "bin"
-        binary.mkdir()
-        git = binary / "git"
-        git.write_text(
-            """#!/usr/bin/env bash
-case "$1 $2" in
-  "status --porcelain") exit 0 ;;
-  "branch --show-current") echo main; exit 0 ;;
-  "fetch --no-tags") exit 0 ;;
-  "rev-parse HEAD") echo local-commit; exit 0 ;;
-  "rev-parse origin/main") echo remote-commit; exit 0 ;;
-  *) echo "unexpected git call: $*" >&2; exit 98 ;;
-esac
-""",
-            encoding="utf-8",
-        )
-        git.chmod(0o755)
+    def test_advanced_main_still_tags_validated_commit(self):
+        self.git("commit", "--allow-empty", "-m", "Later main")
+        self.git("push", "origin", "main")
+        self.git("checkout", "--detach", self.sha)
+        result = self.run_publish()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.git("rev-list", "-n", "1", self.tag), self.sha)
 
-        result = self.run_publish(path=f"{binary}:{os.environ['PATH']}")
-        self.assertEqual(result.returncode, 1)
-        self.assertIn("HEAD must exactly match origin/main", result.stderr)
-        self.assertIn("local-commit", result.stderr)
-        self.assertIn("remote-commit", result.stderr)
+    def test_failed_verification_keeps_draft(self):
+        result = self.run_publish(FAIL_GH="release download")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertTrue(json.loads(self.state.read_text())["draft"])
 
 
 if __name__ == "__main__":

@@ -28,7 +28,7 @@ the next batch. Before removing the old branch, confirm that all work was
 included in the merge or preserved elsewhere. Start with fresh branch history
 after a squash merge to avoid carrying already merged commits into the next PR.
 
-Run `make doctor env`, make focused changes, and build and check the affected book with `make books BOOK=<slug> check`. Select the required checks from [Contributing](CONTRIBUTING.md#validation-by-change-category) before review. Make-based build files stay under the ignored `build/` directory, while LaTeX Workshop writes to the ignored `vscode-build/` directory. Release staging uses an automatically cleaned temporary directory.
+Run `make doctor env`, make focused changes, and build and check the affected book with `make books BOOK=<slug> check`. Select the required checks from [Contributing](CONTRIBUTING.md#validation-by-change-category) before review. Make-based build files stay under the ignored `build/` directory, while LaTeX Workshop writes to the ignored `vscode-build/` directory. Release packages are retained as GitHub Actions artifacts.
 
 ## Cleaning outputs and caches
 
@@ -88,9 +88,8 @@ one. Untracked drafts and other extensions are not included. Temporary
 `latexindent` files are isolated and removed automatically. The command fails
 with a dependency error when `latexindent` is not available.
 
-For displays using `\by{...}`, follow the formatter-safe convention in the
-[textbook writing guide](writing-guide.md#displayed-justifications-with-by). Review
-formatter diffs because `latexindent` recognizes TeX structure heuristically.
+Review formatter diffs because `latexindent` recognizes TeX structure
+heuristically.
 
 Python formatting applies only to `scripts/` and `tests/`. Update mode applies
 the configured safe Ruff fixes and formatting; check mode is non-mutating.
@@ -165,56 +164,77 @@ fork pull requests do not publish.
 
 ### Releases
 
-Update the book's semantic `version` in `books.yml`, run
-`make contents chap BOOK=<slug>`, and complete the applicable validation in
-[Contributing](CONTRIBUTING.md#validation-by-change-category). Merge the reviewed
-change into remote `main` through a pull request before preparing a release.
+A reviewed `release: false` to `release: true` change requests publication of
+that book's current version, so a first release can use `0.1.0` unchanged. A newly
+registered book with `release: true` also requests its first publication. While
+`release: true` remains set, only a version increase requests another release;
+ordinary content changes do not. Version changes must increase in semantic-version
+order. Release targets must also have `build: true`. A version change while
+`release: false` does not publish. All books initially have `release: false`.
 
-From a clean `main` workspace, run `make publish BOOK=<slug>`. The command requires
-`release: true`, fetches `origin/main`, and requires exact equality with local
-`HEAD`. It builds under `build/<slug>/`, strictly checks the log, and packages the
-PDF and `SHA256SUMS` in an automatically cleaned temporary directory. It creates
-and pushes the annotated `<slug>-v<version>` tag; it never pushes source code.
+On `local-work` or another development branch, run:
 
-The command waits for the successful release workflow, which validates the tag
-and creates a draft GitHub Release. CI does not build or attach release PDFs.
-The local command uploads the PDF and checksum without overwriting existing
-assets and leaves the release as a draft. It refuses asset changes to an already
-public release. The repository owner downloads and reviews the staged PDF,
-checks `SHA256SUMS`, and then publishes the draft through GitHub. Preparing assets
-and making them public are separate steps.
+```bash
+make release-prepare BOOK=mathematical-analysis-1 VERSION=0.1.0
+```
+
+This enables `release: true`, sets that book's version in `books.yml`, and
+synchronizes its generated assembly, equivalent to `make contents all BOOK=<slug>`.
+The current version is accepted when enabling a disabled book; an already enabled
+book requires a higher version (for example `VERSION=0.2.0`). It preserves unrelated
+manifest formatting and edits. It does not commit, push, create a PR, build a PDF,
+or create a tag. Direct preparation on `main` or detached HEAD is rejected.
+Review and commit the resulting changes with the textbook work, complete the
+applicable checks in [Contributing](CONTRIBUTING.md#validation-by-change-category),
+and submit the usual batch PR. Merging the release preparation authorizes automatic
+public release; no second approval is required. The old `make publish` interface
+has been removed.
+
+`build.yml` compares the PR base or the main push's `before` commit with the
+checked-out manifest, independently of the development snapshot baseline.
+Release books are included in the PDF build matrix even if the snapshot has
+already advanced. PRs validate the plan without publishing. Ordinary manual
+**Build textbooks** runs refresh development PDFs only.
+
+After the main source, Lean, formatting, and strict PDF gates pass, `build.yml`
+calls `release.yml` with the release book matrix. The build jobs package the
+strictly checked PDFs and `SHA256SUMS` into `<slug>-release` artifacts retained
+for 90 days. The publication jobs use those same-run packages and tag the exact
+validated `GITHUB_SHA`, even when `main` has since advanced. They never use the
+mutable `generated-pdfs` snapshot as a release source. Pages deployment and
+versioned releases are independent consumers of the validated build.
+
+Each publication creates an annotated `<slug>-v<version>` tag, stages a draft,
+uploads `<slug>-v<version>.pdf` and `SHA256SUMS`, downloads and verifies both, then
+automatically publishes the draft. Versions with a prerelease suffix are marked
+as prereleases. Releases use their book tag as the title; GitHub-generated notes
+are repository-wide. No book claims the repository-wide `Latest` designation.
+The release process does not change the descriptive book `status` in `books.yml`.
+Only publication jobs receive repository-content write permission for releases.
+Tag pushes no longer trigger a separate release workflow.
 
 #### Recovering an interrupted release
 
-- If tag push failed, inspect the local and remote tag before retrying. An
-  existing local tag must be annotated and point to the release commit; never
-  move an existing publication tag to a different commit.
-- If workflow discovery timed out, check the tag's **Release textbooks** run on
-  GitHub. If that run failed, resolve the cause and rerun it. Pushing an unchanged
-  tag again does not create a new push event. Wait for a successful run before
-  retrying the local command.
-- If asset upload was interrupted and `main` still points to the release commit,
-  rerun `make publish BOOK=<slug>`. Identical existing assets are retained and
-  missing assets are uploaded. A byte mismatch is an error, even when the PDF was
-  rebuilt from the same source; do not delete or overwrite assets to hide it.
-- If `main` has advanced, do not reset it or move the tag to satisfy the command.
-  Use a separate checkout of the tagged commit to inspect or rebuild the PDF and
-  verify it against any uploaded checksum. A maintainer may resume the missing
-  asset upload with `scripts/upload-release-assets.sh <tag> <pdf> <checksums>`
-  after confirming the release is still a draft and its validation run passed.
-  If the original bytes cannot be recovered consistently, leave the draft
-  unpublished and prepare a reviewed new version.
-
-Temporary packaging files are removed on failure as well as success. The build
-PDF remains under `build/<slug>/` until the next build or cleanup; preserve it
-when investigating an interrupted upload.
-
-## Contributor workflows
-
-### Bug fixes and content writing
-
-For a bug, reproduce it with the smallest relevant build or checker, correct only the owning file, add a regression test when tooling failed to detect it, then run the checks required by [Contributing](CONTRIBUTING.md#validation-by-change-category). For content writing, work in one book and section, preserve notation and labels, verify sources and rights, build frequently, and avoid combining exposition with infrastructure changes.
-
-### New contributors
-
-Begin with the root README, [the contributing guide](CONTRIBUTING.md), and [the architecture guide](ARCHITECTURE.md). Choose a bounded issue, follow the batch workflow above (or use a separate task branch when isolation is useful), use public Make commands, and ask before changing shared interfaces. `make doctor books BOOK=<slug>` offers advisory local diagnostics; it does not replace the required validation in [Contributing](CONTRIBUTING.md#validation-by-change-category).
+- Use **Re-run failed jobs** on the original main **Build textbooks** run. Its
+  original event, commit, plan, and retained package identify the release even
+  after `main` advances. Do not dispatch a new build to recover an old version.
+- If publication failed after packaging, retain the original `<slug>-release`
+  artifact. Avoid rerunning successful build jobs: a rebuilt PDF can differ in
+  bytes, and an existing immutable artifact must not be replaced.
+- Re-enabling a previously published book does not reset its release history.
+  Choose a higher version if its current version already has a tag; the existing
+  tag conflict guard still applies.
+- An existing tag must be annotated and point to the same validated commit.
+  Existing draft assets must match the original package byte for byte; only
+  missing assets are uploaded. Conflicts stop publication without overwriting.
+- An already-public release is left unchanged on retry. If publication succeeded
+  just before the job lost its connection, a retry therefore completes safely.
+- If a retained package has expired or conflicting bytes cannot be recovered,
+  leave the draft unpublished and prepare a reviewed higher version. Never move
+  an existing tag or overwrite public assets to force recovery.
+- Concurrent runs are isolated by book and source commit. A later main commit
+  does not suppress an earlier version's publication. Main push runs have separate
+  concurrency groups per commit; development snapshot writes remain serialized.
+  If a run is cancelled or
+  fails, recover that original run explicitly; later pushes do not implicitly
+  backfill missed versions.

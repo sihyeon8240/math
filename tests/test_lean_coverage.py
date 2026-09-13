@@ -26,7 +26,20 @@ class LeanCoverageTests(unittest.TestCase):
                 metrics = lean_coverage.book_lean_metrics("sample", root)
             self.assertEqual(metrics["total"], 1)
 
-    def test_verified_count_cannot_exceed_theorem_total(self) -> None:
+    def test_coverage_can_exceed_one_hundred_percent(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "books/sample/chapter.tex"
+            source.parent.mkdir(parents=True)
+            source.write_text("\\begin{theorem}Real.\\end{theorem}\n", encoding="utf-8")
+            proofs = [{"book": "sample"}, {"book": "sample"}, {"book": "other"}]
+            with mock.patch.object(
+                lean_coverage, "load_proof_index", return_value=([], proofs)
+            ):
+                metrics = lean_coverage.book_lean_metrics("sample", root)
+            self.assertEqual(metrics, {"verified": 2, "total": 1, "percentage": 200.0})
+
+    def test_registered_results_without_theorems_keep_zero_percentage(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             (root / "books/sample").mkdir(parents=True)
@@ -34,8 +47,8 @@ class LeanCoverageTests(unittest.TestCase):
             with mock.patch.object(
                 lean_coverage, "load_proof_index", return_value=([], proofs)
             ):
-                with self.assertRaisesRegex(ValueError, "only 0 theorem"):
-                    lean_coverage.book_lean_metrics("sample", root)
+                metrics = lean_coverage.book_lean_metrics("sample", root)
+            self.assertEqual(metrics, {"verified": 1, "total": 0, "percentage": 0.0})
 
 
 if __name__ == "__main__":

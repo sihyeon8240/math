@@ -135,5 +135,7 @@ Prepare a concise summary containing:
 4. Any intentionally unresolved warnings or unavailable local-only files.
 
 The repository owner performs final review and merge. GitHub Actions validate
-pull requests and `main`; tag workflows create releases only after their own
-validation gates pass.
+pull requests and `main`; merged release enablement or version increases for release-enabled books trigger automatic publication
+only after main CI validation gates pass. Prepare versions on development branches
+with `make release-prepare BOOK=<slug> VERSION=<version>`; do not create or push
+release tags locally.
