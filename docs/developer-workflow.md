@@ -88,9 +88,8 @@ one. Untracked drafts and other extensions are not included. Temporary
 `latexindent` files are isolated and removed automatically. The command fails
 with a dependency error when `latexindent` is not available.
 
-For displays using `\by{...}`, follow the formatter-safe convention in the
-[textbook writing guide](writing-guide.md#displayed-justifications-with-by). Review
-formatter diffs because `latexindent` recognizes TeX structure heuristically.
+Review formatter diffs because `latexindent` recognizes TeX structure
+heuristically.
 
 Python formatting applies only to `scripts/` and `tests/`. Update mode applies
 the configured safe Ruff fixes and formatting; check mode is non-mutating.

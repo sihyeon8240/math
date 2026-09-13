@@ -220,9 +220,9 @@ Organize proofs around mathematical deductions, with enough prose to connect
 each step to its purpose. For formalized results, use the paired format above.
 Bold labels such as `Injectivity`, `Surjectivity`, `Base case`, and `Inductive
 step` are optional aids for repeated obligations. Displayed implication chains
-in an `array` with `\Downarrow` are also optional within an explanation; use
-`\by{...}` when a displayed step needs a justification. These devices supplement
-the explanation and do not replace the required explanation/code pairing.
+in an `array` with `\Downarrow` are also optional within an explanation. These
+devices supplement the explanation and do not replace the required
+explanation/code pairing.
 
 ## LaTeX source conventions
 
@@ -268,7 +268,7 @@ applying a blanket Unicode normalization or ASCII conversion.
 
 | Context | Source convention |
 |---|---|
-| LaTeX mathematical prose | Use math mode and the existing macros, such as `$\N$`, `$\N^{+}$`, and `$\bigcup_i E_i$`; do not paste a bare mathematical Unicode glyph into ordinary text as a font workaround. |
+| LaTeX mathematical prose | Use math mode and the existing macros, such as `$\N$`, `$\N^{+}$`, and `$\bigcup_{i} E_{i}$`; do not paste a bare mathematical Unicode glyph into ordinary text as a font workaround. |
 | Ordinary prose and PDF bookmark strings | Unicode appropriate to the language and supported by the selected text font is allowed; preserve existing `\texorpdfstring` alternatives. |
 | Checked Lean and displayed Lean | Keep the actual identifiers and notation, including `ℕ`, `ℕ+`, `⋃`, and `⋂`. Displayed fragments must follow the [checked-source correspondence policy](formalization.md#displayed-code-correspondence). |
 | Typesetting fixtures | Literal glyph inventories are allowed and must be identified as rendering specimens, not checked mathematical proofs. |
@@ -310,8 +310,6 @@ A missing-character diagnostic is already a build error in
 `scripts/check-log.py`, even without `--strict`; strict mode additionally rejects
 overfull boxes. Shared font changes require `make test` and `make check all
 strict` under the [validation policy](CONTRIBUTING.md#validation-by-change-category).
-Text mathematical fonts remain separate from code fonts; see the
-[`unicode-math` decision](design-decisions.md#unicode-math-and-code-fonts).
 
 ### Braces in command arguments and scripts
 
@@ -319,22 +317,4 @@ For consistent LaTeX source, prefer braces around every mandatory command
 argument and every subscript or superscript argument, even when the argument is
 a single character. This preference applies to both single- and multi-character
 arguments. For example, write `\frac{1}{n}`, `N_{r}(p)`, `\mathcal{G}_{2}(b)`, and
-`x^{2}` rather than `\frac 1n`, `N_r(p)`, `\mathcal G_2(b)`, and `x^2`.
-
-### Displayed justifications with `\by`
-
-The `\by{...}` command typesets a justification beside a displayed implication.
-Its argument may contain prose, mathematics, or both. Wrap each mathematical
-portion in `\ensuremath{...}`; do not use `$...$` or `$$...$$` inside `\by`.
-For example:
-
-```tex
-\by{the preceding lemma} \Downarrow
-\by{\ensuremath{x \leq y}} \Downarrow
-\by{\ensuremath{n} is positive} \Downarrow
-```
-
-This form works in the text-mode boxes created by `\by` without introducing
-nested dollar-delimited math. It also prevents `latexindent` from mistaking the
-inner dollars for a separate math block and consequently failing to recognize
-the surrounding `array` environment.
+`x^{2}`.
