@@ -2,7 +2,9 @@
 
 ## Registry fields
 
-`books.yml` is the canonical source for repository title, short title, label prefix, optional Lean module, status, ordering, and the `build`, `check`, `release`, and `site` flags. The flags control participation in the all-books build, repository-wide validation, official releases, and site publication respectively. An explicit `make books BOOK=<slug>` may build a registered book even when `build` is false, while `make publish` requires `release: true`.
+`books.yml` is the canonical source for repository title, short title, label prefix, optional Lean module, status, ordering, and the `build`, `check`, `release`, and `site` flags. The flags control participation in the all-books build, repository-wide validation, official releases, and site publication respectively. An explicit `make books BOOK=<slug>` may build a registered book even when `build` is false, while release preparation requires `build: true` and enables `release: true`.
+A reviewed transition to `release: true` publishes the current version; subsequent
+version increases publish new releases after main CI succeeds. See [Releases](developer-workflow.md#releases).
 
 Statuses describe publication state:
 

@@ -56,14 +56,17 @@ This records why established choices fit this repository; [the architecture guid
 
 ## Publishing and site generation
 
-### Ephemeral release staging
+### Reviewed release preparation triggers publication
 
-- **Decision:** development builds remain under ignored `build/`; release packaging
-  uses an automatically cleaned temporary directory. Uploads remain in a draft
-  until the owner reviews and publishes the release.
-- **Benefits:** no persistent staging state and a narrower public interface.
-- **Tradeoff:** local release artifacts exist only on GitHub after upload.
-- **Future direction:** preserve asset immutability.
+- **Decision:** prepare versions on development branches; enabling release
+  publishes the current version, and later version increases trigger publication after the
+  existing main CI gates. A reusable release workflow consumes the same run's
+  retained package, stages and verifies assets, then publishes automatically.
+- **Benefits:** the ordinary PR is the publication approval; no local upload,
+  post-merge branch switching, or second PDF build is needed for publication.
+- **Tradeoff:** failed publication must be retried from the original run while
+  its package is retained; GitHub-generated release notes span the repository.
+- **Invariant:** published assets and annotated version tags remain immutable.
 
 ### Ephemeral manifest-derived site pages
 

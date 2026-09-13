@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
+import json
 import subprocess
 import sys
 import tempfile
@@ -62,6 +65,26 @@ class AffectedBookTests(unittest.TestCase):
             ),
         ):
             return affected.plan(paths, old)
+
+    def test_release_matrix_forces_build_after_snapshot_has_advanced(self):
+        output = io.StringIO()
+        with (
+            mock.patch.object(affected, "load_manifest", return_value=self.manifest),
+            mock.patch.object(affected, "changed_paths", return_value=[]),
+            mock.patch.object(affected, "manifest_at", return_value=self.manifest),
+            mock.patch.object(
+                affected, "dependencies", side_effect=lambda slug: self.deps[slug]
+            ),
+            mock.patch.dict(
+                affected.os.environ, {"RELEASE_MATRIX": '{"book":["beta"]}'}
+            ),
+            mock.patch.object(sys, "argv", ["affected-books.py", "--base", "HEAD"]),
+            contextlib.redirect_stdout(output),
+        ):
+            self.assertEqual(affected.main(), 0)
+        result = json.loads(output.getvalue())
+        self.assertEqual(result["book"], ["beta"])
+        self.assertEqual(result["count"], 1)
 
     def test_book_inputs_select_one_book(self):
         for path in (

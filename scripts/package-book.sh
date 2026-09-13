@@ -33,4 +33,8 @@ fi
 "$PYTHON" "$repo_root/scripts/check-log.py" --strict "$log"
 mkdir -p "$output_dir"
 cp "$source_pdf" "$target"
-echo "==> Created $target"
+(
+  cd "$output_dir"
+  sha256sum "$slug-v$version.pdf" >SHA256SUMS
+)
+echo "==> Created $target and SHA256SUMS"

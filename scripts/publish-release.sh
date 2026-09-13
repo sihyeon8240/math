@@ -1,96 +1,66 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 1 ]]; then
-  echo "usage: $0 <book-slug>" >&2
+if [[ $# -ne 2 ]]; then
+  echo "usage: $0 <book-slug> <package-directory>" >&2
   exit 2
 fi
-
+if [[ "${GITHUB_ACTIONS:-}" != true || "${GITHUB_EVENT_NAME:-}" != push ||
+  "${GITHUB_REF:-}" != refs/heads/main ]]; then
+  echo "error: publication requires a main push workflow" >&2
+  exit 1
+fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PYTHON="${PYTHON:-python3}"
-slug="$1"
-
 cd "$repo_root"
-
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo "error: repository must be clean before publishing" >&2
-  git status --short >&2
-  exit 1
-fi
-
-current_branch="$(git branch --show-current)"
-if [[ "$current_branch" != "main" ]]; then
-  echo "error: releases must be published from the main branch" \
-    "(current: ${current_branch:-detached HEAD})" >&2
-  exit 1
-fi
-
-git fetch --no-tags origin main
-head_commit="$(git rev-parse HEAD)"
-remote_main_commit="$(git rev-parse origin/main)"
-if [[ "$head_commit" != "$remote_main_commit" ]]; then
-  echo "error: HEAD must exactly match origin/main" >&2
-  echo "HEAD:        $head_commit" >&2
-  echo "origin/main: $remote_main_commit" >&2
-  exit 1
-fi
-
-"$PYTHON" scripts/books.py validate
-"$PYTHON" scripts/books.py require "$slug" >/dev/null
-version="$("$PYTHON" scripts/books.py version "$slug")"
+slug="$1"
+package="$(cd "$2" && pwd)"
+version="$(python3 scripts/books.py version "$slug")"
 tag="$slug-v$version"
 ./scripts/release-plan.sh "$tag" >/dev/null
-
-release_dir="$(mktemp -d)"
-trap 'rm -rf -- "$release_dir"' EXIT
-./scripts/build-book.sh "$slug"
-./scripts/package-book.sh "$slug" "$release_dir"
-pdf="$release_dir/$tag.pdf"
+[[ "$(git rev-parse HEAD)" == "$GITHUB_SHA" ]] || {
+  echo "error: checkout does not match the validated commit" >&2
+  exit 1
+}
+git fetch --no-tags origin main
+git merge-base --is-ancestor "$GITHUB_SHA" origin/main
 (
-  cd "$release_dir"
-  sha256sum "$tag.pdf" >SHA256SUMS
+  cd "$package"
+  test -s "$tag.pdf"
+  test "$(wc -l <SHA256SUMS)" -eq 1
+  [[ "$(cat SHA256SUMS)" == "$(sha256sum "$tag.pdf")" ]]
 )
-
+# Fetch tags without force: an existing tag must never move.
+git fetch origin 'refs/tags/*:refs/tags/*'
 if git rev-parse --verify --quiet "refs/tags/$tag" >/dev/null; then
-  tag_commit="$(git rev-list -n 1 "$tag")"
-  if [[ "$tag_commit" != "$(git rev-parse HEAD)" ]]; then
-    echo "error: existing tag $tag does not point to HEAD" >&2
+  [[ "$(git rev-list -n 1 "$tag")" == "$GITHUB_SHA" &&
+  "$(git cat-file -t "refs/tags/$tag")" == tag ]] || {
+    echo "error: existing release tag has a conflicting commit or is not annotated" >&2
     exit 1
-  fi
-  if [[ "$(git cat-file -t "refs/tags/$tag")" != "tag" ]]; then
-    echo "error: existing tag $tag is not annotated" >&2
-    exit 1
-  fi
+  }
 else
-  git tag -a "$tag" -m "Release $slug version $version"
+  git config user.name 'github-actions[bot]'
+  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+  git tag -a "$tag" "$GITHUB_SHA" -m "Release $slug version $version"
+  git push origin "refs/tags/$tag"
 fi
-
-git push origin "$tag"
-
-echo "==> Waiting for the release workflow for $tag"
-run_id=""
-for _ in {1..24}; do
-  run_id="$(gh run list --workflow release.yml --branch "$tag" \
-    --event push --limit 1 --json databaseId \
-    --jq '.[0].databaseId // empty')"
-  [[ -n "$run_id" ]] && break
-  sleep 5
-done
-if [[ -z "$run_id" ]]; then
-  echo "error: release workflow did not appear within 2 minutes for $tag" >&2
-  exit 1
+# Listing must succeed; authorization/network failures are not missing releases.
+draft="$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+  --jq ".[] | select(.tag_name == \"$tag\") | .draft")"
+if [[ "$draft" == false ]]; then
+  echo "==> $tag is already public; leaving it unchanged"
+  exit 0
 fi
-if ! timeout 15m gh run watch "$run_id" --exit-status; then
-  echo "error: release workflow $run_id failed or did not finish within 15 minutes" >&2
-  exit 1
+if [[ -z "$draft" ]]; then
+  options=(--draft --verify-tag --generate-notes --latest=false --title "$tag")
+  [[ "$version" != *-* ]] || options+=(--prerelease)
+  gh release create "$tag" "${options[@]}"
 fi
-
-release_is_draft="$(gh release view "$tag" --json isDraft --jq .isDraft)"
-if [[ "$release_is_draft" != true ]]; then
-  echo "error: release $tag is already public; refusing to change its assets" >&2
-  exit 1
-fi
-
-./scripts/upload-release-assets.sh "$tag" "$pdf" "$release_dir/SHA256SUMS"
-echo "==> Uploaded $tag.pdf and SHA256SUMS; the release remains a draft"
-echo "==> Review the PDF and checksum on GitHub, then publish the draft manually"
+./scripts/upload-release-assets.sh "$tag" "$package/$tag.pdf" "$package/SHA256SUMS"
+# Verify bytes downloaded from GitHub before making the release public.
+verification="$(mktemp -d)"
+trap 'rm -rf -- "$verification"' EXIT
+gh release download "$tag" --pattern "$tag.pdf" --pattern SHA256SUMS --dir "$verification"
+cmp "$package/$tag.pdf" "$verification/$tag.pdf"
+cmp "$package/SHA256SUMS" "$verification/SHA256SUMS"
+gh release edit "$tag" --draft=false --latest=false
+echo "==> Published $tag"
