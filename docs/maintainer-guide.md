@@ -1,6 +1,7 @@
 # Maintainer guide
 
-Use [the architecture guide](ARCHITECTURE.md) as policy and [design-decisions.md](design-decisions.md) for rationale.
+Use [the architecture guide](ARCHITECTURE.md) for repository structure and
+ownership, and the [documentation map](README.md) to find task-specific policies.
 
 ## Reviewing changes
 

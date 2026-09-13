@@ -1,8 +1,9 @@
 # Documentation map
 
 The root [README](../README.md) is the repository overview and quick start. This
-directory separates stable policy, task-oriented instructions, and explanatory
-context so that a rule has one authoritative home.
+directory separates stable policy from task-oriented instructions so that a
+rule has one authoritative home. Keep any necessary explanation of a policy
+with that policy.
 
 ## Choose a guide
 
@@ -15,7 +16,6 @@ context so that a rule has one authoritative home.
 | [Developer workflow](developer-workflow.md) | Repository developers | Day-to-day commands, CI behavior, development PDF publication, and release operations. |
 | [Maintainer guide](maintainer-guide.md) | Maintainers and reviewers | Review, publication checklists, and toolchain image operations. |
 | [Site metadata](site-metadata.md) | Site maintainers | Manifest statuses, automation flags, and generated site pages. |
-| [Design decisions](design-decisions.md) | Future maintainers | Rationale and tradeoffs behind the architecture; not a second policy source. |
 
 Each book owns its mathematical prerequisites in `books/<slug>/formalization.md`;
 the [Lean formalization guide](formalization.md#book-owned-prerequisite-boundaries)
