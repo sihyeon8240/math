@@ -38,11 +38,7 @@ def book_lean_metrics(slug: str, root: Path = REPO_ROOT) -> dict[str, int | floa
     verified = sum(
         isinstance(entry, dict) and entry.get("book") == slug for entry in proofs
     )
-    if verified > total:
-        raise ValueError(
-            f"{slug}: proof index has {verified} verified results but "
-            f"only {total} theorem environments"
-        )
+    # Lean-first authoring can put registered results ahead of the exposition.
     percentage = round(100 * verified / total, 1) if total else 0.0
     return {
         "verified": verified,
