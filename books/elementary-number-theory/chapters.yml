@@ -1,0 +1,34 @@
+schema_version: 1
+chapters:
+- slug: preliminaries
+  title: Preliminaries
+- slug: divisibility-theory-in-the-integers
+  title: Divisibility Theory in the Integers
+- slug: primes-and-their-distribution
+  title: Primes and Their Distribution
+- slug: the-theory-of-congruences
+  title: The Theory of Congruences
+- slug: fermats-theorem
+  title: Fermat's Theorem
+- slug: number-theoretic-functions
+  title: Number-Theoretic Functions
+- slug: eulers-generalization-of-fermats-theorem
+  title: Euler's Generalization of Fermat's Theorem
+- slug: primitive-roots-and-indices
+  title: Primitive Roots and Indices
+- slug: the-quadratic-reciprocity-law
+  title: The Quadratic Reciprocity Law
+- slug: introduction-to-cryptography
+  title: Introduction to Cryptography
+- slug: numbers-of-special-form
+  title: Numbers of Special Form
+- slug: certain-nonlinear-diophantine-equations
+  title: Certain Nonlinear Diophantine Equations
+- slug: representation-of-integers-as-sums-of-squares
+  title: Representation of Integers as Sums of Squares
+- slug: fibonacci-numbers
+  title: Fibonacci Numbers
+- slug: continued-fractions
+  title: Continued Fractions
+- slug: some-modern-developments
+  title: Some Modern Developments

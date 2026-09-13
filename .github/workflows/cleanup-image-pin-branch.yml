@@ -1,0 +1,42 @@
+name: Clean up image pin branch
+
+on:
+  pull_request_target:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  delete-branch:
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      startsWith(github.event.pull_request.head.ref, 'automation/image-pin-')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Delete the closed image pin branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ ! "$HEAD_REF" =~ ^automation/image-pin-[0-9]+$ ]]; then
+            echo "Refusing to delete an unexpected branch: $HEAD_REF" >&2
+            exit 1
+          fi
+
+          get_endpoint="repos/${GITHUB_REPOSITORY}/git/ref/heads/${HEAD_REF}"
+          if ! remote_sha="$(gh api "$get_endpoint" --jq '.object.sha' 2>/dev/null)"; then
+            echo "Branch is already absent: $HEAD_REF"
+            exit 0
+          fi
+
+          if [[ "$remote_sha" != "$HEAD_SHA" ]]; then
+            echo "Branch moved after the PR closed; leaving it in place: $HEAD_REF" >&2
+            exit 0
+          fi
+
+          gh api \
+            --method DELETE \
+            "repos/${GITHUB_REPOSITORY}/git/refs/heads/${HEAD_REF}"

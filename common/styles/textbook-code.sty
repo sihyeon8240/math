@@ -1,0 +1,54 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{textbook-code}[2026/09/12 Mathematical prose with Lean code]
+
+\RequirePackage{fontspec}
+\RequirePackage{xcolor}
+\RequirePackage{minted}
+
+% Use only fonts shipped with the supported TeX Live environment. In
+% particular, DejaVu Sans Mono lacks indexed union/intersection glyphs.
+% The fallback supplies missing characters without rewriting checked Lean.
+\directlua{
+  luaotfload.add_fallback("textbookcode", {
+    "file:texgyretermes-math.otf:mode=base;"
+  })
+}
+
+\newfontfamily\textbookcodefont{DejaVuSansMono.ttf}[
+  BoldFont=DejaVuSansMono-Bold.ttf,
+  ItalicFont=DejaVuSansMono-Oblique.ttf,
+  BoldItalicFont=DejaVuSansMono-BoldOblique.ttf,
+  NFSSFamily=textbookcode,
+  Scale=0.85,
+  RawFeature={fallback=textbookcode}
+]
+
+\usemintedstyle{friendly}
+
+\newenvironment{lean}[1]{%
+  \VerbatimEnvironment
+
+  % Finish a pending theorem/proof label before placing a full-width pair.
+  \if@inlabel\noindent\par\fi
+
+  \par\addvspace{\medskipamount}%
+  \noindent
+  \begin{minipage}[t]{\linewidth}%
+
+    #1\par
+
+    \begin{minted}[
+      fontfamily=textbookcode,
+      fontsize=\small,
+      frame=single,
+      rulecolor=\color{black!25},
+      framesep=3mm,
+      autogobble,
+      breaklines
+    ]{lean4}%
+}{%
+    \end{minted}
+
+  \end{minipage}%
+  \par\addvspace{\medskipamount}%
+}

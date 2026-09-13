@@ -1,0 +1,20 @@
+schema_version: 1
+sections:
+- slug: set-functions
+  title: Set Functions
+- slug: construction-of-the-lebesgue-measure
+  title: Construction of the Lebesgue Measure
+- slug: measure-spaces
+  title: Measure Spaces
+- slug: measurable-functions
+  title: Measurable Functions
+- slug: simple-functions
+  title: Simple Functions
+- slug: integration
+  title: Integration
+- slug: comparison-with-the-riemann-integral
+  title: Comparison with the Riemann Integral
+- slug: integration-of-complex-functions
+  title: Integration of Complex Functions
+- slug: functions-of-class-l2
+  title: Functions of Class \texorpdfstring{$\mathscr{L}^{2}$}{ℒ²}

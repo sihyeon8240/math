@@ -1,0 +1,3 @@
+proofs:
+  - id: nt:thm:division-algorithm
+    declaration: ElementaryNumberTheory.Chapter02.existsUnique_quotient_remainder

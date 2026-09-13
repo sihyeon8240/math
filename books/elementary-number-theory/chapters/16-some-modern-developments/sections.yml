@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: hardy-dickson-and-erdos
+  title: Hardy, Dickson, and Erd\"os
+- slug: primality-testing-and-factorization
+  title: Primality Testing and Factorization
+- slug: an-application-to-factoring-remote-coin-flipping
+  title: 'An Application to Factoring: Remote Coin Flipping'
+- slug: the-prime-number-theorem-and-zeta-function
+  title: The Prime Number Theorem and Zeta Function

@@ -1,0 +1,260 @@
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.compl_interior_eq_closure_compl
+\begin{lemma} \label{an1:lem:complement-of-interior-is-closure-of-complement}
+  \begin{lean}{$(E^{\circ})^{c}=\overline{E^{c}}$.}
+    theorem compl_interior_eq_closure_compl (E : Set X) :
+        (interior E)ᶜ = closure Eᶜ
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Failure to be interior means that no positive-radius ball lies in $E$. Thus every such ball contains a point of $E^{c}$, giving membership in its closure. Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.}
+    classical
+    ext p
+    rw [mem_compl_iff, mem_interior_iff_mem_nhds, Metric.mem_nhds_iff,
+      Metric.mem_closure_iff]
+    constructor
+    · intro h r hr
+      have hn : ¬ ball p r ⊆ E := fun hs => h ⟨r, hr, hs⟩
+      obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hn
+      exact ⟨q, hqe, by rwa [dist_comm]⟩
+    · intro h ⟨r, hr, hs⟩
+      obtain ⟨q, hq, hd⟩ := h r hr
+      exact hq (hs (by simpa only [mem_ball, dist_comm] using hd))
+  \end{lean}
+
+\end{proof}
+
+\begin{definition} \label{an1:def:boundary}
+  The \textbf{boundary} is $\partial E=\overline E\cap\overline{E^{c}}$.
+  Equivalently, $\partial E=\overline E\setminus E^{\circ}$.
+  \begin{lean}{The boundary is the closure with the interior removed.}
+    noncomputable abbrev boundary (E : Set X) : Set X := frontier E
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.boundary_eq
+\begin{lemma} \label{an1:lem:boundary-eq}
+  \begin{lean}{$\partial E=\overline E\cap\overline{E^{c}}$.}
+    theorem boundary_eq (E : Set X) :
+        boundary E = closure E ∩ closure Eᶜ
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Replace the complement of the interior by the closure of the complement in the difference $\overline E\setminus E^{\circ}$.}
+    change closure E \ interior E = _
+    rw [sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.zero_dimensional
+\begin{lemma} \label{an1:lem:zero-dimensional}
+  \begin{lean}{Any two points of $\R^{0}$ are equal, and every deleted neighborhood in $\R^{0}$ is empty.}
+    theorem zero_dimensional (p q : EuclideanSpace ℝ (Fin 0)) (r : ℝ) :
+        p = q ∧ deletedNeighborhood p r = ∅
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{There are no coordinates on which two empty tuples can differ, so they are equal. Removing the center consequently removes every possible point of a ball.}
+    have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by
+      intro x y
+      ext j
+      exact Fin.elim0 j
+    refine ⟨heq p q, ?_⟩
+    apply Set.eq_empty_iff_forall_notMem.mpr
+    intro x hx
+    exact hx.2 (heq x p)
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_punctured_ball
+\begin{lemma} \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
+  \begin{lean}{For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the deleted neighborhood $\widetilde N_r(p)$ is nonempty.}
+    theorem euclidean_punctured_ball (n : ℕ+)
+        (p : EuclideanSpace ℝ (Fin n)) (r : ℝ) (hr : 0 < r) :
+        ∃ q : EuclideanSpace ℝ (Fin n), q ≠ p ∧ dist q p < r
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Since $n>0$, the coordinate vector $e_0$ exists. Put $v=(r/2)e_0$, so $\|v\|=r/2>0$. The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.}
+    let v : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single ⟨0, n.pos⟩ (r / 2)
+    have hv : ‖v‖ = r / 2 := by
+      rw [PiLp.norm_single, Real.norm_eq_abs, abs_of_pos (half_pos hr)]
+    refine ⟨p + v, ?_, ?_⟩
+    · intro heq
+      have hz : v = 0 := add_left_cancel (heq.trans (add_zero p).symm)
+      rw [hz, norm_zero] at hv
+      linarith
+    · rw [dist_eq_norm, add_sub_cancel_left, hv]
+      linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_limit_compl
+\begin{lemma} \label{an1:lem:isolated-limit-compl}
+  \begin{lean}{If every positive-radius deleted ball in $X$ is nonempty, then $E^{i}\subseteq(E^{c})^{\prime}$.}
+    theorem isolated_limit_compl (E : Set X)
+        (hX : ∀ p : X, ∀ r > 0, ∃ q : X, q ≠ p ∧ dist q p < r) :
+        isolatedPoints E ⊆ limitPoints Eᶜ
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{For an isolated point $p$, choose $r>0$ with $E\cap N_r(p)=\{p\}$. For any $s>0$, take a distinct point within $\min(r,s)$ of $p$. It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.}
+    intro p hp
+    obtain ⟨r, hr, heq⟩ := hp
+    intro s hs
+    obtain ⟨q, hne, hd⟩ := hX p (min r s) (lt_min hr hs)
+    refine ⟨q, ?_, hne, hd.trans_le (min_le_right _ _)⟩
+    intro hq
+    have hm : q ∈ E ∩ ball p r := ⟨hq, hd.trans_le (min_le_left _ _)⟩
+    rw [heq, mem_singleton_iff] at hm
+    exact hne hm
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_boundary
+\begin{proposition} \label{an1:thm:properties-of-boundary-in-rn}
+  \begin{lean}{For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial E=E^{i}\cup(E^{c})^{i}\cup(E^{\prime}\cap(E^{c})^{\prime})$.}
+    theorem euclidean_boundary (n : ℕ+)
+        (E : Set (EuclideanSpace ℝ (Fin n))) :
+        frontier E = isolatedPoints E ∪ isolatedPoints Eᶜ ∪
+          (limitPoints E ∩ limitPoints Eᶜ)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{An isolated point of either side is a limit point of the other, by the preceding two results. Expand the two closures in $\partial E$ as the set together with its limit points. Separate points which fail one of the two limit-point conditions from those satisfying both. The former are exactly the isolated points of one side; the latter form $E^{\prime}\cap(E^{c})^{\prime}$.}
+    have hE := isolated_limit_compl E (euclidean_punctured_ball n)
+    have hEc := isolated_limit_compl Eᶜ (euclidean_punctured_ball n)
+    rw [compl_compl] at hEc
+    rw [isolated_eq_diff] at hE hEc
+    rw [frontier, sdiff_eq_compl_inter,
+      compl_interior_eq_closure_compl, closure_eq_union_limitPoints,
+      closure_eq_union_limitPoints, isolated_eq_diff, isolated_eq_diff]
+    ext p
+    have h1 := @hE p
+    have h2 := @hEc p
+    simp only [mem_inter_iff, mem_union, mem_sdiff, mem_compl_iff] at *
+    tauto
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subspace_metric
+\begin{proposition} \label{an1:lem:subspace-metric}
+  \begin{lean}{For $Y\subseteq X$, restricting $d$ to $Y\times Y$ gives a metric on $Y$, with the same distances.}
+    theorem subspace_metric (Y : Set X) (p q z : Y) :
+        dist p q = dist p.val q.val ∧ 0 ≤ dist p q ∧
+        (dist p q = 0 ↔ p = q) ∧ dist p q = dist q p ∧
+        dist p z ≤ dist p q + dist q z
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Nonnegativity, symmetry, and the triangle inequality are inherited from $X$. Distance zero means equality of the underlying points, which is also equality as points of $Y$.}
+    exact ⟨rfl, dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
+  \end{lean}
+
+\end{proof}
+
+The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to write $d(p,q)$ for its distance.
+
+\begin{definition} \label{an1:def:relative-open-closed-sets}
+  For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ if each $p\in E$ has a radius $r>0$ with $Y\cap N_r(p)\subseteq E$.
+  It is \textbf{closed relative to} $Y$ if $E^{\prime}\cap Y\subseteq E$.
+  The first condition is the ball definition in the subspace; the equivalence for closedness is checked below.
+  \begin{lean}{Relative openness means openness of $E$ as a subset of the subspace $Y$.}
+    abbrev relativeOpen (E Y : Set X) : Prop :=
+      E ⊆ Y ∧ IsOpen ((Subtype.val : Y → X) ⁻¹' E)
+  \end{lean}
+  \begin{lean}{Relative closedness means closedness of that subset of $Y$.}
+    abbrev relativeClosed (E Y : Set X) : Prop :=
+      E ⊆ Y ∧ IsClosed ((Subtype.val : Y → X) ⁻¹' E)
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_closed
+\begin{lemma} \label{an1:lem:relative-closed}
+  \begin{lean}{For $E\subseteq Y$, $E$ is closed in $Y$ if and only if $E^{\prime}\cap Y\subseteq E$.}
+    theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
+        IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ limitPoints E ∩ Y ⊆ E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{A point of $Y$ that is an ambient limit point of $E$ is a subspace limit point: every witness lies in $E\subseteq Y$, and its distance is unchanged.}
+    rw [closed_iff_limitPoints]
+    constructor
+  \end{lean}
+
+  \begin{lean}{Conversely, each subspace witness has an underlying point in $E$ with the same positive distance. Thus a subspace limit point is an ambient limit point lying in $Y$, and the stated condition puts it in $E$.}
+    · intro h p hp
+      apply h (show (⟨p, hp.2⟩ : Y) ∈ limitPoints (Subtype.val ⁻¹' E) from ?_)
+      intro r hr
+      obtain ⟨q, hq, hne, hd⟩ := hp.1 r hr
+      refine ⟨⟨q, hEY hq⟩, hq, ?_, hd⟩
+      intro heq
+      exact hne (congrArg Subtype.val heq)
+    · intro h p hp
+      apply h
+      refine ⟨?_, p.property⟩
+      intro r hr
+      obtain ⟨q, hq, hne, hd⟩ := hp r hr
+      exact ⟨q.val, hq, fun heq => hne (Subtype.ext heq), hd⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_open
+\begin{proposition} \label{an1:thm:open-set-relative-to-subspace}
+  \begin{lean}{For $E\subseteq Y\subseteq X$, $E$ is open in $Y$ if and only if $E=V\cap Y$ for some open $V\subseteq X$.}
+    theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
+        IsOpen ((Subtype.val : Y → X) ⁻¹' E) ↔
+          ∃ V : Set X, IsOpen V ∧ E = V ∩ Y
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Suppose $E$ is open in $Y$. For each $p\in E$, choose $r_p>0$ with $Y\cap N_{r_p}(p)\subseteq E$.}
+    classical
+    constructor
+    · intro h
+      have hex : ∀ p : E, ∃ r > 0, Y ∩ ball p.val r ⊆ E := by
+        intro p
+        obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp h ⟨p.val, hEY p.property⟩ p.property
+        exact ⟨r, hr, fun q hq => hs (show (⟨q, hq.1⟩ : Y) ∈ ball ⟨p.val, hEY p.property⟩ r from hq.2)⟩
+  \end{lean}
+
+  \begin{lean}{Let $V$ be the union of these ambient balls. It is open. Each point of $E$ lies in its own ball and in $Y$; conversely, a point in $V\cap Y$ lies in one chosen ball, whose intersection with $Y$ lies in $E$. Hence $E=V\cap Y$.}
+    choose r hr hs using hex
+    refine ⟨⋃ p : E, ball p.val (r p), open_union _ (fun p => ball_open _ _), ?_⟩
+    ext q
+    constructor
+    · intro hq
+      exact ⟨mem_iUnion.mpr ⟨⟨q, hq⟩, by simpa only [mem_ball, dist_self] using hr ⟨q, hq⟩⟩, hEY hq⟩
+    · rintro ⟨hq, hy⟩
+      obtain ⟨p, hp⟩ := mem_iUnion.mp hq
+      exact hs p ⟨hy, hp⟩
+  \end{lean}
+
+  \begin{lean}{Conversely, choose an ambient ball inside $V$ about each point of $E=V\cap Y$. Restricting this ball to $Y$ produces a subspace ball inside $E$.}
+    · rintro ⟨V, hV, heq⟩
+      apply Metric.isOpen_iff.mpr
+      intro p hp
+      have hpV : p.val ∈ V := (show p.val ∈ V ∩ Y from heq ▸ hp).1
+      obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp hV p.val hpV
+      refine ⟨r, hr, ?_⟩
+      intro q hq
+      change q.val ∈ E
+      rw [heq]
+      exact ⟨hs hq, q.property⟩
+  \end{lean}
+
+\end{proof}

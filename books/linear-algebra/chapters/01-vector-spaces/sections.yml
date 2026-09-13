@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: definitions
+  title: Definitions
+- slug: bases
+  title: Bases
+- slug: dimension-of-a-vector-space
+  title: Dimension of a Vector Space
+- slug: sums-and-direct-sums
+  title: Sums and Direct Sums

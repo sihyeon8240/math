@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: carl-friedrich-gauss
+  title: Carl Friedrich Gauss
+- slug: basic-properties-of-congruence
+  title: Basic Properties of Congruence
+- slug: binary-and-decimal-representations-of-integers
+  title: Binary and Decimal Representations of Integers
+- slug: linear-congruences-and-the-chinese-remainder-theorem
+  title: Linear Congruences and the Chinese Remainder Theorem

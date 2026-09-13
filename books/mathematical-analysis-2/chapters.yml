@@ -1,0 +1,12 @@
+schema_version: 1
+chapters:
+- slug: sequences-and-series-of-functions
+  title: Sequences and Series of Functions
+- slug: some-special-functions
+  title: Some Special Functions
+- slug: functions-of-several-variables
+  title: Functions of Several Variables
+- slug: integration-of-differential-forms
+  title: Integration of Differential Forms
+- slug: the-lebesgue-theory
+  title: The Lebesgue Theory

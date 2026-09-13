@@ -1,0 +1,106 @@
+name: Build DevContainer Image
+on:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+    paths:
+      - '.devcontainer/Dockerfile'
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+concurrency:
+  group: >-
+    build-image-${{
+      github.event.pull_request.number || github.ref
+    }}
+  cancel-in-progress: true
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          ref: >-
+            ${{
+              github.event_name == 'pull_request_target'
+              && github.event.pull_request.head.sha
+              || github.sha
+            }}
+      - name: Validate the Dependabot image update
+        if: github.event_name == 'pull_request_target'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          test "${{ github.actor }}" = 'dependabot[bot]'
+          test "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}"
+          ./scripts/check-dependabot-image-update.sh "$BASE_SHA" HEAD
+  prepare-image:
+    needs: guard
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/prepare-image.yml
+    with:
+      ref: >-
+        ${{
+          github.event_name == 'pull_request_target'
+          && github.event.pull_request.head.sha
+          || github.sha
+        }}
+  pin:
+    needs: prepare-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          ref: >-
+            ${{
+              github.event_name == 'pull_request_target'
+              && github.event.pull_request.head.sha
+              || github.sha
+            }}
+      - name: Pin the tested image in repository consumers
+        env:
+          DIGEST: ${{ needs.prepare-image.outputs.digest }}
+        run: make image-pin DIGEST="$DIGEST"
+      - name: Commit the updated image pin
+        id: pin
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add config/container-image.txt .devcontainer/devcontainer.json
+          git commit -m "build(toolchain): pin tested development image"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Update the source branch
+        if: >-
+          steps.pin.outputs.changed == 'true' &&
+          (github.event_name == 'pull_request_target' || github.ref_name != 'main')
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref || github.ref_name }}
+        run: git push origin "HEAD:${HEAD_REF}"
+      - name: Open a pin update pull request
+        if: >-
+          steps.pin.outputs.changed == 'true' &&
+          github.event_name != 'pull_request_target' &&
+          github.ref_name == 'main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="automation/image-pin-${GITHUB_RUN_ID}"
+          git push origin "HEAD:refs/heads/${branch}"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "build(toolchain): pin tested development image" \
+            --body "Pins the image prepared and tested by prepare-image.yml."

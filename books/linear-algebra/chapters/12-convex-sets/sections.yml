@@ -1,0 +1,10 @@
+schema_version: 1
+sections:
+- slug: definitions
+  title: Definitions
+- slug: separating-hyperplanes
+  title: Separating Hyperplanes
+- slug: extreme-points-and-supporting-hyperplanes
+  title: Extreme Points and Supporting Hyperplanes
+- slug: the-krein-milman-theorem
+  title: The Krein-Milman Theorem

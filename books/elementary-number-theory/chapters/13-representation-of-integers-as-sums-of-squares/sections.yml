@@ -1,0 +1,8 @@
+schema_version: 1
+sections:
+- slug: joseph-louis-lagrange
+  title: Joseph Louis Lagrange
+- slug: sums-of-two-squares
+  title: Sums of Two Squares
+- slug: sums-of-more-than-two-squares
+  title: Sums of More Than Two Squares

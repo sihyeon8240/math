@@ -1,0 +1,20 @@
+schema_version: 1
+sections:
+- slug: determinants-of-order-2
+  title: Determinants of Order 2
+- slug: existence-of-determinants
+  title: Existence of Determinants
+- slug: additional-properties-of-determinants
+  title: Additional Properties of Determinants
+- slug: cramers-rule
+  title: Cramer's Rule
+- slug: triangulation-of-a-matrix-by-column-operations
+  title: Triangulation of a Matrix by Column Operations
+- slug: permutations
+  title: Permutations
+- slug: expansion-formula-and-uniqueness-of-determinants
+  title: Expansion Formula and Uniqueness of Determinants
+- slug: inverse-of-a-matrix
+  title: Inverse of a Matrix
+- slug: the-rank-of-a-matrix-and-subdeterminants
+  title: The Rank of a Matrix and Subdeterminants

@@ -1,0 +1,20 @@
+schema_version: 1
+sections:
+- slug: integration
+  title: Integration
+- slug: primitive-mappings
+  title: Primitive Mappings
+- slug: partitions-of-unity
+  title: Partitions of Unity
+- slug: change-of-variables
+  title: Change of Variables
+- slug: differential-forms
+  title: Differential Forms
+- slug: simplexes-and-chains
+  title: Simplexes and Chains
+- slug: stokes-theorem
+  title: Stokes' Theorem
+- slug: closed-forms-and-exact-forms
+  title: Closed Forms and Exact Forms
+- slug: vector-analysis
+  title: Vector Analysis

@@ -1,0 +1,8 @@
+schema_version: 1
+sections:
+- slug: the-linear-map-associated-with-a-matrix
+  title: The Linear Map Associated with a Matrix
+- slug: the-matrix-associated-with-a-linear-map
+  title: The Matrix Associated with a Linear Map
+- slug: bases-matrices-and-linear-maps
+  title: Bases, Matrices, and Linear Maps

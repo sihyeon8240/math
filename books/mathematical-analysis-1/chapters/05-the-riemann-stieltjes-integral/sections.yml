@@ -1,0 +1,12 @@
+schema_version: 1
+sections:
+- slug: definition-and-existence-of-the-integral
+  title: Definition and Existence of the Integral
+- slug: properties-of-the-integral
+  title: Properties of the Integral
+- slug: integration-and-differentiation
+  title: Integration and Differentiation
+- slug: integration-of-vector-valued-functions
+  title: Integration of Vector-valued Functions
+- slug: rectifiable-curves
+  title: Rectifiable Curves

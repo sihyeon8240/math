@@ -1,0 +1,12 @@
+schema_version: 1
+sections:
+- slug: srinivasa-ramanujan
+  title: Srinivasa Ramanujan
+- slug: finite-continued-fractions
+  title: Finite Continued Fractions
+- slug: infinite-continued-fractions
+  title: Infinite Continued Fractions
+- slug: farey-fractions
+  title: Farey Fractions
+- slug: pells-equation
+  title: Pell's Equation

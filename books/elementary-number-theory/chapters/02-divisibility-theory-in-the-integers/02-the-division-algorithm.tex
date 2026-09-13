@@ -1,0 +1,119 @@
+\begin{theorem} \label{nt:thm:division-algorithm}
+  \begin{lean}{
+      Let $a\in\Z$ and $b\in\N^+$. There is a unique pair
+      $(q,r)\in\Z\times\N$ such that
+      \[
+        a=qb+r, \qquad r<b.
+      \]
+      We call $q$ the \textbf{quotient} and $r$ the \textbf{remainder}.
+      }
+    theorem existsUnique_quotient_remainder (a : ℤ) (b : ℕ+) :
+      ∃! qr : ℤ × ℕ, a = qr.1 * b + qr.2 ∧ qr.2 < b
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Since $b\ge1$,
+      \[
+        a-(-|a|)b=a+|a|b\ge a+|a|\ge0.
+      \]
+    }
+    classical
+    have hb : (1 : ℤ) ≤ (b : ℤ) := by exact_mod_cast b.pos
+    have hnonneg : 0 ≤ a - (-|a|) * (b : ℤ) := by
+      have ha : -|a| ≤ a := neg_abs_le a
+      have habs : 0 ≤ |a| := abs_nonneg a
+      nlinarith
+  \end{lean}
+
+  \begin{lean}{
+      Define
+      \[
+        S\coloneqq\{n\in\N: a-qb=n\text{ for some }q\in\Z\}.
+      \]
+      By the preceding inequality, $S\ne\varnothing$.
+      Let $r=\min S$ and choose $q\in\Z$ with $a-qb=r$.
+    }
+    let h : ∃ n : ℕ, ∃ q : ℤ, a - q * b = (n : ℤ) :=
+      ⟨(a - (-|a|) * b).toNat, -|a|, (Int.toNat_of_nonneg hnonneg).symm⟩
+    obtain ⟨q, hq⟩ := Nat.find_spec h
+    let r : ℕ := Nat.find h
+    have hr0 : (0 : ℤ) ≤ r := Int.natCast_nonneg _
+  \end{lean}
+
+  \begin{lean}{
+      By minimality, for $s\in\Z$,
+      \[
+        0\le s,\quad s=a-xb\ (x\in\Z)\quad\Longrightarrow\quad r\le s.
+      \]
+    }
+    have hminimal : ∀ s : ℤ, 0 ≤ s → (∃ x : ℤ, a - x * b = s) → (r : ℤ) ≤ s := by
+      intro s hs ⟨x, hx⟩
+      have hn : Nat.find h ≤ s.toNat :=
+        Nat.find_min' h ⟨x, hx.trans (Int.toNat_of_nonneg hs).symm⟩
+      have hc : (Nat.find h : ℤ) ≤ (s.toNat : ℤ) := Int.ofNat_le.mpr hn
+      rwa [Int.toNat_of_nonneg hs] at hc
+  \end{lean}
+
+  \begin{lean}{
+      If $r\ge b$, then
+      \[
+        0\le r-b=a-(q+1)b<r,
+      \]
+      contradicting minimality. Hence $r<b$.
+    }
+    have hrb_int : (r : ℤ) < b := by
+      by_contra hnot
+      have hs : 0 ≤ (r : ℤ) - b := by linarith
+      have hsmaller := hminimal ((r : ℤ) - b) hs ⟨q + 1, by dsimp [r]; nlinarith [hq]⟩
+      linarith
+  \end{lean}
+
+  \begin{lean}{
+      Thus $a=qb+r$ and $0\le r<b$, proving existence.
+    }
+    have ha : a = q * b + r := by dsimp [r]; linarith [hq]
+    have hrb : r < (b : ℕ) := by exact_mod_cast hrb_int
+    refine ⟨(q, r), ⟨ha, hrb⟩, ?_⟩
+  \end{lean}
+
+  \begin{lean}{
+      Suppose another pair $(q',r')\in\Z\times\N$ satisfies
+      $a=q'b+r'$ and $0\le r'<b$.
+    }
+    rintro ⟨q', r'⟩ ⟨ha', hr'b⟩
+    change a = q' * b + r' at ha'
+    have hr'0 : (0 : ℤ) ≤ r' := Int.natCast_nonneg _
+    have hr'b_int : (r' : ℤ) < b := by exact_mod_cast hr'b
+  \end{lean}
+
+  \begin{lean}{
+      Since $q,q'\in\Z$,
+      \[
+        \begin{aligned}
+          q'<q &\Longrightarrow q-q'\ge1
+               \Longrightarrow r'=r+(q-q')b\ge b,\\
+          q'>q &\Longrightarrow q'-q\ge1
+               \Longrightarrow r=r'+(q'-q)b\ge b.
+        \end{aligned}
+      \]
+      Both contradict the remainder bounds, so $q'=q$.
+    }
+    have hqq : q' = q := by
+      rcases lt_trichotomy q' q with hlt | heq | hgt
+      · have hstep : q' + 1 ≤ q := hlt
+        nlinarith
+      · exact heq
+      · have hstep : q + 1 ≤ q' := hgt
+        nlinarith
+  \end{lean}
+
+  \begin{lean}{
+      Then $r'=a-q'b=a-qb=r$, so $(q',r')=(q,r)$, proving uniqueness.
+    }
+    have hrr_int : (r' : ℤ) = r := by rw [hqq] at ha'; linarith
+    have hrr : r' = r := by exact_mod_cast hrr_int
+    exact Prod.ext hqq hrr
+  \end{lean}
+\end{proof}

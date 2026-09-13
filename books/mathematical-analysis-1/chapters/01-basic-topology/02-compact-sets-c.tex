@@ -1,0 +1,125 @@
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.pi_cell_compact
+\begin{lemma} \label{an1:lem:pi-cell-compact}
+  \begin{lean}{For $n\in\N$ and real endpoints $a_j\leq b_j$ for $0\leq j<n$, the coordinate box $\{x: a_j\leq x_j\leq b_j\text{ for all }j\}$ is compact in the finite-coordinate product metric.}
+    theorem pi_cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
+        IsCompact {x : Fin n → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j}
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Induct on $n$. With no coordinates, every vector is the same empty tuple, so the box is a compact singleton.}
+    induction n with
+    | zero =>
+      have heq : {x : Fin 0 → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j} = {fun j => Fin.elim0 j} := by
+        ext x
+        simp only [mem_ofPred_eq, mem_singleton_iff]
+        constructor
+        · intro _
+          funext j
+          exact Fin.elim0 j
+        · intro _ j
+          exact Fin.elim0 j
+      rw [heq]
+      exact singleton_compact _
+  \end{lean}
+
+  \begin{lean}{For $n+1$ coordinates, separate coordinate $0$ from the remaining $n$. The map adjoining that first coordinate is continuous, since each of its coordinates is a coordinate projection. The interval for coordinate $0$ and the remaining box are compact, so their product is compact.}
+    | succ n ih =>
+      let K := {x : Fin n → ℝ | ∀ j, a j.succ ≤ x j ∧ x j ≤ b j.succ}
+      let f : ℝ × (Fin n → ℝ) → (Fin (n + 1) → ℝ) := fun p => Fin.cons p.1 p.2
+      have hf : Continuous f := by
+        apply continuous_pi
+        intro j
+        refine Fin.cases ?_ (fun k => ?_) j
+        · exact continuous_fst
+        · exact (continuous_apply k).comp continuous_snd
+      have hk := compact_product (Icc (a 0) (b 0)) K (interval_compact _ _ (hab 0))
+        (ih (fun j => a j.succ) (fun j => b j.succ) (fun j => hab j.succ))
+  \end{lean}
+
+  \begin{lean}{The image of this product is exactly the desired box: its first coordinate lies in the first interval, and the tail lies in the remaining intervals. Conversely, split any vector in the box into its first coordinate and tail. Compactness of continuous images completes the induction.}
+    have heq : f '' (Icc (a 0) (b 0) ×ˢ K) =
+        {x : Fin (n + 1) → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j} := by
+      ext x
+      constructor
+      · rintro ⟨⟨y, z⟩, ⟨hy, hz⟩, rfl⟩ j
+        exact Fin.cases hy (fun k => hz k) j
+      · intro hx
+        refine ⟨(x 0, fun j => x j.succ), ⟨hx 0, fun j => hx j.succ⟩, ?_⟩
+        funext j
+        exact Fin.cases rfl (fun k => rfl) j
+    rw [← heq]
+    exact compact_image _ hk f hf
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.cell_compact
+\begin{theorem} \label{an1:thm:k-cell-is-compact}
+  \begin{lean}{For every $n\in\N$ and real endpoints $a_j\leq b_j$, the cell $\prod_{j=0}^{n-1}[a_j,b_j]$ is compact in $\R^{n}$.}
+    theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
+        IsCompact {x : EuclideanSpace ℝ (Fin n) | ∀ j, a j ≤ x j ∧ x j ≤ b j}
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{The finite-coordinate and Euclidean descriptions have the same coordinates and topology. The identity on coordinates from the product description to the Euclidean description is continuous. Its image is exactly the same coordinate box, so the preceding result and compactness of continuous images apply. This includes $n=0$.}
+    have h := compact_image _ (pi_cell_compact n a b hab)
+      (fun x : Fin n → ℝ => (WithLp.toLp 2 x : EuclideanSpace ℝ (Fin n)))
+      (PiLp.continuous_toLp 2 (fun _ : Fin n => ℝ))
+    convert h using 1
+    ext x
+    constructor
+    · intro hx
+      exact ⟨WithLp.ofLp x, hx, rfl⟩
+    · rintro ⟨y, hy, rfl⟩
+      exact hy
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.closed_interval_compact
+\begin{corollary} \label{an1:cor:closed-interval-in-R-is-compact}
+  \begin{lean}{For $a,b\in\R$ with $a\leq b$, the closed interval $[a,b]$ is compact.}
+    theorem closed_interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b)
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  \begin{lean}{This is the real interval result established in the construction of compact cells.}
+    exact interval_compact a b hab
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.heine_borel
+\begin{theorem} \label{an1:thm:heine-borel-theorem}
+  \begin{lean}{For $n\in\N$ and $E\subseteq\R^{n}$, $E$ is compact if and only if it is closed and bounded. This is the \textbf{Heine--Borel theorem}.}
+    theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
+        IsCompact E ↔ IsClosed E ∧ bounded E
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{A compact set is closed and bounded by the metric-space results above. Conversely, suppose $E$ is closed and bounded. Euclidean space has a zero vector even in dimension zero, so choose a ball $N_r(p)$ containing $E$.}
+    constructor
+    · intro h
+      exact ⟨compact_closed E h, compact_bounded E h⟩
+    · rintro ⟨hc, hb⟩
+      obtain ⟨p, r, hr, hs⟩ := hb ⟨0⟩
+  \end{lean}
+
+  \begin{lean}{The box with coordinate intervals $[p_j-r,p_j+r]$ is compact. Each coordinate difference is bounded in absolute value by the Euclidean norm, so a point in $N_r(p)$ lies in this box. Hence $E$ is a closed subset of a compact set and is compact.}
+    let K : Set (EuclideanSpace ℝ (Fin n)) := {x | ∀ j, p j - r ≤ x j ∧ x j ≤ p j + r}
+    have hk : IsCompact K := cell_compact n _ _ (fun j => by linarith)
+    apply closed_subset_compact K E hk hc
+    intro x hx j
+    have hd : ‖x - p‖ < r := by simpa only [mem_ball, dist_eq_norm] using hs hx
+    have hj : ‖(x - p) j‖ ≤ ‖x - p‖ := PiLp.norm_apply_le _ _
+    change ‖x j - p j‖ ≤ ‖x - p‖ at hj
+    rw [Real.norm_eq_abs] at hj
+    have hcoord := abs_le.mp (hj.trans (le_of_lt hd))
+    constructor <;> linarith
+  \end{lean}
+
+\end{proof}

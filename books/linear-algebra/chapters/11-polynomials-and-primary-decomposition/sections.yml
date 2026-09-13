@@ -1,0 +1,14 @@
+schema_version: 1
+sections:
+- slug: the-euclidean-algorithm
+  title: The Euclidean Algorithm
+- slug: greatest-common-divisor
+  title: Greatest Common Divisor
+- slug: unique-factorization
+  title: Unique Factorization
+- slug: application-to-the-decomposition-of-a-vector-space
+  title: Application to the Decomposition of a Vector Space
+- slug: schurs-lemma
+  title: Schur's Lemma
+- slug: the-jordan-normal-form
+  title: The Jordan Normal Form

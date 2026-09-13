@@ -1,0 +1,273 @@
+\begin{definition} \label{an1:def:metric-space}
+  A \textbf{metric} on $X$ is a function $d:X\times X\to[0,\infty)$ such that, for all $p,q,z\in X$,
+  \[
+    d(p,q)=0\iff p=q,\qquad d(p,q)=d(q,p),\qquad d(p,z)\leq d(p,q)+d(q,z).
+  \]
+  The last condition is the \textbf{triangle inequality}. The pair $(X,d)$ is a \textbf{metric space}.
+  \begin{lean}{The metric-space structure records the distance and its axioms.}
+    abbrev MetricStructure (A : Type*) := MetricSpace A
+  \end{lean}
+  \begin{lean}{For every $n\in\N$, $\R^{n}$ has its Euclidean norm, including the unique vector when $n=0$.}
+    abbrev Euclidean (n : ℕ) := EuclideanSpace ℝ (Fin n)
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_metric
+\begin{proposition} \label{an1:thm:standard-metric-on-Rn}
+  \begin{lean}{For $n\in\N$, the function $d(x,y)=\|x-y\|$ is a metric on $\R^{n}$.}
+    theorem euclidean_metric (n : ℕ) :
+        (∀ x y : EuclideanSpace ℝ (Fin n), 0 ≤ ‖x - y‖) ∧
+        (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = 0 ↔ x = y) ∧
+        (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = ‖y - x‖) ∧
+        (∀ x y z : EuclideanSpace ℝ (Fin n),
+          ‖x - z‖ ≤ ‖x - y‖ + ‖y - z‖)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{The norm is nonnegative. It vanishes exactly at the zero vector, so $\|x-y\|=0$ precisely when $x=y$.}
+    refine ⟨fun x y => norm_nonneg _, ?_, ?_, ?_⟩
+    · intro x y
+      rw [norm_eq_zero, sub_eq_zero]
+  \end{lean}
+
+  \begin{lean}{Reversing a difference changes only its sign and leaves its norm unchanged.}
+    · intro x y
+      exact norm_sub_rev x y
+  \end{lean}
+
+  \begin{lean}{Write $x-z=(x-y)+(y-z)$ and apply the Euclidean norm triangle inequality. These norm facts are accepted finite-dimensional prerequisites.}
+    · intro x y z
+      calc
+        ‖x - z‖ = ‖(x - y) + (y - z)‖ := by rw [sub_add_sub_cancel]
+        _ ≤ ‖x - y‖ + ‖y - z‖ := norm_add_le _ _
+  \end{lean}
+
+\end{proof}
+
+Euclidean spaces always use this standard metric. In particular, the zero-dimensional space is included, rather than excluded by convention.
+
+\begin{definition} \label{an1:def:neighborhood-open-ball}
+  For $p\in X$ and $r>0$, define the \textbf{neighborhood} $N_r(p)=\{q:d(p,q)<r\}$ and the \textbf{deleted neighborhood} $\widetilde N_r(p)=N_r(p)\setminus\{p\}$. Metric symmetry allows the center to appear in either distance argument.
+  \begin{lean}{$N_r(p)$ is the open ball centered at $p$.}
+    abbrev neighborhood (p : X) (r : ℝ) : Set X := ball p r
+  \end{lean}
+  \begin{lean}{Removing the center gives $\widetilde N_r(p)$.}
+    abbrev deletedNeighborhood (p : X) (r : ℝ) : Set X := ball p r \ {p}
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.deleted_neighborhood_iff
+\begin{lemma} \label{an1:lem:deleted-neighborhood-iff}
+  \begin{lean}{$q\in\widetilde N_r(p)$ if and only if $0<d(q,p)<r$.}
+    theorem deleted_neighborhood_iff (p q : X) (r : ℝ) :
+        q ∈ deletedNeighborhood p r ↔ 0 < dist q p ∧ dist q p < r
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The only additional condition after removing the center is $q\ne p$, which is equivalent to positive distance in a metric space.}
+    change (dist q p < r ∧ q ≠ p) ↔ _
+    rw [dist_pos]
+    exact and_comm
+  \end{lean}
+
+\end{proof}
+
+\begin{definition} \label{an1:def:limit-interior-isolated-points}
+  A point $p$ is a \textbf{limit point} of $E$ if every deleted neighborhood of $p$ meets $E$.
+  It is an \textbf{interior point} if some neighborhood lies in $E$, and an \textbf{isolated point} if some neighborhood meets $E$ exactly at $p$.
+  We write these sets as $E'$, $E^{\circ}$, and $E^{i}$, respectively.
+  \begin{lean}{$p\in E^{\prime}$ means that every positive radius admits a distinct point of $E$ within that distance.}
+    def limitPoints (E : Set X) : Set X :=
+      {p | ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r}
+  \end{lean}
+  \begin{lean}{$E^{\circ}$ is the usual interior; its ball description is verified below.}
+    noncomputable abbrev interiorPoints (E : Set X) : Set X := interior E
+  \end{lean}
+  \begin{lean}{$p\in E^{i}$ means $E\cap N_r(p)=\{p\}$ for some $r>0$. In particular $p\in E$.}
+    def isolatedPoints (E : Set X) : Set X :=
+      {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.interior_iff
+\begin{lemma} \label{an1:lem:interior-iff}
+  \begin{lean}{$p\in E^{\circ}$ if and only if some $r>0$ satisfies $N_r(p)\subseteq E$.}
+    theorem interior_iff (E : Set X) (p : X) :
+        p ∈ interiorPoints E ↔ ∃ r > 0, ball p r ⊆ E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The interior consists of points for which $E$ is a neighborhood. The metric neighborhood basis consists of positive-radius balls, giving the stated description.}
+    exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
+  \end{lean}
+
+\end{proof}
+
+\begin{definition} \label{an1:def:open-closed-sets}
+  A set $E$ is \textbf{open} when every point of $E$ is interior, and \textbf{closed} when $E^{\prime}\subseteq E$.
+  Write $\mathcal O(X)$ and $\mathcal C(X)$ for the respective collections.
+  For openness, the metric ball characterization gives the standard predicate; the corresponding closed-set characterization is proved below.
+  \begin{lean}{$\mathcal O(X)$ is the collection of open sets.}
+    abbrev openSets : Set (Set X) := {E | IsOpen E}
+  \end{lean}
+  \begin{lean}{$\mathcal C(X)$ is the collection of closed sets.}
+    abbrev closedSets : Set (Set X) := {E | IsClosed E}
+  \end{lean}
+\end{definition}
+
+\begin{definition} \label{an1:def:closure}
+  The \textbf{closure} of $E$ is $\overline E=E\cup E^{\prime}$. We use the standard closure in Lean and prove this equality below.
+  \begin{lean}{$\overline E$ denotes the closure of $E$.}
+    noncomputable abbrev setClosure (E : Set X) : Set X := closure E
+  \end{lean}
+\end{definition}
+
+\begin{definition} \label{an1:def:bounded-perfect-dense-sets}
+  A set $E$ is \textbf{bounded} if, whenever $X$ is nonempty, $E$ is contained in some positive-radius ball.
+  Write $\mathcal B(X)$ for the bounded sets. This convention also treats subsets of the empty space as bounded.
+  A set is \textbf{perfect} if $E=E^{\prime}$ and \textbf{dense} if $\overline E=X$.
+  \begin{lean}{When the ambient space has a point, a bounded set lies in a ball.}
+    def bounded (E : Set X) : Prop :=
+      Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r
+  \end{lean}
+  \begin{lean}{A perfect set equals its set of limit points.}
+    abbrev perfect (E : Set X) : Prop := E = limitPoints E
+  \end{lean}
+  \begin{lean}{A dense set has the whole ambient space as its closure.}
+    abbrev dense (E : Set X) : Prop := closure E = univ
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.ball_open
+\begin{proposition} \label{an1:thm:neighborhood-is-open}
+  \begin{lean}{Every ball $N_r(p)$ is open. This also holds for nonpositive $r$, when the ball is empty.}
+    theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Suppose $q\in N_r(p)$. The remaining distance $\delta=r-d(q,p)$ is positive.}
+    apply Metric.isOpen_iff.mpr
+    intro q hq
+    refine ⟨r - dist q p, sub_pos.mpr hq, ?_⟩
+  \end{lean}
+
+  \begin{lean}{If $d(s,q)<\delta$, the triangle inequality gives $d(s,p)\leq d(s,q)+d(q,p)<r$. Thus the ball of radius $\delta$ about $q$ stays inside $N_r(p)$.}
+    intro s hs
+    change dist s p < r
+    have ht := dist_triangle s q p
+    change dist s q < r - dist q p at hs
+    linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.finite_positive_lower_bound
+\begin{lemma} \label{an1:lem:finite-positive-lower-bound}
+  \begin{lean}{For a finite index set $S$ and positive numbers $r_i$ for $i\in S$, there is $\delta>0$ with $\delta\leq r_i$ for every $i\in S$.}
+    theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
+        (r : ι → ℝ) (hr : ∀ i ∈ s, 0 < r i) :
+        ∃ δ > 0, ∀ i ∈ s, δ ≤ r i
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Use induction on $S$. For the empty set, $\delta=1$ works. On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the remaining indices. It stays positive and is below every required radius.}
+    classical
+    induction s using Finset.induction_on with
+    | empty => exact ⟨1, zero_lt_one, by simp only [Finset.notMem_empty, false_implies, implies_true]⟩
+    | @insert i s hi ih =>
+      obtain ⟨δ, hδ, hle⟩ := ih (fun j hj => hr j (Finset.mem_insert_of_mem hj))
+      refine ⟨min (r i) δ, lt_min (hr i (Finset.mem_insert_self i s)) hδ, ?_⟩
+      intro j hj
+      rcases Finset.mem_insert.mp hj with rfl | hj
+      · exact min_le_left _ _
+      · exact (min_le_right _ _).trans (hle j hj)
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.limit_point_infinite
+\begin{proposition} \label{an1:thm:limit-point-neighborhood-contains-infinite-elements}
+  \begin{lean}{If $p\in E^{\prime}$ and $r>0$, then $E\cap N_r(p)$ is infinite.}
+    theorem limit_point_infinite (E : Set X) (p : X)
+        (hp : p ∈ limitPoints E) (r : ℝ) (hr : 0 < r) :
+        (E ∩ ball p r).Infinite
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Assume instead that this intersection is finite. After deleting $p$, its points still form a finite set, and all their distances from $p$ are positive.}
+    classical
+    intro hf
+    let s := (hf.subset (show (E ∩ ball p r) \ {p} ⊆ E ∩ ball p r from sdiff_subset)).toFinset
+    have hpos : ∀ q ∈ s, 0 < dist q p := by
+      intro q hq
+      have h := (Set.Finite.mem_toFinset _).mp hq
+      exact dist_pos.mpr h.2
+  \end{lean}
+
+  \begin{lean}{Choose a common positive lower bound $\delta$ for those distances. The limit-point condition supplies a distinct point of $E$ within $\min(r,\delta)$ of $p$. It belongs to the finite set but has distance less than its lower bound, a contradiction.}
+    obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s (fun q => dist q p) hpos
+    obtain ⟨q, hq, hqp, hdist⟩ := hp (min r δ) (lt_min hr hδ)
+    have hqs : q ∈ s := (Set.Finite.mem_toFinset _).mpr
+      ⟨⟨hq, hdist.trans_le (min_le_left _ _)⟩, hqp⟩
+    exact (not_lt_of_ge (hle q hqs)) (hdist.trans_le (min_le_right _ _))
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_iff_compl_limitPoints
+\begin{proposition} \label{an1:thm:complement-of-open-set-is-closed}
+  \begin{lean}{$E$ is open if and only if $E^{c}$ contains all its limit points, that is, $E^{c}$ is closed.}
+    theorem open_iff_compl_limitPoints (E : Set X) :
+        IsOpen E ↔ limitPoints Eᶜ ⊆ Eᶜ
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{If $E$ is open, a point in $E$ has a ball contained in $E$. Such a ball prevents that point from being a limit point of the complement.}
+    classical
+    constructor
+    · intro h p hp hpe
+      obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp h p hpe
+      obtain ⟨q, hq, _, hd⟩ := hp r hr
+      exact hq (hball hd)
+  \end{lean}
+
+  \begin{lean}{Conversely, suppose the complement contains its limit points. If $p\in E$ had no ball contained in $E$, each ball would contain a point outside $E$. That point differs from $p$, making $p$ a limit point of the complement and contradicting $p\in E$.}
+    · intro h
+      apply Metric.isOpen_iff.mpr
+      intro p hp
+      by_contra hn
+      have hl : p ∈ limitPoints Eᶜ := by
+        intro r hr
+        have hnsub : ¬ ball p r ⊆ E := fun hs => hn ⟨r, hr, hs⟩
+        obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hnsub
+        refine ⟨q, hqe, ?_, hq⟩
+        intro heq
+        exact hqe (heq.symm ▸ hp)
+      exact h hl hp
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_iff_limitPoints
+\begin{lemma} \label{an1:lem:closed-iff-limitPoints}
+  \begin{lean}{The standard closed-set predicate is equivalent to $E^{\prime}\subseteq E$.}
+    theorem closed_iff_limitPoints (E : Set X) :
+        IsClosed E ↔ limitPoints E ⊆ E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{A set is closed precisely when its complement is open. Apply the preceding result to $E^{c}$ and take its complement twice.}
+    have h := open_iff_compl_limitPoints Eᶜ
+    rw [compl_compl] at h
+    exact isOpen_compl_iff.symm.trans h
+  \end{lean}
+
+\end{proof}

@@ -1,0 +1,6 @@
+schema_version: 1
+sections:
+- slug: polynomials
+  title: Polynomials
+- slug: polynomials-of-matrices-and-linear-maps
+  title: Polynomials of Matrices and Linear Maps

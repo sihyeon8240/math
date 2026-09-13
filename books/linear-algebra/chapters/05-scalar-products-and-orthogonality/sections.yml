@@ -1,0 +1,18 @@
+schema_version: 1
+sections:
+- slug: scalar-products
+  title: Scalar Products
+- slug: orthogonal-bases-positive-definite-case
+  title: Orthogonal Bases, Positive Definite Case
+- slug: application-to-linear-equations-the-rank
+  title: Application to Linear Equations; the Rank
+- slug: bilinear-maps-and-matrices
+  title: Bilinear Maps and Matrices
+- slug: general-orthogonal-bases
+  title: General Orthogonal Bases
+- slug: the-dual-space-and-scalar-products
+  title: The Dual Space and Scalar Products
+- slug: quadratic-forms
+  title: Quadratic Forms
+- slug: sylvesters-theorem
+  title: Sylvester's Theorem

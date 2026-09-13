@@ -1,0 +1,8 @@
+schema_version: 1
+sections:
+- slug: the-fundamental-theorem-of-arithmetic
+  title: The Fundamental Theorem of Arithmetic
+- slug: the-sieve-of-eratosthenes
+  title: The Sieve of Eratosthenes
+- slug: the-goldbach-conjecture
+  title: The Goldbach Conjecture

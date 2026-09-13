@@ -1,0 +1,22 @@
+\chapter{Preface}
+
+\input{formalization-versions}
+
+This textbook uses Lean~4 to formalize selected mathematical statements and proofs.
+
+\begin{itemize}
+  \item \textbf{Tools.} Lean is an interactive theorem prover; Mathlib is a library
+        of formalized mathematics. This edition uses Lean~\TextbookLeanVersion{}
+        and Mathlib~\TextbookMathlibVersion{}
+        (revision \href{https://github.com/leanprover-community/mathlib4/commit/\TextbookMathlibRevision}{\texttt{\TextbookMathlibShortRevision}}).
+  \item \textbf{Reading the proofs.} Each paired statement or proof step gives
+        a mathematical explanation followed by its Lean code. The explanations
+        can be read independently; code fragments are read in order within the
+        complete declaration.
+  \item \textbf{Verification.} Lean checks formal proofs under their stated
+        assumptions. Verification covers only statements linked to checked
+        declarations. Agreement between the explanations, displayed code, and
+        checked proofs is reviewed separately.
+  \item \textbf{Prerequisites.} Starting assumptions and accepted external
+        results are specific to this textbook.
+\end{itemize}

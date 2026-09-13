@@ -1,0 +1,8 @@
+schema_version: 1
+sections:
+- slug: the-space-of-matrices
+  title: The Space of Matrices
+- slug: linear-equations
+  title: Linear Equations
+- slug: multiplication-of-matrices
+  title: Multiplication of Matrices

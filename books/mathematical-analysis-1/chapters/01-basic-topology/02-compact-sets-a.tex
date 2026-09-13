@@ -1,0 +1,265 @@
+\begin{definition} \label{an1:def:open-cover}
+  A family $(G_i)_{i\in I}$ is an \textbf{open cover} of $E$ if each $G_i$ is open and $E\subseteq\bigcup_{i\in I}G_i$.
+  For $S\subseteq I$, the subfamily indexed by $S$ is a \textbf{subcover} if it still covers $E$.
+  \begin{lean}{An open cover consists of open sets whose union contains $E$.}
+    abbrev openCover {ι : Type*} (E : Set X) (U : ι → Set X) : Prop :=
+      (∀ i, IsOpen (U i)) ∧ E ⊆ ⋃ i, U i
+  \end{lean}
+  \begin{lean}{A subcover keeps only indices in $S$ and still contains $E$ in its union.}
+    abbrev subcover {ι : Type*} (E : Set X) (U : ι → Set X) (S : Set ι) : Prop :=
+      E ⊆ ⋃ i ∈ S, U i
+  \end{lean}
+\end{definition}
+
+\begin{definition} \label{an1:def:compact}
+  A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
+  Write $\mathcal K(X)$ for the collection of compact sets. In the proofs, a finite index set is represented by a \texttt{Finset}.
+  The standard Lean predicate has exactly this open-cover characterization, \texttt{isCompact\_iff\_finite\_subcover}; using it changes the representation of the definition, not the mathematical premise.
+  \begin{lean}{$\mathcal K(X)$ consists of the compact subsets of $X$.}
+    abbrev compactSets : Set (Set X) := {E | IsCompact E}
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_subspace
+\begin{proposition} \label{an1:thm:compactness-preserved-under-subspace}
+  \begin{lean}{For $E\subseteq Y\subseteq X$, $E$ is compact in the subspace $Y$ if and only if it is compact in $X$.}
+    theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
+        IsCompact ((Subtype.val : Y → X) ⁻¹' E) ↔ IsCompact E
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{First suppose $E$ is compact in $Y$. Restrict an ambient open cover to $Y$. An ambient ball contained in a cover member restricts to a subspace ball, so each restricted member is open.}
+    classical
+    constructor
+    · intro h
+      apply isCompact_of_finite_subcover
+      intro ι U hU hc
+      have ho : ∀ i, IsOpen ((Subtype.val : Y → X) ⁻¹' U i) := by
+        intro i
+        apply Metric.isOpen_iff.mpr
+        intro p hp
+        obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (hU i) p.val hp
+        exact ⟨r, hr, fun q hq => hs hq⟩
+  \end{lean}
+
+  \begin{lean}{The restricted family covers $E$ in $Y$. A finite subcover there gives the same finite collection of ambient members covering $E$ in $X$.}
+    have hcov : (Subtype.val : Y → X) ⁻¹' E ⊆ ⋃ i, Subtype.val ⁻¹' U i := by
+      intro p hp
+      obtain ⟨i, hi⟩ := mem_iUnion.mp (hc hp)
+      exact mem_iUnion.mpr ⟨i, hi⟩
+    obtain ⟨s, hs⟩ := h.elim_finite_subcover _ ho hcov
+    refine ⟨s, ?_⟩
+    intro p hp
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs (show (⟨p, hEY hp⟩ : Y) ∈ Subtype.val ⁻¹' E from hp))
+    obtain ⟨his, hpi⟩ := mem_iUnion.mp hi
+    exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hpi⟩⟩
+  \end{lean}
+
+  \begin{lean}{Conversely, let a family of subspace-open sets cover $E$. Each member is the intersection with $Y$ of an ambient open set, by the relative-open-set proposition.}
+    · intro h
+      apply isCompact_of_finite_subcover
+      intro ι U hU hc
+      have hex : ∀ i, ∃ V : Set X, IsOpen V ∧ Subtype.val '' U i = V ∩ Y := by
+        intro i
+        apply (relative_open _ Y (by rintro x ⟨p, _, rfl⟩; exact p.property)).mp
+        have heq : (Subtype.val : Y → X) ⁻¹' (Subtype.val '' U i) = U i :=
+          preimage_image_eq _ Subtype.val_injective
+        rw [heq]
+        exact hU i
+  \end{lean}
+
+  \begin{lean}{Choose those ambient open sets. They cover $E$ in $X$, so compactness gives finitely many of them.}
+    choose V hV heq using hex
+    have hcov : E ⊆ ⋃ i, V i := by
+      intro p hp
+      obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (show (⟨p, hEY hp⟩ : Y) ∈ Subtype.val ⁻¹' E from hp))
+      have hm : p ∈ Subtype.val '' U i := ⟨⟨p, hEY hp⟩, hi, rfl⟩
+      rw [heq i] at hm
+      exact mem_iUnion.mpr ⟨i, hm.1⟩
+  \end{lean}
+
+  \begin{lean}{For a point of $E\subseteq Y$, membership in a chosen ambient set is membership in its intersection with $Y$. Thus the corresponding finitely many original members cover $E$ in the subspace.}
+    obtain ⟨s, hs⟩ := h.elim_finite_subcover V hV hcov
+    refine ⟨s, ?_⟩
+    intro p hp
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs hp)
+    obtain ⟨his, hpi⟩ := mem_iUnion.mp hi
+    have hm : p.val ∈ Subtype.val '' U i := (heq i).symm ▸ ⟨hpi, p.property⟩
+    obtain ⟨q, hq, he⟩ := hm
+    have hqp : q = p := Subtype.ext he
+    exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hqp ▸ hq⟩⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_closed
+\begin{proposition} \label{an1:thm:compact-set-is-closed}
+  \begin{lean}{Every compact subset $E$ of a metric space is closed.}
+    theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{To prove that $E^{c}$ is open, fix $p\notin E$. For each $q\in E$, let $r_q=d(q,p)/2>0$. The balls $N_{r_q}(q)$ cover $E$.}
+    classical
+    apply isOpen_compl_iff.mp
+    apply Metric.isOpen_iff.mpr
+    intro p hp
+    let r : E → ℝ := fun q => dist q.val p / 2
+    have hr : ∀ q : E, 0 < r q := by
+      intro q
+      exact half_pos (dist_pos.mpr (fun heq => hp (heq ▸ q.property)))
+    have hcover : E ⊆ ⋃ q : E, ball q.val (r q) := by
+      intro q hq
+      exact mem_iUnion.mpr ⟨⟨q, hq⟩, by simpa only [mem_ball, dist_self] using hr ⟨q, hq⟩⟩
+  \end{lean}
+
+  \begin{lean}{Take a finite subcover and a common positive lower bound $\delta$ for its radii. This is also possible when the finite subcover is empty.}
+    obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun q => ball_open _ _) hcover
+    obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s r (fun q _ => hr q)
+    refine ⟨δ, hδ, ?_⟩
+  \end{lean}
+
+  \begin{lean}{If $x\in N_\delta(p)\cap E$, one of the selected balls contains $x$. Then $d(q,p)\leq d(q,x)+d(x,p)<r_q+\delta\leq 2r_q=d(q,p)$, a contradiction. Hence $N_\delta(p)\subseteq E^{c}$.}
+    intro x hx hxe
+    obtain ⟨q, hq⟩ := mem_iUnion.mp (hs hxe)
+    obtain ⟨hqs, hxq⟩ := mem_iUnion.mp hq
+    have hd := dist_triangle q.val x p
+    rw [dist_comm q.val x] at hd
+    have hδq := hle q hqs
+    change dist x p < δ at hx
+    change dist x q.val < dist q.val p / 2 at hxq
+    change δ ≤ dist q.val p / 2 at hδq
+    linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_bounded
+\begin{proposition} \label{an1:thm:compact-set-is-bounded}
+  \begin{lean}{Every compact subset of a metric space is bounded, with the stated empty-space convention.}
+    theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{If $X$ is nonempty, choose $p\in X$. The balls $N_{n+1}(p)$, for $n\in\N$, cover $E$: every real distance is below some natural number by the Archimedean property.}
+    classical
+    intro hX
+    obtain ⟨p⟩ := hX
+    have hc : E ⊆ ⋃ n : ℕ, ball p (n + 1 : ℝ) := by
+      intro q _
+      obtain ⟨n, hn⟩ := exists_nat_gt (dist q p)
+      exact mem_iUnion.mpr ⟨n, by change dist q p < (n : ℝ) + 1; linarith⟩
+  \end{lean}
+
+  \begin{lean}{Choose a finite subcover and set $R=1+\sum_{n\in S}(n+1)$. This is positive, even when $S$ is empty.}
+    obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun n => ball_open _ _) hc
+    let R : ℝ := 1 + ∑ n ∈ s, (n + 1 : ℝ)
+    have hnonneg : 0 ≤ ∑ n ∈ s, (n + 1 : ℝ) :=
+      Finset.sum_nonneg (fun n _ => by positivity)
+    refine ⟨p, R, by dsimp [R]; linarith, ?_⟩
+  \end{lean}
+
+  \begin{lean}{Each $q\in E$ belongs to a selected ball. Its radius is at most the sum of all selected radii, so $d(q,p)<R$. Thus $E\subseteq N_R(p)$.}
+    intro q hq
+    obtain ⟨n, hn⟩ := mem_iUnion.mp (hs hq)
+    obtain ⟨hns, hdist⟩ := mem_iUnion.mp hn
+    have hle : (n + 1 : ℝ) ≤ ∑ k ∈ s, (k + 1 : ℝ) :=
+      Finset.single_le_sum (f := fun k : ℕ => (k + 1 : ℝ)) (fun k _ => by positivity) hns
+    change dist q p < R
+    change dist q p < (n + 1 : ℝ) at hdist
+    dsimp [R]
+    linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.closed_subset_compact
+\begin{proposition} \label{an1:thm:closed-subset-of-compact-set-is-compact}
+  \begin{lean}{If $E$ is compact, $F$ is closed, and $F\subseteq E$, then $F$ is compact.}
+    theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
+        (hF : IsClosed F) (hFE : F ⊆ E) : IsCompact F
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Take an open cover of $F$. Add the open set $F^{c}$, giving the added member its own index distinct from the original indices.}
+    classical
+    apply isCompact_of_finite_subcover
+    intro ι U hU hcover
+    let V : Option ι → Set X := fun i => match i with
+      | none => Fᶜ
+      | some j => U j
+    have hV : ∀ i, IsOpen (V i) := by
+      intro i
+      cases i with
+      | none => exact hF.isOpen_compl
+      | some j => exact hU j
+  \end{lean}
+
+  \begin{lean}{The enlarged family covers $E$: points in $F$ are covered by the original family, and the others lie in $F^{c}$. Select a finite subcover of $E$.}
+    have hc : E ⊆ ⋃ i, V i := by
+      intro x _
+      by_cases hx : x ∈ F
+      · obtain ⟨i, hi⟩ := mem_iUnion.mp (hcover hx)
+        exact mem_iUnion.mpr ⟨some i, hi⟩
+      · exact mem_iUnion.mpr ⟨none, hx⟩
+    obtain ⟨s, hs⟩ := hE.elim_finite_subcover V hV hc
+  \end{lean}
+
+  \begin{lean}{Discard the added member and keep the selected original indices. A point of $F$ cannot lie in $F^{c}$, so it remains covered. This gives a finite subcover of $F$.}
+    refine ⟨s.biUnion Option.toFinset, ?_⟩
+    intro x hx
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs (hFE hx))
+    obtain ⟨his, hxi⟩ := mem_iUnion.mp hi
+    cases i with
+    | none => exact False.elim (hxi hx)
+    | some j =>
+      exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨some j, his, by simp⟩, hxi⟩⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.infinite_subset_limit_point
+\begin{theorem} \label{an1:thm:infinite-subset-of-compact-set-has-limit-point}
+  \begin{lean}{If $E$ is compact and $F\subseteq E$ is infinite, then $F^{\prime}\cap E\ne\varnothing$.}
+    theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
+        (hFE : F ⊆ E) (hF : F.Infinite) : (limitPoints F ∩ E).Nonempty
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{Assume there is no such limit point. Then each $p\in E$ has a radius $r_p>0$ for which the only possible point of $F$ inside $N_{r_p}(p)$ is $p$ itself. Otherwise every radius would have a distinct witness, making $p$ a limit point.}
+    classical
+    by_contra hn
+    have hlocal : ∀ p : E, ∃ r > 0, ∀ q ∈ F, dist q p.val < r → q = p.val := by
+      intro p
+      by_contra h
+      push Not at h
+      apply hn
+      refine ⟨p.val, ?_, p.property⟩
+      intro r hr
+      obtain ⟨q, hq, hd, hne⟩ := h r hr
+      exact ⟨q, hq, hne, hd⟩
+  \end{lean}
+
+  \begin{lean}{These balls cover $E$, so choose finitely many of them.}
+    choose r hr hsingle using hlocal
+    have hc : E ⊆ ⋃ p : E, ball p.val (r p) := by
+      intro p hp
+      exact mem_iUnion.mpr ⟨⟨p, hp⟩, by simpa only [mem_ball, dist_self] using hr ⟨p, hp⟩⟩
+    obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun p => ball_open _ _) hc
+  \end{lean}
+
+  \begin{lean}{Every point of $F$ lies in one of the selected balls and must equal its center. Hence $F$ is contained in the finite set of selected centers, contradicting its infinitude.}
+    apply hF
+    apply (s.finite_toSet.image Subtype.val).subset
+    intro q hq
+    obtain ⟨p, hp⟩ := mem_iUnion.mp (hs (hFE hq))
+    obtain ⟨hps, hd⟩ := mem_iUnion.mp hp
+    exact ⟨p, hps, (hsingle p q hq hd).symm⟩
+  \end{lean}
+
+\end{proof}

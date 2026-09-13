@@ -1,0 +1,21 @@
+proofs:
+- id: an1:lem:convergesTo-iff-tendsto
+  declaration: MathematicalAnalysis1.Chapter02.convergesTo_iff_tendsto
+- id: an1:lem:convergent-bounded
+  declaration: MathematicalAnalysis1.Chapter02.convergent_bounded
+- id: an1:lem:limit-unique
+  declaration: MathematicalAnalysis1.Chapter02.limit_unique
+- id: an1:thm:convergent-sequence-is-bounded
+  declaration: MathematicalAnalysis1.Chapter02.convergent_properties
+- id: an1:lem:reciprocal-small
+  declaration: MathematicalAnalysis1.Chapter02.reciprocal_small
+- id: an1:lem:reciprocal-converges
+  declaration: MathematicalAnalysis1.Chapter02.reciprocal_converges
+- id: an1:lem:positive-reciprocal-diverges
+  declaration: MathematicalAnalysis1.Chapter02.positive_reciprocal_diverges
+- id: an1:lem:convergesTo-iff-finite-exceptions
+  declaration: MathematicalAnalysis1.Chapter02.convergesTo_iff_finite_exceptions
+- id: an1:lem:sequence-at-limit-point
+  declaration: MathematicalAnalysis1.Chapter02.sequence_at_limit_point
+- id: an1:thm:neighborhood
+  declaration: MathematicalAnalysis1.Chapter02.neighborhood_characterization

@@ -1,0 +1,270 @@
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_union
+\begin{proposition} \label{an1:thm:arbitrary-union-of-open-sets-is-open}
+  \begin{lean}{For any indexed family of open sets $(E_i)$, the union $\bigcup_i E_i$ is open.}
+    theorem open_union {ι : Type*} (E : ι → Set X)
+        (h : ∀ i, IsOpen (E i)) : IsOpen (⋃ i, E i)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{A point in the union belongs to one member $E_i$. Choose a ball contained in that member; the same ball is contained in the union. This argument also covers an empty family, since then there is no point to consider.}
+    apply Metric.isOpen_iff.mpr
+    intro p hp
+    obtain ⟨i, hi⟩ := mem_iUnion.mp hp
+    obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (h i) p hi
+    exact ⟨r, hr, fun q hq => mem_iUnion.mpr ⟨i, hs hq⟩⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_intersection
+\begin{corollary} \label{an1:cor:arbitrary-intersection-of-closed-sets-is-closed}
+  \begin{lean}{For any indexed family of closed sets $(E_i)$, the intersection $\bigcap_i E_i$ is closed.}
+    theorem closed_intersection {ι : Type*} (E : ι → Set X)
+        (h : ∀ i, IsClosed (E i)) : IsClosed (⋂ i, E i)
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  \begin{lean}{A limit point of the intersection is a limit point of each member: every nearby witness in the intersection belongs to that member. Each member is closed, so it contains the point; consequently the intersection contains it.}
+    apply (closed_iff_limitPoints _).mpr
+    intro p hp
+    apply mem_iInter.mpr
+    intro i
+    apply (closed_iff_limitPoints _).mp (h i)
+    intro r hr
+    obtain ⟨q, hq, hn, hd⟩ := hp r hr
+    exact ⟨q, mem_iInter.mp hq i, hn, hd⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_intersection
+\begin{lemma} \label{an1:lem:open-intersection}
+  \begin{lean}{The intersection of two open sets is open.}
+    theorem open_intersection (E F : Set X) (hE : IsOpen E) (hF : IsOpen F) :
+        IsOpen (E ∩ F)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{At a point of the intersection, choose one positive radius for each set. The smaller radius gives a ball lying in both sets.}
+    apply Metric.isOpen_iff.mpr
+    intro p hp
+    obtain ⟨r, hr, hEr⟩ := Metric.isOpen_iff.mp hE p hp.1
+    obtain ⟨s, hs, hFs⟩ := Metric.isOpen_iff.mp hF p hp.2
+    refine ⟨min r s, lt_min hr hs, ?_⟩
+    intro q hq
+    change dist q p < min r s at hq
+    exact ⟨hEr (hq.trans_le (min_le_left _ _)), hFs (hq.trans_le (min_le_right _ _))⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_finite_intersection
+\begin{proposition} \label{an1:thm:finite-intersection-of-open-sets-is-open}
+  \begin{lean}{A finite intersection of open sets is open. In particular this applies to $\bigcap_{j=0}^{n-1}E_j$ for every $n\in\N$.}
+    theorem open_finite_intersection {ι : Type*} (s : Finset ι)
+        (E : ι → Set X) (hE : ∀ i ∈ s, IsOpen (E i)) :
+        IsOpen (⋂ i ∈ s, E i)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{For no indices the intersection is $X$, which contains a unit ball about each of its points. Adjoining one index replaces an already open finite intersection by its intersection with one more open set, so induction completes the proof.}
+    classical
+    induction s using Finset.induction_on with
+    | empty =>
+      simp only [Finset.notMem_empty, iInter_of_empty, iInter_univ]
+      exact Metric.isOpen_iff.mpr (fun p _ => ⟨1, zero_lt_one, subset_univ _⟩)
+    | @insert i s hi ih =>
+      rw [Finset.set_biInter_insert]
+      exact open_intersection _ _ (hE i (Finset.mem_insert_self i s))
+        (ih (fun j hj => hE j (Finset.mem_insert_of_mem hj)))
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_finite_union
+\begin{corollary} \label{an1:cor:finite-union-of-closed-sets-is-closed}
+  \begin{lean}{A finite union of closed sets is closed, including the union over no indices.}
+    theorem closed_finite_union {ι : Type*} (s : Finset ι)
+        (E : ι → Set X) (hE : ∀ i ∈ s, IsClosed (E i)) :
+        IsClosed (⋃ i ∈ s, E i)
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  \begin{lean}{The complements are open, so their finite intersection is open. By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that union is closed.}
+    have ho := open_finite_intersection s (fun i => (E i)ᶜ)
+      (fun i hi => (hE i hi).isOpen_compl)
+    have heq : (⋃ i ∈ s, E i)ᶜ = ⋂ i ∈ s, (E i)ᶜ := by
+      ext p
+      simp only [mem_compl_iff, mem_iUnion, mem_iInter, not_exists]
+    exact isOpen_compl_iff.mp (heq ▸ ho)
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_eq_union_limitPoints
+\begin{lemma} \label{an1:lem:closure-eq-union-limitPoints}
+  \begin{lean}{$\overline E=E\cup E^{\prime}$, so the standard closure agrees with the textbook definition.}
+    theorem closure_eq_union_limitPoints (E : Set X) :
+        closure E = E ∪ limitPoints E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{If $p\in\overline E$, every ball about $p$ meets $E$. Either $p\in E$, or each such witness differs from $p$, making $p$ a limit point.}
+    classical
+    ext p
+    constructor
+    · intro hp
+      by_cases he : p ∈ E
+      · exact Or.inl he
+      · right
+        intro r hr
+        obtain ⟨q, hq, hd⟩ := Metric.mem_closure_iff.mp hp r hr
+        exact ⟨q, hq, fun h => he (h ▸ hq), by rwa [dist_comm]⟩
+  \end{lean}
+
+  \begin{lean}{Conversely, a point of $E$ itself witnesses that every ball meets $E$. For a limit point, use the distinct witness in each deleted ball. Both cases give membership in the closure.}
+    · intro hp
+      apply Metric.mem_closure_iff.mpr
+      intro r hr
+      rcases hp with hp | hp
+      · exact ⟨p, hp, by simpa only [dist_self] using hr⟩
+      · obtain ⟨q, hq, _, hd⟩ := hp r hr
+        exact ⟨q, hq, by rwa [dist_comm]⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_closed
+\begin{lemma} \label{an1:lem:closure-closed}
+  \begin{lean}{The closure of any set is closed.}
+    theorem closure_closed (E : Set X) : IsClosed (closure E)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Suppose $p$ is a limit point of $\overline E$ and $r>0$. Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$. The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.}
+    apply (closed_iff_limitPoints _).mpr
+    intro p hp
+    apply Metric.mem_closure_iff.mpr
+    intro r hr
+    obtain ⟨q, hq, _, hdq⟩ := hp (r / 2) (half_pos hr)
+    obtain ⟨s, hs, hds⟩ := Metric.mem_closure_iff.mp hq (r / 2) (half_pos hr)
+    refine ⟨s, hs, ?_⟩
+    have ht := dist_triangle p q s
+    rw [dist_comm q p] at hdq
+    linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_properties
+\begin{proposition} \label{an1:thm:properties-of-closure}
+  \begin{lean}{For every $E\subseteq X$: $\overline E$ is closed; $E=\overline E$ if and only if $E$ is closed; and every closed set $F$ containing $E$ also contains $\overline E$.}
+    theorem closure_properties (E : Set X) :
+        IsClosed (closure E) ∧ (E = closure E ↔ IsClosed E) ∧
+        (∀ F : Set X, IsClosed F → E ⊆ F → closure E ⊆ F)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{We have just proved that $\overline E$ is closed. Therefore $E=\overline E$ implies that $E$ is closed. Conversely, closedness gives $E^{\prime}\subseteq E$, so $E\cup E^{\prime}=E$.}
+    refine ⟨closure_closed E, ?_, ?_⟩
+    · constructor
+      · intro h
+        rw [h]
+        exact closure_closed E
+      · intro h
+        rw [closure_eq_union_limitPoints]
+        exact (union_eq_left.mpr ((closed_iff_limitPoints E).mp h)).symm
+  \end{lean}
+
+  \begin{lean}{Let $F$ be closed with $E\subseteq F$. A point of $\overline E$ either lies in $E$, hence in $F$, or is a limit point of $E$. In the latter case the same nearby witnesses make it a limit point of $F$, which belongs to $F$ by closedness.}
+    · intro F hF hEF p hp
+      rw [closure_eq_union_limitPoints] at hp
+      rcases hp with hp | hp
+      · exact hEF hp
+      · apply (closed_iff_limitPoints F).mp hF
+        intro r hr
+        obtain ⟨q, hq, hn, hd⟩ := hp r hr
+        exact ⟨q, hEF hq, hn, hd⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.supremum_in_closure
+\begin{proposition} \label{an1:thm:supremum-in-closure}
+  \begin{lean}{If $E\subseteq\R$ is nonempty and bounded above, then $\sup E\in\overline E$. If $E$ is also closed, then $\sup E\in E$.}
+    theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
+        sSup E ∈ closure E ∧ (IsClosed E → sSup E ∈ E)
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{Write $c=\sup E$. For any $r>0$, the smaller number $c-r$ is not an upper bound, so choose $q\in E$ with $c-r<q\leq c$. Then $|c-q|<r$, proving that every ball about $c$ meets $E$.}
+    have hc : sSup E ∈ closure E := by
+      apply Metric.mem_closure_iff.mpr
+      intro r hr
+      obtain ⟨q, hq, hlt⟩ := exists_lt_of_lt_csSup hne (sub_lt_self (sSup E) hr)
+      refine ⟨q, hq, ?_⟩
+      rw [Real.dist_eq, abs_of_nonneg (sub_nonneg.mpr (le_csSup hb hq))]
+      linarith
+  \end{lean}
+
+  \begin{lean}{When $E$ is closed, its closure equals $E$, so the established closure membership is membership in $E$ itself.}
+    exact ⟨hc, fun h => by
+      have heq := (closure_properties E).2.1.mpr h
+      rw [← heq] at hc
+      exact hc⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_eq_diff
+\begin{proposition} \label{an1:thm:isolated-points-are-self-minus-limit-points}
+  \begin{lean}{$E^{i}=E\setminus E^{\prime}$.}
+    theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{If $E\cap N_r(p)=\{p\}$, then $p\in E$ and no distinct point of $E$ is in that ball. This contradicts the limit-point condition, so $p\notin E^{\prime}$.}
+    classical
+    ext p
+    constructor
+    · rintro ⟨r, hr, heq⟩
+      have hp : p ∈ E ∩ ball p r := heq.symm ▸ (mem_singleton p)
+      refine ⟨hp.1, ?_⟩
+      intro hl
+      obtain ⟨q, hq, hn, hd⟩ := hl r hr
+      have hmem : q ∈ E ∩ ball p r := ⟨hq, hd⟩
+      rw [heq, mem_singleton_iff] at hmem
+      exact hn hmem
+  \end{lean}
+
+  \begin{lean}{Conversely, if $p\in E$ but $p\notin E^{\prime}$, some positive-radius ball contains no distinct point of $E$. Its intersection with $E$ is therefore exactly $\{p\}$.}
+    · rintro ⟨hp, hn⟩
+      have hex : ∃ r > 0, ∀ q ∈ E, dist q p < r → q = p := by
+        by_contra h
+        push Not at h
+        exact hn (fun r hr => by
+          obtain ⟨q, hq, hd, hne⟩ := h r hr
+          exact ⟨q, hq, hne, hd⟩)
+      obtain ⟨r, hr, h⟩ := hex
+      refine ⟨r, hr, ?_⟩
+      ext q
+      constructor
+      · intro hq
+        exact h q hq.1 hq.2
+      · intro hq
+        rw [mem_singleton_iff] at hq
+        subst q
+        exact ⟨hp, by simpa only [mem_ball, dist_self] using hr⟩
+  \end{lean}
+
+\end{proof}

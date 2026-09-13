@@ -1,0 +1,423 @@
+name: Build textbooks
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  packages: write
+  actions: read
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  source:
+    name: Source and repository checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - id: changes
+        name: Classify changed files
+        env:
+          BASE_SHA: >-
+            ${{
+              github.event_name == 'pull_request'
+              && github.event.pull_request.base.sha
+              || github.event.before
+            }}
+        shell: bash
+        run: |
+          paths="$(git diff --name-only "$BASE_SHA" HEAD 2>/dev/null || git ls-files)"
+          structured_pattern='^(\.github/.*\.yml|books\.yml|CITATION\.cff'
+          structured_pattern+='|\.devcontainer/devcontainer\.json)'
+          if grep -Eq "$structured_pattern" <<< "$paths"; then
+            echo "structured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Load repository configuration
+        id: config
+        run: ./scripts/export-config.sh
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ steps.config.outputs.python }}
+          cache: pip
+          cache-dependency-path: .github/requirements-ci.txt
+      - name: Install repository check dependencies
+        run: |
+          if ! command -v rg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --no-install-recommends --yes ripgrep
+          fi
+          command -v rg
+      - run: >-
+          python3 -m pip install --disable-pip-version-check
+          --requirement .github/requirements-ci.txt
+      - name: Cache Lean dependencies and build outputs
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: lean/.lake
+          key: lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-${{ hashFiles('lean/**/*.lean') }}
+          restore-keys: |
+            lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-
+      - name: Set up the pinned Lean toolchain
+        uses: leanprover/lean-action@50fcf42d2e460296f1a34b402e990d1b24f8b596 # v1
+        with:
+          auto-config: false
+          lake-package-directory: lean
+          use-github-cache: false
+          use-mathlib-cache: true
+      - name: Check Lean proofs and LaTeX links
+        run: make lean check
+      - name: Repository structure, metadata, labels, generated files, and draft markers
+        run: ./scripts/check-repository.sh
+      - name: Python formatting and lint
+        run: make format py check
+      - name: Unit tests
+        run: make test
+      - name: YAML and JSON syntax
+        if: steps.changes.outputs.structured == 'true'
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          import yaml
+          for path in sorted(Path('.github').rglob('*.yml')):
+              yaml.safe_load(path.read_text(encoding='utf-8'))
+              print(path)
+          yaml.safe_load(Path('CITATION.cff').read_text(encoding='utf-8'))
+          json.loads(Path('.devcontainer/devcontainer.json').read_text(encoding='utf-8'))
+          PY
+      - name: GitHub Actions semantics
+        if: steps.changes.outputs.structured == 'true'
+        run: ./scripts/check-actions.sh
+  latex:
+    name: Source formatting
+    needs: prepare-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Cache LaTeX formatting checks
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .latexindent_cache
+          key: latexindent-v1-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-${{ hashFiles('**/*.tex', '**/*.sty') }}
+          restore-keys: |
+            latexindent-v1-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-
+      - uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          docker_image: ${{ needs.prepare-image.outputs.image }}
+          run: |
+            git config --global --add safe.directory "$(pwd)"
+            make format sh check
+            make format tex check
+  check:
+    name: Check sources
+    needs: [source, latex]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Verify source and formatting checks passed
+        env:
+          SOURCE_RESULT: ${{ needs.source.result }}
+          LATEX_RESULT: ${{ needs.latex.result }}
+        shell: bash
+        run: |
+          if [[ "$SOURCE_RESULT" != success || "$LATEX_RESULT" != success ]]; then
+            echo "::error::Source checks: $SOURCE_RESULT; formatting checks: $LATEX_RESULT"
+            exit 1
+          fi
+          echo "Source and LaTeX checks passed."
+  prepare-image:
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/prepare-image.yml
+    with:
+      ref: ${{ github.sha }}
+  pin-image:
+    needs: prepare-image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Pin the tested image in repository consumers
+        env:
+          DIGEST: ${{ needs.prepare-image.outputs.digest }}
+        run: make image-pin DIGEST="$DIGEST"
+      - name: Open an image pin pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add config/container-image.txt .devcontainer/devcontainer.json
+          git commit -m "build(toolchain): pin tested development image"
+          branch="automation/image-pin-${GITHUB_RUN_ID}"
+          git push origin "HEAD:refs/heads/${branch}"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "build(toolchain): pin tested development image" \
+            --body "Pins the image prepared and tested by the textbook CI workflow."
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.books.outputs.matrix }}
+      count: ${{ steps.books.outputs.count }}
+      site_changed: ${{ steps.books.outputs.site_changed }}
+      snapshot_changed: ${{ steps.books.outputs.snapshot_changed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Load repository configuration
+        id: config
+        run: ./scripts/export-config.sh
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: ${{ steps.config.outputs.python }}
+          cache: pip
+          cache-dependency-path: .github/requirements-ci.txt
+      - run: >-
+          python3 -m pip install --disable-pip-version-check
+          --requirement .github/requirements-ci.txt
+      - name: Validate manifest before creating the matrix
+        run: python3 scripts/books.py validate
+      - name: Read last snapshot source
+        if: github.event_name == 'push'
+        id: snapshot
+        run: ./scripts/snapshot-base.sh
+      - name: Create cumulative build matrix
+        id: books
+        env:
+          BASE_SHA: >-
+            ${{
+              github.event_name == 'push'
+              && steps.snapshot.outputs.base
+              || (
+                github.event_name == 'pull_request'
+                && github.event.pull_request.base.sha
+                || ''
+              )
+            }}
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == workflow_dispatch ]]; then
+            python3 scripts/affected-books.py --all --format github >> "$GITHUB_OUTPUT"
+          else
+            python3 scripts/affected-books.py --base "$BASE_SHA" --format github >> "$GITHUB_OUTPUT"
+          fi
+  book:
+    needs: [prepare-image, plan]
+    if: needs.plan.outputs.count != '0'
+    name: Build ${{ matrix.book }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Identify the build inputs
+        id: inputs
+        env:
+          IMAGE: ${{ needs.prepare-image.outputs.image }}
+          BOOK: ${{ matrix.book }}
+        run: |
+          mkdir -p "build/$BOOK"
+          echo "tree=$(git rev-parse 'HEAD^{tree}')" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE##*@sha256:}" >> "$GITHUB_OUTPUT"
+      - name: Reuse a verified PDF from the merged pull request
+        id: reuse
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          IMAGE: ${{ needs.prepare-image.outputs.image }}
+          BOOK: ${{ matrix.book }}
+        run: python3 scripts/verified-build.py restore --book "$BOOK" --image "$IMAGE"
+      - name: Cache LaTeX build outputs
+        if: steps.reuse.outputs.reused != 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build/${{ matrix.book }}
+          key: latex-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.book }}-${{ steps.inputs.outputs.image }}-${{ steps.inputs.outputs.tree }}
+          restore-keys: |
+            latex-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.book }}-${{ steps.inputs.outputs.image }}-
+      - name: Build and strictly check in the prepared image
+        if: steps.reuse.outputs.reused != 'true'
+        uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
+        with:
+          docker_image: ${{ needs.prepare-image.outputs.image }}
+          run: |
+            ./scripts/build-book.sh "${{ matrix.book }}"
+            python3 scripts/check-log.py --strict "build/${{ matrix.book }}/book.log"
+      - name: Prepare PDF artifact
+        env:
+          BOOK: ${{ matrix.book }}
+        run: cp "build/$BOOK/book.pdf" "build/$BOOK/$BOOK.pdf"
+      - name: Record the verified build
+        if: github.event_name == 'pull_request'
+        env:
+          IMAGE: ${{ needs.prepare-image.outputs.image }}
+          BOOK: ${{ matrix.book }}
+        run: python3 scripts/verified-build.py record --book "$BOOK" --image "$IMAGE"
+      - name: Upload verified build for reuse after merge
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.book }}-verified-build
+          path: |
+            build/${{ matrix.book }}/book.pdf
+            build/${{ matrix.book }}/book.log
+            build/${{ matrix.book }}/verified-build.json
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ matrix.book }}-pdf
+          path: build/${{ matrix.book }}/${{ matrix.book }}.pdf
+          if-no-files-found: error
+          retention-days: 14
+  build-check:
+    name: Verify textbook builds
+    needs: [prepare-image, plan, book]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Verify all requested textbook builds passed
+        env:
+          PREPARE_RESULT: ${{ needs.prepare-image.result }}
+          PLAN_RESULT: ${{ needs.plan.result }}
+          BOOK_RESULT: ${{ needs.book.result }}
+          BOOK_COUNT: ${{ needs.plan.outputs.count }}
+        shell: bash
+        run: |
+          if [[ "$PREPARE_RESULT" != success ]]; then
+            echo "::error::Toolchain image preparation ended with: $PREPARE_RESULT"
+            exit 1
+          fi
+          if [[ "$PLAN_RESULT" != success ]]; then
+            echo "::error::Build planning ended with: $PLAN_RESULT"
+            exit 1
+          fi
+          if [[ ! "$BOOK_COUNT" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid textbook build count: ${BOOK_COUNT:-<empty>}"
+            exit 1
+          fi
+          if (( BOOK_COUNT == 0 )); then
+            expected=skipped
+          else
+            expected=success
+          fi
+          if [[ "$BOOK_RESULT" != "$expected" ]]; then
+            echo "::error::Textbook builds ended with: $BOOK_RESULT; expected: $expected"
+            exit 1
+          fi
+  publish:
+    name: Publish latest PDF snapshot
+    needs: [plan, book, check, build-check]
+    if: >-
+      always() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main' &&
+      needs.check.result == 'success' && needs.build-check.result == 'success' &&
+      needs.plan.result == 'success' &&
+      (needs.book.result == 'success' || needs.book.result == 'skipped') &&
+      (needs.plan.outputs.count != '0' || needs.plan.outputs.site_changed == 'true' ||
+      needs.plan.outputs.snapshot_changed == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      current: ${{ steps.publish.outputs.current }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: needs.plan.outputs.count != '0'
+        with:
+          pattern: '*-pdf'
+          path: updated-pdfs
+          merge-multiple: true
+      - id: publish
+        name: Update generated-pdfs snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          if [[ "$(git rev-parse origin/main)" != "$GITHUB_SHA" ]]; then
+            echo "A newer main commit exists; its cumulative workflow will publish."
+            echo "current=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if git ls-remote --exit-code --heads origin generated-pdfs >/dev/null 2>&1; then
+            git fetch --no-tags origin generated-pdfs
+            git worktree add snapshot origin/generated-pdfs
+          else
+            git worktree add --detach snapshot
+            git -C snapshot switch --orphan generated-pdfs
+            git -C snapshot rm -r --ignore-unmatch .
+          fi
+          mkdir -p snapshot/pdf
+          shopt -s nullglob
+          updated_pdfs=(updated-pdfs/*.pdf)
+          for pdf in "${updated_pdfs[@]}"; do
+            slug="${pdf##*/}"
+            slug="${slug%.pdf}"
+            if [[ ! -s "$pdf" ]]; then
+              echo "error: PDF artifact is missing or empty: $pdf" >&2
+              exit 1
+            fi
+            python3 scripts/books.py require "$slug" >/dev/null
+            cp "$pdf" "snapshot/pdf/$slug.pdf"
+          done
+          mapfile -t expected < <(python3 scripts/books.py list --for site)
+          while IFS= read -r -d '' pdf; do
+            slug="${pdf##*/}"
+            slug="${slug%.pdf}"
+            [[ " ${expected[*]} " == *" $slug "* ]] || rm "$pdf"
+          done < <(find snapshot/pdf -maxdepth 1 -type f -name '*.pdf' -print0)
+          for slug in "${expected[@]}"; do
+            test -s "snapshot/pdf/$slug.pdf" || {
+              echo "error: snapshot lacks site PDF $slug;" \
+                "dispatch Build textbooks once to bootstrap all PDFs" >&2
+              exit 1
+            }
+          done
+          printf '%s\n' "$GITHUB_SHA" > snapshot/.source-sha
+          cp .github/generated-pdfs-README.md snapshot/README.md
+          git -C snapshot add .source-sha README.md pdf
+          if ! git -C snapshot diff --cached --quiet; then
+            git -C snapshot commit -m "Update PDFs from ${GITHUB_SHA}"
+            git -C snapshot push origin HEAD:generated-pdfs
+          fi
+          echo "current=true" >> "$GITHUB_OUTPUT"
+  pages:
+    needs: [plan, publish]
+    if: >-
+      always() && needs.publish.outputs.current == 'true' &&
+      (needs.plan.outputs.count != '0' || needs.plan.outputs.site_changed == 'true')
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/pages.yml
+    with:
+      source_sha: ${{ github.sha }}

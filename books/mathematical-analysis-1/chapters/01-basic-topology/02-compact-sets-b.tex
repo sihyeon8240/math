@@ -1,0 +1,281 @@
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_finite_intersection
+\begin{theorem} \label{an1:thm:finite-compact-intersection-property}
+  \begin{lean}{Suppose $(K_i)_{i\in I}$ are compact and every finite intersection $\bigcap_{i\in S}K_i$ is nonempty, including the intersection over no indices. Then $\bigcap_{i\in I}K_i$ is nonempty.}
+    theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
+        (hK : ∀ i, IsCompact (K i))
+        (hfinite : ∀ s : Finset ι, (⋂ i ∈ s, K i).Nonempty) :
+        (⋂ i, K i).Nonempty
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{First suppose $I$ has an index $i_0$. If the full intersection were empty, the complements of the $K_i$ would cover $K_{i_0}$. These complements are open because compact sets are closed.}
+    classical
+    by_cases hi : Nonempty ι
+    · obtain ⟨i₀⟩ := hi
+      by_contra hn
+      have hc : K i₀ ⊆ ⋃ i, (K i)ᶜ := by
+        intro p _
+        by_contra hp
+        apply hn
+        refine ⟨p, mem_iInter.mpr ?_⟩
+        intro i
+        by_contra hpi
+        exact hp (mem_iUnion.mpr ⟨i, hpi⟩)
+  \end{lean}
+
+  \begin{lean}{A finite subcover would make the intersection over its indices together with $i_0$ empty. The finite-intersection hypothesis instead supplies a point in all these sets, contradicting that subcover.}
+    obtain ⟨s, hs⟩ := (hK i₀).elim_finite_subcover _
+      (fun i => (compact_closed _ (hK i)).isOpen_compl) hc
+    obtain ⟨p, hp⟩ := hfinite (insert i₀ s)
+    have hp0 := mem_iInter.mp (mem_iInter.mp hp i₀) (Finset.mem_insert_self _ _)
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs hp0)
+    obtain ⟨his, hpi⟩ := mem_iUnion.mp hi
+    exact hpi (mem_iInter.mp (mem_iInter.mp hp i) (Finset.mem_insert_of_mem his))
+  \end{lean}
+
+  \begin{lean}{If $I$ is empty, the hypothesis for the empty finite index set supplies a point of $X$. It automatically belongs to every member of the empty family.}
+    · obtain ⟨p, _⟩ := hfinite ∅
+      refine ⟨p, mem_iInter.mpr ?_⟩
+      intro i
+      exact False.elim (hi ⟨i⟩)
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.nested_intervals
+\begin{lemma} \label{an1:lem:nested-intervals}
+  \begin{lean}{Let $(a_n)$ and $(b_n)$ be real sequences indexed by $n\in\N$ with $a_n\leq a_{n+1}\leq b_{n+1}\leq b_n$. There exists $x\in\R$ with $a_n\leq x\leq b_n$ for every $n$, so the nested intervals have nonempty intersection.}
+    theorem nested_intervals (a b : ℕ → ℝ)
+        (h : ∀ n, a n ≤ a (n + 1) ∧ a (n + 1) ≤ b (n + 1) ∧ b (n + 1) ≤ b n) :
+        ∃ x : ℝ, ∀ n, a n ≤ x ∧ x ≤ b n
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The left endpoints increase and the right endpoints decrease. For any $n,m$, compare the indices: if $n\leq m$, then $a_n\leq a_m\leq b_m$; otherwise $a_n\leq b_n\leq b_m$. Thus each $b_m$ bounds all left endpoints.}
+    have ha : Monotone a := monotone_nat_of_le_succ (fun n => (h n).1)
+    have hb : Antitone b := antitone_nat_of_succ_le (fun n => (h n).2.2)
+    have hab : ∀ n, a n ≤ b n := fun n => (h n).1.trans ((h n).2.1.trans (h n).2.2)
+    have hcross : ∀ n m, a n ≤ b m := by
+      intro n m
+      rcases le_total n m with hnm | hmn
+      · exact (ha hnm).trans (hab m)
+      · exact (hab n).trans (hb hmn)
+  \end{lean}
+
+  \begin{lean}{The set of left endpoints contains $a_0$ and is bounded above by $b_0$. Its supremum exists. Each $a_n$ is below that supremum, and each $b_n$ is an upper bound for it, giving a point in every interval.}
+    have hne : (range a).Nonempty := ⟨a 0, mem_range_self 0⟩
+    have hbd : BddAbove (range a) := ⟨b 0, by rintro x ⟨n, rfl⟩; exact hcross n 0⟩
+    refine ⟨sSup (range a), ?_⟩
+    intro n
+    exact ⟨le_csSup hbd (mem_range_self n), csSup_le hne (by rintro x ⟨m, rfl⟩; exact hcross m n)⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.nested_cells
+\begin{theorem} \label{an1:thm:nested-k-cells}
+  \begin{lean}{Let $k\in\N$ and let real endpoints satisfy $a_{n,j}\leq a_{n+1,j}\leq b_{n+1,j}\leq b_{n,j}$ for every $n\in\N$ and $0\leq j<k$. Then the cells $\prod_{j=0}^{k-1}[a_{n,j},b_{n,j}]$ have nonempty intersection.}
+    theorem nested_cells (k : ℕ) (a b : ℕ → Fin k → ℝ)
+        (h : ∀ n j, a n j ≤ a (n + 1) j ∧
+          a (n + 1) j ≤ b (n + 1) j ∧ b (n + 1) j ≤ b n j) :
+        ∃ x : EuclideanSpace ℝ (Fin k), ∀ n j, a n j ≤ x j ∧ x j ≤ b n j
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{For each coordinate, apply the nested-interval result and choose a point belonging to every interval in that coordinate. The resulting vector belongs to every cell. When $k=0$, the choice has no coordinates and produces the unique empty tuple.}
+    have hex : ∀ j, ∃ x : ℝ, ∀ n, a n j ≤ x ∧ x ≤ b n j :=
+      fun j => nested_intervals (fun n => a n j) (fun n => b n j) (fun n => h n j)
+    choose x hx using hex
+    exact ⟨WithLp.toLp 2 x, fun n j => hx j n⟩
+  \end{lean}
+
+\end{proof}
+
+We now prove compactness of cells from open covers. We first prove the interval case using a supremum, then combine finitely many coordinates. This also accounts for degenerate intervals and the zero-dimensional cell.
+The next supporting argument applies more generally to topological spaces: their open sets contain the empty and whole sets and are closed under arbitrary unions and finite intersections. Metric spaces have these properties by the preceding results. Compactness still means the finite-open-subcover property. A map is continuous in the open-set sense: inverse images of open sets are open. Only this defining property is needed.
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_image
+\begin{lemma} \label{an1:lem:compact-image}
+  \begin{lean}{For topological spaces $A$ and $B$, if $K\subseteq A$ is compact and $f:A\to B$ is continuous, then $f(K)$ is compact.}
+    theorem compact_image {A B : Type*} [TopologicalSpace A] [TopologicalSpace B]
+        (K : Set A) (hK : IsCompact K) (f : A → B) (hf : Continuous f) :
+        IsCompact (f '' K)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Pull an open cover of $f(K)$ back along $f$. The inverse images are open and cover $K$, so finitely many cover it.}
+    apply isCompact_of_finite_subcover
+    intro ι U hU hc
+    have hcov : K ⊆ ⋃ i, f ⁻¹' U i := by
+      intro x hx
+      obtain ⟨i, hi⟩ := mem_iUnion.mp (hc ⟨x, hx, rfl⟩)
+      exact mem_iUnion.mpr ⟨i, hi⟩
+    obtain ⟨s, hs⟩ := hK.elim_finite_subcover _ (fun i => (hU i).preimage hf) hcov
+  \end{lean}
+
+  \begin{lean}{Every point of $f(K)$ has a preimage in $K$. That preimage belongs to a selected inverse image, so the point belongs to the corresponding selected cover member.}
+    refine ⟨s, ?_⟩
+    rintro y ⟨x, hx, rfl⟩
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs hx)
+    obtain ⟨his, hxi⟩ := mem_iUnion.mp hi
+    exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hxi⟩⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.singleton_compact
+\begin{lemma} \label{an1:lem:singleton-compact}
+  \begin{lean}{A singleton in any metric space is compact.}
+    theorem singleton_compact {A : Type*} [MetricSpace A] (a : A) :
+        IsCompact ({a} : Set A)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{One member of any cover contains its sole point. The subfamily containing only that member already covers the singleton.}
+    apply isCompact_of_finite_subcover
+    intro ι U _ hc
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (mem_singleton a))
+    refine ⟨{i}, ?_⟩
+    intro x hx
+    rw [mem_singleton_iff] at hx
+    subst x
+    exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_singleton_self _, hi⟩⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.interval_compact
+\begin{lemma} \label{an1:lem:interval-compact}
+  \begin{lean}{If $a,b\in\R$ and $a\leq b$, then $[a,b]$ is compact.}
+    theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Fix an open cover. Let $T$ consist of the endpoints $x\in[a,b]$ for which $[a,x]$ has a finite subcover. A cover member containing $a$ covers $[a,a]$, so $a\in T$.}
+    classical
+    apply isCompact_of_finite_subcover
+    intro ι U hU hc
+    let T : Set ℝ := {x | x ∈ Icc a b ∧ ∃ s : Finset ι, Icc a x ⊆ ⋃ i ∈ s, U i}
+    obtain ⟨i₀, hi₀⟩ := mem_iUnion.mp (hc (show a ∈ Icc a b from ⟨le_rfl, hab⟩))
+    have ha : a ∈ T := by
+      refine ⟨⟨le_rfl, hab⟩, {i₀}, ?_⟩
+      intro x hx
+      have heq : x = a := le_antisymm hx.2 hx.1
+      subst x
+      exact mem_iUnion.mpr ⟨i₀, mem_iUnion.mpr ⟨Finset.mem_singleton_self _, hi₀⟩⟩
+  \end{lean}
+
+  \begin{lean}{The set $T$ is nonempty and bounded above by $b$. Let $c=\sup T$; then $a\leq c\leq b$. Choose a cover member containing $c$ and a radius $r>0$ whose ball about $c$ stays in that member.}
+    have hne : T.Nonempty := ⟨a, ha⟩
+    have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
+    let c := sSup T
+    have hac : a ≤ c := le_csSup hb ha
+    have hcb : c ≤ b := csSup_le hne (fun x hx => hx.1.2)
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (show c ∈ Icc a b from ⟨hac, hcb⟩))
+    obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp (hU i) c hi
+  \end{lean}
+
+  \begin{lean}{Choose $t\in T$ with $c-r/2<t$. Set $d=\min(b,c+r/2)$, which is at least $c$. We will extend a finite cover of $[a,t]$ to $[a,d]$ by adjoining the chosen member.}
+    obtain ⟨t, ht, hct⟩ := exists_lt_of_lt_csSup hne (show c - r / 2 < sSup T by dsimp [c]; linarith)
+    obtain ⟨s, hs⟩ := ht.2
+    let d := min b (c + r / 2)
+    have hcd : c ≤ d := le_min hcb (by linarith)
+    have hd : d ∈ T := by
+      refine ⟨⟨hac.trans hcd, min_le_left _ _⟩, insert i s, ?_⟩
+  \end{lean}
+
+  \begin{lean}{A point $x\in[a,d]$ with $x\leq t$ is covered by the old subcover. Otherwise $c-r/2<t<x\leq c+r/2$, so $x$ is in the chosen ball. Therefore $d\in T$.}
+    intro x hx
+    by_cases hxt : x ≤ t
+    · obtain ⟨j, hj⟩ := mem_iUnion.mp (hs ⟨hx.1, hxt⟩)
+      obtain ⟨hjs, hxj⟩ := mem_iUnion.mp hj
+      exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr ⟨Finset.mem_insert_of_mem hjs, hxj⟩⟩
+    · have hxu : x ≤ c + r / 2 := hx.2.trans (min_le_right _ _)
+      have hxball : x ∈ ball c r := by
+        rw [mem_ball, Real.dist_eq, abs_lt]
+        constructor <;> linarith
+      exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_insert_self _ _, hball hxball⟩⟩
+  \end{lean}
+
+  \begin{lean}{Since $c$ is an upper bound of $T$, we have $d\leq c$. If $c<b$, both $b$ and $c+r/2$ are greater than $c$, which would give $d>c$. Hence $c=b$ and $d=b$. The finite subcover witnessing $d\in T$ covers the whole interval.}
+    have hdc : d ≤ c := le_csSup hb hd
+    have hbc : b ≤ c := by
+      by_contra h
+      have hlt : c < d := lt_min (lt_of_not_ge h) (by linarith)
+      exact (not_lt_of_ge hdc) hlt
+    have hdb : d = b := le_antisymm (min_le_left _ _) (hbc.trans hcd)
+    rw [hdb] at hd
+    exact hd.2
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_product
+\begin{lemma} \label{an1:lem:compact-product}
+  \begin{lean}{For compact sets $K\subseteq A$ and $L\subseteq B$ in metric spaces, $K\times L$ is compact in the product metric $d((x,y),(x^{\prime},y^{\prime}))=\max(d(x,x^{\prime}),d(y,y^{\prime}))$.}
+    theorem compact_product {A B : Type*} [MetricSpace A] [MetricSpace B]
+        (K : Set A) (L : Set B) (hK : IsCompact K) (hL : IsCompact L) :
+        IsCompact (K ×ˢ L)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Fix an open cover and $x\in K$. For each $y\in L$, choose a cover member and a product ball of radius $r_y>0$ about $(x,y)$ contained in it.}
+    classical
+    apply isCompact_of_finite_subcover
+    intro ι U hU hc
+    have htube : ∀ x : K, ∃ δ > 0, ∃ s : Finset ι,
+        ∀ x' ∈ ball x.val δ, ∀ y ∈ L, (x', y) ∈ ⋃ i ∈ s, U i := by
+      intro x
+      have hlocal : ∀ y : L, ∃ i : ι, ∃ r > 0, ball (x.val, y.val) r ⊆ U i := by
+        intro y
+        obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (show (x.val, y.val) ∈ K ×ˢ L from ⟨x.property, y.property⟩))
+        obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (hU i) (x.val, y.val) hi
+        exact ⟨i, r, hr, hs⟩
+  \end{lean}
+
+  \begin{lean}{The balls about the $y$ coordinates cover $L$. Compactness selects finitely many; take a common positive lower bound $\delta$ for their radii.}
+    choose i r hr hs using hlocal
+    have hcov : L ⊆ ⋃ y : L, ball y.val (r y) := by
+      intro y hy
+      exact mem_iUnion.mpr ⟨⟨y, hy⟩, by simpa only [mem_ball, dist_self] using hr ⟨y, hy⟩⟩
+    obtain ⟨t, ht⟩ := hL.elim_finite_subcover _ (fun y => ball_open _ _) hcov
+    obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound t r (fun y _ => hr y)
+  \end{lean}
+
+  \begin{lean}{If $d(x^{\prime},x)<\delta$ and $y^{\prime}\in L$, choose a selected ball containing $y^{\prime}$. Both coordinate distances are below its radius, so $(x^{\prime},y^{\prime})$ lies in its original cover member. Thus finitely many members cover the whole strip $N_\delta(x)\times L$.}
+    refine ⟨δ, hδ, t.image i, ?_⟩
+    intro x' hx' y hy
+    obtain ⟨z, hz⟩ := mem_iUnion.mp (ht hy)
+    obtain ⟨hzt, hyz⟩ := mem_iUnion.mp hz
+    have hpair : (x', y) ∈ ball (x.val, z.val) (r z) := by
+      change max (dist x' x.val) (dist y z.val) < r z
+      exact max_lt (hx'.trans_le (hle z hzt)) hyz
+    exact mem_iUnion.mpr ⟨i z, mem_iUnion.mpr ⟨Finset.mem_image.mpr ⟨z, hzt, rfl⟩, hs z hpair⟩⟩
+  \end{lean}
+
+  \begin{lean}{Choose such a strip and finite index set for each $x\in K$. Their balls cover $K$, so finitely many strips suffice.}
+    choose δ hδ s hs using htube
+    have hcov : K ⊆ ⋃ x : K, ball x.val (δ x) := by
+      intro x hx
+      exact mem_iUnion.mpr ⟨⟨x, hx⟩, by simpa only [mem_ball, dist_self] using hδ ⟨x, hx⟩⟩
+    obtain ⟨t, ht⟩ := hK.elim_finite_subcover _ (fun x => ball_open _ _) hcov
+  \end{lean}
+
+  \begin{lean}{Take the union of the finite index sets for those strips. For any $(x,y)\in K\times L$, one selected strip contains it, and its associated members cover it. The resulting finite family covers the product.}
+    refine ⟨t.biUnion s, ?_⟩
+    rintro ⟨x, y⟩ ⟨hx, hy⟩
+    obtain ⟨z, hz⟩ := mem_iUnion.mp (ht hx)
+    obtain ⟨hzt, hxz⟩ := mem_iUnion.mp hz
+    obtain ⟨i, hi⟩ := mem_iUnion.mp (hs z x hxz y hy)
+    obtain ⟨his, hxyi⟩ := mem_iUnion.mp hi
+    exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨z, hzt, his⟩, hxyi⟩⟩
+  \end{lean}
+
+\end{proof}

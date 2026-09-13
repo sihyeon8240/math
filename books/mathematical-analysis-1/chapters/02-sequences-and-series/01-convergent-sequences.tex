@@ -1,0 +1,253 @@
+Sequences in this chapter are indexed by $\N=\{0,1,2,\ldots\}$.
+The Lean declarations lie in \texttt{MathematicalAnalysis1.Chapter02} and use the metric-space context from the preceding chapter, with its definitions available.
+The terms of a sequence retain their indices even when values repeat: $\{u_n:n\in\N\}$ is its range, whereas ``finitely many exceptional terms'' refers to finitely many exceptional indices.
+
+\begin{definition} \label{an1:def:sequence-convergence}
+  A \textbf{sequence} in $X$ is a function $u:\N\to X$, with terms $u_n=u(n)$.
+  It \textbf{converges to} $p\in X$ if for every $\varepsilon>0$ there is $N\in\N$ such that $d(u_n,p)<\varepsilon$ whenever $n\geq N$.
+  We write $u_n\to p$ or $\lim_{n\to\infty}u_n=p$. A sequence is \textbf{convergent} if it has a limit, and \textbf{divergent} otherwise.
+  \begin{lean}{Eventually every term is within any prescribed positive distance of $p$.}
+    def convergesTo (u : ℕ → X) (p : X) : Prop :=
+      ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε
+  \end{lean}
+  \begin{lean}{A convergent sequence has a limit in its ambient space.}
+    abbrev convergent (u : ℕ → X) : Prop := ∃ p : X, convergesTo u p
+  \end{lean}
+  \begin{lean}{A divergent sequence has no limit in that space.}
+    abbrev divergent (u : ℕ → X) : Prop := ¬ convergent u
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergesTo_iff_tendsto
+\begin{lemma} \label{an1:lem:convergesTo-iff-tendsto}
+  \begin{lean}{The epsilon definition of $u_n\to p$ agrees with the standard Lean limit of a sequence.}
+    theorem convergesTo_iff_tendsto (u : ℕ → X) (p : X) :
+        convergesTo u p ↔ Filter.Tendsto u Filter.atTop (nhds p)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The neighborhoods of a point in a metric space have positive-radius balls as a basis, and the eventual sets of natural indices have tails as a basis. Expressing the limit with these bases gives exactly the stated epsilon condition.}
+    exact Metric.tendsto_atTop.symm
+  \end{lean}
+
+\end{proof}
+
+\begin{definition} \label{an1:def:bounded-sequence}
+  A sequence is \textbf{bounded} if its range $\{u_n:n\in\N\}$ is bounded.
+  \begin{lean}{Boundedness concerns the set of values of the sequence.}
+    abbrev boundedSequence (u : ℕ → X) : Prop := bounded (range u)
+  \end{lean}
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergent_bounded
+\begin{lemma} \label{an1:lem:convergent-bounded}
+  \begin{lean}{If $u_n\to p$ in a metric space, then the range of $u$ is bounded.}
+    theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
+        bounded (range u)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Use convergence with $\varepsilon=1$ to choose $N$ beyond which every term is within $1$ of $p$. Set $R=1+\sum_{n=0}^{N-1}d(u_n,p)>0$.}
+    intro _
+    obtain ⟨N, hN⟩ := h 1 zero_lt_one
+    let R := 1 + ∑ n ∈ Finset.range N, dist (u n) p
+    have hsum : 0 ≤ ∑ n ∈ Finset.range N, dist (u n) p :=
+      Finset.sum_nonneg (fun n _ => dist_nonneg)
+    refine ⟨p, R, by dsimp [R]; linarith, ?_⟩
+  \end{lean}
+
+  \begin{lean}{For $n<N$, the distance $d(u_n,p)$ is at most the finite sum defining $R-1$. For $n\geq N$, it is less than $1\leq R$. Thus every term lies in $N_R(p)$. The argument still works if the initial segment is empty.}
+    rintro x ⟨n, rfl⟩
+    change dist (u n) p < R
+    by_cases hn : n < N
+    · have hle := Finset.single_le_sum (f := fun n => dist (u n) p)
+        (fun n _ => dist_nonneg) (Finset.mem_range.mpr hn)
+      dsimp [R]
+      linarith
+    · have htail := hN n (Nat.le_of_not_gt hn)
+      dsimp [R]
+      linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.limit_unique
+\begin{lemma} \label{an1:lem:limit-unique}
+  \begin{lean}{If a sequence converges to both $p$ and $q$ in a metric space, then $p=q$.}
+    theorem limit_unique (u : ℕ → X) (p q : X)
+        (hp : convergesTo u p) (hq : convergesTo u q) : p = q
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{If $p\ne q$, let $r=d(p,q)>0$. Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both points. The triangle inequality would then give $d(p,q)<r$, a contradiction.}
+    by_contra hne
+    have hd : 0 < dist p q := dist_pos.mpr hne
+    obtain ⟨N, hN⟩ := hp (dist p q / 2) (half_pos hd)
+    obtain ⟨M, hM⟩ := hq (dist p q / 2) (half_pos hd)
+    have hn := hN (max N M) (le_max_left _ _)
+    have hm := hM (max N M) (le_max_right _ _)
+    have ht := dist_triangle p (u (max N M)) q
+    rw [dist_comm p (u (max N M))] at ht
+    linarith
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergent_properties
+\begin{proposition} \label{an1:thm:convergent-sequence-is-bounded}
+  \begin{lean}{A convergent sequence is bounded and has a unique limit.}
+    theorem convergent_properties (u : ℕ → X) (p : X) (hp : convergesTo u p) :
+        bounded (range u) ∧ ∀ q : X, convergesTo u q → p = q
+  \end{lean}
+\end{proposition}
+
+\begin{proof}
+  \begin{lean}{The two preceding arguments give boundedness of the range and equality of any other limit with the given one.}
+    exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.reciprocal_small
+\begin{lemma} \label{an1:lem:reciprocal-small}
+  \begin{lean}{For every $\varepsilon>0$, some $N\in\N$ satisfies $1/(n+1)<\varepsilon$ for all $n\geq N$.}
+    theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
+        ∃ N : ℕ, ∀ n ≥ N, 1 / ((n : ℝ) + 1) < ε
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{By the Archimedean property, choose $N>1/\varepsilon$. For $n\geq N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$. Dividing by $n+1>0$ proves the claim.}
+    obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
+    refine ⟨N, ?_⟩
+    intro n hn
+    have hcast : (N : ℝ) ≤ n := Nat.cast_le.mpr hn
+    have hprod : 1 < (N : ℝ) * ε := (div_lt_iff₀ hε).mp hN
+    apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
+    nlinarith
+  \end{lean}
+
+\end{proof}
+
+\begin{example}
+  Define $u_n=1/(n+1)$ for $n\in\N$. We will verify that $u_n\to0$ in $\R$, but that the same sequence diverges in the positive-real subspace $\R^{+}$.
+  The shift makes every denominator positive under our zero-based indexing convention.
+\end{example}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.reciprocal_converges
+\begin{lemma} \label{an1:lem:reciprocal-converges}
+  \begin{lean}{The real sequence $u_n=1/(n+1)$ converges to $0$.}
+    theorem reciprocal_converges : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) 0
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{Choose the threshold from the preceding reciprocal estimate. Since each term is positive, its distance from zero is exactly $1/(n+1)$, which is eventually below $\varepsilon$.}
+    intro ε hε
+    obtain ⟨N, hN⟩ := reciprocal_small ε hε
+    refine ⟨N, ?_⟩
+    intro n hn
+    rw [Real.dist_eq, sub_zero, abs_of_pos (by positivity)]
+    exact hN n hn
+  \end{lean}
+
+\end{proof}
+
+\begin{lean}{Each $1/(n+1)$ also defines a point of the positive-real subspace.}
+  noncomputable def positiveReciprocal (n : ℕ) : {x : ℝ // 0 < x} :=
+    ⟨1 / ((n : ℝ) + 1), by positivity⟩
+\end{lean}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.positive_reciprocal_diverges
+\begin{lemma} \label{an1:lem:positive-reciprocal-diverges}
+  \begin{lean}{The sequence of positive-real points $u_n=1/(n+1)$ has no limit in $\R^{+}$.}
+    theorem positive_reciprocal_diverges :
+        ¬ ∃ p : {x : ℝ // 0 < x}, convergesTo positiveReciprocal p
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{If it converged to a positive point $p$ in the subspace, it would converge to the same real point because the distances are unchanged. Its real limit is already zero. Uniqueness would give $p=0$, contradicting $p>0$.}
+    rintro ⟨p, hp⟩
+    have hreal : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) p.val := hp
+    have heq := limit_unique _ p.val 0 hreal reciprocal_converges
+    exact (ne_of_gt p.property) heq
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergesTo_iff_finite_exceptions
+\begin{lemma} \label{an1:lem:convergesTo-iff-finite-exceptions}
+  \begin{lean}{$u_n\to p$ if and only if, for every $\varepsilon>0$, the set of indices $\{n\in\N:d(u_n,p)\geq\varepsilon\}$ is finite.}
+    theorem convergesTo_iff_finite_exceptions (u : ℕ → X) (p : X) :
+        convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{If $u_n\to p$, choose its threshold $N$. Every exceptional index is less than $N$, so the exception set is contained in a finite initial segment.}
+    constructor
+  \end{lean}
+
+  \begin{lean}{Conversely, a finite set of natural indices has an upper bound $N$, including when it is empty. No index $n\geq N+1$ can be exceptional. Therefore every such term is within $\varepsilon$ of $p$, proving convergence.}
+    · intro h ε hε
+      obtain ⟨N, hN⟩ := h ε hε
+      apply (Finset.range N).finite_toSet.subset
+      intro n hn
+      apply Finset.mem_range.mpr
+      by_contra hnot
+      exact (not_lt_of_ge hn) (hN n (Nat.le_of_not_gt hnot))
+    · intro h ε hε
+      obtain ⟨N, hN⟩ := (h ε hε).bddAbove
+      refine ⟨N + 1, ?_⟩
+      intro n hn
+      by_contra hdist
+      have hle := hN (show n ∈ {n : ℕ | ε ≤ dist (u n) p} from le_of_not_gt hdist)
+      omega
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.sequence_at_limit_point
+\begin{lemma} \label{an1:lem:sequence-at-limit-point}
+  \begin{lean}{If $p\in E^{\prime}$, there is a sequence $(u_n)$ of points in $E\setminus\{p\}$ that converges to $p$.}
+    theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
+        ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ convergesTo u p
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{For each $n\in\N$, use the limit-point condition to choose $u_n\in E$, distinct from $p$, with $d(u_n,p)<1/(n+1)$.}
+    have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
+      fun n => hp _ (by positivity)
+    choose u hu hne hd using hex
+    refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
+  \end{lean}
+
+  \begin{lean}{Given $\varepsilon>0$, the reciprocal estimate makes $1/(n+1)<\varepsilon$ for all sufficiently large $n$. The chosen distance is smaller still, so $u_n\to p$.}
+    intro ε hε
+    obtain ⟨N, hN⟩ := reciprocal_small ε hε
+    exact ⟨N, fun n hn => (hd n).trans (hN n hn)⟩
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.neighborhood_characterization
+\begin{theorem} \label{an1:thm:neighborhood}
+  \begin{lean}{A sequence converges to $p$ exactly when every neighborhood $N_\varepsilon(p)$ contains all but finitely many of its terms, counted by indices. Also, if $p\in E^{\prime}$, a sequence in $E\setminus\{p\}$ converges to $p$.}
+    theorem neighborhood_characterization (u : ℕ → X) (p : X) :
+        (convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
+        (∀ E : Set X, p ∈ limitPoints E →
+          ∃ v : ℕ → X, (∀ n, v n ∈ E ∧ v n ≠ p) ∧ convergesTo v p)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{The finite-exception characterization proves the first assertion, including its converse. The construction from shrinking deleted neighborhoods proves the second assertion, with the terms explicitly required to belong to $E\setminus\{p\}$.}
+    exact ⟨convergesTo_iff_finite_exceptions u p, fun E hp => sequence_at_limit_point E p hp⟩
+  \end{lean}
+
+\end{proof}
