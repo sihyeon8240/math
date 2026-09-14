@@ -3,7 +3,7 @@ import Mathlib.Tactic.Ring
 
 namespace ElementaryNumberTheory.Chapter02
 
-/-- Core result: a positive common divisor that is a linear combination exists.
+/-- Theorem (Core result): a positive common divisor that is a linear combination exists.
 Every common divisor divides this combination, by expanding its witnesses. -/
 theorem exists_positive_common_divisor (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     ∃ d : ℕ, 0 < d ∧ (d : ℤ) ∣ a ∧ (d : ℤ) ∣ b ∧
@@ -73,14 +73,14 @@ theorem exists_positive_common_divisor (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
 
   exact ⟨d, hdpos, hda, hdb, ⟨x, y, hxy.symm⟩, hcommon⟩
 
-/-- The nonnegative greatest common divisor, constructed from a positive
-linear combination when the inputs are not both zero; gcd(0, 0) is zero. -/
+/-- Definition: the nonnegative greatest common divisor, constructed from a
+positive linear combination when the inputs are not both zero; gcd(0, 0) is zero. -/
 noncomputable def gcd (a b : ℤ) : ℕ :=
   if hab : a ≠ 0 ∨ b ≠ 0 then
     Classical.choose (exists_positive_common_divisor a b hab)
   else 0
 
-/-- Core result: the constructed gcd is positive, divides both inputs, is a
+/-- Theorem (Core result): the constructed gcd is positive, divides both inputs, is a
 linear combination, and is divisible by every common divisor. -/
 theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     0 < gcd a b ∧ (gcd a b : ℤ) ∣ a ∧ (gcd a b : ℤ) ∣ b ∧
@@ -89,7 +89,7 @@ theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
   rw [gcd, dif_pos hab]
   exact Classical.choose_spec (exists_positive_common_divisor a b hab)
 
-/-- Core result: every common divisor is at most the positive gcd.
+/-- Theorem (Core result): every common divisor is at most the positive gcd.
 This verifies the order-theoretic meaning of "greatest" directly. -/
 theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
     (hca : c ∣ a) (hcb : c ∣ b) : c ≤ (gcd a b : ℤ) := by
@@ -102,12 +102,12 @@ theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
     nlinarith
   · linarith
 
-/-- Supporting lemma: the total definition assigns zero to the zero pair. -/
+/-- Theorem (Supporting lemma): the total definition assigns zero to the zero pair. -/
 theorem gcd_zero_zero : gcd 0 0 = 0 := by
   unfold gcd
   rw [dif_neg (by rintro (h | h); exact h rfl; exact h rfl)]
 
-/-- Core result: the order characterization uniquely determines the gcd. -/
+/-- Theorem (Core result): the order characterization uniquely determines the gcd. -/
 theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
     (hda : (d : ℤ) ∣ a) (hdb : (d : ℤ) ∣ b)
     (hgreatest : ∀ c : ℤ, c ∣ a → c ∣ b → c ≤ (d : ℤ)) : gcd a b = d := by
@@ -116,12 +116,12 @@ theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
   have hge := common_divisor_le_gcd a b d hab hda hdb
   exact_mod_cast (le_antisymm hle hge)
 
-/-- Core result: Bezout's identity for the gcd constructed in this book. -/
+/-- Theorem (Core result): Bezout's identity for the gcd constructed in this book. -/
 theorem exists_gcd_eq_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     ∃ x y : ℤ, (gcd a b : ℤ) = a * x + b * y := by
   exact (gcd_spec a b hab).2.2.2.1
 
-/-- Core result: integer linear combinations are exactly the multiples of the
+/-- Theorem (Core result): integer linear combinations are exactly the multiples of the
 locally constructed gcd. -/
 theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     {z : ℤ | ∃ x y : ℤ, z = a * x + b * y} =

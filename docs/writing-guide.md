@@ -90,6 +90,14 @@ sequence. Problem uses a separate section-scoped sequence. Solution and remark
 are unnumbered; proof is the standard `amsthm` environment. Use `ax` as the
 label type for numbered axioms.
 
+For formalized declarations, preserve the environment kind in the Lean
+docstring and record the proof dependency role separately, following
+[declaration kinds and proof roles](formalization.md#proof-roles-and-permitted-dependencies).
+For example, a `corollary` proved from earlier local results uses
+`Corollary (Core result):`; a `definition` uses `Definition:`. A textbook
+`axiom` must be represented by explicit assumptions or a checked result within
+the accepted boundary, never by a new unchecked Lean `axiom` declaration.
+
 ### Labels and references
 
 New labels use `<course-prefix>:<type>:<descriptive-name>`. Use the owning
