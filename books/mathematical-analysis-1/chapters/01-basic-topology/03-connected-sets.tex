@@ -57,7 +57,7 @@
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets.no_separation_of_between
 \begin{lemma} \label{an1:lem:no-separation-of-between}
   \begin{lean}{Suppose $E\subseteq\R$ contains every point strictly between any two of its elements.
-It is impossible to have $E=A\cup B$ with $A,B$ separated and points $a\in A$, $b\in B$, $a<b$.}
+      It is impossible to have $E=A\cup B$ with $A,B$ separated and points $a\in A$, $b\in B$, $a<b$.}
     theorem no_separation_of_between (E A B : Set ℝ)
         (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
         (heq : E = A ∪ B) (hsep : separated A B)

@@ -254,7 +254,10 @@ do not nest a `verbatim` environment inside it.
 
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment
-and condenses consecutive blank lines. Format the prose argument manually.
+and condenses consecutive blank lines. It also aligns multiline prose arguments:
+continuation text starts two indentation levels inside `\begin{lean}`, and a
+closing brace on its own line starts one level inside. Relative indentation
+within the prose is preserved; format its mathematical structure manually.
 Put only mathematical statements in the prose, without step titles or
 explanations of Lean commands.
 
