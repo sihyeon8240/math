@@ -15,3 +15,13 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter02.exists_gcd_eq_mul_add_mul
   - id: nt:thm:gcd-linear-combinations
     declaration: ElementaryNumberTheory.Chapter02.linear_combinations_eq_gcd_multiples
+  - id: nt:thm:gcd-one-bezout
+    declaration: ElementaryNumberTheory.Chapter02.gcd_eq_one_iff_exists_mul_add_mul
+  - id: nt:thm:gcd-div-gcd
+    declaration: ElementaryNumberTheory.Chapter02.gcd_div_gcd_eq_one
+  - id: nt:thm:coprime-product-divides
+    declaration: ElementaryNumberTheory.Chapter02.mul_dvd_of_coprime
+  - id: nt:thm:euclid-lemma
+    declaration: ElementaryNumberTheory.Chapter02.dvd_of_dvd_mul_of_coprime
+  - id: nt:thm:gcd-divisibility-characterization
+    declaration: ElementaryNumberTheory.Chapter02.eq_gcd_iff_common_divisor

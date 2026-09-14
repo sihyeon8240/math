@@ -153,4 +153,110 @@ theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b �
     rw [hz, hbezout]
     ring
 
+/-- Theorem (Core result): Theorem 2.4, the Bezout characterization of coprimality. -/
+theorem gcd_eq_one_iff_exists_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+    gcd a b = 1 ↔ ∃ x y : ℤ, 1 = a * x + b * y := by
+  constructor
+  · intro h
+    obtain ⟨x, y, hxy⟩ := exists_gcd_eq_mul_add_mul a b hab
+    exact ⟨x, y, by simpa only [h, Nat.cast_one] using hxy⟩
+  · rintro ⟨x, y, hxy⟩
+    apply gcd_eq_of_greatest a b hab 1
+    · exact ⟨a, by ring⟩
+    · exact ⟨b, by ring⟩
+    · intro c hca hcb
+      obtain ⟨u, hu⟩ := hca
+      obtain ⟨v, hv⟩ := hcb
+      have hone : 1 = c * (u * x + v * y) := by
+        calc
+          1 = a * x + b * y := hxy
+          _ = c * (u * x + v * y) := by rw [hu, hv]; ring
+      by_cases hc : 0 < c
+      · have hk : 0 < u * x + v * y := by nlinarith
+        have hkone : 1 ≤ u * x + v * y := hk
+        norm_num only [Nat.cast_one]
+        nlinarith
+      · norm_num only [Nat.cast_one]
+        omega
+
+/-- Corollary (Core result): dividing a nonzero pair by its positive gcd gives
+relatively prime integers (Corollary 1 to Theorem 2.4). -/
+theorem gcd_div_gcd_eq_one (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+    gcd (a / (gcd a b : ℤ)) (b / (gcd a b : ℤ)) = 1 := by
+  obtain ⟨hdpos, ⟨u, hu⟩, ⟨v, hv⟩, ⟨x, y, hxy⟩, _⟩ := gcd_spec a b hab
+  generalize hg : gcd a b = d at *
+  have hdne : (d : ℤ) ≠ 0 := by exact_mod_cast (ne_of_gt hdpos)
+  have ha : a / (d : ℤ) = u := by rw [hu]; exact Int.mul_ediv_cancel_left u hdne
+  have hb : b / (d : ℤ) = v := by rw [hv]; exact Int.mul_ediv_cancel_left v hdne
+  have hone : (1 : ℤ) = u * x + v * y := by
+    apply mul_left_cancel₀ hdne
+    calc
+      (d : ℤ) * 1 = a * x + b * y := by simpa using hxy
+      _ = (d : ℤ) * (u * x + v * y) := by rw [hu, hv]; ring
+  have huv : u ≠ 0 ∨ v ≠ 0 := by
+    by_contra h
+    push Not at h
+    obtain ⟨rfl, rfl⟩ := h
+    norm_num at hone
+  rw [ha, hb]
+  exact (gcd_eq_one_iff_exists_mul_add_mul u v huv).2 ⟨x, y, hone⟩
+
+/-- Corollary (Core result): coprime divisors have a product dividing the same
+integer (Corollary 2 to Theorem 2.4). -/
+theorem mul_dvd_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
+    (hac : a ∣ c) (hbc : b ∣ c) : a * b ∣ c := by
+  have hnz : a ≠ 0 ∨ b ≠ 0 := by
+    by_contra h
+    push Not at h
+    obtain ⟨rfl, rfl⟩ := h
+    rw [gcd_zero_zero] at hab
+    contradiction
+  obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
+  obtain ⟨r, hr⟩ := hac
+  obtain ⟨s, hs⟩ := hbc
+  refine ⟨s * x + r * y, ?_⟩
+  calc
+    c = c * (a * x + b * y) := by rw [← hxy]; ring
+    _ = a * c * x + b * c * y := by ring
+    _ = a * (b * s) * x + b * (a * r) * y := by nth_rw 1 [hs]; rw [hr]
+    _ = (a * b) * (s * x + r * y) := by ring
+
+/-- Theorem (Core result): Theorem 2.5, Euclid's lemma for coprime integers. -/
+theorem dvd_of_dvd_mul_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
+    (hdiv : a ∣ b * c) : a ∣ c := by
+  have hnz : a ≠ 0 ∨ b ≠ 0 := by
+    by_contra h
+    push Not at h
+    obtain ⟨rfl, rfl⟩ := h
+    rw [gcd_zero_zero] at hab
+    contradiction
+  obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
+  obtain ⟨k, hk⟩ := hdiv
+  refine ⟨c * x + k * y, ?_⟩
+  calc
+    c = (a * x + b * y) * c := by rw [← hxy]; ring
+    _ = a * (c * x) + (b * c) * y := by ring
+    _ = a * (c * x + k * y) := by rw [hk]; ring
+
+/-- Theorem (Core result): Theorem 2.6, the divisibility characterization of
+ the positive gcd, with the candidate divisor an integer. -/
+theorem eq_gcd_iff_common_divisor (a b d : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
+    (hd : 0 < d) :
+    d = (gcd a b : ℤ) ↔
+      d ∣ a ∧ d ∣ b ∧ (∀ c : ℤ, c ∣ a → c ∣ b → c ∣ d) := by
+  constructor
+  · intro heq
+    subst d
+    obtain ⟨_, hda, hdb, _, hcommon⟩ := gcd_spec a b hab
+    exact ⟨hda, hdb, hcommon⟩
+  · rintro ⟨hda, hdb, hcommon⟩
+    have hle := common_divisor_le_gcd a b d hab hda hdb
+    obtain ⟨hgpos, hga, hgb, _, _⟩ := gcd_spec a b hab
+    obtain ⟨k, hk⟩ := hcommon (gcd a b) hga hgb
+    have hgpos' : (0 : ℤ) < gcd a b := by exact_mod_cast hgpos
+    have hkpos : 0 < k := by nlinarith
+    have hkone : 1 ≤ k := hkpos
+    have hge : (gcd a b : ℤ) ≤ d := by nlinarith
+    exact le_antisymm hle hge
+
 end ElementaryNumberTheory.Chapter02
