@@ -50,6 +50,46 @@ results, mean value results, and the fundamental theorem of calculus from the
 accepted boundary and earlier local results. Do not cite their Mathlib
 counterparts as shortcuts in the core proofs.
 
+## Definitions and proof dependencies
+
+Introduce the definitions needed by each formalized development explicitly.
+For metric topology, define interior points by contained positive-radius balls,
+closed sets by containment of limit points, closure as the union with the
+limit-point set, and boundary as the intersection of complementary closures.
+Define compactness by finite open subcovers, connectedness by the absence of a
+separation, and sequence convergence by the epsilon condition. Retain the
+book's empty-space, empty-set, zero-dimensional, and zero-based sequence
+conventions.
+
+Reuse standard real and Euclidean types, metric structures and their distance
+axioms, balls, subtypes with the inherited distance, and finite products with the
+maximum distance. Their distance formulas and elementary coordinate norm
+inequalities fall within the accepted arithmetic and finite-dimensional linear
+algebra boundary. This does not accept topological properties of those spaces.
+
+The standard topology and filter interfaces may encode these definitions.
+Use their ball, neighborhood, open-complement, finite-open-subcover, and epsilon
+characterizations only as representation bridges. Prove the textbook definitions'
+agreement with those interfaces explicitly before using the corresponding
+standard notation in subsequent arguments. In particular, the closed-set and
+closure bridges require the local limit-point arguments; they are not extra
+assumed topological theorems. The open-preimage characterization of continuity
+is likewise a definition interface, not permission to import continuity results.
+
+No substantive topological or analytic result is accepted merely because it is a
+short Mathlib helper. Prove closure properties, compactness properties, and the
+continuity of the coordinate maps needed for finite boxes locally. For the latter,
+use the maximum product distance and the Euclidean sum-of-squares formula,
+including dimension zero; do not assume equivalence of finite-dimensional norms
+or invoke an external coordinate-continuity theorem. Subsequent proofs reuse
+these local results. Arithmetic, finite sums, and logical automation must stay
+within the accepted boundary; simplification must not supply missing topology.
+
+The current checked development covers metric topology, compactness and real
+connectedness in Chapter 1 and the introductory sequence results in Chapter 2.
+The same rules apply as later sections are formalized; this policy does not claim
+that the remaining chapters have already been checked.
+
 ## Scoped external exceptions
 
 No additional external theorem is initially approved. Real construction is

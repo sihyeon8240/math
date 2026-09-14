@@ -14,11 +14,33 @@
 \begin{definition} \label{an1:def:compact}
   A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
   Write $\mathcal K(X)$ for the collection of compact sets. In the proofs, a finite index set is represented by a \texttt{Finset}.
-  The standard Lean predicate has exactly this open-cover characterization, \texttt{isCompact\_iff\_finite\_subcover}; using it changes the representation of the definition, not the mathematical premise.
+  The definition below quantifies over index types in the same universe as the ambient space. The following bridge verifies its agreement with the standard predicate, which also handles covers with other index universes. The Lean context declares \texttt{universe u} and \texttt{variable \{X : Type u\} [MetricSpace X]}.
   \begin{lean}{$\mathcal K(X)$ consists of the compact subsets of $X$.}
-    abbrev compactSets : Set (Set X) := {E | IsCompact E}
+    def compactSets : Set (Set X) :=
+      {E | ∀ {ι : Type u} (U : ι → Set X), openCover E U →
+        ∃ s : Finset ι, subcover E U (s : Set ι)}
   \end{lean}
 \end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.mem_compactSets_iff
+\begin{lemma} \label{an1:lem:mem-compactSets-iff}
+  \begin{lean}{The finite-open-subcover definition agrees with the standard compact-set predicate.}
+    theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{In either direction, unpack an open cover into openness and coverage and retain the same finite index set. The standard finite-subcover interface changes only the representation of compactness.}
+    constructor
+    · intro h
+      apply isCompact_of_finite_subcover
+      intro ι U hU hc
+      exact h U ⟨hU, hc⟩
+    · intro h ι U hU
+      exact h.elim_finite_subcover U hU.1 hU.2
+  \end{lean}
+
+\end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_subspace
 \begin{proposition} \label{an1:thm:compactness-preserved-under-subspace}
@@ -217,7 +239,7 @@
     cases i with
     | none => exact False.elim (hxi hx)
     | some j =>
-      exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨some j, his, by simp⟩, hxi⟩⟩
+      exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨some j, his, by simp only [Option.toFinset_some, Finset.mem_singleton]⟩, hxi⟩⟩
   \end{lean}
 
 \end{proof}

@@ -140,6 +140,35 @@
 
 \end{proof}
 
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.setClosure_eq_closure
+\begin{lemma} \label{an1:lem:setClosure-eq-closure}
+  \begin{lean}{The locally defined closure equals the standard closure.}
+    theorem setClosure_eq_closure (E : Set X) : setClosure E = closure E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The preceding ball argument identifies the standard closure with the union of the set and its limit points, exactly our definition.}
+    exact (closure_eq_union_limitPoints E).symm
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subset_closure
+\begin{lemma} \label{an1:lem:subset-closure}
+  \begin{lean}{Every set is contained in its closure.}
+    theorem subset_closure (E : Set X) : E ⊆ closure E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{In the local definition, a point of the original set belongs to the left member of the union. Transfer this inclusion to the standard notation.}
+    rw [← setClosure_eq_closure]
+    exact fun _ hp => Or.inl hp
+  \end{lean}
+
+\end{proof}
+
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_closed
 \begin{lemma} \label{an1:lem:closure-closed}
   \begin{lean}{The closure of any set is closed.}

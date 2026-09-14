@@ -76,7 +76,7 @@
     have hcb : c ≤ b := csSup_le hne (fun x hx => hx.2.2)
     have hcS : c ∈ closure S := (supremum_in_closure S hne hbd).1
     have hcA : c ∈ closure A := (closure_properties S).2.2 (closure A)
-      (closure_closed A) (fun x hx => subset_closure hx.1) hcS
+      (closure_closed A) (fun x hx => subset_closure A hx.1) hcS
   \end{lean}
 
   \begin{lean}{Separation implies $c\notin B$, and thus $c<b$. If $c=a$, it is already in $E$; otherwise it is strictly between $a$ and $b$, so the between-points hypothesis puts it in $E$. Since $c\notin B$, we have $c\in A$.}
@@ -173,7 +173,7 @@
       obtain ⟨b, hb⟩ := hB
       have hne : a ≠ b := by
         intro he
-        exact Set.disjoint_left.mp hsep.1 (subset_closure ha) (he.symm ▸ hb)
+        exact Set.disjoint_left.mp hsep.1 (subset_closure A ha) (he.symm ▸ hb)
       rcases lt_or_gt_of_ne hne with hab | hba
       · exact no_separation_of_between E A B h heq hsep a b ha hb hab
       · have hsep' : separated B A := ⟨hsep.2.symm, hsep.1.symm⟩

@@ -82,8 +82,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
     def limitPoints (E : Set X) : Set X :=
       {p | ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r}
   \end{lean}
-  \begin{lean}{$E^{\circ}$ is the usual interior; its ball description is verified below.}
-    noncomputable abbrev interiorPoints (E : Set X) : Set X := interior E
+  \begin{lean}{$E^{\circ}$ is defined by contained positive-radius balls.}
+    def interiorPoints (E : Set X) : Set X :=
+      {p | ∃ r > 0, ball p r ⊆ E}
   \end{lean}
   \begin{lean}{$p\in E^{i}$ means $E\cap N_r(p)=\{p\}$ for some $r>0$. In particular $p\in E$.}
     def isolatedPoints (E : Set X) : Set X :=
@@ -100,8 +101,23 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{The interior consists of points for which $E$ is a neighborhood. The metric neighborhood basis consists of positive-radius balls, giving the stated description.}
-    exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
+  \begin{lean}{This is the defining condition for an interior point.}
+    rfl
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.interiorPoints_eq_interior
+\begin{lemma} \label{an1:lem:interiorPoints-eq-interior}
+  \begin{lean}{The ball-defined interior equals the standard interior.}
+    theorem interiorPoints_eq_interior (E : Set X) : interiorPoints E = interior E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{A point lies in the standard interior when the set is a neighborhood of that point. The metric neighborhood interface says precisely that it contains a positive-radius ball.}
+    ext p
+    exact (mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff).symm
   \end{lean}
 
 \end{proof}
@@ -109,19 +125,33 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \begin{definition} \label{an1:def:open-closed-sets}
   A set $E$ is \textbf{open} when every point of $E$ is interior, and \textbf{closed} when $E^{\prime}\subseteq E$.
   Write $\mathcal O(X)$ and $\mathcal C(X)$ for the respective collections.
-  For openness, the metric ball characterization gives the standard predicate; the corresponding closed-set characterization is proved below.
+  These definitions express the stated conditions directly. Their agreement with the standard predicates is verified below.
   \begin{lean}{$\mathcal O(X)$ is the collection of open sets.}
-    abbrev openSets : Set (Set X) := {E | IsOpen E}
+    def openSets : Set (Set X) := {E | E ⊆ interiorPoints E}
   \end{lean}
   \begin{lean}{$\mathcal C(X)$ is the collection of closed sets.}
-    abbrev closedSets : Set (Set X) := {E | IsClosed E}
+    def closedSets : Set (Set X) := {E | limitPoints E ⊆ E}
   \end{lean}
 \end{definition}
 
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_openSets_iff
+\begin{lemma} \label{an1:lem:mem-openSets-iff}
+  \begin{lean}{The locally defined open sets are exactly the sets satisfying the standard open-set predicate.}
+    theorem mem_openSets_iff (E : Set X) : E ∈ openSets ↔ IsOpen E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The metric open-set interface expresses the same condition: every point of the set has a ball contained in it.}
+    exact Metric.isOpen_iff.symm
+  \end{lean}
+
+\end{proof}
+
 \begin{definition} \label{an1:def:closure}
-  The \textbf{closure} of $E$ is $\overline E=E\cup E^{\prime}$. We use the standard closure in Lean and prove this equality below.
+  The \textbf{closure} of $E$ is $\overline E=E\cup E^{\prime}$. We define this union directly and prove its agreement with the standard closure below.
   \begin{lean}{$\overline E$ denotes the closure of $E$.}
-    noncomputable abbrev setClosure (E : Set X) : Set X := closure E
+    def setClosure (E : Set X) : Set X := E ∪ limitPoints E
   \end{lean}
 \end{definition}
 
@@ -137,7 +167,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
     abbrev perfect (E : Set X) : Prop := E = limitPoints E
   \end{lean}
   \begin{lean}{A dense set has the whole ambient space as its closure.}
-    abbrev dense (E : Set X) : Prop := closure E = univ
+    abbrev dense (E : Set X) : Prop := setClosure E = univ
   \end{lean}
 \end{definition}
 
@@ -268,6 +298,20 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
     have h := open_iff_compl_limitPoints Eᶜ
     rw [compl_compl] at h
     exact isOpen_compl_iff.symm.trans h
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_closedSets_iff
+\begin{lemma} \label{an1:lem:mem-closedSets-iff}
+  \begin{lean}{The locally defined closed sets are exactly the sets satisfying the standard closed-set predicate.}
+    theorem mem_closedSets_iff (E : Set X) : E ∈ closedSets ↔ IsClosed E
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  \begin{lean}{The preceding complement argument proves that closedness is equivalent to containing every limit point. Reverse that equivalence.}
+    exact (closed_iff_limitPoints E).symm
   \end{lean}
 
 \end{proof}

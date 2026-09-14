@@ -27,8 +27,8 @@
 \begin{definition} \label{an1:def:boundary}
   The \textbf{boundary} is $\partial E=\overline E\cap\overline{E^{c}}$.
   Equivalently, $\partial E=\overline E\setminus E^{\circ}$.
-  \begin{lean}{The boundary is the closure with the interior removed.}
-    noncomputable abbrev boundary (E : Set X) : Set X := frontier E
+  \begin{lean}{The boundary is the intersection of the two locally defined closures.}
+    def boundary (E : Set X) : Set X := setClosure E ∩ setClosure Eᶜ
   \end{lean}
 \end{definition}
 
@@ -41,9 +41,8 @@
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Replace the complement of the interior by the closure of the complement in the difference $\overline E\setminus E^{\circ}$.}
-    change closure E \ interior E = _
-    rw [sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
+  \begin{lean}{Replace each locally defined closure by its verified standard representation. The difference formula follows from the preceding complement-of-interior lemma.}
+    rw [boundary, setClosure_eq_closure, setClosure_eq_closure]
   \end{lean}
 
 \end{proof}
@@ -171,12 +170,12 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
   It is \textbf{closed relative to} $Y$ if $E^{\prime}\cap Y\subseteq E$.
   The first condition is the ball definition in the subspace; the equivalence for closedness is checked below.
   \begin{lean}{Relative openness means openness of $E$ as a subset of the subspace $Y$.}
-    abbrev relativeOpen (E Y : Set X) : Prop :=
-      E ⊆ Y ∧ IsOpen ((Subtype.val : Y → X) ⁻¹' E)
+    def relativeOpen (E Y : Set X) : Prop :=
+      E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ openSets
   \end{lean}
   \begin{lean}{Relative closedness means closedness of that subset of $Y$.}
-    abbrev relativeClosed (E Y : Set X) : Prop :=
-      E ⊆ Y ∧ IsClosed ((Subtype.val : Y → X) ⁻¹' E)
+    def relativeClosed (E Y : Set X) : Prop :=
+      E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ closedSets
   \end{lean}
 \end{definition}
 
