@@ -91,4 +91,88 @@ theorem existsUnique_quotient_remainder (a : ℤ) (b : ℕ+) :
 
   exact Prod.ext hqq hrr
 
+/-- Core result: division algorithm for a nonzero integer divisor. -/
+theorem existsUnique_quotient_remainder_of_ne_zero (a b : ℤ) (hb : b ≠ 0) :
+    ∃! qr : ℤ × ℕ,
+      a = qr.1 * b + qr.2 ∧ (qr.2 : ℤ) < |b| := by
+
+  have habs : 0 < |b| := abs_pos.mpr hb
+
+  let d : ℕ+ := ⟨|b|.toNat, by omega⟩
+
+  have hd : (d : ℤ) = |b| :=
+    Int.toNat_of_nonneg (abs_nonneg b)
+
+  obtain ⟨⟨q, r⟩, ⟨ha, hr⟩, huniq⟩ :=
+    existsUnique_quotient_remainder a d
+
+  change a = q * (d : ℤ) + (r : ℤ) at ha
+
+  have hrabs : (r : ℤ) < |b| := by
+    rw [← hd]
+    exact_mod_cast hr
+
+  rw [hd] at ha
+
+  rcases lt_or_gt_of_ne hb with hbneg | hbpos
+
+  · have habsneg : |b| = -b := abs_of_neg hbneg
+
+    refine ⟨(-q, r), ⟨?_, hrabs⟩, ?_⟩
+
+    · rw [habsneg] at ha
+      nlinarith
+
+    · rintro ⟨q', r'⟩ ⟨ha', hr'⟩
+
+      have hr'd : r' < (d : ℕ) := by
+        exact_mod_cast (show (r' : ℤ) < (d : ℤ) by
+          rw [hd]
+          exact hr')
+
+      have hpair : (-q', r') = (q, r) := by
+        apply huniq
+        constructor
+
+        · change a = (-q') * (d : ℤ) + (r' : ℤ)
+          rw [hd, habsneg]
+          nlinarith [ha']
+
+        · exact hr'd
+
+      have hq : -q' = q :=
+        congrArg Prod.fst hpair
+
+      have hrr : r' = r :=
+        congrArg Prod.snd hpair
+
+      apply Prod.ext
+      · linarith
+      · exact hrr
+
+  · have habspos : |b| = b := abs_of_pos hbpos
+
+    refine ⟨(q, r), ⟨?_, hrabs⟩, ?_⟩
+
+    · rwa [habspos] at ha
+
+    · rintro ⟨q', r'⟩ ⟨ha', hr'⟩
+
+      have hr'd : r' < (d : ℕ) := by
+        exact_mod_cast (show (r' : ℤ) < (d : ℤ) by
+          rw [hd]
+          exact hr')
+
+      have hpair : (q', r') = (q, r) := by
+        apply huniq
+        constructor
+
+        · change a = q' * (d : ℤ) + (r' : ℤ)
+          rw [hd, habspos]
+          exact ha'
+
+        · exact hr'd
+
+      exact hpair
+
 end ElementaryNumberTheory.Chapter02
