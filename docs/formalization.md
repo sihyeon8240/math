@@ -295,7 +295,11 @@ results declared in `namespace ElementaryNumberTheory.Chapter02`. Retain
 Moving a declaration between topic files within a chapter must preserve its
 public name and proof-index link.
 
-Lean files need not match LaTeX section files one-to-one. Stable linkage happens
+Use textbook sections as the default guide for topic boundaries. When a section
+forms one coherent topic, prefer one Lean file for it. Keep shared definitions
+and lemmas together or separate topics when their responsibilities or imports
+require it; Lean files need not match LaTeX section files one-to-one.
+Stable linkage happens
 at the labeled theorem level, so declaration names should describe mathematics
 rather than printed theorem numbers. The proof-link checker enforces the
 chapter/topic path shape and the registered declaration's book and chapter

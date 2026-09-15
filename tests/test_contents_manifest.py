@@ -32,9 +32,7 @@ class ContentsManifestTests(unittest.TestCase):
             encoding="utf-8",
         )
         (chapter / "sections.yml").write_text(
-            "schema_version: 1\nsections:\n"
-            "  - slug: first\n    title: First\n"
-            "    split: 2\n",
+            "schema_version: 1\nsections:\n  - slug: first\n    title: First\n",
             encoding="utf-8",
         )
         (book / "book.tex").write_text(
@@ -45,11 +43,10 @@ class ContentsManifestTests(unittest.TestCase):
             "% END GENERATED APPENDICES\nafter\n",
             encoding="utf-8",
         )
-        for part in "ab":
-            (chapter / f"01-first-{part}.tex").write_text("body\n", encoding="utf-8")
+        (chapter / "01-first.tex").write_text("body\n", encoding="utf-8")
         return book
 
-    def test_render_uses_manifest_order_titles_and_split_count(self) -> None:
+    def test_render_uses_manifest_titles_and_single_source(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             book = self.fixture(Path(temporary))
             rendered = expected_files(book, book=self.RECORD)
@@ -60,9 +57,8 @@ class ContentsManifestTests(unittest.TestCase):
             index = rendered[book / "chapters/01-start/index.tex"]
             self.assertIn(r"\chapter{Start}", index)
             self.assertEqual(index.count(r"\section{First}"), 1)
-            self.assertLess(
-                index.index("01-first-a.tex"), index.index("01-first-b.tex")
-            )
+            self.assertEqual(index.count(r"\input{"), 1)
+            self.assertIn("01-first.tex", index)
 
     def test_metadata_is_rendered_from_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -121,7 +117,7 @@ class ContentsManifestTests(unittest.TestCase):
                 r"\typeout{APPENDIX-CHECK=\thechapter|\thesection|\thetheorem}"
                 r"\end{theorem}" + "\n"
             )
-            (book / "chapters/01-start/01-first-a.tex").write_text(body)
+            (book / "chapters/01-start/01-first.tex").write_text(body)
             for name in ("01-tables", "02-details"):
                 appendix = book / "appendices" / name
                 appendix.mkdir(parents=True)
@@ -181,21 +177,16 @@ class ContentsManifestTests(unittest.TestCase):
             self.assertNotIn("hand-edited entry", rendered)
             self.assertTrue(rendered.startswith("% Generated from"))
 
-    def test_split_count_26_ends_at_z(self) -> None:
-        filenames = section_filenames(1, {"slug": "topic", "split": 26})
-        self.assertEqual(len(filenames), 26)
-        self.assertEqual(filenames[-1], "01-topic-z.tex")
+    def test_one_filename_per_section(self) -> None:
+        self.assertEqual(section_filenames(1, {"slug": "topic"}), ["01-topic.tex"])
 
-    def test_split_must_fit_lowercase_suffixes(self) -> None:
+    def test_split_field_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             book = self.fixture(Path(temporary))
             path = book / "chapters/01-start/sections.yml"
-            valid = path.read_text()
-            for value in (1, 27, True, "two"):
-                with self.subTest(value=value):
-                    path.write_text(valid.replace("split: 2", f"split: {value}"))
-                    with self.assertRaisesRegex(ValueError, "integer from 2 to 26"):
-                        load_sections(path.parent)
+            path.write_text(path.read_text() + "    split: 2\n")
+            with self.assertRaisesRegex(ValueError, "unknown field.*split"):
+                load_sections(path.parent)
 
     def test_titles_must_be_single_line_with_balanced_braces(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -216,7 +207,7 @@ class ContentsManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "orphan section source"):
                 expected_files(book, book=self.RECORD)
             orphan.unlink()
-            source = book / "chapters/01-start/01-first-a.tex"
+            source = book / "chapters/01-start/01-first.tex"
             source.write_text(r"\section{Wrong}" + "\n", encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "belong in sections.yml"):
                 expected_files(book, book=self.RECORD)

@@ -129,16 +129,7 @@ def load_chapters(book_dir: Path) -> list[dict]:
 
 def load_sections(chapter_dir: Path) -> list[dict]:
     path = chapter_dir / "sections.yml"
-    sections = _entries(path, "sections", {"slug", "title", "split"})
-    for number, section in enumerate(sections, 1):
-        split = section.get("split")
-        if split is None:
-            continue
-        if type(split) is not int or not 2 <= split <= 26:
-            raise ValueError(
-                f"{path}: sections[{number}].split must be an integer from 2 to 26"
-            )
-    return sections
+    return _entries(path, "sections", {"slug", "title"})
 
 
 def chapter_directory(book_dir: Path, number: int, chapter: dict) -> Path:
@@ -150,11 +141,7 @@ def appendix_directory(book_dir: Path, number: int, appendix: dict) -> Path:
 
 
 def section_filenames(number: int, section: dict) -> list[str]:
-    base = f"{number:02d}-{section['slug']}"
-    split = section.get("split")
-    if split is None:
-        return [f"{base}.tex"]
-    return [f"{base}-{chr(ord('a') + offset)}.tex" for offset in range(split)]
+    return [f"{number:02d}-{section['slug']}.tex"]
 
 
 def render_include_block(entries: list[dict], kind: str) -> str:

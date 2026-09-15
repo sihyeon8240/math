@@ -40,19 +40,13 @@ a generated `index.tex`
 that declares the chapter and inputs its section files in reading order.
 Appendices use A, B, ... numbering and precede the bibliography backmatter.
 
-Name a single-file logical section `NN-section-name.tex`. If it must be split,
-keep the same logical number and slug in every source and add consecutive
-suffixes beginning with `-a`, for example `02-main-result-a.tex` and
-`02-main-result-b.tex`. Set `split` in `sections.yml` to the number of physical
-files; the generator assigns consecutive suffixes from `a`. Do not use
-context-dependent names such as `section-part-2`. See the canonical naming policy
-in [the architecture guide](ARCHITECTURE.md#naming-conventions).
+Give each logical section exactly one `NN-section-name.tex` file. Do not
+split a section into alphabetically suffixed files or add `split` metadata.
+Do not use context-dependent names such as `section-part-2`. See the canonical
+naming policy in [the architecture guide](ARCHITECTURE.md#naming-conventions).
 
-Generated `index.tex` declares each `\section` once. All single and split
-section files contain only the section body; later parts continue that body
-without repeating a heading. Split at a top-level boundary rather than inside
-an environment. A theorem statement may end one
-part and its separate `proof` environment may begin the next part.
+Generated `index.tex` declares each `\section` once. Each section source
+contains only its body, without repeating the heading.
 
 ### Contents manifests and metadata
 
