@@ -11,7 +11,7 @@ variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 def IsBasisOf (s : Finset V) (W : Submodule K V) : Prop :=
   LinearIndepOn K id (s : Set V) ∧ span K (s : Set V) = W
 
-/-- Theorem (Core result): any two finite bases of a subspace have equal size. -/
+/-- Theorem: any two finite bases of a subspace have equal size. -/
 theorem basis_card_eq {s t : Finset V} {W : Submodule K V}
     (hs : IsBasisOf s W) (ht : IsBasisOf t W) : s.card = t.card := by
   apply Nat.le_antisymm
@@ -22,7 +22,7 @@ theorem basis_card_eq {s t : Finset V} {W : Submodule K V}
     rw [hs.2, ← ht.2]
     exact subset_span
 
-/-- Theorem (Core result): extend an independent finite set inside a subspace,
+/-- Theorem: extend an independent finite set inside a subspace,
 using a finite ambient spanning set as a bound on the number of insertions. -/
 theorem extend_in_subspace (t : Finset V) (W : Submodule K V)
     (ht : W ≤ span K (t : Set V)) (s : Finset V)
@@ -52,7 +52,7 @@ decreasing_by
   rw [Finset.card_insert_of_notMem hxs] at hb ⊢
   omega
 
-/-- Theorem (Core result): every subspace of a finitely generated space has a finite basis. -/
+/-- Theorem: every subspace of a finitely generated space has a finite basis. -/
 theorem subspace_has_basis (t : Finset V) (ht : span K (t : Set V) = ⊤)
     (W : Submodule K V) : ∃ s : Finset V, IsBasisOf s W ∧ s.card ≤ t.card := by
   obtain ⟨s, _, hs, hc⟩ := extend_in_subspace t W (by rw [ht]; exact le_top)
@@ -67,7 +67,7 @@ def HasFiniteBasis (K V : Type*) [Field K] [AddCommGroup V] [Module K V] : Prop 
 def HasDimension (K V : Type*) [Field K] [AddCommGroup V] [Module K V] (n : ℕ) : Prop :=
   ∃ s : Finset V, IsBasisOf s (⊤ : Submodule K V) ∧ s.card = n
 
-/-- Theorem (Core result): dimension does not depend on the choice of basis. -/
+/-- Theorem: dimension does not depend on the choice of basis. -/
 theorem dimension_unique {m n : ℕ} (hm : HasDimension K V m) (hn : HasDimension K V n) :
     m = n := by
   obtain ⟨s, hs, rfl⟩ := hm
@@ -81,13 +81,13 @@ noncomputable def dimension (h : HasFiniteBasis K V) : ℕ := by
     obtain ⟨s, hs⟩ := h
     exact ⟨s.card, s, hs, rfl⟩)
 
-/-- Theorem (Core result): the defined dimension is attained by a basis. -/
+/-- Theorem: the defined dimension is attained by a basis. -/
 theorem hasDimension_dimension (h : HasFiniteBasis K V) :
     HasDimension K V (dimension h) := by
   classical
   exact Nat.find_spec _
 
-/-- Theorem (Core result): every basis has the defined dimension. -/
+/-- Theorem: every basis has the defined dimension. -/
 theorem dimension_eq_card (h : HasFiniteBasis K V) {s : Finset V}
     (hs : IsBasisOf s (⊤ : Submodule K V)) : dimension h = s.card :=
   dimension_unique (hasDimension_dimension h) ⟨s, hs, rfl⟩
@@ -98,7 +98,7 @@ def IsLine (W : Submodule K V) : Prop := HasDimension K W 1
 /-- Definition: a plane is a two-dimensional subspace. -/
 def IsPlane (W : Submodule K V) : Prop := HasDimension K W 2
 
-/-- Theorem (Core result): an independent family of the full dimension is a basis. -/
+/-- Theorem: an independent family of the full dimension is a basis. -/
 theorem independent_full_card_is_basis {s t : Finset V}
     (ht : IsBasisOf t (⊤ : Submodule K V)) (hs : LinearIndepOn K id (s : Set V))
     (hc : s.card = t.card) : IsBasisOf s (⊤ : Submodule K V) := by
@@ -106,7 +106,7 @@ theorem independent_full_card_is_basis {s t : Finset V}
   have he : s = u := Finset.eq_of_subset_of_card_le hsu (by omega)
   simpa only [he] using hu
 
-/-- Theorem (Core result): a generating family of the full dimension is a basis. -/
+/-- Theorem: a generating family of the full dimension is a basis. -/
 theorem spanning_full_card_is_basis {s t : Finset V}
     (ht : IsBasisOf t (⊤ : Submodule K V)) (hs : span K (s : Set V) = ⊤)
     (hc : s.card = t.card) : IsBasisOf s (⊤ : Submodule K V) := by
@@ -138,7 +138,7 @@ noncomputable def basisOfSet {s : Finset V} (hs : IsBasisOf s (⊤ : Submodule K
   Module.Basis.mk (v := fun x : s => (x : V)) hs.1 (by
     rw [show range (fun x : s => (x : V)) = (s : Set V) by ext; simp, hs.2])
 
-/-- Proposition (Supporting lemma): the locally determined finite dimension agrees
+/-- Proposition: the locally determined finite dimension agrees
 with `Module.finrank`. -/
 theorem dimension_eq_finrank (h : HasFiniteBasis K V) : dimension h = Module.finrank K V := by
   obtain ⟨s, hs⟩ := h
@@ -167,13 +167,13 @@ noncomputable def subspaceBasis {s : Finset V} {W : Submodule K V} (hs : IsBasis
   refine ⟨a, Subtype.ext ?_⟩
   simpa only [v, Submodule.coe_sum, Submodule.coe_smul] using ha
 
-/-- Proposition (Supporting lemma): the cardinality of an explicitly constructed
+/-- Proposition: the cardinality of an explicitly constructed
 subspace basis is its standard finite rank. -/
 theorem finrank_eq_card_of_basisOf {s : Finset V} {W : Submodule K V}
     (hs : IsBasisOf s W) : Module.finrank K W = s.card := by
   simpa only [Fintype.card_coe] using Module.finrank_eq_card_basis (subspaceBasis hs)
 
-/-- Theorem (Core result): finite generation and finite basis existence are equivalent. -/
+/-- Theorem: finite generation and finite basis existence are equivalent. -/
 theorem hasFiniteBasis_iff_finite : HasFiniteBasis K V ↔ Module.Finite K V := by
   constructor
   · rintro ⟨s, hs⟩
@@ -183,7 +183,7 @@ theorem hasFiniteBasis_iff_finite : HasFiniteBasis K V ↔ Module.Finite K V := 
     obtain ⟨s, hs, _⟩ := subspace_has_basis t ht ⊤
     exact ⟨s, hs⟩
 
-/-- Theorem (Core result): a subspace has dimension at most the ambient finite dimension. -/
+/-- Theorem: a subspace has dimension at most the ambient finite dimension. -/
 theorem subspace_finrank_le [Module.Finite K V] (W : Submodule K V) :
     Module.finrank K W ≤ Module.finrank K V := by
   obtain ⟨t, ht⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
@@ -192,7 +192,7 @@ theorem subspace_finrank_le [Module.Finite K V] (W : Submodule K V) :
     dimension_eq_card ⟨t, ht⟩ ht]
   exact hc
 
-/-- Theorem (Core result): a subspace of full finite dimension is the whole space. -/
+/-- Theorem: a subspace of full finite dimension is the whole space. -/
 theorem subspace_eq_top_of_finrank_eq [Module.Finite K V] (W : Submodule K V)
     (h : Module.finrank K W = Module.finrank K V) : W = ⊤ := by
   obtain ⟨t, ht⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
@@ -202,7 +202,7 @@ theorem subspace_eq_top_of_finrank_eq [Module.Finite K V] (W : Submodule K V)
       dimension_eq_card ⟨t, ht⟩ ht]
   exact hs.2.symm.trans (independent_full_card_is_basis ht hs.1 hc).2
 
-/-- Theorem (Core result): an independent finite set extends to a basis with
+/-- Theorem: an independent finite set extends to a basis with
 exactly the ambient dimension many vectors. -/
 theorem extend_to_basis [Module.Finite K V] (s : Finset V)
     (hs : LinearIndepOn K id (s : Set V)) :
@@ -213,7 +213,7 @@ theorem extend_to_basis [Module.Finite K V] (s : Finset V)
   exact ⟨t, hst, ht, (dimension_eq_card ⟨t, ht⟩ ht).symm.trans (dimension_eq_finrank ⟨t, ht⟩)⟩
 
 
-/-- Theorem (Core result): an independent finite family is no larger than a generating family. -/
+/-- Theorem: an independent finite family is no larger than a generating family. -/
 theorem independent_le_generating {ι κ : Type*} [Fintype ι] [Fintype κ]
     {v : ι → V} {w : κ → V} (hv : LinearIndependent K v) (hw : Generates (K := K) w) :
     Fintype.card ι ≤ Fintype.card κ := by
@@ -233,7 +233,7 @@ theorem independent_le_generating {ι κ : Type*} [Fintype ι] [Fintype κ]
   have htc : t.card ≤ Fintype.card κ := (Finset.card_image_le).trans_eq Finset.card_univ
   omega
 
-/-- Theorem (Core result): an independent family whose size is the dimension is a basis. -/
+/-- Theorem: an independent family whose size is the dimension is a basis. -/
 theorem independent_card_finrank_is_basis [Module.Finite K V]
     {ι : Type*} [Fintype ι] {v : ι → V} (hv : LinearIndependent K v)
     (hc : Fintype.card ι = Module.finrank K V) : IsFiniteBasis (K := K) v := by
@@ -255,7 +255,7 @@ theorem independent_card_finrank_is_basis [Module.Finite K V]
 def IsInfiniteDimensional (K V : Type*) [Field K] [AddCommGroup V] [Module K V] : Prop :=
   ¬HasFiniteBasis K V
 
-/-- Theorem (Core result): the zero space has the empty basis and dimension zero. -/
+/-- Theorem: the zero space has the empty basis and dimension zero. -/
 theorem zero_space_dimension [Subsingleton V] : HasDimension K V 0 := by
   refine ⟨∅, ⟨by simp, ?_⟩, rfl⟩
   apply le_antisymm le_top

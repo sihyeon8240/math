@@ -18,7 +18,7 @@ def separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
 def connected {X : Type*} [MetricSpace X] (E : Set X) : Prop :=
   ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ separated A B
 
-/-- Lemma (Core result): closure preserves a real upper bound. -/
+/-- Lemma: closure preserves a real upper bound. -/
 theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
     ∀ x ∈ closure A, x ≤ c := by
   intro x hx
@@ -29,7 +29,7 @@ theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
   have hyc := h y hy
   linarith
 
-/-- Lemma (Core result): closure preserves a real lower bound. -/
+/-- Lemma: closure preserves a real lower bound. -/
 theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
     ∀ x ∈ closure A, c ≤ x := by
   intro x hx
@@ -40,7 +40,7 @@ theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
   have hcy := h y hy
   linarith
 
-/-- Lemma (Core result): the supremum between points in opposite
+/-- Lemma: the supremum between points in opposite
 separated sets cannot belong to either side of an interval. -/
 theorem no_separation_of_between (E A B : Set ℝ)
     (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
@@ -91,7 +91,7 @@ theorem no_separation_of_between (E A B : Set ℝ)
   dsimp [x] at hxc
   linarith
 
-/-- Theorem (Core result): real connected sets are exactly the sets containing all
+/-- Theorem: real connected sets are exactly the sets containing all
 points between any two of their elements. -/
 theorem connected_iff_between (E : Set ℝ) :
     connected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by

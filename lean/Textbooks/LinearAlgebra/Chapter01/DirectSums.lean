@@ -18,7 +18,7 @@ def sumSubspace (U W : Submodule K V) : Submodule K V :=
       rintro c _ ⟨u, hu, w, hw, rfl⟩
       exact ⟨c • u, U.smul_mem c hu, c • w, W.smul_mem c hw, (smul_add c u w).symm⟩)
 
-/-- Theorem (Core result): the sum is the smallest subspace containing both summands. -/
+/-- Theorem: the sum is the smallest subspace containing both summands. -/
 theorem sum_eq_sup (U W : Submodule K V) : sumSubspace U W = U ⊔ W := by
   apply le_antisymm
   · rintro x ⟨u, hu, w, hw, rfl⟩
@@ -33,7 +33,7 @@ theorem sum_eq_sup (U W : Submodule K V) : sumSubspace U W = U ⊔ W := by
 def IsDirectSum (U W : Submodule K V) : Prop :=
   ∀ x : V, ∃! p : U × W, (p.1 : V) + (p.2 : V) = x
 
-/-- Theorem (Core result): a spanning sum with zero intersection is direct. -/
+/-- Theorem: a spanning sum with zero intersection is direct. -/
 theorem directSum_of_sup_inf (U W : Submodule K V) (hspan : U ⊔ W = ⊤)
     (hzero : U ⊓ W = ⊥) : IsDirectSum U W := by
   intro x
@@ -54,7 +54,7 @@ theorem directSum_of_sup_inf (U W : Submodule K V) (hspan : U ⊔ W = ⊤)
     simpa only [hu'] using he'.trans he.symm
   exact Prod.ext (Subtype.ext hu') (Subtype.ext hw')
 
-/-- Theorem (Core result): a direct decomposition spans and has zero intersection. -/
+/-- Theorem: a direct decomposition spans and has zero intersection. -/
 theorem directSum_sup_inf {U W : Submodule K V} (h : IsDirectSum U W) :
     U ⊔ W = ⊤ ∧ U ⊓ W = ⊥ := by
   constructor
@@ -70,12 +70,12 @@ theorem directSum_sup_inf {U W : Submodule K V} (h : IsDirectSum U W) :
     have he := congrArg (fun q : U × W => (q.1 : V)) (h1.trans h2.symm)
     exact he
 
-/-- Theorem (Core result): the direct-sum criterion in both directions. -/
+/-- Theorem: the direct-sum criterion in both directions. -/
 theorem directSum_iff (U W : Submodule K V) :
     IsDirectSum U W ↔ U ⊔ W = ⊤ ∧ U ⊓ W = ⊥ :=
   ⟨directSum_sup_inf, fun h => directSum_of_sup_inf U W h.1 h.2⟩
 
-/-- Lemma (Core result): spans of disjoint parts of an independent set have zero intersection. -/
+/-- Lemma: spans of disjoint parts of an independent set have zero intersection. -/
 theorem independent_disjoint_spans {s t : Set V} (hi : LinearIndepOn K id (s ∪ t))
     (hd : Disjoint s t) : span K s ⊓ span K t = ⊥ := by
   classical
@@ -99,7 +99,7 @@ theorem independent_disjoint_spans {s t : Set V} (hi : LinearIndepOn K id (s ∪
   rw [haz, map_zero] at hea
   exact hea.symm
 
-/-- Theorem (Core result): every subspace of a finite-dimensional space has a complement. -/
+/-- Theorem: every subspace of a finite-dimensional space has a complement. -/
 theorem exists_complement [Module.Finite K V] (W : Submodule K V) :
     ∃ U : Submodule K V, IsDirectSum W U := by
   classical
@@ -113,12 +113,12 @@ theorem exists_complement [Module.Finite K V] (W : Submodule K V) :
     · simpa only [← Finset.coe_union, Finset.union_sdiff_of_subset hst] using ht.1
     · exact Set.disjoint_left.mpr fun x hx hxt => (Finset.mem_sdiff.mp hxt).2 hx
 
-/-- Lemma (Core result): an independent set contains no zero vector. -/
+/-- Lemma: an independent set contains no zero vector. -/
 theorem independent_zero_not_mem {s : Set V} (hs : LinearIndepOn K id s) : (0 : V) ∉ s := by
   intro h
   exact independent_not_mem_span hs (empty_subset s) h (notMem_empty _) (zero_mem _)
 
-/-- Theorem (Core result): the union of bases of subspaces with zero intersection
+/-- Theorem: the union of bases of subspaces with zero intersection
 is a basis of their sum. -/
 theorem union_is_basis [DecidableEq V] {s t : Finset V} {U W : Submodule K V}
     (hs : IsBasisOf s U) (ht : IsBasisOf t W) (hz : U ⊓ W = ⊥) :
@@ -148,7 +148,7 @@ theorem union_is_basis [DecidableEq V] {s t : Finset V} {U W : Submodule K V}
     · exact linearIndepOn_finset_iff.mp ht.1 a htz x hx
   · rw [Finset.coe_union, span_union, hs.2, ht.2]
 
-/-- Theorem (Core result): dimensions add in a finite-dimensional direct sum. -/
+/-- Theorem: dimensions add in a finite-dimensional direct sum. -/
 theorem finrank_directSum [Module.Finite K V] {U W : Submodule K V}
     (h : IsDirectSum U W) : Module.finrank K V = Module.finrank K U + Module.finrank K W := by
   classical

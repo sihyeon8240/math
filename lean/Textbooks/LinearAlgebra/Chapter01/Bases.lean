@@ -12,7 +12,7 @@ variable {K V : Type*} [Field K] [AddCommGroup V] [Module K V]
 def Dependent {ι : Type*} [Fintype ι] (v : ι → V) : Prop :=
   ∃ a : ι → K, linearCombination v a = 0 ∧ a ≠ 0
 
-/-- Proposition (Supporting lemma): the finite-sum definition agrees with the
+/-- Proposition: the finite-sum definition agrees with the
 negation of Mathlib's standard linear independence. -/
 theorem dependent_iff {ι : Type*} [Fintype ι] (v : ι → V) :
     Dependent (K := K) v ↔ ¬LinearIndependent K v := by
@@ -23,7 +23,7 @@ theorem dependent_iff {ι : Type*} [Fintype ι] (v : ι → V) :
 def IsFiniteBasis {ι : Type*} [Fintype ι] (v : ι → V) : Prop :=
   LinearIndependent K v ∧ Generates (K := K) v
 
-/-- Theorem (Core result): coefficients in an independent family are unique. -/
+/-- Theorem: coefficients in an independent family are unique. -/
 theorem coefficients_unique {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : LinearIndependent K v) {a b : ι → K}
     (h : linearCombination v a = linearCombination v b) : a = b := by
@@ -34,7 +34,7 @@ theorem coefficients_unique {ι : Type*} [Fintype ι] {v : ι → V}
   funext i
   exact sub_eq_zero.mp (hc i)
 
-/-- Theorem (Core result): a basis supplies exactly one coordinate tuple. -/
+/-- Theorem: a basis supplies exactly one coordinate tuple. -/
 theorem exists_unique_coordinates {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : IsFiniteBasis (K := K) v) (x : V) :
     ∃! a : ι → K, linearCombination v a = x := by
@@ -46,12 +46,12 @@ noncomputable def coordinates {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : IsFiniteBasis (K := K) v) (x : V) : ι → K :=
   Classical.choose (hv.2 x)
 
-/-- Theorem (Core result): reconstruction from coordinates. -/
+/-- Theorem: reconstruction from coordinates. -/
 theorem combination_coordinates {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : IsFiniteBasis (K := K) v) (x : V) :
     linearCombination v (coordinates hv x) = x := Classical.choose_spec (hv.2 x)
 
-/-- Proposition (Supporting lemma): independent generating families correspond to bases. -/
+/-- Proposition: independent generating families correspond to bases. -/
 theorem finiteBasis_iff {ι : Type*} [Fintype ι] (v : ι → V) :
     IsFiniteBasis (K := K) v ↔ ∃ b : Module.Basis ι K V, ⇑b = v := by
   constructor
@@ -68,13 +68,13 @@ theorem finiteBasis_iff {ι : Type*} [Fintype ι] (v : ι → V) :
 def standardVector {n : ℕ} (i : Fin n) : CoordinateSpace K n :=
   fun j => if i = j then 1 else 0
 
-/-- Lemma (Supporting lemma): combinations of unit vectors evaluate to their coefficients. -/
+/-- Lemma: combinations of unit vectors evaluate to their coefficients. -/
 theorem combination_standard {n : ℕ} (a : Fin n → K) :
     linearCombination (standardVector (K := K)) a = a := by
   funext j
   simp [linearCombination, standardVector, Finset.sum_apply]
 
-/-- Theorem (Core result): the coordinate unit vectors form a basis. -/
+/-- Theorem: the coordinate unit vectors form a basis. -/
 theorem standard_is_basis (n : ℕ) :
     IsFiniteBasis (K := K) (standardVector (K := K) (n := n)) := by
   refine ⟨Fintype.linearIndependent_iff.mpr ?_, fun x => ⟨x, combination_standard x⟩⟩
@@ -91,7 +91,7 @@ def MaximalIndependentIn (s t : Set V) : Prop :=
 def MaximalIndependent (s : Set V) : Prop :=
   MaximalIndependentIn (K := K) s Set.univ
 
-/-- Lemma (Core result): adjoining a vector outside the span preserves independence.
+/-- Lemma: adjoining a vector outside the span preserves independence.
 Separate its coefficient from the remaining finite sum; a nonzero coefficient
 would express the new vector in the old span. -/
 theorem independent_insert {s : Set V} {x : V} (hs : LinearIndepOn K id s)
@@ -124,14 +124,14 @@ theorem independent_insert {s : Set V} {x : V} (hs : LinearIndepOn K id s)
     intro y hy
     exact (ht hy).resolve_left (fun he => hxt (he ▸ hy))
 
-/-- Theorem (Core result): a maximal independent subset spans all allowable vectors. -/
+/-- Theorem: a maximal independent subset spans all allowable vectors. -/
 theorem maximal_spans {s t : Set V} (h : MaximalIndependentIn (K := K) s t) :
     t ⊆ span K s := by
   intro x hx
   by_contra hn
   exact h.2.2 x hx (fun hm => hn (subset_span hm)) (independent_insert h.2.1 hn)
 
-/-- Theorem (Core result): a finite maximal independent subset of a generating set
+/-- Theorem: a finite maximal independent subset of a generating set
 is a basis; this also covers maximal independent subsets of the whole space. -/
 theorem maximal_is_basis {s : Finset V} {t : Set V}
     (h : MaximalIndependentIn (K := K) (s : Set V) t) (ht : span K t = ⊤) :

@@ -4,7 +4,7 @@ import Mathlib.Tactic.Linarith
 
 namespace ElementaryNumberTheory.Chapter02
 
-/-- Theorem (Core result): division algorithm for a positive divisor.
+/-- Theorem: division algorithm for a positive divisor.
 Mathlib counterpart: `Int.ediv_emod_unique`. -/
 theorem existsUnique_quotient_remainder (a : ℤ) (b : ℕ+) :
     ∃! qr : ℤ × ℕ,
@@ -91,7 +91,7 @@ theorem existsUnique_quotient_remainder (a : ℤ) (b : ℕ+) :
 
   exact Prod.ext hqq hrr
 
-/-- Theorem (Core result): division algorithm for a nonzero integer divisor. -/
+/-- Theorem: division algorithm for a nonzero integer divisor. -/
 theorem existsUnique_quotient_remainder_of_ne_zero (a b : ℤ) (hb : b ≠ 0) :
     ∃! qr : ℤ × ℕ,
       a = qr.1 * b + qr.2 ∧ (qr.2 : ℤ) < |b| := by

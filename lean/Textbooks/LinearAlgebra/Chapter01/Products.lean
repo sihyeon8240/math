@@ -11,14 +11,14 @@ variable {K U W : Type*} [Field K] [AddCommGroup U] [Module K U]
 def productFamily {ι κ : Type*} (u : ι → U) (w : κ → W) : ι ⊕ κ → U × W :=
   Sum.elim (fun i => (u i, 0)) (fun j => (0, w j))
 
-/-- Lemma (Supporting lemma): a product combination splits into two component combinations. -/
+/-- Lemma: a product combination splits into two component combinations. -/
 theorem combination_product {ι κ : Type*} [Fintype ι] [Fintype κ]
     (u : ι → U) (w : κ → W) (a : ι ⊕ κ → K) :
     linearCombination (productFamily u w) a =
       (linearCombination u (a ∘ Sum.inl), linearCombination w (a ∘ Sum.inr)) := by
   ext <;> simp [linearCombination, productFamily, Fintype.sum_sum_type, Prod.fst_sum, Prod.snd_sum]
 
-/-- Theorem (Core result): bases of the factors give a basis of the direct product. -/
+/-- Theorem: bases of the factors give a basis of the direct product. -/
 theorem product_is_basis {ι κ : Type*} [Fintype ι] [Fintype κ]
     {u : ι → U} {w : κ → W} (hu : IsFiniteBasis (K := K) u)
     (hw : IsFiniteBasis (K := K) w) : IsFiniteBasis (K := K) (productFamily u w) := by
@@ -36,7 +36,7 @@ theorem product_is_basis {ι κ : Type*} [Fintype ι] [Fintype κ]
     rw [combination_product]
     exact Prod.ext ha hb
 
-/-- Theorem (Core result): the dimension of a product is the sum of the dimensions. -/
+/-- Theorem: the dimension of a product is the sum of the dimensions. -/
 theorem finrank_product [Module.Finite K U] [Module.Finite K W] :
     Module.finrank K (U × W) = Module.finrank K U + Module.finrank K W := by
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K U)

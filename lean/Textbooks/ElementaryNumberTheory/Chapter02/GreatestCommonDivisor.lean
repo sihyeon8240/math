@@ -3,7 +3,7 @@ import Mathlib.Tactic.Ring
 
 namespace ElementaryNumberTheory.Chapter02
 
-/-- Theorem (Core result): a positive common divisor that is a linear combination exists.
+/-- Theorem: a positive common divisor that is a linear combination exists.
 Every common divisor divides this combination, by expanding its witnesses. -/
 theorem exists_positive_common_divisor (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     ∃ d : ℕ, 0 < d ∧ (d : ℤ) ∣ a ∧ (d : ℤ) ∣ b ∧
@@ -80,7 +80,7 @@ noncomputable def gcd (a b : ℤ) : ℕ :=
     Classical.choose (exists_positive_common_divisor a b hab)
   else 0
 
-/-- Theorem (Core result): the constructed gcd is positive, divides both inputs, is a
+/-- Theorem: the constructed gcd is positive, divides both inputs, is a
 linear combination, and is divisible by every common divisor. -/
 theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     0 < gcd a b ∧ (gcd a b : ℤ) ∣ a ∧ (gcd a b : ℤ) ∣ b ∧
@@ -89,7 +89,7 @@ theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
   rw [gcd, dif_pos hab]
   exact Classical.choose_spec (exists_positive_common_divisor a b hab)
 
-/-- Theorem (Core result): every common divisor is at most the positive gcd.
+/-- Theorem: every common divisor is at most the positive gcd.
 This verifies the order-theoretic meaning of "greatest" directly. -/
 theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
     (hca : c ∣ a) (hcb : c ∣ b) : c ≤ (gcd a b : ℤ) := by
@@ -102,12 +102,12 @@ theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
     nlinarith
   · linarith
 
-/-- Theorem (Supporting lemma): the total definition assigns zero to the zero pair. -/
+/-- Theorem: the total definition assigns zero to the zero pair. -/
 theorem gcd_zero_zero : gcd 0 0 = 0 := by
   unfold gcd
   rw [dif_neg (by rintro (h | h); exact h rfl; exact h rfl)]
 
-/-- Theorem (Core result): the order characterization uniquely determines the gcd. -/
+/-- Theorem: the order characterization uniquely determines the gcd. -/
 theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
     (hda : (d : ℤ) ∣ a) (hdb : (d : ℤ) ∣ b)
     (hgreatest : ∀ c : ℤ, c ∣ a → c ∣ b → c ≤ (d : ℤ)) : gcd a b = d := by
@@ -116,12 +116,12 @@ theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
   have hge := common_divisor_le_gcd a b d hab hda hdb
   exact_mod_cast (le_antisymm hle hge)
 
-/-- Theorem (Core result): Bezout's identity for the gcd constructed in this book. -/
+/-- Theorem: Bezout's identity for the gcd constructed in this book. -/
 theorem exists_gcd_eq_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     ∃ x y : ℤ, (gcd a b : ℤ) = a * x + b * y := by
   exact (gcd_spec a b hab).2.2.2.1
 
-/-- Theorem (Core result): integer linear combinations are exactly the multiples of the
+/-- Theorem: integer linear combinations are exactly the multiples of the
 locally constructed gcd. -/
 theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     {z : ℤ | ∃ x y : ℤ, z = a * x + b * y} =
@@ -153,7 +153,7 @@ theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b �
     rw [hz, hbezout]
     ring
 
-/-- Theorem (Core result): Theorem 2.4, the Bezout characterization of coprimality. -/
+/-- Theorem: Theorem 2.4, the Bezout characterization of coprimality. -/
 theorem gcd_eq_one_iff_exists_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     gcd a b = 1 ↔ ∃ x y : ℤ, 1 = a * x + b * y := by
   constructor
@@ -179,7 +179,7 @@ theorem gcd_eq_one_iff_exists_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0
       · norm_num only [Nat.cast_one]
         omega
 
-/-- Corollary (Core result): dividing a nonzero pair by its positive gcd gives
+/-- Corollary: dividing a nonzero pair by its positive gcd gives
 relatively prime integers (Corollary 1 to Theorem 2.4). -/
 theorem gcd_div_gcd_eq_one (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     gcd (a / (gcd a b : ℤ)) (b / (gcd a b : ℤ)) = 1 := by
@@ -201,7 +201,7 @@ theorem gcd_div_gcd_eq_one (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
   rw [ha, hb]
   exact (gcd_eq_one_iff_exists_mul_add_mul u v huv).2 ⟨x, y, hone⟩
 
-/-- Corollary (Core result): coprime divisors have a product dividing the same
+/-- Corollary: coprime divisors have a product dividing the same
 integer (Corollary 2 to Theorem 2.4). -/
 theorem mul_dvd_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
     (hac : a ∣ c) (hbc : b ∣ c) : a * b ∣ c := by
@@ -221,7 +221,7 @@ theorem mul_dvd_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
     _ = a * (b * s) * x + b * (a * r) * y := by nth_rw 1 [hs]; rw [hr]
     _ = (a * b) * (s * x + r * y) := by ring
 
-/-- Theorem (Core result): Theorem 2.5, Euclid's lemma for coprime integers. -/
+/-- Theorem: Theorem 2.5, Euclid's lemma for coprime integers. -/
 theorem dvd_of_dvd_mul_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
     (hdiv : a ∣ b * c) : a ∣ c := by
   have hnz : a ≠ 0 ∨ b ≠ 0 := by
@@ -238,7 +238,7 @@ theorem dvd_of_dvd_mul_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
     _ = a * (c * x) + (b * c) * y := by ring
     _ = a * (c * x + k * y) := by rw [hk]; ring
 
-/-- Theorem (Core result): Theorem 2.6, the divisibility characterization of
+/-- Theorem: Theorem 2.6, the divisibility characterization of
  the positive gcd, with the candidate divisor an integer. -/
 theorem eq_gcd_iff_common_divisor (a b d : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
     (hd : 0 < d) :

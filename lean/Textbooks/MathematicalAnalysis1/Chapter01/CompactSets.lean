@@ -29,7 +29,7 @@ def compactSets : Set (Set X) :=
   {E | ∀ {ι : Type u} (U : ι → Set X), openCover E U →
     ∃ s : Finset ι, subcover E U (s : Set ι)}
 
-/-- Lemma (Supporting lemma): finite open subcovers translate the standard
+/-- Lemma: finite open subcovers translate the standard
 filter encoding; no compactness result is assumed. -/
 theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E := by
   constructor
@@ -40,7 +40,7 @@ theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E := b
   · intro h ι U hU
     exact h.elim_finite_subcover U hU.1 hU.2
 
-/-- Proposition (Core result): a finite union of balls avoiding an exterior point still
+/-- Proposition: a finite union of balls avoiding an exterior point still
 avoids a sufficiently small ball about that point. -/
 theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
   classical
@@ -68,7 +68,7 @@ theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
   change δ ≤ dist q.val p / 2 at hδq
   linarith
 
-/-- Proposition (Core result): concentric balls cover the whole space; a finite subcover
+/-- Proposition: concentric balls cover the whole space; a finite subcover
 has a common bound, obtained here by a finite sum. -/
 theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E := by
   classical
@@ -93,7 +93,7 @@ theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E := by
   dsimp [R]
   linarith
 
-/-- Proposition (Core result): append the open complement to cover a closed subset. -/
+/-- Proposition: append the open complement to cover a closed subset. -/
 theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
     (hF : IsClosed F) (hFE : F ⊆ E) : IsCompact F := by
   classical
@@ -123,7 +123,7 @@ theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
   | some j =>
     exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨some j, his, by simp only [Option.toFinset_some, Finset.mem_singleton]⟩, hxi⟩⟩
 
-/-- Theorem (Core result): if every point has a ball meeting F at most at its center,
+/-- Theorem: if every point has a ball meeting F at most at its center,
 a finite subcover would force F to be finite. -/
 theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
     (hFE : F ⊆ E) (hF : F.Infinite) : (limitPoints F ∩ E).Nonempty := by
@@ -150,7 +150,7 @@ theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
   obtain ⟨hps, hd⟩ := mem_iUnion.mp hp
   exact ⟨p, hps, (hsingle p q hq hd).symm⟩
 
-/-- Proposition (Core result): compactness is unchanged on passage to a metric subspace. -/
+/-- Proposition: compactness is unchanged on passage to a metric subspace. -/
 theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
     IsCompact ((Subtype.val : Y → X) ⁻¹' E) ↔ IsCompact E := by
   classical
@@ -201,7 +201,7 @@ theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
     have hqp : q = p := Subtype.ext he
     exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hqp ▸ hq⟩⟩
 
-/-- Theorem (Core result): the empty indexing family is covered by its FIP hypothesis. -/
+/-- Theorem: the empty indexing family is covered by its FIP hypothesis. -/
 theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
     (hK : ∀ i, IsCompact (K i))
     (hfinite : ∀ s : Finset ι, (⋂ i ∈ s, K i).Nonempty) :
@@ -230,7 +230,7 @@ theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
     intro i
     exact False.elim (hi ⟨i⟩)
 
-/-- Lemma (Core result): nested intervals meet by the real least-upper-bound property. -/
+/-- Lemma: nested intervals meet by the real least-upper-bound property. -/
 theorem nested_intervals (a b : ℕ → ℝ)
     (h : ∀ n, a n ≤ a (n + 1) ∧ a (n + 1) ≤ b (n + 1) ∧ b (n + 1) ≤ b n) :
     ∃ x : ℝ, ∀ n, a n ≤ x ∧ x ≤ b n := by
@@ -248,7 +248,7 @@ theorem nested_intervals (a b : ℕ → ℝ)
   intro n
   exact ⟨le_csSup hbd (mem_range_self n), csSup_le hne (by rintro x ⟨m, rfl⟩; exact hcross m n)⟩
 
-/-- Theorem (Core result): choose one point in each nested coordinate interval. -/
+/-- Theorem: choose one point in each nested coordinate interval. -/
 theorem nested_cells (k : ℕ) (a b : ℕ → Fin k → ℝ)
     (h : ∀ n j, a n j ≤ a (n + 1) j ∧
       a (n + 1) j ≤ b (n + 1) j ∧ b (n + 1) j ≤ b n j) :
@@ -258,7 +258,7 @@ theorem nested_cells (k : ℕ) (a b : ℕ → Fin k → ℝ)
   choose x hx using hex
   exact ⟨WithLp.toLp 2 x, fun n j => hx j n⟩
 
-/-- Lemma (Core result): pull an open cover back along a continuous map. -/
+/-- Lemma: pull an open cover back along a continuous map. -/
 theorem compact_image {A B : Type*} [TopologicalSpace A] [TopologicalSpace B]
     (K : Set A) (hK : IsCompact K) (f : A → B) (hf : Continuous f) :
     IsCompact (f '' K) := by
@@ -275,7 +275,7 @@ theorem compact_image {A B : Type*} [TopologicalSpace A] [TopologicalSpace B]
   obtain ⟨his, hxi⟩ := mem_iUnion.mp hi
   exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hxi⟩⟩
 
-/-- Lemma (Core result): compactness of a singleton is a one-set cover. -/
+/-- Lemma: compactness of a singleton is a one-set cover. -/
 theorem singleton_compact {A : Type*} [MetricSpace A] (a : A) :
     IsCompact ({a} : Set A) := by
   apply isCompact_of_finite_subcover
@@ -287,7 +287,7 @@ theorem singleton_compact {A : Type*} [MetricSpace A] (a : A) :
   subst x
   exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_singleton_self _, hi⟩⟩
 
-/-- Lemma (Core result): the supremum of finitely covered initial intervals can be
+/-- Lemma: the supremum of finitely covered initial intervals can be
 extended inside an open cover member, and therefore reaches the right endpoint. -/
 theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
   classical
@@ -333,7 +333,7 @@ theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
   rw [hdb] at hd
   exact hd.2
 
-/-- Lemma (Core result): finite subcovers in each factor give a finite
+/-- Lemma: finite subcovers in each factor give a finite
 subcover of the product. The common radius is obtained before the second cover. -/
 theorem compact_product {A B : Type*} [MetricSpace A] [MetricSpace B]
     (K : Set A) (L : Set B) (hK : IsCompact K) (hL : IsCompact L) :
@@ -376,7 +376,7 @@ theorem compact_product {A B : Type*} [MetricSpace A] [MetricSpace B]
   obtain ⟨his, hxyi⟩ := mem_iUnion.mp hi
   exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_biUnion.mpr ⟨z, hzt, his⟩, hxyi⟩⟩
 
-/-- Lemma (Core result): finite-coordinate induction; the zero-coordinate box is a singleton. -/
+/-- Lemma: finite-coordinate induction; the zero-coordinate box is a singleton. -/
 theorem pi_cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
     IsCompact {x : Fin n → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j} := by
   induction n with
@@ -421,7 +421,7 @@ theorem pi_cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b 
     rw [← heq]
     exact compact_image _ hk f hf
 
-/-- Lemma (Core result): the coordinate identity is continuous by an explicit
+/-- Lemma: the coordinate identity is continuous by an explicit
 estimate, including dimension zero. `PiLp.dist_sq_eq_of_L2` is the accepted
 Euclidean distance formula; `dist_le_pi_dist` is the finite maximum bound.
 Mathlib counterpart: `PiLp.continuous_toLp` specialized to real Euclidean space. -/
@@ -458,7 +458,7 @@ theorem continuous_to_euclidean (n : ℕ) :
     nlinarith
   exact hbound.trans_lt hsmall
 
-/-- Theorem (Core result): the Euclidean coordinate box is the image of the finite-product box
+/-- Theorem: the Euclidean coordinate box is the image of the finite-product box
 under the locally proved continuous coordinate identity. -/
 theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
     IsCompact {x : EuclideanSpace ℝ (Fin n) | ∀ j, a j ≤ x j ∧ x j ≤ b j} := by
@@ -473,11 +473,11 @@ theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) 
   · rintro ⟨y, hy, rfl⟩
     exact hy
 
-/-- Corollary (Core result): The one-dimensional interval statement, after the cell theorem. -/
+/-- Corollary: The one-dimensional interval statement, after the cell theorem. -/
 theorem closed_interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
   exact interval_compact a b hab
 
-/-- Theorem (Core result): enclose a bounded set in a compact coordinate box. -/
+/-- Theorem: enclose a bounded set in a compact coordinate box. -/
 theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
     IsCompact E ↔ IsClosed E ∧ bounded E := by
   constructor

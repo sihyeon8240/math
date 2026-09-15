@@ -22,7 +22,7 @@ abbrev CoordinateSpace (K : Type*) (n : ℕ) := Fin n → K
 /-- Definition: the function space on a set/type, with pointwise operations. -/
 abbrev FunctionSpace (S K : Type*) := S → K
 
-/-- Proposition (Core result): the eight vector-space laws. -/
+/-- Proposition: the eight vector-space laws. -/
 theorem vector_space_laws (u v w : V) (a b c : K) :
     (u + v) + w = u + (v + w) ∧ 0 + u = u ∧ u + -u = 0 ∧
     u + v = v + u ∧ c • (u + v) = c • u + c • v ∧
@@ -31,17 +31,17 @@ theorem vector_space_laws (u v w : V) (a b c : K) :
   ⟨add_assoc .., zero_add _, add_neg_cancel _, add_comm .., smul_add ..,
     add_smul .., mul_smul .., one_smul ..⟩
 
-/-- Proposition (Core result): uniqueness of the zero vector. -/
+/-- Proposition: uniqueness of the zero vector. -/
 theorem zero_unique (z : V) (h : ∀ v : V, z + v = v) : z = 0 := by
   simpa only [add_zero] using h 0
 
-/-- Proposition (Core result): scalar zero annihilates every vector. -/
+/-- Proposition: scalar zero annihilates every vector. -/
 theorem scalar_zero_smul (v : V) : (0 : K) • v = 0 := by
   have h : (0 : K) • v + 0 = (0 : K) • v + (0 : K) • v := by
     rw [add_zero, ← add_smul, zero_add]
   exact (add_left_cancel h).symm
 
-/-- Proposition (Core result): multiplication by minus one. -/
+/-- Proposition: multiplication by minus one. -/
 theorem minus_one_smul (v : V) : (-1 : K) • v = -v := by
   apply add_left_cancel (a := v)
   calc
@@ -49,7 +49,7 @@ theorem minus_one_smul (v : V) : (-1 : K) • v = -v := by
     _ = 0 := by rw [← add_smul, add_neg_cancel, scalar_zero_smul]
     _ = v + -v := (add_neg_cancel v).symm
 
-/-- Proposition (Core result): every scalar annihilates the zero vector. -/
+/-- Proposition: every scalar annihilates the zero vector. -/
 theorem scalar_smul_zero (c : K) : c • (0 : V) = 0 := by
   have h : c • (0 : V) + 0 = c • 0 + c • 0 := by
     rw [add_zero, ← smul_add, zero_add]
@@ -75,12 +75,12 @@ def intersection (U W : Submodule K V) : Submodule K V :=
 def linearCombination {ι : Type*} [Fintype ι] (v : ι → V) (a : ι → K) : V :=
   ∑ i, a i • v i
 
-/-- Lemma (Supporting lemma): adding coefficient vectors adds combinations. -/
+/-- Lemma: adding coefficient vectors adds combinations. -/
 theorem combination_add {ι : Type*} [Fintype ι] (v : ι → V) (a b : ι → K) :
     linearCombination v (a + b) = linearCombination v a + linearCombination v b := by
   simp only [linearCombination, Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
-/-- Lemma (Supporting lemma): scaling coefficients scales a combination. -/
+/-- Lemma: scaling coefficients scales a combination. -/
 theorem combination_smul {ι : Type*} [Fintype ι] (v : ι → V) (c : K) (a : ι → K) :
     linearCombination v (c • a) = c • linearCombination v a := by
   simp only [linearCombination, Pi.smul_apply, smul_eq_mul, mul_smul, Finset.smul_sum]
@@ -92,7 +92,7 @@ def generatedSubspace {ι : Type*} [Fintype ι] (v : ι → V) : Submodule K V :
     (fun _ ⟨a, ha⟩ _ ⟨b, hb⟩ => ⟨a + b, by rw [combination_add, ha, hb]⟩)
     (fun c _ ⟨a, ha⟩ => ⟨c • a, by rw [combination_smul, ha]⟩)
 
-/-- Proposition (Supporting lemma): the generated subspace equals the span of the family. -/
+/-- Proposition: the generated subspace equals the span of the family. -/
 theorem generatedSubspace_eq_span {ι : Type*} [Fintype ι] (v : ι → V) :
     generatedSubspace (K := K) v = Submodule.span K (Set.range v) := by
   ext x
@@ -108,16 +108,16 @@ def dotProduct {n : ℕ} (a b : CoordinateSpace K n) : K := ∑ i, a i * b i
 /-- Definition: perpendicularity for the bilinear dot product. -/
 def Perpendicular {n : ℕ} (a b : CoordinateSpace K n) : Prop := dotProduct a b = 0
 
-/-- Proposition (Core result): symmetry. -/
+/-- Proposition: symmetry. -/
 theorem dot_comm {n : ℕ} (a b : CoordinateSpace K n) : dotProduct a b = dotProduct b a := by
   simp only [dotProduct, mul_comm]
 
-/-- Proposition (Core result): additivity. -/
+/-- Proposition: additivity. -/
 theorem dot_add {n : ℕ} (a b c : CoordinateSpace K n) :
     dotProduct a (b + c) = dotProduct a b + dotProduct a c := by
   simp only [dotProduct, Pi.add_apply, mul_add, Finset.sum_add_distrib]
 
-/-- Proposition (Core result): homogeneity. -/
+/-- Proposition: homogeneity. -/
 theorem dot_smul {n : ℕ} (a b : CoordinateSpace K n) (c : K) :
     dotProduct (c • a) b = c * dotProduct a b := by
   simp only [dotProduct, Pi.smul_apply, smul_eq_mul, mul_assoc, Finset.mul_sum]
