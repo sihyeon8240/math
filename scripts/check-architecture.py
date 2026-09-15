@@ -62,13 +62,12 @@ class SectionSource:
     path: Path
     number: int
     slug: str
-    part: str | None = None
 
 
 def parse_section_sources(
     paths: list[Path], chapter_name: str, out: Findings
 ) -> list[SectionSource]:
-    """Parse physical files, retaining every part of a logical section."""
+    """Parse the single source file for each logical section."""
     raw: list[tuple[Path, int, str]] = []
     for path in sorted(paths):
         match = SECTION_FILENAME.fullmatch(path.name)
@@ -89,32 +88,7 @@ def parse_section_sources(
             )
         raw.append((path, number, slug))
 
-    # Interpret a final one-letter component using the complete chapter set.
-    candidate_bases: dict[tuple[int, str], int] = {}
-    for _, number, slug in raw:
-        base, separator, tail = slug.rpartition("-")
-        if separator and len(tail) == 1:
-            key = (number, base)
-            candidate_bases[key] = candidate_bases.get(key, 0) + 1
-    raw_slugs = {(number, slug) for _, number, slug in raw}
-    split_bases = {
-        key for key, count in candidate_bases.items() if count > 1 or key in raw_slugs
-    }
-    # A lone -a has an unambiguous correction under the split convention;
-    # other lone one-letter endings remain valid slug text.
-    split_bases.update(
-        (number, slug.rsplit("-", 1)[0])
-        for _, number, slug in raw
-        if slug.endswith("-a")
-    )
-    parsed: list[SectionSource] = []
-    for path, number, slug in raw:
-        base, separator, tail = slug.rpartition("-")
-        if separator and (number, base) in split_bases and len(tail) == 1:
-            parsed.append(SectionSource(path, number, base, tail))
-        else:
-            parsed.append(SectionSource(path, number, slug))
-    return parsed
+    return [SectionSource(path, number, slug) for path, number, slug in raw]
 
 
 def check_section_sources(
@@ -125,52 +99,12 @@ def check_section_sources(
         by_number.setdefault(source.number, []).append(source)
 
     for number, numbered in sorted(by_number.items()):
-        slugs = {source.slug for source in numbered}
-        if len(slugs) != 1:
+        if len(numbered) > 1:
             names = ", ".join(source.path.name for source in numbered)
             out.error(
-                f"chapter {chapter_name}: logical section {number:02d} uses "
-                f"multiple slugs: {names}"
+                f"chapter {chapter_name}: logical section {number:02d} must "
+                f"have exactly one source file: {names}"
             )
-            continue
-        slug = next(iter(slugs))
-        plain = [source for source in numbered if source.part is None]
-        parts = [source for source in numbered if source.part is not None]
-        label = f"{number:02d}-{slug}"
-        if plain and parts:
-            out.error(
-                f"chapter {chapter_name}: logical section {label} mixes an "
-                "unsuffixed file with split parts"
-            )
-        elif parts:
-            part_names = sorted(source.part for source in parts)
-            if len(set(part_names)) != len(part_names):
-                duplicates = sorted(
-                    part for part in set(part_names) if part_names.count(part) > 1
-                )
-                out.error(
-                    f"chapter {chapter_name}: split section {label} has "
-                    f"duplicate part suffixes: {', '.join(duplicates)}"
-                )
-            elif len(parts) < 2:
-                out.error(
-                    f"chapter {chapter_name}: split section {label} must "
-                    f"contain at least two parts; rename {parts[0].path.name} "
-                    f"to {label}.tex"
-                )
-            elif part_names[0] != "a":
-                out.error(
-                    f"chapter {chapter_name}: split section {label} must "
-                    f"start at part a; found parts {', '.join(part_names)}"
-                )
-            else:
-                expected = [chr(ord("a") + i) for i in range(len(parts))]
-                if part_names != expected:
-                    missing = next(part for part in expected if part not in part_names)
-                    out.error(
-                        f"chapter {chapter_name}: split section {label} has "
-                        f"a gap; expected part {missing} before part {part_names[-1]}"
-                    )
 
     actual = sorted(by_number)
     expected = list(range(1, len(actual) + 1))
@@ -195,21 +129,12 @@ def check_section_include_order(
         for path in ordered_paths
         if path.resolve() in source_by_path
     ]
-    keys = [(source.number, source.part or "") for source in ordered]
+    keys = [source.number for source in ordered]
     if keys != sorted(keys):
         out.error(
             f"chapter {chapter.parent.name}: section inputs in {chapter.name} "
-            "must follow logical section number and part suffix order"
+            "must follow logical section number order"
         )
-    positions: dict[tuple[int, str], list[int]] = {}
-    for position, source in enumerate(ordered):
-        positions.setdefault((source.number, source.slug), []).append(position)
-    for (number, slug), found in positions.items():
-        if len(found) > 1 and found != list(range(found[0], found[-1] + 1)):
-            out.error(
-                f"chapter {chapter.parent.name}: parts of "
-                f"{number:02d}-{slug} must be adjacent in index.tex"
-            )
 
 
 def tex_path(base: Path, target: str) -> Path:

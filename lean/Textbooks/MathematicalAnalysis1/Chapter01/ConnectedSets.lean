@@ -10,15 +10,15 @@ namespace MathematicalAnalysis1.Chapter01
 
 open Set Metric
 
-/-- The separated-set formulation used in the textbook. -/
+/-- Definition: The separated-set formulation used in the textbook. -/
 def separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
   Disjoint (closure A) B ∧ Disjoint A (closure B)
 
-/-- The textbook convention includes the empty set. -/
+/-- Definition: The textbook convention includes the empty set. -/
 def connected {X : Type*} [MetricSpace X] (E : Set X) : Prop :=
   ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ separated A B
 
-/-- Supporting core result: closure preserves a real upper bound. -/
+/-- Lemma: closure preserves a real upper bound. -/
 theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
     ∀ x ∈ closure A, x ≤ c := by
   intro x hx
@@ -29,7 +29,7 @@ theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
   have hyc := h y hy
   linarith
 
-/-- Supporting core result: closure preserves a real lower bound. -/
+/-- Lemma: closure preserves a real lower bound. -/
 theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
     ∀ x ∈ closure A, c ≤ x := by
   intro x hx
@@ -40,7 +40,7 @@ theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
   have hcy := h y hy
   linarith
 
-/-- Supporting core argument: the supremum between points in opposite
+/-- Lemma: the supremum between points in opposite
 separated sets cannot belong to either side of an interval. -/
 theorem no_separation_of_between (E A B : Set ℝ)
     (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
@@ -55,7 +55,7 @@ theorem no_separation_of_between (E A B : Set ℝ)
   have hcb : c ≤ b := csSup_le hne (fun x hx => hx.2.2)
   have hcS : c ∈ closure S := (supremum_in_closure S hne hbd).1
   have hcA : c ∈ closure A := (closure_properties S).2.2 (closure A)
-    (closure_closed A) (fun x hx => subset_closure hx.1) hcS
+    (closure_closed A) (fun x hx => subset_closure A hx.1) hcS
   have hcnotB : c ∉ B := fun h => Set.disjoint_left.mp hsep.1 hcA h
   have hcltb : c < b := lt_of_le_of_ne hcb (fun h => hcnotB (h.symm ▸ hb))
   have hcE : c ∈ E := by
@@ -91,7 +91,7 @@ theorem no_separation_of_between (E A B : Set ℝ)
   dsimp [x] at hxc
   linarith
 
-/-- Core result: real connected sets are exactly the sets containing all
+/-- Theorem: real connected sets are exactly the sets containing all
 points between any two of their elements. -/
 theorem connected_iff_between (E : Set ℝ) :
     connected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by
@@ -125,7 +125,7 @@ theorem connected_iff_between (E : Set ℝ) :
     obtain ⟨b, hb⟩ := hB
     have hne : a ≠ b := by
       intro he
-      exact Set.disjoint_left.mp hsep.1 (subset_closure ha) (he.symm ▸ hb)
+      exact Set.disjoint_left.mp hsep.1 (subset_closure A ha) (he.symm ▸ hb)
     rcases lt_or_gt_of_ne hne with hab | hba
     · exact no_separation_of_between E A B h heq hsep a b ha hb hab
     · have hsep' : separated B A := ⟨hsep.2.symm, hsep.1.symm⟩

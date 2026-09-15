@@ -455,6 +455,74 @@ class FormatTexTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(path.read_text(encoding="utf-8"), expected)
 
+    @unittest.skipUnless(shutil.which("latexindent"), "latexindent is required")
+    def test_multiline_caption_indentation_is_checked(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            for name in ("format-tex.sh", "normalize-eof.sh"):
+                shutil.copy2(ROOT / "scripts" / name, scripts / name)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            source = (
+                "\\begin{theorem}\n"
+                "  \\begin{lean}{\n"
+                "Suppose $a\\in\\Z$. % unmatched { in a comment\n"
+                "Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
+                "\\[\n"
+                "  a=a.\n"
+                "\\]\n"
+                "}\n"
+                "    example (a : ℤ) : a = a := by\n"
+                "      rfl\n"
+                "  \\end{lean}\n"
+                "\\end{theorem}\n"
+            )
+            expected = source.replace(
+                "Suppose $a\\in\\Z$. % unmatched { in a comment\n"
+                "Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
+                "\\[\n"
+                "  a=a.\n"
+                "\\]\n"
+                "}\n",
+                "      Suppose $a\\in\\Z$. % unmatched { in a comment\n"
+                "      Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
+                "      \\[\n"
+                "        a=a.\n"
+                "      \\]\n"
+                "    }\n",
+            )
+            path = root / "theorem.tex"
+            path.write_text(source, encoding="utf-8")
+            subprocess.run(["git", "add", "theorem.tex"], cwd=root, check=True)
+
+            def run(*arguments: str) -> subprocess.CompletedProcess[str]:
+                return subprocess.run(
+                    [str(scripts / "format-tex.sh"), *arguments],
+                    cwd=root,
+                    env={**os.environ, "FORMAT_TEX_CACHE_DIR": str(root / "cache")},
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+
+            result = run("--check")
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertEqual(path.read_text(), source)
+            result = run()
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(path.read_text(), expected)
+            # A fresh check and second formatting pass must agree without cache.
+            for arguments in [("--check",), ()]:
+                shutil.rmtree(root / "cache")
+                result = run(*arguments)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(path.read_text(), expected)
+            # Changing only the closing brace must invalidate the cached success.
+            path.write_text(expected.replace("    }\n", "}\n"))
+            result = run("--check")
+            self.assertEqual(result.returncode, 1, result.stderr)
+
     def test_only_tracked_tex_files_are_checked(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

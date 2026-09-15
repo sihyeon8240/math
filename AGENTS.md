@@ -8,7 +8,7 @@ Shared LaTeX definitions live under `common/styles/`, with `textbook.sty` as the
 shared entry point. `books.yml` is the source of truth for the textbook list and
 its build, check, release, and site flags. Each book's `chapters.yml` owns chapter and optional appendix
 order, slugs, and titles; each entry's `sections.yml` owns logical section data
-and an optional numeric split count. The complete `book.tex` and chapter/appendix
+with one source file per logical section. The complete `book.tex` and chapter/appendix
 `index.tex` files are generated from those manifests and shared templates.
 CI-only Python dependencies live in `.github/requirements-ci.txt`; keep workflow
 install and cache configuration pointed at that file.
@@ -60,9 +60,8 @@ install and cache configuration pointed at that file.
 - Preserve document structure, naming conventions, macros, and mathematical notation.
 - Do not edit textbook body content unless the task explicitly requires it.
 - Do not modify workflows, the devcontainer, or shared styles unless the task explicitly requires it.
-- Name single-file logical sections `NN-section-name.tex`. For split logical
-  sections, keep the same number and slug and set `split` in `sections.yml` to
-  the number of consecutive `-a`, `-b`, ... files. Do not edit generated
+- Give each logical section exactly one `NN-section-name.tex` source file;
+  do not use alphabetic part suffixes or `split` metadata. Do not edit generated
   assembly or put `\chapter` or `\section` declarations in section sources.
   Run `make contents all BOOK=<slug>` after contents-manifest edits. See `docs/ARCHITECTURE.md`.
 - If a shared style changes, consider and validate its effect on every textbook.
@@ -82,7 +81,8 @@ install and cache configuration pointed at that file.
 - From the first result, put mathematical Lean sources in
   `lean/Textbooks/<Book>/ChapterNN/<Topic>.lean` (or `AppendixNN` for appendices),
   using descriptive `UpperCamelCase` topic names. Never use flat chapter files or a numbered
-  theorem-per-file convention. Group related definitions and proofs by topic.
+  theorem-per-file convention. Group related definitions and proofs by topic, using textbook sections as the
+  default guide without requiring one Lean file per TeX section.
 - Use `<Book>.ChapterNN` or `<Book>.AppendixNN` declaration namespaces without a
   `Textbooks` prefix.
   Keep `Textbooks` in module paths and imports. Book-level `All.lean` files are

@@ -12,22 +12,25 @@ open MathematicalAnalysis1.Chapter01
 
 variable {X : Type*} [MetricSpace X]
 
-/-- The epsilon definition for a sequence indexed from zero. -/
+/-- Definition: The epsilon definition for a sequence indexed from zero. -/
 def convergesTo (u : ℕ → X) (p : X) : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε
 
+/-- Definition: a sequence has a limit in its ambient metric space. -/
 abbrev convergent (u : ℕ → X) : Prop := ∃ p : X, convergesTo u p
 
+/-- Definition: a sequence has no limit in its ambient metric space. -/
 abbrev divergent (u : ℕ → X) : Prop := ¬ convergent u
 
+/-- Definition: the range of the sequence is bounded. -/
 abbrev boundedSequence (u : ℕ → X) : Prop := bounded (range u)
 
-/-- Representation bridge to the standard Mathlib limit. -/
+/-- Lemma: Representation bridge to the standard Mathlib limit. -/
 theorem convergesTo_iff_tendsto (u : ℕ → X) (p : X) :
     convergesTo u p ↔ Filter.Tendsto u Filter.atTop (nhds p) := by
   exact Metric.tendsto_atTop.symm
 
-/-- Core result: a finite initial segment and a bounded tail have a common bound. -/
+/-- Lemma: a finite initial segment and a bounded tail have a common bound. -/
 theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
     bounded (range u) := by
   intro _
@@ -47,7 +50,7 @@ theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
     dsimp [R]
     linarith
 
-/-- Core result: two distinct limits contradict the triangle inequality. -/
+/-- Lemma: two distinct limits contradict the triangle inequality. -/
 theorem limit_unique (u : ℕ → X) (p q : X)
     (hp : convergesTo u p) (hq : convergesTo u q) : p = q := by
   by_contra hne
@@ -60,12 +63,12 @@ theorem limit_unique (u : ℕ → X) (p q : X)
   rw [dist_comm p (u (max N M))] at ht
   linarith
 
-/-- Core result: boundedness and uniqueness, paired with the printed theorem. -/
+/-- Proposition: boundedness and uniqueness, paired with the printed theorem. -/
 theorem convergent_properties (u : ℕ → X) (p : X) (hp : convergesTo u p) :
     bounded (range u) ∧ ∀ q : X, convergesTo u q → p = q := by
   exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
 
-/-- Core result: finite exceptional indices, rather than finitely many values. -/
+/-- Lemma: finite exceptional indices, rather than finitely many values. -/
 theorem convergesTo_iff_finite_exceptions (u : ℕ → X) (p : X) :
     convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
   constructor
@@ -84,7 +87,7 @@ theorem convergesTo_iff_finite_exceptions (u : ℕ → X) (p : X) :
     have hle := hN (show n ∈ {n : ℕ | ε ≤ dist (u n) p} from le_of_not_gt hdist)
     omega
 
-/-- Accepted Archimedean arithmetic supplies an index with reciprocal below ε. -/
+/-- Lemma: Accepted Archimedean arithmetic supplies an index with reciprocal below ε. -/
 theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
     ∃ N : ℕ, ∀ n ≥ N, 1 / ((n : ℝ) + 1) < ε := by
   obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
@@ -95,7 +98,7 @@ theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
   apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
   nlinarith
 
-/-- Core example: the shifted reciprocal sequence converges to zero. -/
+/-- Lemma: Core example: the shifted reciprocal sequence converges to zero. -/
 theorem reciprocal_converges : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) 0 := by
   intro ε hε
   obtain ⟨N, hN⟩ := reciprocal_small ε hε
@@ -104,11 +107,11 @@ theorem reciprocal_converges : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) 
   rw [Real.dist_eq, sub_zero, abs_of_pos (by positivity)]
   exact hN n hn
 
-/-- The same points, regarded as elements of the positive real subspace. -/
+/-- Definition: The same points, regarded as elements of the positive real subspace. -/
 noncomputable def positiveReciprocal (n : ℕ) : {x : ℝ // 0 < x} :=
   ⟨1 / ((n : ℝ) + 1), by positivity⟩
 
-/-- Core example: any positive-subspace limit would also be a real limit,
+/-- Lemma: Core example: any positive-subspace limit would also be a real limit,
 contradicting uniqueness and the exclusion of zero from the subspace. -/
 theorem positive_reciprocal_diverges :
     ¬ ∃ p : {x : ℝ // 0 < x}, convergesTo positiveReciprocal p := by
@@ -117,7 +120,7 @@ theorem positive_reciprocal_diverges :
   have heq := limit_unique _ p.val 0 hreal reciprocal_converges
   exact (ne_of_gt p.property) heq
 
-/-- Core result: choose a distinct point within radius 1/(n+1). -/
+/-- Lemma: choose a distinct point within radius 1/(n+1). -/
 theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
     ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ convergesTo u p := by
   have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
@@ -128,7 +131,7 @@ theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
   obtain ⟨N, hN⟩ := reciprocal_small ε hε
   exact ⟨N, fun n hn => (hd n).trans (hN n hn)⟩
 
-/-- Both parts of the neighborhood characterization in the textbook. -/
+/-- Theorem: Both parts of the neighborhood characterization in the textbook. -/
 theorem neighborhood_characterization (u : ℕ → X) (p : X) :
     (convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
     (∀ E : Set X, p ∈ limitPoints E →

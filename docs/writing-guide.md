@@ -40,19 +40,13 @@ a generated `index.tex`
 that declares the chapter and inputs its section files in reading order.
 Appendices use A, B, ... numbering and precede the bibliography backmatter.
 
-Name a single-file logical section `NN-section-name.tex`. If it must be split,
-keep the same logical number and slug in every source and add consecutive
-suffixes beginning with `-a`, for example `02-main-result-a.tex` and
-`02-main-result-b.tex`. Set `split` in `sections.yml` to the number of physical
-files; the generator assigns consecutive suffixes from `a`. Do not use
-context-dependent names such as `section-part-2`. See the canonical naming policy
-in [the architecture guide](ARCHITECTURE.md#naming-conventions).
+Give each logical section exactly one `NN-section-name.tex` file. Do not
+split a section into alphabetically suffixed files or add `split` metadata.
+Do not use context-dependent names such as `section-part-2`. See the canonical
+naming policy in [the architecture guide](ARCHITECTURE.md#naming-conventions).
 
-Generated `index.tex` declares each `\section` once. All single and split
-section files contain only the section body; later parts continue that body
-without repeating a heading. Split at a top-level boundary rather than inside
-an environment. A theorem statement may end one
-part and its separate `proof` environment may begin the next part.
+Generated `index.tex` declares each `\section` once. Each section source
+contains only its body, without repeating the heading.
 
 ### Contents manifests and metadata
 
@@ -89,6 +83,14 @@ relations. Within each section, axiom through exercise share one numbered
 sequence. Problem uses a separate section-scoped sequence. Solution and remark
 are unnumbered; proof is the standard `amsthm` environment. Use `ax` as the
 label type for numbered axioms.
+
+For formalized declarations, preserve the environment kind in the Lean
+docstring and record the proof dependency role separately, following
+[declaration kinds and proof roles](formalization.md#proof-roles-and-permitted-dependencies).
+For example, a `corollary` proved from earlier local results uses
+`Corollary (Core result):`; a `definition` uses `Definition:`. A textbook
+`axiom` must be represented by explicit assumptions or a checked result within
+the accepted boundary, never by a new unchecked Lean `axiom` declaration.
 
 ### Labels and references
 
@@ -246,7 +248,10 @@ do not nest a `verbatim` environment inside it.
 
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment
-and condenses consecutive blank lines. Format the prose argument manually.
+and condenses consecutive blank lines. It also aligns multiline prose arguments:
+continuation text starts two indentation levels inside `\begin{lean}`, and a
+closing brace on its own line starts one level inside. Relative indentation
+within the prose is preserved; format its mathematical structure manually.
 Put only mathematical statements in the prose, without step titles or
 explanations of Lean commands.
 

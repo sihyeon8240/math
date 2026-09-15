@@ -35,9 +35,18 @@ the results selected from the later chapters on cryptography, special number
 forms, Diophantine equations, sums of squares, Fibonacci numbers, and continued
 fractions in the same order from the accepted boundary.
 
-Definitions such as divisibility, gcd, congruence, and primality may reuse Mathlib
-representations. Their substantive properties remain core results when taught
-here; an existing implementation does not authorize those properties as lemmas.
+Introduce the number-theoretic definitions needed by each development explicitly.
+In the current gcd development, define the nonnegative gcd locally from a least
+positive integer linear combination, with value zero for the zero pair. Prove
+its common-divisor, greatestness, and uniqueness properties before using them;
+do not obtain them from a Mathlib gcd characterization. Integer divisibility
+uses the defining relation `a ∣ b ↔ ∃ k : ℤ, b = a * k`, with its witnesses
+expanded directly in proofs.
+
+No substantive number-theoretic property, even a short supporting lemma, is an
+accepted prerequisite merely because Mathlib supplies it. Prove needed properties
+from the accepted arithmetic and logical boundary and earlier local results.
+Elementary type conversions and the standard number types remain permitted.
 
 ## Scoped external exceptions
 

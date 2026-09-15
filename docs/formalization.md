@@ -127,14 +127,57 @@ in one book does not authorize use in another.
 
 ## Proof roles and permitted dependencies
 
-Classify formalized results in their module documentation or declaration
-docstrings using the following roles; the proof-index schema remains unchanged.
+Distinguish a declaration's textbook kind from its proof dependency role.
+The kind follows the corresponding LaTeX environment; the role records which
+mathematical dependencies its proof may use. The proof-index schema remains
+unchanged.
 
-| Role | Permitted proof dependencies |
+| Proof role | Permitted proof dependencies |
 |---|---|
 | Prerequisite | Direct Mathlib citation within the owning book's accepted boundary; document its role as an assumed result. |
 | Core result | Accepted prerequisites and earlier established results of the same book, with permitted bookkeeping lemmas. |
 | Supporting lemma | Reuse Mathlib for logical, representational, and elementary computational steps within the book's boundary; classify substantive new mathematics as a prerequisite or core result. |
+
+For new or revised mathematical declarations, begin the Lean declaration
+docstring with `Kind (Role):` for proved statements and `Definition:` for
+definitions. Use the capitalized LaTeX environment name as the kind:
+`Theorem`, `Lemma`, `Proposition`, or `Corollary`. These kinds all use Lean
+`theorem` declarations; Lean syntax does not determine the textbook kind.
+When no corresponding textbook statement exists yet, choose the kind that
+matches its intended exposition. For example:
+
+```lean
+/-- Definition: the nonnegative greatest common divisor, with value zero
+when both inputs are zero. -/
+/-- Theorem (Core result): Bezout's identity for the locally constructed gcd. -/
+/-- Lemma (Supporting lemma): an elementary representation conversion. -/
+/-- Corollary (Core result): a consequence of an earlier local theorem. -/
+/-- Proposition (Prerequisite): an accepted result cited from Mathlib. -/
+```
+
+The two classifications are independent: a corollary may be a core result,
+and a statement printed as a theorem may serve as a supporting lemma.
+Definitions, including `noncomputable def` declarations, introduce mathematical
+objects, relations, or constructions. State their meaning and conventions;
+classify their proved properties separately. A construction requiring an
+existence proof must use accepted prerequisites or earlier local results.
+The `Definition:` label does not authorize additional assumptions or external
+theorems.
+
+For the LaTeX `axiom` environment, preserve the textbook kind with `Axiom:`
+when documenting an explicit hypothesis or a structure's assumption field.
+If the statement is instead proved from the accepted boundary, use
+`Axiom (Role):` on that theorem and explain that it is an axiom only in the
+textbook presentation. Never translate the environment into a new unchecked
+Lean `axiom` declaration. The repository's proof-safety requirements and the
+book's prerequisite boundary still apply. Other exposition environments, such
+as examples and remarks, do not automatically require Lean declarations; see
+[Authoring policy](#authoring-policy).
+
+Module documentation may explain shared prerequisites and dependency choices,
+but does not replace these declaration prefixes for new or revised declarations.
+Apply the convention when declarations are next revised; unrelated existing
+sources need not be relabeled as part of a documentation change.
 
 A core proof must not invoke the target's Mathlib counterpart, an equivalent
 result, or an unaccepted stronger result that supplies the essential argument.
@@ -252,7 +295,11 @@ results declared in `namespace ElementaryNumberTheory.Chapter02`. Retain
 Moving a declaration between topic files within a chapter must preserve its
 public name and proof-index link.
 
-Lean files need not match LaTeX section files one-to-one. Stable linkage happens
+Use textbook sections as the default guide for topic boundaries. When a section
+forms one coherent topic, prefer one Lean file for it. Keep shared definitions
+and lemmas together or separate topics when their responsibilities or imports
+require it; Lean files need not match LaTeX section files one-to-one.
+Stable linkage happens
 at the labeled theorem level, so declaration names should describe mathematics
 rather than printed theorem numbers. The proof-link checker enforces the
 chapter/topic path shape and the registered declaration's book and chapter

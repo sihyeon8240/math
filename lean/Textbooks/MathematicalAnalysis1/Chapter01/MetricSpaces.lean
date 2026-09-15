@@ -1,11 +1,18 @@
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.MetricSpace.Basic
-import Mathlib.Tactic
+import Mathlib.Tactic.Choose
+import Mathlib.Tactic.Convert
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Push
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Tauto
 
 /-! Metric topology developed from balls and the metric axioms.
 The metric ball and open-set characterizations are representational bridges.
 Euclidean norm identities are accepted finite-dimensional prerequisites.
-All other results below are core results with explicit metric arguments. -/
+Representation lemmas expose definitions only; the core results use explicit
+metric arguments. The owning book policy specifies this boundary. -/
 
 set_option autoImplicit false
 
@@ -15,61 +22,83 @@ open Set Metric
 
 variable {X : Type*} [MetricSpace X]
 
-/-- Standard metric spaces and Euclidean spaces include the empty coordinate type. -/
+/-- Definition: metric spaces reuse the standard structure and its distance axioms. -/
 abbrev MetricStructure (A : Type*) := MetricSpace A
 
+/-- Definition: Euclidean n-space, including the zero-dimensional case. -/
 abbrev Euclidean (n : ℕ) := EuclideanSpace ℝ (Fin n)
 
-/-- Balls use distance to the center; metric symmetry matches d(p,q) in print. -/
+/-- Definition: a neighborhood is a ball with distance measured to its center. -/
 abbrev neighborhood (p : X) (r : ℝ) : Set X := ball p r
 
+/-- Definition: a deleted neighborhood excludes its center. -/
 abbrev deletedNeighborhood (p : X) (r : ℝ) : Set X := ball p r \ {p}
 
-noncomputable abbrev interiorPoints (E : Set X) : Set X := interior E
-
-abbrev openSets : Set (Set X) := {E | IsOpen E}
-
-abbrev closedSets : Set (Set X) := {E | IsClosed E}
-
-noncomputable abbrev setClosure (E : Set X) : Set X := closure E
-
-noncomputable abbrev boundary (E : Set X) : Set X := frontier E
-
-abbrev relativeOpen (E Y : Set X) : Prop :=
-  E ⊆ Y ∧ IsOpen ((Subtype.val : Y → X) ⁻¹' E)
-
-abbrev relativeClosed (E Y : Set X) : Prop :=
-  E ⊆ Y ∧ IsClosed ((Subtype.val : Y → X) ⁻¹' E)
-
-/-- The textbook's boundedness convention also covers an empty ambient space. -/
-def bounded (E : Set X) : Prop :=
-  Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r
-
-/-- The textbook's punctured-ball definition of a limit point. -/
+/-- Definition: every positive-radius ball meets E away from its center. -/
 def limitPoints (E : Set X) : Set X :=
   {p | ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r}
 
-/-- The textbook's isolated points, including membership in the set. -/
+/-- Definition: an interior point has a ball contained in E. -/
+def interiorPoints (E : Set X) : Set X :=
+  {p | ∃ r > 0, ball p r ⊆ E}
+
+/-- Definition: every point of an open set is interior. -/
+def openSets : Set (Set X) := {E | E ⊆ interiorPoints E}
+
+/-- Definition: a closed set contains all of its limit points. -/
+def closedSets : Set (Set X) := {E | limitPoints E ⊆ E}
+
+/-- Definition: the closure adjoins all limit points. -/
+def setClosure (E : Set X) : Set X := E ∪ limitPoints E
+
+/-- Definition: boundary points lie in both complementary closures. -/
+def boundary (E : Set X) : Set X := setClosure E ∩ setClosure Eᶜ
+
+/-- Definition: relative openness uses the same ball definition on the subtype. -/
+def relativeOpen (E Y : Set X) : Prop :=
+  E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ openSets
+
+/-- Definition: relative closedness uses limit points in the subtype. -/
+def relativeClosed (E Y : Set X) : Prop :=
+  E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ closedSets
+
+/-- Definition: boundedness also covers an empty ambient space. -/
+def bounded (E : Set X) : Prop :=
+  Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r
+
+/-- Definition: an isolated point belongs to E and is alone in some ball. -/
 def isolatedPoints (E : Set X) : Set X :=
   {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
 
+/-- Definition: a perfect set equals its limit-point set. -/
 abbrev perfect (E : Set X) : Prop := E = limitPoints E
 
-abbrev dense (E : Set X) : Prop := closure E = univ
+/-- Definition: a dense set has the whole space as its closure. -/
+abbrev dense (E : Set X) : Prop := setClosure E = univ
 
-/-- Representation bridge for the ball definition of interior points. -/
+/-- Lemma: the interior-point characterization is its local definition. -/
 theorem interior_iff (E : Set X) (p : X) :
     p ∈ interiorPoints E ↔ ∃ r > 0, ball p r ⊆ E := by
-  exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
+  rfl
 
-/-- Representation bridge for the punctured ball's positive-distance formula. -/
+/-- Lemma: the ball-defined interior agrees with Mathlib's
+neighborhood representation (`Metric.mem_nhds_iff`). -/
+theorem interiorPoints_eq_interior (E : Set X) : interiorPoints E = interior E := by
+  ext p
+  exact (mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff).symm
+
+/-- Lemma: `Metric.isOpen_iff` unfolds metric openness. -/
+theorem mem_openSets_iff (E : Set X) : E ∈ openSets ↔ IsOpen E := by
+  exact Metric.isOpen_iff.symm
+
+/-- Lemma: Representation bridge for the punctured ball's positive-distance formula. -/
 theorem deleted_neighborhood_iff (p q : X) (r : ℝ) :
     q ∈ deletedNeighborhood p r ↔ 0 < dist q p ∧ dist q p < r := by
   change (dist q p < r ∧ q ≠ p) ↔ _
   rw [dist_pos]
   exact and_comm
 
-/-- Accepted prerequisite: the Euclidean norm gives a metric. -/
+/-- Proposition: the Euclidean norm gives a metric. -/
 theorem euclidean_metric (n : ℕ) :
     (∀ x y : EuclideanSpace ℝ (Fin n), 0 ≤ ‖x - y‖) ∧
     (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = 0 ↔ x = y) ∧
@@ -86,7 +115,7 @@ theorem euclidean_metric (n : ℕ) :
       ‖x - z‖ = ‖(x - y) + (y - z)‖ := by rw [sub_add_sub_cancel]
       _ ≤ ‖x - y‖ + ‖y - z‖ := norm_add_le _ _
 
-/-- Core result: a ball is open, using the remaining distance to its edge. -/
+/-- Proposition: a ball is open, using the remaining distance to its edge. -/
 theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r) := by
   apply Metric.isOpen_iff.mpr
   intro q hq
@@ -97,7 +126,7 @@ theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r) := by
   change dist s q < r - dist q p at hs
   linarith
 
-/-- Core result: a finite collection of positive numbers has a common
+/-- Lemma: a finite collection of positive numbers has a common
 positive lower bound. The empty collection is included. -/
 theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
     (r : ι → ℝ) (hr : ∀ i ∈ s, 0 < r i) :
@@ -113,7 +142,7 @@ theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
     · exact min_le_left _ _
     · exact (min_le_right _ _).trans (hle j hj)
 
-/-- Core result: a limit point has infinitely many nearby points. -/
+/-- Proposition: a limit point has infinitely many nearby points. -/
 theorem limit_point_infinite (E : Set X) (p : X)
     (hp : p ∈ limitPoints E) (r : ℝ) (hr : 0 < r) :
     (E ∩ ball p r).Infinite := by
@@ -130,7 +159,7 @@ theorem limit_point_infinite (E : Set X) (p : X)
     ⟨⟨hq, hdist.trans_le (min_le_left _ _)⟩, hqp⟩
   exact (not_lt_of_ge (hle q hqs)) (hdist.trans_le (min_le_right _ _))
 
-/-- Core result: complements exchange openness and containing limit points. -/
+/-- Proposition: complements exchange openness and containing limit points. -/
 theorem open_iff_compl_limitPoints (E : Set X) :
     IsOpen E ↔ limitPoints Eᶜ ⊆ Eᶜ := by
   classical
@@ -152,14 +181,19 @@ theorem open_iff_compl_limitPoints (E : Set X) :
       exact hqe (heq.symm ▸ hp)
     exact h hl hp
 
-/-- Representational bridge for the textbook's definition of closedness. -/
+/-- Lemma: Representational bridge for the textbook's definition of closedness. -/
 theorem closed_iff_limitPoints (E : Set X) :
     IsClosed E ↔ limitPoints E ⊆ E := by
   have h := open_iff_compl_limitPoints Eᶜ
   rw [compl_compl] at h
   exact isOpen_compl_iff.symm.trans h
 
-/-- Core result: an arbitrary union inherits a ball from one member. -/
+/-- Lemma: the local closed-set definition agrees with Mathlib,
+using the previously proved complement argument. -/
+theorem mem_closedSets_iff (E : Set X) : E ∈ closedSets ↔ IsClosed E := by
+  exact (closed_iff_limitPoints E).symm
+
+/-- Proposition: an arbitrary union inherits a ball from one member. -/
 theorem open_union {ι : Type*} (E : ι → Set X)
     (h : ∀ i, IsOpen (E i)) : IsOpen (⋃ i, E i) := by
   apply Metric.isOpen_iff.mpr
@@ -168,7 +202,7 @@ theorem open_union {ι : Type*} (E : ι → Set X)
   obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (h i) p hi
   exact ⟨r, hr, fun q hq => mem_iUnion.mpr ⟨i, hs hq⟩⟩
 
-/-- Core result: intersections preserve the limit-point condition. -/
+/-- Corollary: intersections preserve the limit-point condition. -/
 theorem closed_intersection {ι : Type*} (E : ι → Set X)
     (h : ∀ i, IsClosed (E i)) : IsClosed (⋂ i, E i) := by
   apply (closed_iff_limitPoints _).mpr
@@ -180,7 +214,7 @@ theorem closed_intersection {ι : Type*} (E : ι → Set X)
   obtain ⟨q, hq, hn, hd⟩ := hp r hr
   exact ⟨q, mem_iInter.mp hq i, hn, hd⟩
 
-/-- Core result: the smaller of two radii works for an intersection. -/
+/-- Lemma: the smaller of two radii works for an intersection. -/
 theorem open_intersection (E F : Set X) (hE : IsOpen E) (hF : IsOpen F) :
     IsOpen (E ∩ F) := by
   apply Metric.isOpen_iff.mpr
@@ -192,7 +226,7 @@ theorem open_intersection (E F : Set X) (hE : IsOpen E) (hF : IsOpen F) :
   change dist q p < min r s at hq
   exact ⟨hEr (hq.trans_le (min_le_left _ _)), hFs (hq.trans_le (min_le_right _ _))⟩
 
-/-- Core result: finite intersections, including the empty intersection. -/
+/-- Proposition: finite intersections, including the empty intersection. -/
 theorem open_finite_intersection {ι : Type*} (s : Finset ι)
     (E : ι → Set X) (hE : ∀ i ∈ s, IsOpen (E i)) :
     IsOpen (⋂ i ∈ s, E i) := by
@@ -206,7 +240,7 @@ theorem open_finite_intersection {ι : Type*} (s : Finset ι)
     exact open_intersection _ _ (hE i (Finset.mem_insert_self i s))
       (ih (fun j hj => hE j (Finset.mem_insert_of_mem hj)))
 
-/-- Core result: finite unions are obtained by taking complements. -/
+/-- Corollary: finite unions are obtained by taking complements. -/
 theorem closed_finite_union {ι : Type*} (s : Finset ι)
     (E : ι → Set X) (hE : ∀ i ∈ s, IsClosed (E i)) :
     IsClosed (⋃ i ∈ s, E i) := by
@@ -217,7 +251,7 @@ theorem closed_finite_union {ι : Type*} (s : Finset ι)
     simp only [mem_compl_iff, mem_iUnion, mem_iInter, not_exists]
   exact isOpen_compl_iff.mp (heq ▸ ho)
 
-/-- Core bridge: the standard closure equals the set plus its limit points. -/
+/-- Lemma: the standard closure equals the set plus its limit points. -/
 theorem closure_eq_union_limitPoints (E : Set X) :
     closure E = E ∪ limitPoints E := by
   classical
@@ -238,7 +272,18 @@ theorem closure_eq_union_limitPoints (E : Set X) :
     · obtain ⟨q, hq, _, hd⟩ := hp r hr
       exact ⟨q, hq, by rwa [dist_comm]⟩
 
-/-- Core result: closure contains its own limit points. -/
+/-- Lemma: the locally defined closure agrees with Mathlib,
+using the previously proved punctured-ball argument. -/
+theorem setClosure_eq_closure (E : Set X) : setClosure E = closure E := by
+  exact (closure_eq_union_limitPoints E).symm
+
+/-- Lemma: a set is contained in its closure by the union definition.
+Mathlib counterpart: `subset_closure`. -/
+theorem subset_closure (E : Set X) : E ⊆ closure E := by
+  rw [← setClosure_eq_closure]
+  exact fun _ hp => Or.inl hp
+
+/-- Lemma: closure contains its own limit points. -/
 theorem closure_closed (E : Set X) : IsClosed (closure E) := by
   apply (closed_iff_limitPoints _).mpr
   intro p hp
@@ -251,7 +296,7 @@ theorem closure_closed (E : Set X) : IsClosed (closure E) := by
   rw [dist_comm q p] at hdq
   linarith
 
-/-- Core result: the three universal properties of closure. -/
+/-- Proposition: the three universal properties of closure. -/
 theorem closure_properties (E : Set X) :
     IsClosed (closure E) ∧ (E = closure E ↔ IsClosed E) ∧
     (∀ F : Set X, IsClosed F → E ⊆ F → closure E ⊆ F) := by
@@ -272,7 +317,7 @@ theorem closure_properties (E : Set X) :
       obtain ⟨q, hq, hn, hd⟩ := hp r hr
       exact ⟨q, hEF hq, hn, hd⟩
 
-/-- Core result from the accepted least-upper-bound property. -/
+/-- Proposition: the supremum lies in the closure, by the accepted least-upper-bound property. -/
 theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
     sSup E ∈ closure E ∧ (IsClosed E → sSup E ∈ E) := by
   have hc : sSup E ∈ closure E := by
@@ -287,7 +332,7 @@ theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
     rw [← heq] at hc
     exact hc⟩
 
-/-- Core result: an isolated point is exactly a non-limit point in the set. -/
+/-- Proposition: an isolated point is exactly a non-limit point in the set. -/
 theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E := by
   classical
   ext p
@@ -318,7 +363,7 @@ theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E := b
       subst q
       exact ⟨hp, by simpa only [mem_ball, dist_self] using hr⟩
 
-/-- Core result: failure to contain a ball means every ball meets the complement. -/
+/-- Lemma: failure to contain a ball means every ball meets the complement. -/
 theorem compl_interior_eq_closure_compl (E : Set X) :
     (interior E)ᶜ = closure Eᶜ := by
   classical
@@ -334,7 +379,7 @@ theorem compl_interior_eq_closure_compl (E : Set X) :
     obtain ⟨q, hq, hd⟩ := h r hr
     exact hq (hs (by simpa only [mem_ball, dist_comm] using hd))
 
-/-- Core result: relative openness is induced by an ambient open set. -/
+/-- Proposition: relative openness is induced by an ambient open set. -/
 theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
     IsOpen ((Subtype.val : Y → X) ⁻¹' E) ↔
       ∃ V : Set X, IsOpen V ∧ E = V ∩ Y := by
@@ -365,7 +410,7 @@ theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
     rw [heq]
     exact ⟨hs hq, q.property⟩
 
-/-- Core result: a positive-dimensional Euclidean space has no isolated points. -/
+/-- Lemma: a positive-dimensional Euclidean space has no isolated points. -/
 theorem euclidean_punctured_ball (n : ℕ+)
     (p : EuclideanSpace ℝ (Fin n)) (r : ℝ) (hr : 0 < r) :
     ∃ q : EuclideanSpace ℝ (Fin n), q ≠ p ∧ dist q p < r := by
@@ -380,7 +425,7 @@ theorem euclidean_punctured_ball (n : ℕ+)
   · rw [dist_eq_norm, add_sub_cancel_left, hv]
     linarith
 
-/-- Supporting core argument: an isolated point of a set is a limit point
+/-- Lemma: an isolated point of a set is a limit point
 of its complement when the ambient space has no isolated points. -/
 theorem isolated_limit_compl (E : Set X)
     (hX : ∀ p : X, ∀ r > 0, ∃ q : X, q ≠ p ∧ dist q p < r) :
@@ -395,7 +440,7 @@ theorem isolated_limit_compl (E : Set X)
   rw [heq, mem_singleton_iff] at hm
   exact hne hm
 
-/-- Core result: decompose the boundary according to the two limit-point sets. -/
+/-- Proposition: decompose the boundary according to the two limit-point sets. -/
 theorem euclidean_boundary (n : ℕ+)
     (E : Set (EuclideanSpace ℝ (Fin n))) :
     frontier E = isolatedPoints E ∪ isolatedPoints Eᶜ ∪
@@ -413,13 +458,12 @@ theorem euclidean_boundary (n : ℕ+)
   simp only [mem_inter_iff, mem_union, mem_sdiff, mem_compl_iff] at *
   tauto
 
-/-- Core representation bridge for the two boundary formulas. -/
+/-- Lemma: the boundary definition agrees with the standard closures. -/
 theorem boundary_eq (E : Set X) :
     boundary E = closure E ∩ closure Eᶜ := by
-  change closure E \ interior E = _
-  rw [sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
+  rw [boundary, setClosure_eq_closure, setClosure_eq_closure]
 
-/-- Core representation bridge for relative closedness. -/
+/-- Lemma: relative closedness is characterized by ambient limit points. -/
 theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
     IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ limitPoints E ∩ Y ⊆ E := by
   rw [closed_iff_limitPoints]
@@ -438,14 +482,14 @@ theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
     obtain ⟨q, hq, hne, hd⟩ := hp r hr
     exact ⟨q.val, hq, fun heq => hne (Subtype.ext heq), hd⟩
 
-/-- Accepted metric axioms on a subtype: distances are unchanged. -/
+/-- Proposition: the inherited subtype distance satisfies the ambient metric axioms. -/
 theorem subspace_metric (Y : Set X) (p q z : Y) :
     dist p q = dist p.val q.val ∧ 0 ≤ dist p q ∧
     (dist p q = 0 ↔ p = q) ∧ dist p q = dist q p ∧
     dist p z ≤ dist p q + dist q z := by
   exact ⟨rfl, dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
 
-/-- Core zero-dimensional case: there is only one vector and no deleted ball. -/
+/-- Lemma: the zero-dimensional case: there is only one vector and no deleted ball. -/
 theorem zero_dimensional (p q : EuclideanSpace ℝ (Fin 0)) (r : ℝ) :
     p = q ∧ deletedNeighborhood p r = ∅ := by
   have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by

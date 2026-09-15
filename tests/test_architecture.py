@@ -288,8 +288,6 @@ class ArchitectureTests(unittest.TestCase):
             sections = []
             for (_, slug), sources in sorted(grouped.items()):
                 item = {"slug": slug, "title": slug.replace("-", " ").title()}
-                if any(source.part is not None for source in sources):
-                    item["split"] = len(sources)
                 sections.append(item)
             (chapter / "sections.yml").write_text(
                 yaml.safe_dump(
@@ -326,76 +324,21 @@ class ArchitectureTests(unittest.TestCase):
         self.set_sections(["01-introduction.tex", "02-main-result.tex"])
         self.assertEqual(self.findings().errors, [])
 
-    def test_split_sections_and_mixed_input_extensions_comply(self) -> None:
+    def test_mixed_input_extensions_comply(self) -> None:
         self.set_sections(
-            [
-                "01-introduction.tex",
-                "02-main-result-a.tex",
-                "02-main-result-b.tex",
-                "03-applications.tex",
-            ],
-            [
-                "01-introduction",
-                "02-main-result-a",
-                "02-main-result-b.tex",
-                "03-applications",
-            ],
+            ["01-first.tex", "02-second.tex"], ["01-first", "02-second.tex"]
         )
         self.assertEqual(self.findings().errors, [])
 
-    def test_three_part_first_section_compiles_without_overwrite(self) -> None:
-        self.set_sections(
-            [
-                "01-topic-a.tex",
-                "01-topic-b.tex",
-                "01-topic-c.tex",
-                "02-next-topic.tex",
-            ]
-        )
-        findings = self.findings()
-        self.assertEqual(findings.errors, [])
-        parsed = MODULE.parse_section_sources(
-            list((self.book / "chapters/01-start").glob("0*-*.tex")),
-            "01-start",
-            MODULE.Findings(),
-        )
-        self.assertEqual(
-            [(item.number, item.slug, item.part) for item in parsed[:3]],
-            [(1, "topic", "a"), (1, "topic", "b"), (1, "topic", "c")],
-        )
-
-    def test_same_number_with_different_slugs_is_error(self) -> None:
-        self.set_sections(["01-first-topic-a.tex", "01-second-topic-b.tex"])
-        self.assert_error("logical section 01 uses multiple slugs")
-
-    def test_lone_suffixed_part_is_error(self) -> None:
-        self.set_sections(["01-topic-a.tex"])
-        self.assert_error("must contain at least two parts")
-
-    def test_split_must_start_at_a(self) -> None:
-        self.set_sections(["01-topic-b.tex", "01-topic-c.tex"])
-        self.assert_error("must start at part a")
-
-    def test_split_part_gap_is_error(self) -> None:
-        self.set_sections(["01-topic-a.tex", "01-topic-c.tex"])
-        self.assert_error("has a gap; expected part b")
-
-    def test_plain_and_split_files_cannot_mix(self) -> None:
-        self.set_sections(["01-topic.tex", "01-topic-b.tex"])
-        self.assert_error("mixes an unsuffixed file with split parts")
-
-    def test_split_parts_must_be_adjacent(self) -> None:
-        self.set_sections(
-            ["01-topic-a.tex", "01-topic-b.tex", "02-other.tex"],
-            ["01-topic-a", "02-other", "01-topic-b"],
-        )
-        self.assert_error("parts of 01-topic must be adjacent")
-
-    def test_split_parts_must_be_in_suffix_order(self) -> None:
-        self.set_sections(
-            ["01-topic-a.tex", "01-topic-b.tex"], ["01-topic-b", "01-topic-a"]
-        )
-        self.assert_error("must follow logical section number and part suffix order")
+    def test_multiple_sources_per_section_are_rejected(self) -> None:
+        for files in (
+            ["01-topic-a.tex", "01-topic-b.tex"],
+            ["01-topic.tex", "01-topic-b.tex"],
+            ["01-first.tex", "01-second.tex"],
+        ):
+            with self.subTest(files=files):
+                self.set_sections(files)
+                self.assert_error("must have exactly one source file")
 
     def test_logical_section_number_gap_is_error(self) -> None:
         self.set_sections(["01-first.tex", "03-third.tex"])
@@ -403,23 +346,23 @@ class ArchitectureTests(unittest.TestCase):
 
     def test_logical_sections_must_be_in_numeric_order(self) -> None:
         self.set_sections(["01-first.tex", "02-second.tex"], ["02-second", "01-first"])
-        self.assert_error("must follow logical section number and part suffix order")
+        self.assert_error("must follow logical section number order")
 
-    def test_missing_orphan_and_duplicate_split_inputs_are_errors(self) -> None:
+    def test_missing_orphan_and_duplicate_inputs_are_errors(self) -> None:
         cases = [
             (
-                ["01-topic-a.tex", "01-topic-b.tex"],
-                ["01-topic-a"],
+                ["01-topic.tex", "02-other.tex"],
+                ["01-topic"],
                 "orphan section file",
             ),
             (
-                ["01-topic-a.tex", "01-topic-b.tex"],
-                ["01-topic-a", "01-topic-b", "01-missing-c"],
+                ["01-topic.tex", "02-other.tex"],
+                ["01-topic", "02-other", "01-missing-c"],
                 "target does not exist",
             ),
             (
-                ["01-topic-a.tex", "01-topic-b.tex"],
-                ["01-topic-a", "01-topic-a", "01-topic-b"],
+                ["01-topic.tex", "02-other.tex"],
+                ["01-topic", "01-topic", "02-other"],
                 "duplicate include/input target",
             ),
         ]
@@ -427,17 +370,6 @@ class ArchitectureTests(unittest.TestCase):
             with self.subTest(diagnostic=diagnostic):
                 self.set_sections(files, inputs)
                 self.assert_error(diagnostic)
-
-    def test_duplicate_part_suffix_is_preserved_and_rejected(self) -> None:
-        findings = MODULE.Findings()
-        sources = [
-            MODULE.SectionSource(Path("01-topic-a.tex"), 1, "topic", "a"),
-            MODULE.SectionSource(Path("copy/01-topic-a.tex"), 1, "topic", "a"),
-        ]
-        MODULE.check_section_sources("01-start", sources, findings)
-        self.assertTrue(
-            any("duplicate part suffixes: a" in error for error in findings.errors)
-        )
 
     def test_invalid_section_filename_forms_are_errors(self) -> None:
         invalid_names = (

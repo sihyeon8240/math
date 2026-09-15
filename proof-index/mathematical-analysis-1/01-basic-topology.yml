@@ -93,3 +93,17 @@ proofs:
   declaration: MathematicalAnalysis1.Chapter01.no_separation_of_between
 - id: an1:thm:connected-sets-in-R
   declaration: MathematicalAnalysis1.Chapter01.connected_iff_between
+- id: an1:lem:interiorPoints-eq-interior
+  declaration: MathematicalAnalysis1.Chapter01.interiorPoints_eq_interior
+- id: an1:lem:mem-openSets-iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_openSets_iff
+- id: an1:lem:mem-closedSets-iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_closedSets_iff
+- id: an1:lem:setClosure-eq-closure
+  declaration: MathematicalAnalysis1.Chapter01.setClosure_eq_closure
+- id: an1:lem:subset-closure
+  declaration: MathematicalAnalysis1.Chapter01.subset_closure
+- id: an1:lem:mem-compactSets-iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_compactSets_iff
+- id: an1:lem:continuous-to-euclidean
+  declaration: MathematicalAnalysis1.Chapter01.continuous_to_euclidean

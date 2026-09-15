@@ -34,12 +34,35 @@ mkdir -p "$cache_directory"
 
 # Keep Lean relative indentation, but place its least-indented nonblank line
 # one defaultIndent inside the environment. Captions may span lines and contain
-# nested or escaped braces; they are not part of the Lean body.
+# nested or escaped braces. Normalize their continuation lines separately from
+# Lean, retaining relative indentation within each part.
 normalize_lean_indentation() {
   perl -0777 -pe '
     s{^([\t ]*)(\\begin\{lean\}[\t ]*(?<caption>\{(?:\\.|%[^\n]*\n|[^{}\\%]|(?&caption))*\})[^\n]*\n)(.*?)^[\t ]*(\\end\{lean\}[\t ]*(?:%[^\n]*)?$)}
      {
-       my ($indent, $opening, $body, $closing) = ($1, $2, $4, $5);
+       my ($indent, $opening, $caption, $body, $closing) = ($1, $2, $3, $4, $5);
+       if ($caption =~ /\n/) {
+         my $inner = substr($caption, 1, length($caption) - 2);
+         my $own_closing = $inner =~ s/\n[\t ]*$//;
+         my ($first, $rest) = split /\n/, $inner, 2;
+         if (defined $rest) {
+           my $common;
+           while ($rest =~ /^([\t ]*)\S/gm) {
+             my $prefix = $1;
+             if (!defined $common) { $common = $prefix; }
+             else {
+               chop $common while length($common) && index($prefix, $common) != 0;
+             }
+           }
+           if (defined $common) {
+             $rest =~ s/^\Q$common\E(?=[^\n]*\S)/$indent . "    "/gme;
+           }
+           $inner = $first . "\n" . $rest;
+         }
+         $inner .= "\n" . $indent . "  " if $own_closing;
+         my $normalized = "{" . $inner . "}";
+         $opening =~ s/\Q$caption\E/$normalized/;
+       }
        my $common;
        while ($body =~ /^([\t ]*)\S/gm) {
          my $prefix = $1;

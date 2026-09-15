@@ -1,3 +1,27 @@
 proofs:
   - id: nt:thm:division-algorithm
     declaration: ElementaryNumberTheory.Chapter02.existsUnique_quotient_remainder
+  - id: nt:thm:positive-common-divisor
+    declaration: ElementaryNumberTheory.Chapter02.exists_positive_common_divisor
+  - id: nt:thm:gcd-spec
+    declaration: ElementaryNumberTheory.Chapter02.gcd_spec
+  - id: nt:thm:common-divisor-le-gcd
+    declaration: ElementaryNumberTheory.Chapter02.common_divisor_le_gcd
+  - id: nt:thm:gcd-zero-zero
+    declaration: ElementaryNumberTheory.Chapter02.gcd_zero_zero
+  - id: nt:thm:gcd-eq-of-greatest
+    declaration: ElementaryNumberTheory.Chapter02.gcd_eq_of_greatest
+  - id: nt:thm:bezout
+    declaration: ElementaryNumberTheory.Chapter02.exists_gcd_eq_mul_add_mul
+  - id: nt:thm:gcd-linear-combinations
+    declaration: ElementaryNumberTheory.Chapter02.linear_combinations_eq_gcd_multiples
+  - id: nt:thm:gcd-one-bezout
+    declaration: ElementaryNumberTheory.Chapter02.gcd_eq_one_iff_exists_mul_add_mul
+  - id: nt:thm:gcd-div-gcd
+    declaration: ElementaryNumberTheory.Chapter02.gcd_div_gcd_eq_one
+  - id: nt:thm:coprime-product-divides
+    declaration: ElementaryNumberTheory.Chapter02.mul_dvd_of_coprime
+  - id: nt:thm:euclid-lemma
+    declaration: ElementaryNumberTheory.Chapter02.dvd_of_dvd_mul_of_coprime
+  - id: nt:thm:gcd-divisibility-characterization
+    declaration: ElementaryNumberTheory.Chapter02.eq_gcd_iff_common_divisor

@@ -28,14 +28,14 @@ books.yml
     -> books/<slug>/chapters.yml
         -> chapters/<NN-name>/sections.yml
         -> appendices/<NN-name>/sections.yml
-            -> NN-section-name.tex or NN-section-name-<part>.tex
+            -> NN-section-name.tex
 ```
 
-`books.yml` registers textbooks and owns repository-level automation policy. Each book's `chapters.yml` contains the canonical ordered `chapters` list and an optional ordered `appendices` list; both entries have slugs and LaTeX titles. Each chapter or appendix `sections.yml` is the canonical ordered list of logical section slugs and LaTeX titles; a split section sets `split` to its physical source count. List position supplies the two-digit number, so numbers are not duplicated in YAML.
+`books.yml` registers textbooks and owns repository-level automation policy. Each book's `chapters.yml` contains the canonical ordered `chapters` list and an optional ordered `appendices` list; both entries have slugs and LaTeX titles. Each chapter or appendix `sections.yml` is the canonical ordered list of logical section slugs and LaTeX titles. Each logical section has exactly one source file. List position supplies the two-digit number, so numbers are not duplicated in YAML.
 
 `make contents chap` renders each complete `book.tex` from `common/templates/book.tex`, `books.yml`, and the book's `chapters.yml`; nonempty appendices begin with `\appendix` before `\backmatter`, using A, B, ... chapter numbers and independent section/theorem numbering. `make contents sec` generates every chapter and appendix `index.tex`, including `\chapter`, `\section`, and literal `\input` commands. `make contents all` runs both operations; `BOOK=<slug>` limits any form to one registered book, and `check` validates without writing. `make generated` runs contents generation before site generation. Generated assembly is committed so ordinary LaTeX tools can build directly, but it must never be edited by hand.
 
-Section source files contain mathematical content and labels only. They do not declare `\section`, load packages, or determine assembly order. A single-file logical section is named `NN-section-name.tex`; a split logical section uses `NN-section-name-a.tex`, `-b.tex`, and so on. `references.bib` and any substantive book-specific style or frontmatter overrides remain hand-maintained book-local sources. Appendix source follows the same section-only rule under `appendices/NN-name/`; its assembly is generated from the `appendices` list.
+Section source files contain mathematical content and labels only. They do not declare `\section`, load packages, or determine assembly order. Each logical section is named `NN-section-name.tex` and occupies one file. `references.bib` and any substantive book-specific style or frontmatter overrides remain hand-maintained book-local sources. Appendix source follows the same section-only rule under `appendices/NN-name/`; its assembly is generated from the `appendices` list.
 
 The complete `book.tex`, including its canonical manifest metadata, is generated
 from the shared template and committed with the other assembly so ordinary
@@ -45,9 +45,9 @@ replace the corresponding shared presentation templates.
 
 ### Declarative contents contract
 
-Both contents manifests use `schema_version: 1`. Slugs are nonempty lowercase hyphenated identifiers and titles are nonempty, brace-balanced, single-line LaTeX strings. Lists must be nonempty and ordered. An optional `split` must be an integer from 2 through 26, the number of available lowercase suffixes. Unknown fields, duplicate slugs, invalid split counts, missing manifests, missing content files, orphan files, and stale generated assembly are errors.
+Both contents manifests use `schema_version: 1`. Slugs are nonempty lowercase hyphenated identifiers and titles are nonempty, brace-balanced, single-line LaTeX strings. Lists must be nonempty and ordered. The `split` field is not supported. Unknown fields, duplicate slugs, missing manifests, missing content files, orphan files, and stale generated assembly are errors.
 
-The path rules are deterministic: chapter item `N` with slug `name` owns `chapters/NN-name/`, and appendix item `N` owns `appendices/NN-name/`; section item `N` with slug `topic` owns `NN-topic.tex`, or `NN-topic-a.tex` through the suffix implied by `split`. Rename or reorder through YAML and the corresponding content paths together, then run `make contents all`. Do not add hand-written chapter or section commands to content files.
+The path rules are deterministic: chapter item `N` with slug `name` owns `chapters/NN-name/`, and appendix item `N` owns `appendices/NN-name/`; section item `N` with slug `topic` owns `NN-topic.tex`. Rename or reorder through YAML and the corresponding content paths together, then run `make contents all`. Do not add hand-written chapter or section commands to content files.
 
 `scripts/contents_manifest.py` is the reusable loader, validator, path mapper, and renderer. `scripts/generate-contents.py` is its command-line adapter. Source checks run generation in check mode before structural validation, README checks, and compilation.
 
@@ -91,7 +91,7 @@ from the same manifest.
 ## What belongs where
 
 - Mathematical exposition belongs in the owning book's section files. Never include a section from another textbook.
-- Chapter and appendix order and titles belong in `chapters.yml`; section order, titles, and split counts belong in each entry's `sections.yml`.
+- Chapter and appendix order and titles belong in `chapters.yml`; section order and titles belong in each entry's `sections.yml`.
 - Generated assembly lives in the complete `book.tex` and chapter `index.tex` files; optional presentation overrides belong in the matching `frontmatter/` files.
 - Book-specific preface material, references, and presentation overrides remain in the book directory and are created only when they differ from the shared defaults.
 - Book-specific style extensions belong in the owning book's `local-style.sty`. Shared mathematics commands, reusable layout structure, repository-wide conventions, templates, and assets belong in `common/`.
@@ -122,12 +122,10 @@ its PDF snapshot separately from task branches and `main`.
 - `frontmatter/title-and-copyright.tex`: optional book-local replacement for the shared title and copyright template.
 - `frontmatter/preface.tex`: optional book-local replacement for the shared preface template.
 - `chapters.yml`: canonical ordered chapter slugs and titles plus optional ordered appendices.
-- `chapters/<NN-name>/sections.yml`: canonical ordered section slugs, titles, and optional split counts.
+- `chapters/<NN-name>/sections.yml`: canonical ordered section slugs and titles.
 - `chapters/<NN-name>/index.tex`: generated chapter and section assembly; do not edit.
 - `appendices/<NN-name>/sections.yml` and `index.tex`: appendix counterparts, generated after `\appendix` and before `\backmatter`.
-- `NN-section-name.tex`: a single-file logical section.
-- `NN-section-name-a.tex`, `NN-section-name-b.tex`, ...: the physical
-  sources of one split logical section.
+- `NN-section-name.tex`: the single source file for one logical section.
 - `references.bib`: predictable book-local bibliography.
 - `local-style.sty`: optional book-local extensions to the shared mathematics package; omit it when unused.
 
@@ -135,12 +133,9 @@ Numeric prefixes make reading order obvious in directory listings, while the man
 
 For section sources, `NN` is the two-digit logical section number, not a
 physical-file sequence number. Logical section numbers begin at `01` and are
-consecutive within a chapter. An unsplit section has exactly one unsuffixed
-file. Every source of a split section shares the same `NN` and descriptive slug,
-uses consecutive lowercase suffixes beginning with `-a`, and the group contains
-at least two files. Thus the first split source also has `-a`; an unsuffixed
-source may not be mixed with suffixed sources. A number may repeat only within
-one such logical group. The generator places all parts adjacently in suffix order and logical groups in manifest order. Context-dependent names such as
+consecutive within a chapter. Each number identifies exactly one source file;
+there are no alphabetic part suffixes. The generator includes section files in
+manifest order. Context-dependent names such as
 `section-part-2`, `part-3`, `continuation`, and `misc` are prohibited.
 
 For chapter and appendix directories, `NN` is a two-digit decimal number beginning at `01`.

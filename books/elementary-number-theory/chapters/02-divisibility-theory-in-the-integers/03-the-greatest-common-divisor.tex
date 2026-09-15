@@ -1,1 +1,454 @@
-%
+For integers $c,z$, define $c\mid z$ to mean that $z=ck$ for some
+$k\in\Z$. We use this existential definition directly, including when $c=0$.
+The Lean declarations below belong to \texttt{ElementaryNumberTheory.Chapter02}.
+
+\begin{theorem} \label{nt:thm:positive-common-divisor}
+  \begin{lean}{
+      Suppose $a,b\in\Z$ are not both zero. There is a positive natural number $d$ which divides both $a$ and $b$, is an integer linear combination of them, and is divisible by every common divisor.
+    }
+    theorem exists_positive_common_divisor (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        ∃ d : ℕ, 0 < d ∧ (d : ℤ) ∣ a ∧ (d : ℤ) ∣ b ∧
+          (∃ x y : ℤ, (d : ℤ) = a * x + b * y) ∧
+          (∀ c : ℤ, c ∣ a → c ∣ b → c ∣ (d : ℤ))
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Since $a,b$ are not both zero, $a^{2}+b^{2}>0$. Thus the set of positive natural numbers of the form $ax+by$, with $x,y\in\Z$, is nonempty.
+    }
+    classical
+
+    have hpos : 0 < a * a + b * b := by
+      rcases hab with ha | hb
+      · nlinarith [sq_pos_of_ne_zero ha, sq_nonneg b]
+      · nlinarith [sq_nonneg a, sq_pos_of_ne_zero hb]
+
+    have hS : ∃ n : ℕ, 0 < n ∧ ∃ x y : ℤ, a * x + b * y = (n : ℤ) := by
+      refine ⟨(a * a + b * b).toNat, ?_, a, b, ?_⟩
+      · omega
+      · exact (Int.toNat_of_nonneg (le_of_lt hpos)).symm
+  \end{lean}
+
+  \begin{lean}{
+      Let $d$ be its least element and choose $x,y\in\Z$ with $ax+by=d$. Every positive natural number represented by such a combination is at least $d$.
+    }
+    let d : ℕ := Nat.find hS
+
+    obtain ⟨hdpos, x, y, hxy⟩ := Nat.find_spec hS
+
+    have hminimal (n : ℕ) (hn : 0 < n)
+        (hlinear : ∃ u v : ℤ, a * u + b * v = (n : ℤ)) : d ≤ n :=
+      Nat.find_min' hS ⟨hn, hlinear⟩
+  \end{lean}
+
+  \begin{lean}{
+      Suppose $u,v\in\Z$. Apply the division algorithm to $au+bv$ and the positive divisor $d$, obtaining $au+bv=qd+r$ with $0\le r<d$.
+    }
+    have hddiv (u v : ℤ) : (d : ℤ) ∣ a * u + b * v := by
+      obtain ⟨⟨q, r⟩, ⟨heq, hr⟩, _⟩ :=
+        existsUnique_quotient_remainder (a * u + b * v) ⟨d, hdpos⟩
+
+      change a * u + b * v = q * (d : ℤ) + (r : ℤ) at heq
+      change r < d at hr
+  \end{lean}
+
+  \begin{lean}{
+      The remainder is again a linear combination: $r=a(u-qx)+b(v-qy)$.
+    }
+    have hrlinear : a * (u - q * x) + b * (v - q * y) = (r : ℤ) := by
+      calc
+        a * (u - q * x) + b * (v - q * y) =
+            (a * u + b * v) - q * (a * x + b * y) := by ring
+        _ = r := by
+          rw [hxy]
+          linarith [heq]
+  \end{lean}
+
+  \begin{lean}{
+      If $r\ne0$, then $r>0$ and minimality gives $d\le r$, contradicting $r<d$. Hence $r=0$.
+    }
+    have hrzero : r = 0 := by
+      by_contra hne
+
+      have hle := hminimal r (Nat.pos_of_ne_zero hne)
+        ⟨u - q * x, v - q * y, hrlinear⟩
+
+      omega
+  \end{lean}
+
+  \begin{lean}{
+      Therefore $d\mid au+bv$. Taking $(u,v)=(1,0)$ and $(0,1)$ gives $d\mid a$ and $d\mid b$.
+    }
+      refine ⟨q, ?_⟩
+      rw [hrzero] at heq
+      simpa only [Nat.cast_zero, add_zero, mul_comm] using heq
+
+    have hda : (d : ℤ) ∣ a := by
+      simpa only [mul_one, mul_zero, add_zero] using hddiv 1 0
+
+    have hdb : (d : ℤ) ∣ b := by
+      simpa only [mul_one, mul_zero, zero_add] using hddiv 0 1
+  \end{lean}
+
+  \begin{lean}{
+      Suppose $c\mid a$ and $c\mid b$. Choose $u,v\in\Z$ with $a=cu$ and $b=cv$. Then $d=ax+by=c(ux+vy)$, so $c\mid d$. This proves all the asserted properties.
+    }
+    have hcommon (c : ℤ) (hca : c ∣ a) (hcb : c ∣ b) : c ∣ (d : ℤ) := by
+      obtain ⟨u, hu⟩ := hca
+      obtain ⟨v, hv⟩ := hcb
+
+      refine ⟨u * x + v * y, ?_⟩
+      rw [← hxy, hu, hv]
+      ring
+
+    exact ⟨d, hdpos, hda, hdb, ⟨x, y, hxy.symm⟩, hcommon⟩
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  \begin{lean}{
+      For $a,b\in\Z$ not both zero, define $\gcd(a,b)$ to be the positive common divisor constructed above from the least positive linear combination. Define $\gcd(0,0)=0$.
+    }
+    noncomputable def gcd (a b : ℤ) : ℕ :=
+      if hab : a ≠ 0 ∨ b ≠ 0 then
+        Classical.choose (exists_positive_common_divisor a b hab)
+      else 0
+  \end{lean}
+\end{definition}
+
+\begin{theorem} \label{nt:thm:gcd-spec}
+  \begin{lean}{
+      For integers $a,b$ not both zero, $\gcd(a,b)$ is positive, divides both inputs, is an integer linear combination of them, and is divisible by every common divisor.
+    }
+    theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        0 < gcd a b ∧ (gcd a b : ℤ) ∣ a ∧ (gcd a b : ℤ) ∣ b ∧
+          (∃ x y : ℤ, (gcd a b : ℤ) = a * x + b * y) ∧
+          (∀ c : ℤ, c ∣ a → c ∣ b → c ∣ (gcd a b : ℤ))
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      The definition selects the number constructed above, together with its established properties.
+    }
+    rw [gcd, dif_pos hab]
+    exact Classical.choose_spec (exists_positive_common_divisor a b hab)
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:common-divisor-le-gcd}
+  \begin{lean}{
+      Suppose $a,b\in\Z$ are not both zero and $c\in\Z$ divides both. Then $c\le\gcd(a,b)$.
+    }
+    theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
+        (hca : c ∣ a) (hcb : c ∣ b) : c ≤ (gcd a b : ℤ)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Write $d=\gcd(a,b)>0$. Since $c\mid d$, there is $k\in\Z$ with $d=ck$. If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$. If $c\le0$, then $c<d$ immediately.
+    }
+    obtain ⟨hpos, _, _, _, hcommon⟩ := gcd_spec a b hab
+    have hdpos : (0 : ℤ) < gcd a b := by exact_mod_cast hpos
+    obtain ⟨k, hk⟩ := hcommon c hca hcb
+    by_cases hc : 0 < c
+    · have hkpos : 0 < k := by nlinarith
+      have hkone : 1 ≤ k := hkpos
+      nlinarith
+    · linarith
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-zero-zero}
+  \begin{lean}{
+      The zero-pair convention is $\gcd(0,0)=0$.
+    }
+    theorem gcd_zero_zero : gcd 0 0 = 0
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Neither input is nonzero, so the definition assigns the value zero. This is a convention; the common divisors of zero and zero have no greatest integer.
+    }
+    unfold gcd
+    rw [dif_neg (by rintro (h | h); exact h rfl; exact h rfl)]
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-eq-of-greatest}
+  \begin{lean}{
+      Suppose $a,b\in\Z$ are not both zero and $d\in\N$ divides both. If every integer common divisor is at most $d$, then $\gcd(a,b)=d$.
+    }
+    theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
+        (hda : (d : ℤ) ∣ a) (hdb : (d : ℤ) ∣ b)
+        (hgreatest : ∀ c : ℤ, c ∣ a → c ∣ b → c ≤ (d : ℤ)) : gcd a b = d
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Since $\gcd(a,b)$ is a common divisor, the hypothesis gives $\gcd(a,b)\le d$. The preceding bound applied to $d$ gives $d\le\gcd(a,b)$. Antisymmetry proves equality.
+    }
+    have hspec := gcd_spec a b hab
+    have hle := hgreatest (gcd a b) hspec.2.1 hspec.2.2.1
+    have hge := common_divisor_le_gcd a b d hab hda hdb
+    exact_mod_cast (le_antisymm hle hge)
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:bezout}
+  \begin{lean}{
+      Suppose $a,b\in\Z$ are not both zero. There are integers $x,y$ such that $\gcd(a,b)=ax+by$.
+    }
+    theorem exists_gcd_eq_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        ∃ x y : ℤ, (gcd a b : ℤ) = a * x + b * y
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      The linear-combination representation is one of the properties established when constructing the gcd.
+    }
+    exact (gcd_spec a b hab).2.2.2.1
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-linear-combinations}
+  \begin{lean}{
+      Suppose $a,b\in\Z$ are not both zero. The set of integer linear combinations $ax+by$ is exactly the set of integer multiples of $\gcd(a,b)$.
+    }
+    theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        {z : ℤ | ∃ x y : ℤ, z = a * x + b * y} =
+          {z : ℤ | ∃ n : ℤ, z = n * (gcd a b : ℤ)}
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      Write $d=\gcd(a,b)=ax_{0}+by_{0}$. Since $d$ divides both inputs, choose $u,v\in\Z$ with $a=du$ and $b=dv$. We prove both set inclusions.
+    }
+    obtain ⟨x₀, y₀, hbezout⟩ := exists_gcd_eq_mul_add_mul a b hab
+
+    have hcommon := (gcd_spec a b hab).2
+
+    obtain ⟨u, hu⟩ := hcommon.1
+    obtain ⟨v, hv⟩ := hcommon.2.1
+
+    apply Set.ext
+    intro z
+    constructor
+  \end{lean}
+
+  \begin{lean}{
+      If $z=ax+by$, then $z=(ux+vy)d$, so $z$ is an integer multiple of $d$.
+    }
+    · rintro ⟨x, y, hz⟩
+
+      refine ⟨u * x + v * y, ?_⟩
+      calc
+        z = a * x + b * y := hz
+        _ = ((gcd a b : ℤ) * u) * x + ((gcd a b : ℤ) * v) * y := by
+          rw [← hu, ← hv]
+        _ = (u * x + v * y) * (gcd a b : ℤ) := by ring
+  \end{lean}
+
+  \begin{lean}{
+      Conversely, if $z=nd$, then $z=a(nx_{0})+b(ny_{0})$, an integer linear combination of $a,b$.
+    }
+    · rintro ⟨n, hz⟩
+
+      refine ⟨n * x₀, n * y₀, ?_⟩
+      rw [hz, hbezout]
+      ring
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-one-bezout}
+  \begin{lean}{
+      Let $a,b\in\Z$ be not both zero. They are relatively prime, meaning $\gcd(a,b)=1$, if and only if there are integers $x,y$ with $1=ax+by$.
+    }
+    theorem gcd_eq_one_iff_exists_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        gcd a b = 1 ↔ ∃ x y : ℤ, 1 = a * x + b * y
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      For the forward implication, substitute $\gcd(a,b)=1$ in the previously proved Bezout identity.
+    }
+    constructor
+    · intro h
+      obtain ⟨x, y, hxy⟩ := exists_gcd_eq_mul_add_mul a b hab
+      exact ⟨x, y, by simpa only [h, Nat.cast_one] using hxy⟩
+  \end{lean}
+  \begin{lean}{
+      Conversely, $1$ divides both inputs. If $c$ is a common divisor, write $a=cu$ and $b=cv$. Then $1=c(ux+vy)$. For $c>0$ the second factor is a positive integer, hence at least one, so $c\le1$; for $c\le0$ the same bound is immediate. The order characterization of the gcd gives the result.
+    }
+    · rintro ⟨x, y, hxy⟩
+      apply gcd_eq_of_greatest a b hab 1
+      · exact ⟨a, by ring⟩
+      · exact ⟨b, by ring⟩
+      · intro c hca hcb
+        obtain ⟨u, hu⟩ := hca
+        obtain ⟨v, hv⟩ := hcb
+        have hone : 1 = c * (u * x + v * y) := by
+          calc
+            1 = a * x + b * y := hxy
+            _ = c * (u * x + v * y) := by rw [hu, hv]; ring
+        by_cases hc : 0 < c
+        · have hk : 0 < u * x + v * y := by nlinarith
+          have hkone : 1 ≤ u * x + v * y := hk
+          norm_num only [Nat.cast_one]
+          nlinarith
+        · norm_num only [Nat.cast_one]
+          omega
+  \end{lean}
+\end{proof}
+
+\begin{corollary} \label{nt:thm:gcd-div-gcd}
+  \begin{lean}{
+      For integers $a,b$ not both zero, set $d=\gcd(a,b)$. Then $\gcd(a/d,b/d)=1$, where the quotients are integers.
+    }
+    theorem gcd_div_gcd_eq_one (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
+        gcd (a / (gcd a b : ℤ)) (b / (gcd a b : ℤ)) = 1
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  \begin{lean}{
+      Since the positive gcd divides both inputs, write $a=du$ and $b=dv$. The integer quotients are exactly $u$ and $v$, since $d\ne0$.
+    }
+    obtain ⟨hdpos, ⟨u, hu⟩, ⟨v, hv⟩, ⟨x, y, hxy⟩, _⟩ := gcd_spec a b hab
+    generalize hg : gcd a b = d at *
+    have hdne : (d : ℤ) ≠ 0 := by exact_mod_cast (ne_of_gt hdpos)
+    have ha : a / (d : ℤ) = u := by rw [hu]; exact Int.mul_ediv_cancel_left u hdne
+    have hb : b / (d : ℤ) = v := by rw [hv]; exact Int.mul_ediv_cancel_left v hdne
+  \end{lean}
+  \begin{lean}{
+      Choose Bezout coefficients with $d=ax+by$. Substitution gives $d=d(ux+vy)$, and cancellation of the nonzero integer $d$ yields $1=ux+vy$.
+    }
+    have hone : (1 : ℤ) = u * x + v * y := by
+      apply mul_left_cancel₀ hdne
+      calc
+        (d : ℤ) * 1 = a * x + b * y := by simpa using hxy
+        _ = (d : ℤ) * (u * x + v * y) := by rw [hu, hv]; ring
+  \end{lean}
+  \begin{lean}{
+      The identity rules out $u=v=0$. Apply the preceding characterization to conclude that the two quotients are relatively prime.
+    }
+    have huv : u ≠ 0 ∨ v ≠ 0 := by
+      by_contra h
+      push Not at h
+      obtain ⟨rfl, rfl⟩ := h
+      norm_num at hone
+    rw [ha, hb]
+    exact (gcd_eq_one_iff_exists_mul_add_mul u v huv).2 ⟨x, y, hone⟩
+  \end{lean}
+\end{proof}
+
+\begin{corollary} \label{nt:thm:coprime-product-divides}
+  \begin{lean}{
+      Let $a,b,c\in\Z$. If $\gcd(a,b)=1$, $a\mid c$, and $b\mid c$, then $ab\mid c$.
+    }
+    theorem mul_dvd_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
+        (hac : a ∣ c) (hbc : b ∣ c) : a * b ∣ c
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  \begin{lean}{
+      The inputs cannot both be zero because $\gcd(0,0)=0$. Thus the coprimality characterization supplies integers $x,y$ with $1=ax+by$.
+    }
+    have hnz : a ≠ 0 ∨ b ≠ 0 := by
+      by_contra h
+      push Not at h
+      obtain ⟨rfl, rfl⟩ := h
+      rw [gcd_zero_zero] at hab
+      contradiction
+    obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
+  \end{lean}
+  \begin{lean}{
+      Write $c=ar=bs$. Multiplying the Bezout identity by $c$ and using these two expressions gives $c=acx+bcy=ab(sx+ry)$. The integer $sx+ry$ is the required divisibility witness.
+    }
+    obtain ⟨r, hr⟩ := hac
+    obtain ⟨s, hs⟩ := hbc
+    refine ⟨s * x + r * y, ?_⟩
+    calc
+      c = c * (a * x + b * y) := by rw [← hxy]; ring
+      _ = a * c * x + b * c * y := by ring
+      _ = a * (b * s) * x + b * (a * r) * y := by nth_rw 1 [hs]; rw [hr]
+      _ = (a * b) * (s * x + r * y) := by ring
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:euclid-lemma}
+  \begin{lean}{
+      Let $a,b,c\in\Z$ with $\gcd(a,b)=1$. If $a\mid bc$, then $a\mid c$ (Euclid\textquotesingle s lemma).
+    }
+    theorem dvd_of_dvd_mul_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
+        (hdiv : a ∣ b * c) : a ∣ c
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      As before, coprimality excludes the zero pair, so choose integers $x,y$ with $1=ax+by$.
+    }
+    have hnz : a ≠ 0 ∨ b ≠ 0 := by
+      by_contra h
+      push Not at h
+      obtain ⟨rfl, rfl⟩ := h
+      rw [gcd_zero_zero] at hab
+      contradiction
+    obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
+  \end{lean}
+  \begin{lean}{
+      Write $bc=ak$. Multiplication by $c$ gives $c=acx+bcy=a(cx+ky)$, which exhibits an integer witness for $a\mid c$.
+    }
+    obtain ⟨k, hk⟩ := hdiv
+    refine ⟨c * x + k * y, ?_⟩
+    calc
+      c = (a * x + b * y) * c := by rw [← hxy]; ring
+      _ = a * (c * x) + (b * c) * y := by ring
+      _ = a * (c * x + k * y) := by rw [hk]; ring
+  \end{lean}
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-divisibility-characterization}
+  \begin{lean}{
+      Let $a,b\in\Z$ be not both zero and let $d\in\Z$ be positive. Then $d=\gcd(a,b)$ if and only if $d$ divides both inputs and every integer common divisor of $a,b$ divides $d$.
+    }
+    theorem eq_gcd_iff_common_divisor (a b d : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
+        (hd : 0 < d) :
+        d = (gcd a b : ℤ) ↔
+          d ∣ a ∧ d ∣ b ∧ (∀ c : ℤ, c ∣ a → c ∣ b → c ∣ d)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  \begin{lean}{
+      If $d=\gcd(a,b)$, all three divisibility properties follow from the construction of the gcd.
+    }
+    constructor
+    · intro heq
+      subst d
+      obtain ⟨_, hda, hdb, _, hcommon⟩ := gcd_spec a b hab
+      exact ⟨hda, hdb, hcommon⟩
+  \end{lean}
+  \begin{lean}{
+      Conversely, let $g=\gcd(a,b)>0$. Because $d$ is a common divisor, $d\le g$. Since $g$ divides both inputs, the last hypothesis gives $d=gk$. Positivity forces the integer $k$ to be at least one, so $g\le d$. The two bounds imply $d=g$.
+    }
+    · rintro ⟨hda, hdb, hcommon⟩
+      have hle := common_divisor_le_gcd a b d hab hda hdb
+      obtain ⟨hgpos, hga, hgb, _, _⟩ := gcd_spec a b hab
+      obtain ⟨k, hk⟩ := hcommon (gcd a b) hga hgb
+      have hgpos' : (0 : ℤ) < gcd a b := by exact_mod_cast hgpos
+      have hkpos : 0 < k := by nlinarith
+      have hkone : 1 ≤ k := hkpos
+      have hge : (gcd a b : ℤ) ≤ d := by nlinarith
+      exact le_antisymm hle hge
+  \end{lean}
+\end{proof}
