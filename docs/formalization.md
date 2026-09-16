@@ -338,6 +338,9 @@ Labels must belong to a `theorem`, `lemma`, `proposition`, or `corollary`
 environment within that shard's source directory. A theorem-like label on a
 section, definition, equation, or literal code sample is not a verified result.
 Labels and declarations must be unique across both kinds of shard.
+Register only results already present in these LaTeX environments. Keep Lean-only
+helper results in the Lean sources without proof-index entries until they have
+a corresponding textbook result.
 
 Appendix proofs use the same book prerequisite policy, proof roles, import
 boundary, and review requirements as chapter proofs. Include appendix modules
@@ -398,7 +401,8 @@ together. Ordinary checks must not run `lake update`.
 ## Scope and coverage
 
 Do not claim that an entire textbook is formally verified merely because the
-Lean project builds. Coverage is the set of entries loaded from the chapter
-shards under `proof-index/`.
+Lean project builds. Coverage counts textbook theorem, lemma, proposition, and
+corollary environments linked through `proof-index/`, once per environment,
+relative to all such environments in the book. Lean-only results are excluded.
 Material omitted pedagogically may be supplied by Mathlib and should be described
 as a prerequisite at chapter or book level.

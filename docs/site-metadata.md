@@ -28,12 +28,14 @@ ignored. The snapshot README comes from `.github/generated-pdfs-README.md`. Book
 
 The index discovers generated book pages through `site.pages`, sorts their front matter by manifest order, and renders canonical titles and status labels. The common book layout reads the same page front matter, including Lean coverage generated from the proof index. No separate Jekyll data file is generated or consumed, and generated pages are not tracked by Git. Separate book descriptions are intentionally not supported.
 
-Lean coverage is the number of results registered in the proof index for a book
-divided by its LaTeX theorem, lemma, proposition, and corollary count, expressed
-as a percentage rounded to one decimal place. It may exceed 100% as Lean-first
-authoring advances ahead of the natural-language exposition. It counts registered
-results, not every Lean declaration. When the LaTeX count is zero, the percentage
-remains 0.0% to avoid division by zero; the registered count is still displayed.
+Lean coverage is the number of LaTeX results linked to a Lean declaration through
+the proof index divided by the book's LaTeX theorem, lemma, proposition, and
+corollary count, expressed as a percentage rounded to one decimal place.
+Each result counts once, even when it has multiple registered labels. Comments
+and literal code samples are excluded; unlabeled results remain in the denominator.
+Lean-only results do not belong in the proof index and do not contribute to coverage.
+Coverage cannot exceed 100%. When the LaTeX count is zero, both the linked count
+and the percentage are zero.
 
 Status labels and the `short_title` fallback are defined once in the generator. See [Repository architecture](ARCHITECTURE.md#metadata-and-automation) for metadata ownership and automation policy.
 

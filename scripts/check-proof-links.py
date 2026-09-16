@@ -17,11 +17,11 @@ except ModuleNotFoundError:
 
 try:
     from scripts.book_manifest import load_manifest
-    from scripts.latex_scan import command_arguments
+    from scripts.latex_scan import command_arguments, theorem_label_groups
     from scripts.lean_source import escape_hatch_lines
 except ModuleNotFoundError:
     from book_manifest import load_manifest
-    from latex_scan import command_arguments
+    from latex_scan import command_arguments, theorem_label_groups
     from lean_source import escape_hatch_lines
 
 
@@ -36,23 +36,7 @@ ALLOWED_FIELDS = {"id", "declaration"}
 
 def theorem_labels(text: str) -> set[str]:
     """Recognize labels owned by result environments, excluding literal code."""
-    stack: list[str] = []
-    literal = {"lean", "verbatim", "Verbatim", "minted", "lstlisting"}
-    results = {"theorem", "lemma", "proposition", "corollary"}
-    labels: set[str] = set()
-    for command in command_arguments(text, {"begin", "end", "label"}):
-        if stack and stack[-1] in literal:
-            if command.name == "end" and command.argument == stack[-1]:
-                stack.pop()
-            continue
-        if command.name == "begin":
-            stack.append(command.argument)
-        elif command.name == "end":
-            if stack and stack[-1] == command.argument:
-                stack.pop()
-        elif stack and stack[-1] in results:
-            labels.add(command.argument)
-    return labels
+    return set().union(*theorem_label_groups(text))
 
 
 def index_latex_labels(
