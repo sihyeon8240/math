@@ -1,7 +1,7 @@
 import Textbooks.MathematicalAnalysis1.Chapter01.CompactSets
 
 /-! Core sequence results from the epsilon definition, with indices in ℕ
-starting at zero. The reciprocal example uses n + 1. -/
+starting at zero. -/
 
 set_option autoImplicit false
 
@@ -97,28 +97,6 @@ theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
   have hprod : 1 < (N : ℝ) * ε := (div_lt_iff₀ hε).mp hN
   apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
   nlinarith
-
-/-- Lemma: Core example: the shifted reciprocal sequence converges to zero. -/
-theorem reciprocal_converges : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) 0 := by
-  intro ε hε
-  obtain ⟨N, hN⟩ := reciprocal_small ε hε
-  refine ⟨N, ?_⟩
-  intro n hn
-  rw [Real.dist_eq, sub_zero, abs_of_pos (by positivity)]
-  exact hN n hn
-
-/-- Definition: The same points, regarded as elements of the positive real subspace. -/
-noncomputable def positiveReciprocal (n : ℕ) : {x : ℝ // 0 < x} :=
-  ⟨1 / ((n : ℝ) + 1), by positivity⟩
-
-/-- Lemma: Core example: any positive-subspace limit would also be a real limit,
-contradicting uniqueness and the exclusion of zero from the subspace. -/
-theorem positive_reciprocal_diverges :
-    ¬ ∃ p : {x : ℝ // 0 < x}, convergesTo positiveReciprocal p := by
-  rintro ⟨p, hp⟩
-  have hreal : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) p.val := hp
-  have heq := limit_unique _ p.val 0 hreal reciprocal_converges
-  exact (ne_of_gt p.property) heq
 
 /-- Lemma: choose a distinct point within radius 1/(n+1). -/
 theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :

@@ -9,10 +9,6 @@ proofs:
   declaration: MathematicalAnalysis1.Chapter02.convergent_properties
 - id: an1:lem:reciprocal-small
   declaration: MathematicalAnalysis1.Chapter02.reciprocal_small
-- id: an1:lem:reciprocal-converges
-  declaration: MathematicalAnalysis1.Chapter02.reciprocal_converges
-- id: an1:lem:positive-reciprocal-diverges
-  declaration: MathematicalAnalysis1.Chapter02.positive_reciprocal_diverges
 - id: an1:lem:convergesTo-iff-finite-exceptions
   declaration: MathematicalAnalysis1.Chapter02.convergesTo_iff_finite_exceptions
 - id: an1:lem:sequence-at-limit-point

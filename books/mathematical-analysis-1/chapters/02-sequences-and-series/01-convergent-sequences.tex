@@ -133,51 +133,13 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \end{proof}
 
 \begin{example}
-  Define $u_n=1/(n+1)$ for $n\in\N$. We will verify that $u_n\to0$ in $\R$, but that the same sequence diverges in the positive-real subspace $\R^{+}$.
+  Define $u_n=1/(n+1)$ for $n\in\N$. Then $u_n\to0$ in $\R$, but the same sequence diverges in the positive-real subspace $\R^{+}$.
   The shift makes every denominator positive under our zero-based indexing convention.
+
+  Choose the threshold from the preceding reciprocal estimate. Since each term is positive, its distance from zero is exactly $1/(n+1)$, which is eventually below $\varepsilon$.
+
+  If the sequence converged to a positive point $p$ in the subspace, it would converge to the same real point because the distances are unchanged. Its real limit is already zero. Uniqueness would give $p=0$, contradicting $p>0$.
 \end{example}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.reciprocal_converges
-\begin{lemma} \label{an1:lem:reciprocal-converges}
-  \begin{lean}{The real sequence $u_n=1/(n+1)$ converges to $0$.}
-    theorem reciprocal_converges : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) 0
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  \begin{lean}{Choose the threshold from the preceding reciprocal estimate. Since each term is positive, its distance from zero is exactly $1/(n+1)$, which is eventually below $\varepsilon$.}
-    intro ε hε
-    obtain ⟨N, hN⟩ := reciprocal_small ε hε
-    refine ⟨N, ?_⟩
-    intro n hn
-    rw [Real.dist_eq, sub_zero, abs_of_pos (by positivity)]
-    exact hN n hn
-  \end{lean}
-
-\end{proof}
-
-\begin{lean}{Each $1/(n+1)$ also defines a point of the positive-real subspace.}
-  noncomputable def positiveReciprocal (n : ℕ) : {x : ℝ // 0 < x} :=
-    ⟨1 / ((n : ℝ) + 1), by positivity⟩
-\end{lean}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.positive_reciprocal_diverges
-\begin{lemma} \label{an1:lem:positive-reciprocal-diverges}
-  \begin{lean}{The sequence of positive-real points $u_n=1/(n+1)$ has no limit in $\R^{+}$.}
-    theorem positive_reciprocal_diverges :
-        ¬ ∃ p : {x : ℝ // 0 < x}, convergesTo positiveReciprocal p
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  \begin{lean}{If it converged to a positive point $p$ in the subspace, it would converge to the same real point because the distances are unchanged. Its real limit is already zero. Uniqueness would give $p=0$, contradicting $p>0$.}
-    rintro ⟨p, hp⟩
-    have hreal : convergesTo (fun n : ℕ => 1 / ((n : ℝ) + 1)) p.val := hp
-    have heq := limit_unique _ p.val 0 hreal reciprocal_converges
-    exact (ne_of_gt p.property) heq
-  \end{lean}
-
-\end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergesTo_iff_finite_exceptions
 \begin{lemma} \label{an1:lem:convergesTo-iff-finite-exceptions}
