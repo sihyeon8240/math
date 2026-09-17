@@ -25,3 +25,23 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter02.dvd_of_dvd_mul_of_coprime
   - id: nt:thm:gcd-divisibility-characterization
     declaration: ElementaryNumberTheory.Chapter02.eq_gcd_iff_common_divisor
+  - id: nt:thm:gcd-remainder
+    declaration: ElementaryNumberTheory.Chapter02.gcd_eq_gcd_remainder
+  - id: nt:thm:gcd-abs
+    declaration: ElementaryNumberTheory.Chapter02.gcd_abs
+  - id: nt:thm:euclidean-termination
+    declaration: ElementaryNumberTheory.Chapter02.euclideanTrace_exists
+  - id: nt:thm:euclidean-correctness
+    declaration: ElementaryNumberTheory.Chapter02.EuclideanTrace.gcd_eq
+  - id: nt:thm:euclidean-positive
+    declaration: ElementaryNumberTheory.Chapter02.EuclideanTrace.positive
+  - id: nt:thm:gcd-positive-factor
+    declaration: ElementaryNumberTheory.Chapter02.gcd_mul_of_pos
+  - id: nt:thm:gcd-nonzero-factor
+    declaration: ElementaryNumberTheory.Chapter02.gcd_mul_of_ne_zero
+  - id: nt:thm:positive-common-multiple
+    declaration: ElementaryNumberTheory.Chapter02.exists_positive_common_multiple
+  - id: nt:thm:lcm-spec
+    declaration: ElementaryNumberTheory.Chapter02.lcm_spec
+  - id: nt:thm:gcd-lcm-product
+    declaration: ElementaryNumberTheory.Chapter02.gcd_mul_lcm
