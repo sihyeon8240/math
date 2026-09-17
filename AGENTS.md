@@ -66,6 +66,31 @@ install and cache configuration pointed at that file.
   Run `make contents all BOOK=<slug>` after contents-manifest edits. See `docs/ARCHITECTURE.md`.
 - If a shared style changes, consider and validate its effect on every textbook.
 
+## Code readability and maintainability
+
+- Follow `.editorconfig` and the existing language formatters: four spaces for
+  Python, two spaces by default, and tabs for Make recipes; honor file-specific
+  exceptions. Use `make format`
+  with the appropriate `py`, `sh`, or `tex` scope; do not hand-format against it.
+- Separate logical steps with blank lines. Wrap long expressions and commands
+  at meaningful boundaries, without splitting literal values or changing output.
+  Keep trailing whitespace absent and exactly one final newline.
+- Use descriptive names, straightforward conditions, and early returns where
+  they reduce nesting. Expand multi-step one-liners. Extract helpers for repeated
+  logic or distinct responsibilities, not merely to shorten a function.
+- Keep comments concise: explain non-obvious reasons, constraints, or invariants
+  near the relevant code. Avoid document-like comment blocks, decorative banners,
+  and comments that restate the code. Keep detailed guidance in `docs/`.
+- Apply the same readability standards to tests and embedded scripts. Preserve
+  intentional malformed fixtures and whitespace-sensitive literals.
+- Preserve behavior, diagnostics, and interfaces during readability refactors.
+  In TeX, Lean, YAML, shell, and templates, check that whitespace changes do not
+  alter parsing, typesetting, quoting, or generated output. Edit generators rather
+  than generated files, and keep displayed Lean synchronized with checked sources.
+- Review all relevant languages, but leave already clear code alone. Keep
+  formatting-only changes separate from structural refactors and run the checks
+  required by `docs/CONTRIBUTING.md#validation-by-change-category`.
+
 ## Mathematical exposition
 
 - For new or mathematically revised theorems selected for formalization, pair
