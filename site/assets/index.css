@@ -545,10 +545,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 
+  .project-link {
     min-height: 6rem;
   }
 
-  .project-link {
   .book-card__action {
     flex: 1 1 100%;
     width: 100%;
