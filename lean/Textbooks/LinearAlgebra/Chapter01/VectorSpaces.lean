@@ -39,20 +39,24 @@ theorem zero_unique (z : V) (h : ∀ v : V, z + v = v) : z = 0 := by
 theorem scalar_zero_smul (v : V) : (0 : K) • v = 0 := by
   have h : (0 : K) • v + 0 = (0 : K) • v + (0 : K) • v := by
     rw [add_zero, ← add_smul, zero_add]
+
   exact (add_left_cancel h).symm
 
 /-- Proposition: multiplication by minus one. -/
 theorem minus_one_smul (v : V) : (-1 : K) • v = -v := by
   apply add_left_cancel (a := v)
   calc
-    v + (-1 : K) • v = (1 : K) • v + (-1 : K) • v := by rw [one_smul]
-    _ = 0 := by rw [← add_smul, add_neg_cancel, scalar_zero_smul]
+    v + (-1 : K) • v = (1 : K) • v + (-1 : K) • v := by
+      rw [one_smul]
+    _ = 0 := by
+      rw [← add_smul, add_neg_cancel, scalar_zero_smul]
     _ = v + -v := (add_neg_cancel v).symm
 
 /-- Proposition: every scalar annihilates the zero vector. -/
 theorem scalar_smul_zero (c : K) : c • (0 : V) = 0 := by
   have h : c • (0 : V) + 0 = c • 0 + c • 0 := by
     rw [add_zero, ← smul_add, zero_add]
+
   exact (add_left_cancel h).symm
 
 /-- Definition: a subspace is a set closed under addition and scalar multiplication,
@@ -131,6 +135,8 @@ def perpendicularSubspace {n : ℕ} (a : CoordinateSpace K n) :
     (fun b hb c hc => by
       change dotProduct (b + c) a = 0
       rw [dot_comm, dot_add, dot_comm a b, dot_comm a c, hb, hc, add_zero])
-    (fun c b hb => by change dotProduct (c • b) a = 0; rw [dot_smul, hb, mul_zero])
+    (fun c b hb => by
+      change dotProduct (c • b) a = 0
+      rw [dot_smul, hb, mul_zero])
 
 end LinearAlgebra.Chapter01

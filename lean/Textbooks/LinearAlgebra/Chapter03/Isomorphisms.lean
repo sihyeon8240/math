@@ -23,6 +23,7 @@ theorem isomorphic_refl : Nonempty (U ≃ₗ[K] U) := ⟨LinearEquiv.refl K U⟩
 /-- Proposition: being isomorphic is symmetric. -/
 theorem isomorphic_symm (h : Nonempty (U ≃ₗ[K] V)) : Nonempty (V ≃ₗ[K] U) := by
   obtain ⟨e⟩ := h
+
   exact ⟨e.symm⟩
 
 /-- Proposition: being isomorphic is transitive. -/
@@ -30,6 +31,7 @@ theorem isomorphic_trans (h : Nonempty (U ≃ₗ[K] V)) (h' : Nonempty (V ≃ₗ
     Nonempty (U ≃ₗ[K] W) := by
   obtain ⟨e⟩ := h
   obtain ⟨f⟩ := h'
+
   exact ⟨e.trans f⟩
 
 /-- Proposition: the inverse of a composite reverses the order. -/
@@ -41,10 +43,14 @@ coordinate space, using a locally constructed finite basis. -/
 theorem nonempty_coordinate_equiv [Module.Finite K V] :
     Nonempty ((Fin (Module.finrank K V) → K) ≃ₗ[K] V) := by
   classical
+
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
+
   have hc : Fintype.card s = Module.finrank K V := by
     rw [Fintype.card_coe, ← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs]
+
   let b := (basisOfSet hs).reindex (Fintype.equivFinOfCardEq hc)
+
   exact ⟨combinationEquiv ((finiteBasis_iff b).mpr ⟨b, rfl⟩)⟩
 
 /-- Proposition: finite-dimensional spaces are isomorphic exactly
@@ -53,11 +59,15 @@ when their dimensions agree. This is the field specialization of
 theorem isomorphic_iff_finrank_eq [Module.Finite K U] [Module.Finite K V] :
     Nonempty (U ≃ₗ[K] V) ↔ Module.finrank K U = Module.finrank K V := by
   constructor
+
   · rintro ⟨e⟩
     exact finrank_eq_of_bijective e.toLinearMap e.bijective
+
   · intro h
+
     obtain ⟨e⟩ := nonempty_coordinate_equiv (K := K) (V := U)
     obtain ⟨f⟩ := nonempty_coordinate_equiv (K := K) (V := V)
+
     rw [← h] at f
     exact ⟨e.symm.trans f⟩
 
@@ -66,10 +76,14 @@ exactly when it is bijective. -/
 theorem exists_linearEquiv_iff_bijective (f : U →ₗ[K] V) :
     (∃ e : U ≃ₗ[K] V, e.toLinearMap = f) ↔ Function.Bijective f := by
   constructor
+
   · rintro ⟨e, rfl⟩
     exact e.bijective
+
   · intro h
+
     obtain ⟨g, hgf, hfg⟩ := (hasInverse_iff_bijective f).mpr h
+
     exact ⟨isomorphismOfInverse f g hgf hfg, rfl⟩
 
 /-- Proposition: in equal finite dimensions, a zero kernel is
@@ -93,8 +107,11 @@ linear independence of a finite family. -/
 theorem independent_equiv_iff {ι : Type*} [Fintype ι] (e : U ≃ₗ[K] V) (v : ι → U) :
     LinearIndependent K (fun i => e (v i)) ↔ LinearIndependent K v := by
   constructor
+
   · intro h
-    simpa only [LinearEquiv.coe_coe, e.symm_apply_apply] using independent_map e.symm.toLinearMap e.symm.injective h
+    simpa only [LinearEquiv.coe_coe, e.symm_apply_apply] using
+      independent_map e.symm.toLinearMap e.symm.injective h
+
   · exact independent_map e.toLinearMap e.injective
 
 /-- Lemma: linear maps send spans into spans of images,
@@ -103,9 +120,17 @@ theorem apply_mem_span_image (f : U →ₗ[K] V) (S : Set U) {x : U}
     (hx : x ∈ Submodule.span K S) : f x ∈ Submodule.span K (f '' S) := by
   induction hx using Submodule.span_induction with
   | mem x hx => exact Submodule.subset_span ⟨x, hx, rfl⟩
-  | zero => rw [map_zero]; exact Submodule.zero_mem _
-  | add x y _ _ hx hy => rw [f.map_add]; exact Submodule.add_mem _ hx hy
-  | smul c x _ hx => rw [f.map_smul]; exact Submodule.smul_mem _ c hx
+  | zero =>
+    rw [map_zero]
+    exact Submodule.zero_mem _
+
+  | add x y _ _ hx hy =>
+    rw [f.map_add]
+    exact Submodule.add_mem _ hx hy
+
+  | smul c x _ hx =>
+    rw [f.map_smul]
+    exact Submodule.smul_mem _ c hx
 
 /-- Proposition: an isomorphism takes the span of a set onto
 the span of its image, including empty and infinite generating sets. This is
@@ -113,17 +138,24 @@ the set-image form of `Submodule.map_span` for a linear equivalence. -/
 theorem image_span_equiv (e : U ≃ₗ[K] V) (S : Set U) :
     e '' (Submodule.span K S : Set U) = (Submodule.span K (e '' S) : Set V) := by
   apply Set.Subset.antisymm
+
   · rintro _ ⟨x, hx, rfl⟩
     exact apply_mem_span_image e.toLinearMap S hx
+
   · intro y hy
+
     have hS : e.symm '' (e '' S) = S := by
       ext x
       constructor
+
       · rintro ⟨_, ⟨z, hz, rfl⟩, rfl⟩
         simpa only [LinearEquiv.coe_coe, e.symm_apply_apply] using hz
+
       · intro hx
         exact ⟨e x, ⟨x, hx, rfl⟩, e.symm_apply_apply x⟩
+
     have hx := apply_mem_span_image e.symm.toLinearMap (e '' S) hy
+
     change e.symm y ∈ Submodule.span K (e.symm '' (e '' S)) at hx
     rw [hS] at hx
     exact ⟨e.symm y, hx, e.apply_symm_apply y⟩
@@ -133,26 +165,39 @@ under an isomorphism spans the codomain. -/
 theorem span_image_eq_top_iff (e : U ≃ₗ[K] V) (S : Set U) :
     Submodule.span K (e '' S) = ⊤ ↔ Submodule.span K S = ⊤ := by
   constructor
+
   · intro h
     apply top_unique
     intro x _
-    have hx : e x ∈ (Submodule.span K (e '' S) : Set V) := by rw [h]; trivial
+
+    have hx : e x ∈ (Submodule.span K (e '' S) : Set V) := by
+      rw [h]
+      trivial
+
     rw [← image_span_equiv] at hx
+
     obtain ⟨z, hz, he⟩ := hx
+
     exact e.injective he ▸ hz
+
   · intro h
     apply top_unique
     intro y _
     change y ∈ (Submodule.span K (e '' S) : Set V)
     rw [← image_span_equiv]
-    exact ⟨e.symm y, by rw [h]; trivial, e.apply_symm_apply y⟩
+    exact ⟨e.symm y, by
+      rw [h]
+      trivial, e.apply_symm_apply y⟩
 
 /-- Proposition: an isomorphism preserves and reflects finite bases. -/
 theorem basis_equiv_iff {ι : Type*} [Fintype ι] (e : U ≃ₗ[K] V) (v : ι → U) :
     IsFiniteBasis (K := K) (fun i => e (v i)) ↔ IsFiniteBasis (K := K) v := by
   constructor
+
   · intro h
-    simpa only [LinearEquiv.coe_coe, e.symm_apply_apply] using basis_map e.symm.toLinearMap e.symm.bijective h
+    simpa only [LinearEquiv.coe_coe, e.symm_apply_apply] using
+      basis_map e.symm.toLinearMap e.symm.bijective h
+
   · exact basis_map e.toLinearMap e.bijective
 
 /-- Definition: an isomorphism restricts to an isomorphism of a subspace onto
@@ -162,6 +207,7 @@ def subspaceImageEquiv (e : U ≃ₗ[K] V) (S : Submodule K U) :
   toFun x := ⟨e x, ⟨x, x.property, rfl⟩⟩
   invFun y := ⟨e.symm y, by
     obtain ⟨x, hx, he⟩ := y.property
+
     change e x = (y : V) at he
     rw [← he, e.symm_apply_apply]
     exact hx⟩
@@ -176,10 +222,12 @@ theorem map_symm_map (e : U ≃ₗ[K] V) (S : Submodule K U) :
     (S.map e.toLinearMap).map e.symm.toLinearMap = S := by
   ext x
   constructor
+
   · rintro ⟨_, ⟨z, hz, rfl⟩, he⟩
     change e.symm (e z) = x at he
     rw [e.symm_apply_apply] at he
     exact he ▸ hz
+
   · intro hx
     exact ⟨e x, ⟨x, hx, rfl⟩, e.symm_apply_apply x⟩
 
@@ -199,10 +247,14 @@ theorem range_comp_equiv (e : U ≃ₗ[K] V) (L : V →ₗ[K] W) :
     LinearMap.range (L.comp e.toLinearMap) = LinearMap.range L := by
   ext y
   constructor
+
   · rintro ⟨x, rfl⟩
     exact ⟨e x, rfl⟩
+
   · rintro ⟨v, rfl⟩
-    exact ⟨e.symm v, by change L (e (e.symm v)) = L v; rw [e.apply_symm_apply]⟩
+    exact ⟨e.symm v, by
+      change L (e (e.symm v)) = L v
+      rw [e.apply_symm_apply]⟩
 
 /-- Proposition: postcomposition by an isomorphism preserves the kernel. -/
 theorem ker_equiv_comp (e : U ≃ₗ[K] V) (M : W →ₗ[K] U) :
@@ -210,8 +262,10 @@ theorem ker_equiv_comp (e : U ≃ₗ[K] V) (M : W →ₗ[K] U) :
   ext x
   change e (M x) = 0 ↔ M x = 0
   constructor
+
   · intro h
     exact e.injective (h.trans e.map_zero.symm)
+
   · intro h
     rw [h, e.map_zero]
 
@@ -220,8 +274,10 @@ theorem range_equiv_comp (e : U ≃ₗ[K] V) (M : W →ₗ[K] U) :
     LinearMap.range (e.toLinearMap.comp M) = (LinearMap.range M).map e.toLinearMap := by
   ext y
   constructor
+
   · rintro ⟨x, rfl⟩
     exact ⟨M x, ⟨x, rfl⟩, rfl⟩
+
   · rintro ⟨_, ⟨x, rfl⟩, rfl⟩
     exact ⟨x, rfl⟩
 
@@ -230,8 +286,10 @@ theorem ker_comp_equiv_eq_map_symm (e : U ≃ₗ[K] V) (L : V →ₗ[K] W) :
     LinearMap.ker (L.comp e.toLinearMap) = (LinearMap.ker L).map e.symm.toLinearMap := by
   ext x
   constructor
+
   · intro hx
     exact ⟨e x, hx, e.symm_apply_apply x⟩
+
   · rintro ⟨v, hv, rfl⟩
     change L (e (e.symm v)) = 0
     rw [e.apply_symm_apply]
@@ -248,12 +306,14 @@ theorem finrank_ker_comp_equiv (e : U ≃ₗ[K] V) (L : V →ₗ[K] W)
 /-- Corollary: precomposition preserves image dimension. -/
 theorem finrank_range_comp_equiv (e : U ≃ₗ[K] V) (L : V →ₗ[K] W) :
     Module.finrank K (LinearMap.range (L.comp e.toLinearMap)) =
-      Module.finrank K (LinearMap.range L) := by rw [range_comp_equiv]
+      Module.finrank K (LinearMap.range L) := by
+        rw [range_comp_equiv]
 
 /-- Corollary: postcomposition preserves kernel dimension. -/
 theorem finrank_ker_equiv_comp (e : U ≃ₗ[K] V) (M : W →ₗ[K] U) :
     Module.finrank K (LinearMap.ker (e.toLinearMap.comp M)) =
-      Module.finrank K (LinearMap.ker M) := by rw [ker_equiv_comp]
+      Module.finrank K (LinearMap.ker M) := by
+        rw [ker_equiv_comp]
 
 /-- Corollary: postcomposition preserves finite image dimension. -/
 theorem finrank_range_equiv_comp (e : U ≃ₗ[K] V) (M : W →ₗ[K] U)

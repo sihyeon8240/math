@@ -39,13 +39,16 @@ theorem exists_nontrivial_solution {m n : ℕ} (A : MatrixSpace K m n) (h : m < 
     ∃ x, IsSolution A 0 x ∧ x ≠ 0 := by
   apply (nontrivial_solution_iff A).mpr
   intro hi
+
   have hc := independent_le_generating hi (standard_is_basis (K := K) m).2
+
   simp only [Fintype.card_fin] at hc
   omega
 
 /-- Lemma: the standard coordinate space has its expected dimension. -/
 theorem finrank_coordinates (n : ℕ) : Module.finrank K (Fin n → K) = n := by
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (standard_is_basis (K := K) n)
+
   simpa only [Fintype.card_fin] using Module.finrank_eq_card_basis b
 
 /-- Theorem: a square system with independent columns has exactly one solution. -/
@@ -53,6 +56,7 @@ theorem exists_unique_solution {n : ℕ} (A : MatrixSpace K n n)
     (h : LinearIndependent K (column A)) (b : Fin n → K) : ∃! x, IsSolution A b x := by
   have hb := independent_card_finrank_is_basis h (by
     rw [Fintype.card_fin, finrank_coordinates])
+
   simpa only [solution_iff_mulVec, mulVec_eq_combination] using exists_unique_coordinates hb b
 
 end LinearAlgebra.Chapter02

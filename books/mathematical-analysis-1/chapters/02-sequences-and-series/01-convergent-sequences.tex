@@ -51,21 +51,29 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \begin{proof}
   \begin{lean}{Use convergence with $\varepsilon=1$ to choose $N$ beyond which every term is within $1$ of $p$. Set $R=1+\sum_{n=0}^{N-1}d(u_n,p)>0$.}
     intro _
+
     obtain ⟨N, hN⟩ := h 1 zero_lt_one
+
     let R := 1 + ∑ n ∈ Finset.range N, dist (u n) p
+
     have hsum : 0 ≤ ∑ n ∈ Finset.range N, dist (u n) p :=
       Finset.sum_nonneg (fun n _ => dist_nonneg)
-    refine ⟨p, R, by dsimp [R]; linarith, ?_⟩
+
+    refine ⟨p, R, by
+      dsimp [R]
+      linarith, ?_⟩
   \end{lean}
 
   \begin{lean}{For $n<N$, the distance $d(u_n,p)$ is at most the finite sum defining $R-1$. For $n\geq N$, it is less than $1\leq R$. Thus every term lies in $N_R(p)$. The argument still works if the initial segment is empty.}
     rintro x ⟨n, rfl⟩
     change dist (u n) p < R
     by_cases hn : n < N
+
     · have hle := Finset.single_le_sum (f := fun n => dist (u n) p)
         (fun n _ => dist_nonneg) (Finset.mem_range.mpr hn)
       dsimp [R]
       linarith
+
     · have htail := hN n (Nat.le_of_not_gt hn)
       dsimp [R]
       linarith
@@ -84,12 +92,18 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \begin{proof}
   \begin{lean}{If $p\ne q$, let $r=d(p,q)>0$. Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both points. The triangle inequality would then give $d(p,q)<r$, a contradiction.}
     by_contra hne
+
     have hd : 0 < dist p q := dist_pos.mpr hne
+
     obtain ⟨N, hN⟩ := hp (dist p q / 2) (half_pos hd)
     obtain ⟨M, hM⟩ := hq (dist p q / 2) (half_pos hd)
+
     have hn := hN (max N M) (le_max_left _ _)
+
     have hm := hM (max N M) (le_max_right _ _)
+
     have ht := dist_triangle p (u (max N M)) q
+
     rw [dist_comm p (u (max N M))] at ht
     linarith
   \end{lean}
@@ -122,10 +136,14 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \begin{proof}
   \begin{lean}{By the Archimedean property, choose $N>1/\varepsilon$. For $n\geq N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$. Dividing by $n+1>0$ proves the claim.}
     obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
+
     refine ⟨N, ?_⟩
     intro n hn
+
     have hcast : (N : ℝ) ≤ n := Nat.cast_le.mpr hn
+
     have hprod : 1 < (N : ℝ) * ε := (div_lt_iff₀ hε).mp hN
+
     apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
     nlinarith
   \end{lean}
@@ -156,18 +174,25 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
   \begin{lean}{Conversely, a finite set of natural indices has an upper bound $N$, including when it is empty. No index $n\geq N+1$ can be exceptional. Therefore every such term is within $\varepsilon$ of $p$, proving convergence.}
     · intro h ε hε
+
       obtain ⟨N, hN⟩ := h ε hε
+
       apply (Finset.range N).finite_toSet.subset
       intro n hn
       apply Finset.mem_range.mpr
       by_contra hnot
       exact (not_lt_of_ge hn) (hN n (Nat.le_of_not_gt hnot))
+
     · intro h ε hε
+
       obtain ⟨N, hN⟩ := (h ε hε).bddAbove
+
       refine ⟨N + 1, ?_⟩
       intro n hn
       by_contra hdist
+
       have hle := hN (show n ∈ {n : ℕ | ε ≤ dist (u n) p} from le_of_not_gt hdist)
+
       omega
   \end{lean}
 
@@ -185,13 +210,17 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
   \begin{lean}{For each $n\in\N$, use the limit-point condition to choose $u_n\in E$, distinct from $p$, with $d(u_n,p)<1/(n+1)$.}
     have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
       fun n => hp _ (by positivity)
+
     choose u hu hne hd using hex
+
     refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
   \end{lean}
 
   \begin{lean}{Given $\varepsilon>0$, the reciprocal estimate makes $1/(n+1)<\varepsilon$ for all sufficiently large $n$. The chosen distance is smaller still, so $u_n\to p$.}
     intro ε hε
+
     obtain ⟨N, hN⟩ := reciprocal_small ε hε
+
     exact ⟨N, fun n hn => (hd n).trans (hN n hn)⟩
   \end{lean}
 

@@ -43,6 +43,7 @@ theorem operatorPower_add (f : V →ₗ[K] V) (r s : ℕ) :
   | zero =>
     ext x
     simp only [Nat.zero_add, operatorPower, compose_apply, LinearMap.id_apply]
+
   | succ r ih =>
     rw [Nat.succ_add, operatorPower, ih, operatorPower, compose_assoc]
 
@@ -56,10 +57,13 @@ theorem operatorPower_commute (f : V →ₗ[K] V) (r s : ℕ) :
 def inverseLinear (f : U →ₗ[K] V) (g : V → U)
     (hgf : Function.LeftInverse g f) (hfg : Function.RightInverse g f) : V →ₗ[K] U := by
   have hi : Function.Injective f := ((hasInverse_iff_bijective f).mp ⟨g, hgf, hfg⟩).1
+
   apply linearMapOf g
+
   · intro x y
     apply hi
     rw [hfg, f.map_add, hfg, hfg]
+
   · intro c x
     apply hi
     rw [hfg, f.map_smul, hfg]
@@ -70,6 +74,7 @@ theorem exists_inverse_linear (f : U →ₗ[K] V) (hk : LinearMap.ker f = ⊥)
     ∃ g : V →ₗ[K] U, Function.LeftInverse g f ∧ Function.RightInverse g f := by
   obtain ⟨g, hgf, hfg⟩ := (hasInverse_iff_bijective f).mpr
     ⟨(ker_eq_bot_iff_injective f).mp hk, hs⟩
+
   exact ⟨inverseLinear f g hgf hfg, hgf, hfg⟩
 
 /-- Definition: a linear isomorphism from a linear map and its two-sided inverse. -/

@@ -19,13 +19,16 @@ def linearMapOf (f : V → W) (ha : ∀ x y, f (x + y) = f x + f y)
 
 /-- Proposition: a linear map sends zero to zero. -/
 theorem map_zero (f : V →ₗ[K] W) : f 0 = 0 := by
-  have h : f 0 + 0 = f 0 + f 0 := by rw [add_zero, ← f.map_add, zero_add]
+  have h : f 0 + 0 = f 0 + f 0 := by
+    rw [add_zero, ← f.map_add, zero_add]
+
   exact (add_left_cancel h).symm
 
 /-- Lemma: a linear map preserves finite sums. -/
 theorem map_sum {ι : Type*} (f : V →ₗ[K] W) (s : Finset ι) (v : ι → V) :
     f (∑ i ∈ s, v i) = ∑ i ∈ s, f (v i) := by
   classical
+
   induction s using Finset.induction_on with
   | empty => simp only [Finset.sum_empty, map_zero]
   | @insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, f.map_add, ih]
@@ -49,19 +52,23 @@ def linearFunctionSubspace : Submodule K (V → W) :=
     (by
       rintro f ⟨hfa, hfs⟩ g ⟨hga, hgs⟩
       constructor
+
       · intro x y
         change f (x + y) + g (x + y) = (f x + g x) + (f y + g y)
         rw [hfa, hga]
         abel
+
       · intro c x
         change f (c • x) + g (c • x) = c • (f x + g x)
         rw [hfs, hgs, smul_add])
     (by
       rintro c f ⟨hfa, hfs⟩
       constructor
+
       · intro x y
         change c • f (x + y) = c • f x + c • f y
         rw [hfa, smul_add]
+
       · intro a x
         change c • f (a • x) = a • c • f x
         rw [hfs, smul_comm])
@@ -101,9 +108,11 @@ noncomputable def mapOfBasis {ι : Type*} [Fintype ι] {v : ι → V}
 theorem mapOfBasis_apply {ι : Type*} [Fintype ι] {v : ι → V}
     (h : IsFiniteBasis (K := K) v) (w : ι → W) (i : ι) : mapOfBasis h w (v i) = w i := by
   classical
+
   have hc : coordinates h (v i) = Pi.single i 1 := by
     apply coefficients_unique h.1
     rw [combination_coordinates, combination_single]
+
   change linearCombination w (coordinates h (v i)) = w i
   rw [hc, combination_single]
 
@@ -111,7 +120,9 @@ theorem mapOfBasis_apply {ι : Type*} [Fintype ι] {v : ι → V}
 theorem maps_eq_on_generators {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : Generates (K := K) v) (f g : V →ₗ[K] W) (h : ∀ i, f (v i) = g (v i)) : f = g := by
   ext x
+
   obtain ⟨a, rfl⟩ := hv x
+
   rw [map_combination, map_combination]
   exact congrArg (fun w : ι → W => linearCombination w a) (funext h)
 
