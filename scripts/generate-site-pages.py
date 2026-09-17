@@ -75,14 +75,13 @@ def generate(
             if pages_dir.is_dir()
             else set()
         )
-        scoped_expected = set(selected_pages) if book else expected_names
         stale = [
             name
             for name, expected in selected_pages.items()
             if not (pages_dir / name).is_file()
             or (pages_dir / name).read_text(encoding="utf-8") != expected
         ]
-        orphaned = sorted(actual_names - scoped_expected) if not book else []
+        orphaned = sorted(actual_names - expected_names) if not book else []
         if stale or orphaned:
             for name in sorted(stale):
                 print(f"error: generated site page is stale: {name}", file=sys.stderr)

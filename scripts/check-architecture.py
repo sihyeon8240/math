@@ -68,7 +68,7 @@ def parse_section_sources(
     paths: list[Path], chapter_name: str, out: Findings
 ) -> list[SectionSource]:
     """Parse the single source file for each logical section."""
-    raw: list[tuple[Path, int, str]] = []
+    sources: list[SectionSource] = []
     for path in sorted(paths):
         match = SECTION_FILENAME.fullmatch(path.name)
         if match is None:
@@ -86,9 +86,9 @@ def parse_section_sources(
                 f"chapter {chapter_name}: section filename {path.name} uses "
                 "a context-dependent name; use the logical section slug"
             )
-        raw.append((path, number, slug))
+        sources.append(SectionSource(path, number, slug))
 
-    return [SectionSource(path, number, slug) for path, number, slug in raw]
+    return sources
 
 
 def check_section_sources(
@@ -272,13 +272,61 @@ def check_chapter_include_order(
         )
 
 
+def check_content_targets(
+    entry: Path, book_dir: Path, kind: str, targets: list[str], out: Findings
+) -> set[Path]:
+    label = "chapter" if kind == "chapters" else "appendix"
+    referenced_dirs: set[Path] = set()
+    for target in targets:
+        index = tex_path(book_dir, target)
+        referenced_dirs.add(index.parent)
+        if index.name != "index.tex":
+            out.error(f"{entry}: {label} target is not index.tex: {target}")
+        if not index.is_file():
+            continue
+        try:
+            sections = load_sections(index.parent)
+            expected_sources = [
+                index.parent / filename
+                for number, section in enumerate(sections, 1)
+                for filename in section_filenames(number, section)
+            ]
+        except ValueError:
+            # Manifest errors are reported before inspecting generated indexes.
+            expected_sources = []
+        check_chapter_index(index, book_dir, expected_sources, out)
+
+    return referenced_dirs
+
+
+def check_content_directories(
+    book_dir: Path, kind: str, referenced_dirs: set[Path], out: Findings
+) -> None:
+    label = "chapter" if kind == "chapters" else "appendix"
+    content_root = book_dir / kind
+    directories = (
+        sorted(path for path in content_root.iterdir() if path.is_dir())
+        if content_root.is_dir()
+        else []
+    )
+    numbered_directories: list[tuple[int, Path]] = []
+    for directory in directories:
+        if not (directory / "index.tex").is_file():
+            out.error(f"{directory}: index.tex is missing")
+        if directory not in referenced_dirs:
+            out.error(f"{directory}: orphan {label} directory")
+        number = chapter_number(directory, out)
+        if number is not None:
+            numbered_directories.append((number, directory))
+
+    check_chapter_numbering(content_root, numbered_directories, out)
+
+
 def check_book(book: dict, root: Path, out: Findings) -> None:
     book_dir = root / "books" / book["slug"]
-    required = [book_dir / "book.tex"]
-    for path in required:
-        if not path.is_file():
-            out.error(f"{path}: required file is missing")
-    if any(not path.is_file() for path in required):
+    entry = book_dir / "book.tex"
+    if not entry.is_file():
+        out.error(f"{entry}: required file is missing")
         return
 
     try:
@@ -295,7 +343,6 @@ def check_book(book: dict, root: Path, out: Findings) -> None:
         canonical_chapters = []
         canonical_appendices = []
 
-    entry = book_dir / "book.tex"
     entry_text = entry.read_text(encoding="utf-8")
     entry_targets = includes(entry_text, entry, out)
     for target in entry_targets:
@@ -320,77 +367,18 @@ def check_book(book: dict, root: Path, out: Findings) -> None:
         out.error(f"{entry}: chapter includes do not match canonical chapters.yml")
     if appendix_targets != expected_appendix_targets:
         out.error(f"{entry}: appendix includes do not match canonical chapters.yml")
-    referenced_dirs: set[Path] = set()
-    for target in chapter_targets:
-        chapter = tex_path(book_dir, target)
-        referenced_dirs.add(chapter.parent)
-        if chapter.name != "index.tex":
-            out.error(f"{entry}: chapter target is not index.tex: {target}")
-        if chapter.is_file():
-            try:
-                sections = load_sections(chapter.parent)
-                expected_sources = [
-                    chapter.parent / filename
-                    for number, section in enumerate(sections, 1)
-                    for filename in section_filenames(number, section)
-                ]
-            except ValueError:
-                expected_sources = []
-            check_chapter_index(chapter, book_dir, expected_sources, out)
-
-    for target in appendix_targets:
-        appendix = tex_path(book_dir, target)
-        referenced_dirs.add(appendix.parent)
-        if appendix.name != "index.tex":
-            out.error(f"{entry}: appendix target is not index.tex: {target}")
-        if appendix.is_file():
-            try:
-                sections = load_sections(appendix.parent)
-                expected_sources = [
-                    appendix.parent / filename
-                    for number, section in enumerate(sections, 1)
-                    for filename in section_filenames(number, section)
-                ]
-            except ValueError:
-                expected_sources = []
-            check_chapter_index(appendix, book_dir, expected_sources, out)
-
-    chapter_root = book_dir / "chapters"
-    directories = (
-        sorted(path for path in chapter_root.iterdir() if path.is_dir())
-        if chapter_root.is_dir()
-        else []
+    referenced_dirs = check_content_targets(
+        entry, book_dir, "chapters", chapter_targets, out
     )
-    numbered_directories: list[tuple[int, Path]] = []
-    for directory in directories:
-        if not (directory / "index.tex").is_file():
-            out.error(f"{directory}: index.tex is missing")
-        if directory not in referenced_dirs:
-            out.error(f"{directory}: orphan chapter directory")
-        number = chapter_number(directory, out)
-        if number is not None:
-            numbered_directories.append((number, directory))
-
-    check_chapter_numbering(chapter_root, numbered_directories, out)
-    check_chapter_include_order(entry, chapter_targets, out)
-
-    appendix_root = book_dir / "appendices"
-    appendix_directories = (
-        sorted(path for path in appendix_root.iterdir() if path.is_dir())
-        if appendix_root.is_dir()
-        else []
+    referenced_dirs.update(
+        check_content_targets(entry, book_dir, "appendices", appendix_targets, out)
     )
-    numbered_appendices: list[tuple[int, Path]] = []
-    for directory in appendix_directories:
-        if not (directory / "index.tex").is_file():
-            out.error(f"{directory}: index.tex is missing")
-        if directory not in referenced_dirs:
-            out.error(f"{directory}: orphan appendix directory")
-        number = chapter_number(directory, out)
-        if number is not None:
-            numbered_appendices.append((number, directory))
-    check_chapter_numbering(appendix_root, numbered_appendices, out)
-    check_chapter_include_order(entry, appendix_targets, out)
+    for kind, targets in (
+        ("chapters", chapter_targets),
+        ("appendices", appendix_targets),
+    ):
+        check_content_directories(book_dir, kind, referenced_dirs, out)
+        check_chapter_include_order(entry, targets, out)
     bibliography_checks(book_dir, entry_text, out)
 
 

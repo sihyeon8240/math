@@ -27,7 +27,9 @@ def formalization_versions(root: Path, lean_version: str) -> str:
     """Render publication versions from the toolchain and resolved Mathlib lock."""
     path = root / "lean/lake-manifest.json"
     manifest = json.loads(path.read_text(encoding="utf-8"))
-    packages = [p for p in manifest["packages"] if p["name"] == "mathlib"]
+    packages = [
+        package for package in manifest["packages"] if package["name"] == "mathlib"
+    ]
     if len(packages) != 1:
         raise ValueError(f"{path}: expected exactly one Mathlib package")
     package = packages[0]

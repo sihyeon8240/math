@@ -93,19 +93,18 @@ def link_errors(path: Path, root: Path) -> list[str]:
             and target == "pdf/"
         ):
             continue
-        dest = (
-            (
-                root / unquote(url.path).lstrip("/")
-                if url.path.startswith("/")
-                else path.parent / unquote(url.path)
-            )
-            if url.path
-            else path
-        )
-        if not dest.exists():
+        if not url.path:
+            destination = path
+        elif url.path.startswith("/"):
+            destination = root / unquote(url.path).lstrip("/")
+        else:
+            destination = path.parent / unquote(url.path)
+        if not destination.exists():
             errors.append(f"missing link target: {target}")
-        elif url.fragment and dest.suffix.lower() == ".md":
-            if unquote(url.fragment) not in anchors(dest.read_text(encoding="utf-8")):
+        elif url.fragment and destination.suffix.lower() == ".md":
+            if unquote(url.fragment) not in anchors(
+                destination.read_text(encoding="utf-8")
+            ):
                 errors.append(f"missing heading anchor: {target}")
     return errors
 
