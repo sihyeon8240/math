@@ -13,7 +13,7 @@
       <header class="site-header">
         <a
           class="brand"
-          href="{{ "/" | relative_url }}"
+          href="{{ '/' | relative_url }}"
           aria-label="Mathematics Textbooks home"
         >
           <span class="brand__mark" aria-hidden="true">∑</span>
@@ -38,16 +38,16 @@
               <ul class="resource-list">
                 <li><code>make books BOOK={{ book.slug }}</code></li>
                 <li>
-                <span class="resource-list__item">
-                  Lean coverage: <strong>{{ book.lean_coverage }}%</strong>
-                  ({{ book.lean_verified }}/{{ book.lean_total }})
-                </span>
-              </li>
+                  <span class="resource-list__item">
+                    Lean coverage: <strong>{{ book.lean_coverage }}%</strong>
+                    ({{ book.lean_verified }}/{{ book.lean_total }})
+                  </span>
+                </li>
                 <li>
-                <a href="{{ site.github.repository_url }}/tree/main/books/{{ book.slug }}">
-                  Source directory ↗
-                </a>
-              </li>
+                  <a href="{{ site.github.repository_url }}/tree/main/books/{{ book.slug }}">
+                    Source directory ↗
+                  </a>
+                </li>
               </ul>
             </aside>
           </div>
@@ -92,7 +92,6 @@
                 This browser does not support embedded PDF previews.
                 <a href="{{ pdf_url }}">Open the PDF directly.</a>
               </p>
-
             </object>
           </div>
         </section>
@@ -109,7 +108,6 @@
             Improve this page.
           </a>
         </p>
-
       </footer>
     </div>
   </body>

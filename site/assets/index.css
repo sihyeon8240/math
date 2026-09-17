@@ -434,6 +434,7 @@ h1 {
 .site-footer p {
   margin: 0;
 }
+
 .site-footer a {
   font-weight: 700;
   text-decoration: none;
@@ -444,14 +445,17 @@ h1 {
     grid-template-columns: minmax(0, 1fr);
     min-height: auto;
   }
+
   .formula-card {
     width: 100%;
     min-width: 0;
     min-height: 12rem;
   }
+
   .formula-card__symbol {
     font-size: 4.8rem;
   }
+
   .project-panel {
     grid-template-columns: 1fr;
   }
@@ -461,12 +465,15 @@ h1 {
   .page-shell {
     width: min(calc(100% - 1.25rem), 1120px);
   }
+
   .site-header {
     padding-top: 0.2rem;
   }
+
   .header-link {
     display: none;
   }
+
   .hero {
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 1rem;
@@ -474,19 +481,23 @@ h1 {
     padding: 1.5rem;
     border-radius: 1.15rem;
   }
+
   .hero__content {
     display: contents;
   }
+
   .hero__content > .eyebrow,
   .hero__content > h1,
   .hero__content > .hero__lead {
     grid-column: 1 / -1;
   }
+
   .hero__actions {
     grid-column: 1;
     align-self: center;
     margin-top: 0.5rem;
   }
+
   .formula-card {
     grid-column: 2;
     width: clamp(7.5rem, 30vw, 9rem);
@@ -497,42 +508,52 @@ h1 {
     border-radius: 1rem;
     transform: rotate(2deg);
   }
+
   .formula-card__inner {
     gap: 0.65rem;
     transform: rotate(-2deg);
   }
+
   .formula-card__symbol {
     font-size: clamp(3rem, 13vw, 4rem);
   }
+
   .formula-card__formula {
     padding-top: 0.6rem;
     font-size: clamp(0.72rem, 3vw, 0.9rem);
     white-space: nowrap;
   }
+
   h1 {
     max-width: 100%;
     font-size: clamp(2.65rem, 15vw, 4.2rem);
     overflow-wrap: anywhere;
   }
+
   .section-heading {
     align-items: start;
     flex-direction: column;
     gap: 0.5rem;
   }
+
   .section-heading p {
     width: 100%;
     max-width: none;
   }
+
   .link-grid {
     grid-template-columns: 1fr;
   }
+
     min-height: 6rem;
   }
+
   .project-link {
   .book-card__action {
     flex: 1 1 100%;
     width: 100%;
   }
+
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
@@ -547,7 +568,7 @@ h1 {
   }
 }
 
-/* Storefront redesign */
+/* Storefront overrides. */
 html,
 body {
   overflow-x: clip;

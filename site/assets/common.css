@@ -36,9 +36,11 @@ body {
 a {
   color: var(--brand);
 }
+
 a:hover {
   color: var(--brand-dark);
 }
+
 a:focus-visible {
   outline: 3px solid rgba(49, 87, 213, 0.35);
   outline-offset: 3px;
@@ -102,17 +104,20 @@ h1 {
   background: #edf9f2;
   border-color: #b7e1c8;
 }
+
 .status--draft,
 .status--in-progress {
   color: #9a5b00;
   background: #fff8e6;
   border-color: #ead39a;
 }
+
 .status--review {
   color: #3659b8;
   background: #eef2ff;
   border-color: #b8c5ef;
 }
+
 .status--archived {
   color: #a72820;
   background: #fff0ee;
@@ -125,7 +130,7 @@ h1 {
   }
 }
 
-/* Editorial storefront system, inspired by contemporary Korean book catalogs. */
+/* Shared storefront overrides. */
 :root {
   --ink: #111111;
   --muted: #707070;

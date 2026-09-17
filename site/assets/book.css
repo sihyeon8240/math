@@ -136,13 +136,16 @@ h1 {
 .book-intro > :first-child {
   margin-top: 0;
 }
+
 .book-intro > :last-child {
   margin-bottom: 0;
 }
+
 .book-intro h2,
 .book-intro h3 {
   color: var(--ink);
 }
+
 .book-intro p {
   color: #475467;
 }
@@ -182,6 +185,7 @@ h1 {
   background: var(--brand-soft);
   color: var(--brand-dark);
 }
+
 .resource-list code {
   overflow-wrap: anywhere;
 }
@@ -203,6 +207,7 @@ h1 {
   margin: 0 0 0.4rem;
   font-size: clamp(1.5rem, 3vw, 2.1rem);
 }
+
 .book-pdf__description {
   margin: 0;
   color: var(--muted);
@@ -245,11 +250,13 @@ h1 {
   transform: translateY(-1px);
   box-shadow: 0 6px 18px rgba(23, 32, 51, 0.1);
 }
+
 .button--primary {
   border-color: var(--brand);
   background: var(--brand);
   color: white;
 }
+
 .button--primary:hover {
   background: var(--brand-dark);
   color: white;
@@ -281,19 +288,24 @@ h1 {
   .hero {
     grid-template-columns: 1fr;
   }
+
   .hero__mark {
     display: none;
   }
+
   .content-grid {
     grid-template-columns: 1fr;
   }
+
   .resource-card {
     position: static;
   }
+
   .book-pdf__header {
     align-items: start;
     flex-direction: column;
   }
+
   .book-pdf__actions {
     align-self: flex-end;
   }
@@ -304,25 +316,31 @@ h1 {
     width: min(100% - 1rem, 1120px);
     padding-top: 1rem;
   }
+
   .site-nav {
     padding-inline: 0.25rem;
   }
+
   .hero {
     padding: 1.5rem;
     border-radius: 1.1rem;
   }
+
   .card {
     border-radius: 1.1rem;
   }
+
   .book-pdf__actions {
     align-self: stretch;
     flex-basis: auto;
     width: 100%;
     margin-left: 0;
   }
+
   .button {
     flex: 1 1 100%;
   }
+
   .book-pdf__viewer {
     height: 65vh;
     min-height: 24rem;
@@ -335,7 +353,7 @@ h1 {
   }
 }
 
-/* Textbook detail redesign */
+/* Detail page overrides. */
 body {
   background: #fff;
 }
