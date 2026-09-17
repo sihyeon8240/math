@@ -314,6 +314,7 @@ Set `autoImplicit false` in repository modules. Do not use `sorry`, `admit`,
 or new unchecked `axiom` declarations in checked sources.
 
 ## Linking a verified proof
+
 A verified LaTeX theorem needs two parts:
 
 1. A repository-global theorem label such as `an1:thm:compactness`.

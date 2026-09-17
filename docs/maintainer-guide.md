@@ -5,7 +5,12 @@ ownership, and the [documentation map](README.md) to find task-specific policies
 
 ## Reviewing changes
 
-Confirm scope, ownership, mathematical correctness, provenance, labels, bibliography, generated files, and reported validation. AI-generated changes require the same review plus checks for invented citations, broad rewrites, unsupported claims, and changes that merely look plausible. Risk is highest in mathematical content, `common/styles/`, metadata/versioning, scripts, workflows, templates, and any repository-wide rename.
+Confirm scope, ownership, mathematical correctness, provenance, labels,
+bibliography, generated files, and reported validation. AI-generated changes
+require the same review plus checks for invented citations, broad rewrites,
+unsupported claims, and changes that merely look plausible. Risk is highest in
+mathematical content, `common/styles/`, metadata/versioning, scripts, workflows,
+templates, and any repository-wide rename.
 
 ## Safe changes
 
@@ -86,9 +91,8 @@ Tag pushes no longer trigger a separate release workflow.
 - Concurrent runs are isolated by book and source commit. A later main commit
   does not suppress an earlier version's publication. Main push runs have separate
   concurrency groups per commit; development snapshot writes remain serialized.
-  If a run is cancelled or
-  fails, recover that original run explicitly; later pushes do not implicitly
-  backfill missed versions.
+  If a run is cancelled or fails, recover that original run explicitly; later
+  pushes do not implicitly backfill missed versions.
 
 ## Site publication checklist
 
@@ -98,7 +102,10 @@ validation, and styling. Confirm that generated pages remain untracked.
 ## Drift detection
 
 Run `make check source` for structural validation, `make report` for repository
-health, and `make doctor books BOOK=<slug>` for advisory textbook inspections. Compare changes against architecture rather than historical accidents. Before changing common styles, scripts, or templates, document the motivation, test every consumer, preserve interfaces, and provide a rollback-sized diff.
+health, and `make doctor books BOOK=<slug>` for advisory textbook inspections.
+Compare changes against architecture rather than historical accidents. Before
+changing common styles, scripts, or templates, document the motivation, test
+every consumer, preserve interfaces, and provide a rollback-sized diff.
 
 ## CI caches and verified PDF reuse
 
@@ -148,5 +155,6 @@ consumer pin through the existing pin pull request automation.
 
 Digest artifacts expire after one day. Temporary `build-<run>-<attempt>-<arch>`
 registry tags are retained, including when the other architecture fails; final
-image tags are published only after both smoke tests pass. No QEMU or new
-Python dependencies are required. See the [Docker multi-platform CI guide](https://docs.docker.com/build/ci/github-actions/multi-platform/).
+image tags are published only after both smoke tests pass. No QEMU or new Python
+dependencies are required. See the
+[Docker multi-platform CI guide](https://docs.docker.com/build/ci/github-actions/multi-platform/).

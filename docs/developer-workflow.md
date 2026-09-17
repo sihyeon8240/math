@@ -1,6 +1,8 @@
 # Developer workflow
 
-This guide describes ordinary repository operations. [The architecture guide](ARCHITECTURE.md) remains authoritative for structure and metadata ownership.
+This guide describes ordinary repository operations.
+[The architecture guide](ARCHITECTURE.md) remains authoritative for structure
+and metadata ownership.
 
 ## Development environment
 
@@ -8,8 +10,10 @@ The publishing compiler is LuaLaTeX through `latexmk`. Tool versions are owned b
 `config/toolchain.env`. The reviewed local and devcontainer image pin lives in
 `config/container-image.txt`; CI prepares an image from canonical build inputs
 and passes its tested immutable digest to downstream jobs. Lean consumes the
-synchronized `lean/lean-toolchain` and the locked Mathlib dependency. The development container is the supported setup; for local
-requirements, inspect the canonical configuration and run `make doctor env`.
+synchronized `lean/lean-toolchain` and the locked Mathlib dependency.
+
+The development container is the supported setup; for local requirements,
+inspect the canonical configuration and run `make doctor env`.
 After changing shared configuration, run `make config` and `make config check`.
 
 ## Daily development workflow
@@ -28,7 +32,13 @@ the next batch. Before removing the old branch, confirm that all work was
 included in the merge or preserved elsewhere. Start with fresh branch history
 after a squash merge to avoid carrying already merged commits into the next PR.
 
-Run `make doctor env`, make focused changes, and build and check the affected book with `make books BOOK=<slug> check`. Select the required checks from [Contributing](CONTRIBUTING.md#validation-by-change-category) before review. Make-based build files stay under the ignored `build/` directory, while LaTeX Workshop writes to the ignored `vscode-build/` directory. Release packages are retained as GitHub Actions artifacts.
+Run `make doctor env`, make focused changes, and build and check the affected
+book with `make books BOOK=<slug> check`. Select the required checks from
+[Contributing](CONTRIBUTING.md#validation-by-change-category) before review.
+
+Make-based build files stay under the ignored `build/` directory, while LaTeX
+Workshop writes to the ignored `vscode-build/` directory. Release packages are
+retained as GitHub Actions artifacts.
 
 ## Cleaning outputs and caches
 
@@ -114,7 +124,12 @@ checking proofs and building books. Use the focused
 
 ## Review
 
-Review for scope, mathematical correctness, source rights, metadata ownership, and accidental generated files. Confirm every new chapter and section is included, labels use the book prefix, bibliography keys are unique, and frontmatter overrides exist only for substantive customization. Pull requests state affected books, validation commands, unresolved pre-existing warnings, and unavailable local-only assets.
+Review for scope, mathematical correctness, source rights, metadata ownership,
+and accidental generated files. Confirm every new chapter and section is
+included, labels use the book prefix, bibliography keys are unique, and
+frontmatter overrides exist only for substantive customization. Pull requests
+state affected books, validation commands, unresolved pre-existing warnings, and
+unavailable local-only assets.
 
 ## CI and publication
 

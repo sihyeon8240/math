@@ -25,6 +25,7 @@ Book structure and references live in each `books/<slug>/` source tree. Generate
 files and their ownership are documented in the architecture guide. `AGENTS.md`
 contains instructions for automated coding agents rather than contributor
 documentation.
+
 When documents appear to disagree, follow [Repository architecture](ARCHITECTURE.md)
 for structural policy and `books.yml` for current book metadata and automation
 flags. Treat the Makefile and `make help` as the current public command interface,

@@ -1,19 +1,23 @@
 # Contributing
 
-Thank you for helping improve these textbooks. Keep mathematical-content changes separate from repository maintenance whenever possible.
+Thank you for helping improve these textbooks. Keep mathematical-content changes
+separate from repository maintenance whenever possible.
 
 ## Contribution workflow
 
 ### Reporting errors
 
-Open a GitHub Issue for typographical errors, mathematical errors, missing citations, broken references, or build failures. Include:
+Open a GitHub Issue for typographical errors, mathematical errors, missing
+citations, broken references, or build failures. Include:
 
 - the textbook and chapter or section;
 - the source path or PDF page when known;
 - the current statement;
 - the proposed correction and mathematical justification.
 
-Use a Pull Request for a focused correction after checking that an Issue does not already cover it. Discuss a new chapter, major reorganization, notation change, or shared-style redesign in an Issue before implementation.
+Use a Pull Request for a focused correction after checking that an Issue does
+not already cover it. Discuss a new chapter, major reorganization, notation
+change, or shared-style redesign in an Issue before implementation.
 
 ### Development checks
 

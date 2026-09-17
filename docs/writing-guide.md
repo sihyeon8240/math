@@ -25,11 +25,12 @@ and registers the book in `books.yml`. The lower-level `books.py add` command
 only registers an existing directory.
 
 The scaffold includes `formalization.md` from the
-[formalization boundary template](../common/templates/formalization.md). Complete
-its book-specific starting assumptions, accepted results, core developments,
-and external exceptions before adding formalized results. Record Mathlib
-correspondences in Lean comments under the [citation policy](formalization.md#statements-and-citation-policy).
-The template supplies no common mathematical prerequisites.
+[formalization boundary template](../common/templates/formalization.md).
+Complete its book-specific starting assumptions, accepted results, core
+developments, and external exceptions before adding formalized results. Record
+Mathlib correspondences in Lean comments under the
+[citation policy](formalization.md#statements-and-citation-policy). The template
+supplies no common mathematical prerequisites.
 
 ### Generated assembly and section files
 
