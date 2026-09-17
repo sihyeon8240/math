@@ -28,13 +28,11 @@ and mathematical fidelity explicitly; CI does not establish either.
 
 ### Pull requests
 
-Follow the [local batch workflow](developer-workflow.md#daily-development-workflow):
-keep `main` synchronized with `origin/main`, accumulate focused commits on
-`local-work`, and submit a manageable batch in one PR. Unrelated changes belong
-in separate commits; large or risky changes, or changes likely to be deferred
-independently, belong in separate PRs. The owner merges after the required
-GitHub Actions checks pass. Recreate `local-work` from the updated `main` after
-each merged batch. Never commit or push directly to `main`.
+Follow the [local batch workflow](developer-workflow.md#daily-development-workflow)
+for branch setup, synchronization, and cleanup. Submit a manageable batch in one
+PR. Unrelated changes belong in separate commits; large or risky changes, or
+changes likely to be deferred independently, belong in separate PRs. The owner
+merges after the required GitHub Actions checks pass.
 
 Run the checks required by [Validation by change category](#validation-by-change-category).
 If a required check cannot run locally, explain why in the PR. Describe affected

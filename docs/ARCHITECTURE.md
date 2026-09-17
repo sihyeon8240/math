@@ -37,9 +37,7 @@ books.yml
 
 Section source files contain mathematical content and labels only. They do not declare `\section`, load packages, or determine assembly order. Each logical section is named `NN-section-name.tex` and occupies one file. `references.bib` and any substantive book-specific style or frontmatter overrides remain hand-maintained book-local sources. Appendix source follows the same section-only rule under `appendices/NN-name/`; its assembly is generated from the `appendices` list.
 
-The complete `book.tex`, including its canonical manifest metadata, is generated
-from the shared template and committed with the other assembly so ordinary
-LaTeX tools can build directly. Book-local
+Book-local
 `frontmatter/title-and-copyright.tex` and `frontmatter/preface.tex` files may
 replace the corresponding shared presentation templates.
 
@@ -190,5 +188,5 @@ preparation, and affected-book validation on PRs and main. Required check names
 remain `Check sources` and `Verify textbook builds`. `scripts/verified-build.py`
 owns the verified PDF artifact contract and conservative reuse after merge;
 cache restores alone never count as validation. All PDF and metadata artifacts
-are generated under ignored `build/` directories. The [developer workflow](developer-workflow.md#continuous-integration)
+are generated under ignored `build/` directories. The [maintainer guide](maintainer-guide.md#ci-caches-and-verified-pdf-reuse)
 documents cache boundaries, artifact eligibility, expiration, and rebuild paths.

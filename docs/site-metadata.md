@@ -17,9 +17,21 @@ A published book may continue to evolve. Status is descriptive; automation parti
 
 ## Generated site pages
 
-`make site` selects normalized `site: true` books and writes that metadata into ignored `site/books/<slug>.md` page front matter for a local or CI build; pass `BOOK=<slug>` to limit generation to one site-enabled book. `make site check` validates the same rendering without writing files and accepts the same optional scope. Because `site/books/` is ignored and may not exist in a clean checkout, check mode validates rendering in memory when it is absent; when local generated pages exist, it also rejects stale, missing, and orphaned pages.
+`make site` selects normalized `site: true` books and writes that metadata into
+ignored `site/books/<slug>.md` page front matter for a local or CI build. Pass
+`BOOK=<slug>` to limit generation to one site-enabled book.
 
-Publishing a book on the site requires `build: true` and `site: true` in `books.yml`. After changing the manifest, run `make site check` and the repository checks; run `make site` only when local Jekyll input is needed. Manifest validation rejects `site: true` with `build: false`.
+`make site check` compares existing pages with the expected rendering without
+writing files. It rejects stale, missing, and orphaned pages. Run `make site`
+first in a clean checkout, where the ignored pages are absent. With
+`BOOK=<slug>`, check mode validates only that book's page.
+
+Publishing a book on the site requires `build: true` and `site: true` in
+`books.yml`. Manifest validation rejects `site: true` with `build: false`.
+After changing the manifest, follow [Refreshing local pages](#refreshing-local-pages)
+and the applicable [validation requirements](CONTRIBUTING.md#validation-by-change-category).
+Use `make check source` to validate fresh rendering in a temporary directory
+when local site pages are not needed.
 
 The build workflow downloads PDF artifacts to update the `generated-pdfs`
 branch. Pages checks out that complete snapshot and stages only `site: true`
