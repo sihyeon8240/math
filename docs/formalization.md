@@ -67,6 +67,37 @@ match the checked source. A successful PDF build only establishes that the
 code can be typeset. Contributors and reviewers must check this correspondence
 explicitly, including when only the displayed code changes.
 
+## Lean readability
+
+Use the division-algorithm proof in
+[`DivisionAlgorithm.lean`](../lean/Textbooks/ElementaryNumberTheory/Chapter02/DivisionAlgorithm.lean)
+as a layout reference. Group a proof by mathematical reasoning units: setup,
+witness selection, local claims, case analysis, and the final conclusion.
+Separate these units with one blank line. Keep consecutive tactics that perform
+one short calculation together; do not insert a blank line after every tactic.
+
+Indent each nested `by` proof and branch body by two spaces. Align sibling
+`·` branches and named cases, and distinguish substantial branches with blank
+lines. Wrap long declaration hypotheses and conclusions with four-space
+continuations; wrap long applications, constructors, and rewrite lists at their
+argument boundaries. Aim to keep lines within 100 characters.
+
+Put named local proofs on multiple lines. Expand multi-step inline proofs into
+indented tactic blocks, while retaining compact single-step arguments such as
+`by ring`. Preserve the goal behavior of `<;>` when wrapping it. Keep `calc`
+steps aligned and their supporting proofs indented beneath the relevant step.
+Comments should briefly explain a non-obvious reason or constraint; use proof
+structure and spacing rather than long comment blocks to show the argument.
+
+Apply the same reasoning-unit layout to Lean shown in LaTeX. Copy from the
+checked source and adjust only the surrounding presentation indentation. Keep
+pairs within one page and review page breaks after adding whitespace; see
+[displayed-code correspondence](#displayed-code-correspondence) and the
+[paired-code layout guidance](writing-guide.md#paired-mathematical-prose-and-lean-code).
+Formatting is not a reason to change declarations, dependencies, or proof steps.
+Run `make lean check`, `make check source`, and the affected books' strict builds;
+when displayed code changes, also run `make format tex check`.
+
 ## Trust and dependency model
 
 The checked proof chain is:

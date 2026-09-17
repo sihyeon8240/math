@@ -245,9 +245,16 @@ do not nest a `verbatim` environment inside it.
 
 ```tex
 \begin{lean}{The two remainders are equal: $r'=r$.}
-  have hrr : r' = r := by rw [hqq] at ha'; linarith
+  have hrr : r' = r := by
+    rw [hqq] at ha'
+    linarith
 \end{lean}
 ```
+
+Group displayed proofs by mathematical reasoning unit using the
+[Lean readability conventions](formalization.md#lean-readability), matching the
+checked source. Use blank lines between local claims and substantial branches,
+and indent nested proofs consistently.
 
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment

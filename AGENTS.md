@@ -112,6 +112,12 @@ install and cache configuration pointed at that file.
   `Textbooks` prefix.
   Keep `Textbooks` in module paths and imports. Book-level `All.lean` files are
   aggregation entry points, not mathematical sources.
+- Format Lean proofs by reasoning unit: separate setup, local claims, case
+  branches, and conclusions with single blank lines; indent nested proofs by
+  two spaces and wrap long signatures and expressions. Keep short related tactics
+  together, expand multi-step inline proofs, and keep comments brief. Apply the
+  same layout to displayed Lean, preserving its checked-source correspondence.
+  See `docs/formalization.md#lean-readability`.
 - Update imports and proof-index entries together when moving or renaming
   declarations. Follow `docs/formalization.md` and run `make lean check`.
 
