@@ -12,7 +12,7 @@
   \end{lean}
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_metric
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_metric
 \begin{proposition} \label{an1:thm:standard-metric-on-Rn}
   \begin{lean}{For $n\in\N$, the function $d(x,y)=\|x-y\|$ is a metric on $\R^{n}$.}
     theorem euclidean_metric (n : ℕ) :
@@ -665,7 +665,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.zero_dimensional
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.zero_dimensional
 \begin{lemma} \label{an1:lem:zero-dimensional}
   \begin{lean}{Any two points of $\R^{0}$ are equal, and every deleted neighborhood in $\R^{0}$ is empty.}
     theorem zero_dimensional (p q : EuclideanSpace ℝ (Fin 0)) (r : ℝ) :
@@ -687,7 +687,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_punctured_ball
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_punctured_ball
 \begin{lemma} \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
   \begin{lean}{For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the deleted neighborhood $\widetilde N_r(p)$ is nonempty.}
     theorem euclidean_punctured_ball (n : ℕ+)
@@ -736,7 +736,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_boundary
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_boundary
 \begin{proposition} \label{an1:thm:properties-of-boundary-in-rn}
   \begin{lean}{For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial E=E^{i}\cup(E^{c})^{i}\cup(E^{\prime}\cap(E^{c})^{\prime})$.}
     theorem euclidean_boundary (n : ℕ+)

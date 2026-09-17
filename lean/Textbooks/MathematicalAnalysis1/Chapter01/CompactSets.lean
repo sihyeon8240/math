@@ -1,5 +1,8 @@
 import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
 import Mathlib.Topology.Compactness.Compact
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Tactic.Convert
+import Mathlib.Tactic.Positivity
 
 /-! Core compactness results from the finite-open-subcover definition.
 `isCompact_iff_finite_subcover` only translates Mathlib's filter representation.

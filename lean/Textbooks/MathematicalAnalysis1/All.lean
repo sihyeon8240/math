@@ -1,2 +1,5 @@
+import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
+import Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces
+import Textbooks.MathematicalAnalysis1.Chapter01.CompactSets
 import Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets
 import Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences

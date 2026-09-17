@@ -1,4 +1,5 @@
 import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
+import Mathlib.Tactic.Ring
 
 /-! Core connectedness on the real line from the least-upper-bound property.
 The book permits the empty set to be connected. Its separated-set definition
