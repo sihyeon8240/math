@@ -1,4 +1,5 @@
-import Textbooks.LinearAlgebra.Chapter02.Multiplication
+import Textbooks.LinearAlgebra.Chapter01.Dimension
+import Textbooks.LinearAlgebra.Chapter02.MatrixSpace
 
 namespace LinearAlgebra.Chapter02
 

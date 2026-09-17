@@ -1,4 +1,4 @@
-import Textbooks.LinearAlgebra.Chapter01.DirectSums
+import Textbooks.LinearAlgebra.Chapter01.Dimension
 
 namespace LinearAlgebra.Chapter01
 
@@ -42,9 +42,9 @@ theorem finrank_product [Module.Finite K U] [Module.Finite K W] :
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K U)
   obtain ⟨t, ht⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K W)
   have hu : IsFiniteBasis (K := K) (fun x : s => (x : U)) :=
-    (finiteBasis_iff _).mpr ⟨basisOfSet hs, Module.Basis.coe_mk _ _⟩
+    isFiniteBasis_coe_of_isBasisOf hs
   have hw : IsFiniteBasis (K := K) (fun x : t => (x : W)) :=
-    (finiteBasis_iff _).mpr ⟨basisOfSet ht, Module.Basis.coe_mk _ _⟩
+    isFiniteBasis_coe_of_isBasisOf ht
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (product_is_basis hu hw)
   rw [Module.finrank_eq_card_basis b, Fintype.card_sum, Fintype.card_coe, Fintype.card_coe,
     ← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs,

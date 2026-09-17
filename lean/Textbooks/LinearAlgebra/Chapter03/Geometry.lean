@@ -1,5 +1,5 @@
-import Textbooks.LinearAlgebra.Chapter03.LinearMappings
 import Mathlib.Analysis.Convex.Basic
+import Mathlib.Data.Real.Basic
 
 namespace LinearAlgebra.Chapter03
 

@@ -82,7 +82,7 @@ theorem finrank_eq_of_bijective [Module.Finite K V] (f : V →ₗ[K] W)
     (hf : Function.Bijective f) : Module.finrank K V = Module.finrank K W := by
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
   have hb : IsFiniteBasis (K := K) (fun x : s => (x : V)) :=
-    (finiteBasis_iff _).mpr ⟨basisOfSet hs, Module.Basis.coe_mk _ _⟩
+    isFiniteBasis_coe_of_isBasisOf hs
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (basis_map f hf hb)
   rw [← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs,
     Module.finrank_eq_card_basis b, Fintype.card_coe]

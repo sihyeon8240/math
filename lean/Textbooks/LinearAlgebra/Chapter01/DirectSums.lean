@@ -118,18 +118,22 @@ theorem independent_zero_not_mem {s : Set V} (hs : LinearIndepOn K id s) : (0 : 
   intro h
   exact independent_not_mem_span hs (empty_subset s) h (notMem_empty _) (zero_mem _)
 
+/-- Lemma (Supporting lemma): bases of subspaces with zero intersection are disjoint. -/
+private theorem disjoint_basis_sets {s t : Finset V} {U W : Submodule K V}
+    (hs : IsBasisOf s U) (ht : IsBasisOf t W) (hz : U ⊓ W = ⊥) : Disjoint s t := by
+  apply Finset.disjoint_left.mpr
+  intro x hxs hxt
+  have hx : x ∈ U ⊓ W := ⟨hs.2 ▸ subset_span hxs, ht.2 ▸ subset_span hxt⟩
+  rw [hz, mem_bot] at hx
+  exact independent_zero_not_mem hs.1 (hx ▸ hxs)
+
 /-- Theorem: the union of bases of subspaces with zero intersection
 is a basis of their sum. -/
 theorem union_is_basis [DecidableEq V] {s t : Finset V} {U W : Submodule K V}
     (hs : IsBasisOf s U) (ht : IsBasisOf t W) (hz : U ⊓ W = ⊥) :
     IsBasisOf (s ∪ t) (U ⊔ W) := by
   classical
-  have hd : Disjoint s t := by
-    apply Finset.disjoint_left.mpr
-    intro x hxs hxt
-    have hx : x ∈ U ⊓ W := ⟨hs.2 ▸ subset_span hxs, ht.2 ▸ subset_span hxt⟩
-    rw [hz, mem_bot] at hx
-    exact independent_zero_not_mem hs.1 (hx ▸ hxs)
+  have hd : Disjoint s t := disjoint_basis_sets hs ht hz
   refine ⟨linearIndepOn_finset_iff.mpr ?_, ?_⟩
   · intro a ha x hx
     change ∑ y ∈ s ∪ t, a y • y = 0 at ha
@@ -157,12 +161,7 @@ theorem finrank_directSum [Module.Finite K V] {U W : Submodule K V}
   obtain ⟨t, ht, _⟩ := subspace_has_basis b hb.2 W
   obtain ⟨hsp, hz⟩ := directSum_sup_inf h
   have hu : IsBasisOf (s ∪ t) (⊤ : Submodule K V) := hsp ▸ union_is_basis hs ht hz
-  have hd : Disjoint s t := by
-    apply Finset.disjoint_left.mpr
-    intro x hxs hxt
-    have hx : x ∈ U ⊓ W := ⟨hs.2 ▸ subset_span hxs, ht.2 ▸ subset_span hxt⟩
-    rw [hz, mem_bot] at hx
-    exact independent_zero_not_mem hs.1 (hx ▸ hxs)
+  have hd : Disjoint s t := disjoint_basis_sets hs ht hz
   rw [← dimension_eq_finrank ⟨s ∪ t, hu⟩, dimension_eq_card ⟨s ∪ t, hu⟩ hu,
     finrank_eq_card_of_basisOf hs, finrank_eq_card_of_basisOf ht, Finset.card_union_of_disjoint hd]
 

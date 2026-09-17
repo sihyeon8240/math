@@ -138,6 +138,12 @@ noncomputable def basisOfSet {s : Finset V} (hs : IsBasisOf s (⊤ : Submodule K
   Module.Basis.mk (v := fun x : s => (x : V)) hs.1 (by
     rw [show range (fun x : s => (x : V)) = (s : Set V) by ext; simp, hs.2])
 
+/-- Lemma (Supporting lemma): a finite basis set gives an indexed finite basis. -/
+theorem isFiniteBasis_coe_of_isBasisOf {s : Finset V}
+    (hs : IsBasisOf s (⊤ : Submodule K V)) :
+    IsFiniteBasis (K := K) (fun x : s => (x : V)) := by
+  exact (finiteBasis_iff _).mpr ⟨basisOfSet hs, Module.Basis.coe_mk _ _⟩
+
 /-- Proposition: the locally determined finite dimension agrees
 with `Module.finrank`. -/
 theorem dimension_eq_finrank (h : HasFiniteBasis K V) : dimension h = Module.finrank K V := by

@@ -1,4 +1,5 @@
-import Textbooks.LinearAlgebra.Chapter01.Dimension
+import Textbooks.LinearAlgebra.Chapter01.Bases
+import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.IsDiag
 import Mathlib.LinearAlgebra.Matrix.Symmetric
