@@ -24,7 +24,9 @@ class BuildAllTests(unittest.TestCase):
         shutil.copy2(ROOT / "scripts/check-log.py", scripts / "check-log.py")
         (scripts / "books.py").write_text(
             textwrap.dedent("""\
-            import os, pathlib, sys
+            import os
+            import pathlib
+            import sys
             command = sys.argv[1]
             if command == "validate":
                 pathlib.Path(os.environ["VALIDATE_FILE"]).write_text("validated")
@@ -41,7 +43,11 @@ class BuildAllTests(unittest.TestCase):
         (scripts / "build-book.sh").write_text(
             textwrap.dedent("""\
             #!/usr/bin/env python3
-            import fcntl, os, pathlib, sys, time
+            import fcntl
+            import os
+            import pathlib
+            import sys
+            import time
             slug = sys.argv[1]
             log = pathlib.Path("build") / slug / "book.log"
             log.parent.mkdir(parents=True, exist_ok=True)
@@ -56,7 +62,9 @@ class BuildAllTests(unittest.TestCase):
                 current, maximum = map(int, values or ("0", "0"))
                 current += 1
                 maximum = max(maximum, current)
-                file.seek(0); file.truncate(); file.write(f"{current} {maximum}")
+                file.seek(0)
+                file.truncate()
+                file.write(f"{current} {maximum}")
                 file.flush()
             with pathlib.Path(os.environ["RUN_FILE"]).open("a") as file:
                 file.write(slug + "\\n")
@@ -91,7 +99,9 @@ class BuildAllTests(unittest.TestCase):
             with state.open("r+") as file:
                 fcntl.flock(file, fcntl.LOCK_EX)
                 current, maximum = map(int, file.read().split())
-                file.seek(0); file.truncate(); file.write(f"{current - 1} {maximum}")
+                file.seek(0)
+                file.truncate()
+                file.write(f"{current - 1} {maximum}")
                 file.flush()
             with pathlib.Path(os.environ["EVENT_FILE"]).open("a") as file:
                 file.write("end " + slug + "\\n")

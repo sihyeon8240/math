@@ -21,10 +21,7 @@ eof_formatter="$repository_root/scripts/normalize-eof.sh"
 cruft_directory="$(mktemp -d)"
 trap 'rm -rf "$cruft_directory"' EXIT
 
-# A cached entry means that this exact file content has already passed the
-# current formatter. Including the script and latexindent version in the cache
-# namespace invalidates old results whenever the formatting rules or toolchain
-# change.
+# Reuse checks only while the source, formatting rules, and tool version match.
 cache_root="${FORMAT_TEX_CACHE_DIR:-$repository_root/.latexindent_cache}"
 script_hash="$(sha256sum "$0" "$eof_formatter")"
 latexindent_version="$(latexindent --version | head -n 1)"
@@ -32,10 +29,8 @@ cache_namespace="$(printf '%s\n%s\n' "$script_hash" "$latexindent_version" | sha
 cache_directory="$cache_root/$cache_namespace"
 mkdir -p "$cache_directory"
 
-# Keep Lean relative indentation, but place its least-indented nonblank line
-# one defaultIndent inside the environment. Captions may span lines and contain
-# nested or escaped braces. Normalize their continuation lines separately from
-# Lean, retaining relative indentation within each part.
+# Indent captions and Lean bodies separately, preserving relative indentation.
+# Captions may contain nested braces, escapes, and comments.
 normalize_lean_indentation() {
   perl -0777 -pe '
     s{^([\t ]*)(\\begin\{lean\}[\t ]*(?<caption>\{(?:\\.|%[^\n]*\n|[^{}\\%]|(?&caption))*\})[^\n]*\n)(.*?)^[\t ]*(\\end\{lean\}[\t ]*(?:%[^\n]*)?$)}

@@ -542,7 +542,9 @@ class FormatTexTests(unittest.TestCase):
             latexindent = binary / "latexindent"
             latexindent.write_text(
                 "#!/usr/bin/env python3\n"
-                "import os, pathlib, sys\n"
+                "import os\n"
+                "import pathlib\n"
+                "import sys\n"
                 'if "--version" in sys.argv:\n'
                 '    print("latexindent fake")\n'
                 "    raise SystemExit(0)\n"
@@ -598,7 +600,9 @@ class FormatShellTests(unittest.TestCase):
             shfmt = binary / "shfmt"
             shfmt.write_text(
                 "#!/usr/bin/env python3\n"
-                "import os, pathlib, sys\n"
+                "import os\n"
+                "import pathlib\n"
+                "import sys\n"
                 'capture = pathlib.Path(os.environ["FORMAT_SHELL_CAPTURE"])\n'
                 'with capture.open("w", encoding="utf-8") as stream:\n'
                 "    for argument in sys.argv[1:]:\n"
@@ -761,7 +765,9 @@ class BuildBookTests(unittest.TestCase):
             set -euo pipefail
             printf '%s\n' "$TEXINPUTS" > "$LATEXMK_CAPTURE/texinputs"
             printf '%s\n' "$@" > "$LATEXMK_CAPTURE/arguments"
-            if [[ -e "$LATEXMK_CAPTURE/book.pdf" ]]; then touch "$LATEXMK_CAPTURE/stale-pdf-observed"; fi
+            if [[ -e "$LATEXMK_CAPTURE/book.pdf" ]]; then
+              touch "$LATEXMK_CAPTURE/stale-pdf-observed"
+            fi
             touch "$LATEXMK_CAPTURE/book.pdf"
             """),
             encoding="utf-8",
