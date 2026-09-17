@@ -118,7 +118,7 @@ theorem independent_zero_not_mem {s : Set V} (hs : LinearIndepOn K id s) : (0 : 
   intro h
   exact independent_not_mem_span hs (empty_subset s) h (notMem_empty _) (zero_mem _)
 
-/-- Lemma (Supporting lemma): bases of subspaces with zero intersection are disjoint. -/
+/-- Lemma: bases of subspaces with zero intersection are disjoint. -/
 private theorem disjoint_basis_sets {s t : Finset V} {U W : Submodule K V}
     (hs : IsBasisOf s U) (ht : IsBasisOf t W) (hz : U ⊓ W = ⊥) : Disjoint s t := by
   apply Finset.disjoint_left.mpr

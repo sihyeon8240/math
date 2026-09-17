@@ -138,7 +138,7 @@ noncomputable def basisOfSet {s : Finset V} (hs : IsBasisOf s (⊤ : Submodule K
   Module.Basis.mk (v := fun x : s => (x : V)) hs.1 (by
     rw [show range (fun x : s => (x : V)) = (s : Set V) by ext; simp, hs.2])
 
-/-- Lemma (Supporting lemma): a finite basis set gives an indexed finite basis. -/
+/-- Lemma: a finite basis set gives an indexed finite basis. -/
 theorem isFiniteBasis_coe_of_isBasisOf {s : Finset V}
     (hs : IsBasisOf s (⊤ : Submodule K V)) :
     IsFiniteBasis (K := K) (fun x : s => (x : V)) := by

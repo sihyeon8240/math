@@ -139,24 +139,28 @@ unchanged.
 | Supporting lemma | Reuse Mathlib for logical, representational, and elementary computational steps within the book's boundary; classify substantive new mathematics as a prerequisite or core result. |
 
 For new or revised mathematical declarations, begin the Lean declaration
-docstring with `Kind (Role):` for proved statements and `Definition:` for
+docstring with `Kind:` for proved statements and `Definition:` for
 definitions. Use the capitalized LaTeX environment name as the kind:
 `Theorem`, `Lemma`, `Proposition`, or `Corollary`. These kinds all use Lean
 `theorem` declarations; Lean syntax does not determine the textbook kind.
 When no corresponding textbook statement exists yet, choose the kind that
-matches its intended exposition. For example:
+matches its intended exposition. Describe the mathematics without printed
+textbook numbers or parenthesized proof-role tags. Keep textbook links in the
+proof index using stable LaTeX labels. For example:
 
 ```lean
 /-- Definition: the nonnegative greatest common divisor, with value zero
 when both inputs are zero. -/
-/-- Theorem (Core result): Bezout's identity for the locally constructed gcd. -/
-/-- Lemma (Supporting lemma): an elementary representation conversion. -/
-/-- Corollary (Core result): a consequence of an earlier local theorem. -/
-/-- Proposition (Prerequisite): an accepted result cited from Mathlib. -/
+/-- Theorem: Bezout's identity for the locally constructed gcd. -/
+/-- Lemma: an elementary representation conversion. -/
+/-- Corollary: a consequence of an earlier local theorem. -/
+/-- Proposition: an accepted result cited from Mathlib. -/
 ```
 
-The two classifications are independent: a corollary may be a core result,
-and a statement printed as a theorem may serve as a supporting lemma.
+Proof roles govern dependency review rather than docstring formatting: a
+corollary may be a core result, and a statement printed as a theorem may serve
+as a supporting lemma. Explain accepted prerequisites and dependency choices
+in ordinary prose where needed; no role tag is required.
 Definitions, including `noncomputable def` declarations, introduce mathematical
 objects, relations, or constructions. State their meaning and conventions;
 classify their proved properties separately. A construction requiring an
@@ -167,7 +171,7 @@ theorems.
 For the LaTeX `axiom` environment, preserve the textbook kind with `Axiom:`
 when documenting an explicit hypothesis or a structure's assumption field.
 If the statement is instead proved from the accepted boundary, use
-`Axiom (Role):` on that theorem and explain that it is an axiom only in the
+`Axiom:` on that theorem and explain that it is an axiom only in the
 textbook presentation. Never translate the environment into a new unchecked
 Lean `axiom` declaration. The repository's proof-safety requirements and the
 book's prerequisite boundary still apply. Other exposition environments, such
