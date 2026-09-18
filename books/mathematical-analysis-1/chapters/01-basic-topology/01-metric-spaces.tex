@@ -4,9 +4,6 @@
     d(p,q)=0\iff p=q,\qquad d(p,q)=d(q,p),\qquad d(p,z)\leq d(p,q)+d(q,z).
   \]
   The last condition is the \textbf{triangle inequality}. The pair $(X,d)$ is a \textbf{metric space}.
-  In Lean, this is the standard assumption \texttt{[MetricSpace X]}.
-  For every $n\in\N$, Euclidean space $\R^n$ is represented by \texttt{EuclideanSpace} over $\R$ indexed by \texttt{Fin n}, including dimension zero.
-  We use ordinary set and function language throughout: a space is represented by a type, a subset by \texttt{Set X}, and a subset regarded as a space by its subtype. This interpretation does not identify Lean's type-theoretic foundations with the ZFC axiom system.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_metric
@@ -40,7 +37,7 @@
       exact norm_sub_rev x y
   \end{lean}
 
-  Write $x-z=(x-y)+(y-z)$ and apply the Euclidean norm triangle inequality. These norm facts are accepted finite-dimensional prerequisites.
+  Write $x-z=(x-y)+(y-z)$ and apply the Euclidean norm triangle inequality.
 
   \begin{lean}
     · intro x y z
@@ -52,17 +49,16 @@
 
 \end{proof}
 
-Euclidean spaces always use this standard metric. In particular, the zero-dimensional space is included, rather than excluded by convention.
+Euclidean spaces use this metric, including in dimension zero.
 
 \begin{definition} \label{an1:def:neighborhood-open-ball}
   For $p\in X$ and $r>0$, the \textbf{open ball} is
   \[
     B(p,r)=\{q\in X:d(q,p)<r\}.
   \]
-  It is represented by \texttt{Metric.ball p r}; metric symmetry allows the center in either distance argument.
   The \textbf{punctured ball} is $B(p,r)\setminus\{p\}$.
   A \textbf{neighborhood} of $p$ is any set containing an open ball $B(p,r)$ with $r>0$. A neighborhood need not itself be open or a ball.
-  The notation $U\in\mathcal N(p)$, represented by membership in \texttt{nhds p}, means that $U$ is a neighborhood of $p$.
+  We write $U\in\mathcal N(p)$ when $U$ is a neighborhood of $p$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_nhds_iff
@@ -94,7 +90,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{lemma}
 
 \begin{proof}
-  The only additional condition after removing the center is $q\ne p$, which is equivalent to positive distance in a metric space.
+  Removing the center imposes $q\ne p$, equivalently $d(q,p)>0$.
 
   \begin{lean}
     change (dist q p < r ∧ q ≠ p) ↔ _
@@ -106,8 +102,8 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \begin{definition} \label{an1:def:limit-interior-isolated-points}
   A point $p$ is a \textbf{limit point} of $E$ if every positive-radius punctured ball about $p$ meets $E$.
-  The set of limit points, or \textbf{derived set}, is denoted by $E'$ and represented by \texttt{derivedSet E}.
-  A point is \textbf{interior} if some positive-radius ball about it lies in $E$; the interior $E^\circ$ is represented by \texttt{interior E}.
+  The set of limit points, or \textbf{derived set}, is denoted by $E'$.
+  A point is \textbf{interior} if some positive-radius ball about it lies in $E$; the set of interior points is denoted by $E^\circ$.
   An \textbf{isolated point} of $E$ belongs to $E$ and is its only point in some ball. We write $\operatorname{Iso}(E)$ for the set of isolated points.
   \begin{lean}
     def isolatedPoints (E : Set X) : Set X :=
@@ -168,8 +164,6 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \begin{definition} \label{an1:def:open-closed-sets}
   A set $E$ is \textbf{open} if every point of $E$ is interior, and \textbf{closed} if its complement is open.
-  We use the standard predicates \texttt{IsOpen E} and \texttt{IsClosed E} directly.
-  The characterization of closed sets by $E^{\prime}\subseteq E$ is proved below.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isOpen_iff
@@ -192,14 +186,13 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \begin{definition} \label{an1:def:closure}
   The \textbf{closure} $\overline E$ consists of points whose every positive-radius ball meets $E$.
-  It is represented by \texttt{closure E}. We prove below that $\overline E=E\cup E^{\prime}$.
 \end{definition}
 
 \begin{definition} \label{an1:def:bounded-perfect-dense-sets}
-  A set $E$ is \textbf{bounded} if there is a common upper bound for distances between its points; Lean uses \texttt{Bornology.IsBounded E}.
+  A set $E$ is \textbf{bounded} if there is a common upper bound for distances between its points.
   Equivalently, when $X$ is nonempty, $E$ lies in a positive-radius ball, as proved below. Subsets of the empty space are bounded.
-  A set is \textbf{perfect} if it is closed and each of its points is a limit point, represented by \texttt{Perfect E}. We prove below that this is equivalent to $E=E^{\prime}$.
-  A set is \textbf{dense} if $\overline E=X$, represented by \texttt{Dense E}.
+  A set is \textbf{perfect} if it is closed and each of its points is a limit point.
+  A set is \textbf{dense} if $\overline E=X$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isBounded_iff
@@ -409,7 +402,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_iff_derivedSet
 \begin{lemma} \label{an1:lem:closed-iff-limitPoints}
-  The standard closed-set predicate is equivalent to $E^{\prime}\subseteq E$.
+  $E$ is closed if and only if $E^{\prime}\subseteq E$.
 
   \begin{lean}
     theorem closed_iff_derivedSet (E : Set X) :
@@ -875,7 +868,7 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{proof}
 
 \begin{definition} \label{an1:def:boundary}
-  The \textbf{boundary} is $\partial E=\overline E\setminus E^{\circ}$, represented by \texttt{frontier E}.
+  The \textbf{boundary} is $\partial E=\overline E\setminus E^{\circ}$.
   The next lemma identifies it with $\overline E\cap\overline{E^{c}}$.
 \end{definition}
 
@@ -1058,7 +1051,6 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 \begin{definition} \label{an1:def:relative-open-closed-sets}
   For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ when it is open as a subset of the subspace $Y$. Equivalently, each $p\in E$ has $r>0$ with $Y\cap B(p,r)\subseteq E$.
   It is \textbf{closed relative to} $Y$ when it is closed in that subspace. The next lemma characterizes this by $E^{\prime}\cap Y\subseteq E$.
-  In Lean, use \texttt{IsOpen} or \texttt{IsClosed} on the inverse image of $E$ under the inclusion \texttt{Subtype.val} from $Y$ to $X$, with $E\subseteq Y$ as a separate hypothesis.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_closed

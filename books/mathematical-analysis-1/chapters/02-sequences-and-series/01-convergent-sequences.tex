@@ -1,11 +1,10 @@
 Sequences in this chapter are indexed by $\N=\{0,1,2,\ldots\}$.
-The Lean declarations lie in \texttt{MathematicalAnalysis1.Chapter02} and use the metric-space context from the preceding chapter, with its definitions available.
-The terms of a sequence retain their indices even when values repeat: $\{u_n:n\in\N\}$ is its range, whereas ``finitely many exceptional terms'' refers to finitely many exceptional indices.
+The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' refers to indices, even when values repeat.
 
 \begin{definition} \label{an1:def:sequence-convergence}
   A \textbf{sequence} in $X$ is a function $u:\N\to X$, with terms $u_n=u(n)$.
   It \textbf{converges to} $p\in X$ if for every $\varepsilon>0$ there is $N\in\N$ such that $d(u_n,p)<\varepsilon$ whenever $n\geq N$.
-  We write $u_n\to p$ or $\lim_{n\to\infty}u_n=p$ and represent this by \texttt{Filter.Tendsto u Filter.atTop (nhds p)}.
+  We write $u_n\to p$ or $\lim_{n\to\infty}u_n=p$.
   A sequence is \textbf{convergent} if it has a limit in its ambient space and \textbf{divergent} otherwise.
 \end{definition}
 
@@ -21,7 +20,7 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \end{lemma}
 
 \begin{proof}
-  Positive-radius balls form a neighborhood basis at the limit, and tails form a basis for eventual natural indices. These two bases give precisely the epsilon condition.
+  Balls form a neighborhood basis at $p$, and tails describe eventual membership in $\N$, giving the epsilon condition.
 
   \begin{lean}
     exact Metric.tendsto_atTop
@@ -29,7 +28,7 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \end{proof}
 
 \begin{definition} \label{an1:def:bounded-sequence}
-  A sequence is \textbf{bounded} if its range $\{u_n:n\in\N\}$ is bounded, represented by \texttt{Bornology.IsBounded (Set.range u)}.
+  A sequence is \textbf{bounded} if its range $\{u_n:n\in\N\}$ is bounded.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergent_bounded

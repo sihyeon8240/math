@@ -1,13 +1,10 @@
 \begin{definition} \label{an1:def:open-cover}
   A family $(G_i)_{i\in I}$ is an \textbf{open cover} of $E$ if each $G_i$ is open and $E\subseteq\bigcup_{i\in I}G_i$.
   For $S\subseteq I$, the subfamily indexed by $S$ is a \textbf{subcover} if $E\subseteq\bigcup_{i\in S}G_i$.
-  The family retains its original indices; finite index sets are represented by \texttt{Finset}.
 \end{definition}
 
 \begin{definition} \label{an1:def:compact}
   A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
-  We use \texttt{IsCompact E}. Its finite-open-subcover characterization is recorded below, in the Lean context \texttt{universe u} and \texttt{variable \{X : Type u\} [MetricSpace X]}.
-  Index types in the same universe suffice for this characterization; the standard predicate also handles covers indexed in other universes.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.isCompact_iff_finite_subcover
@@ -22,7 +19,7 @@
 \end{lemma}
 
 \begin{proof}
-  The finite-subcover interface expresses compactness with the same open sets, coverage inclusion, and finite set of indices in both directions.
+  Both directions are the finite-subcover characterization of compactness.
 
   \begin{lean}
     constructor
