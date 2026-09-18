@@ -15,9 +15,3 @@ import Textbooks.LinearAlgebra.Chapter03.RankNullity
 import Textbooks.LinearAlgebra.Chapter03.Composition
 import Textbooks.LinearAlgebra.Chapter03.Geometry
 import Textbooks.LinearAlgebra.Chapter03.Isomorphisms
-
-/-! Formalization entry point for *Linear Algebra*. -/
-
-namespace LinearAlgebra
-
-end LinearAlgebra
