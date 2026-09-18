@@ -1,12 +1,7 @@
-The declarations in this section belong to
-\texttt{ElementaryNumberTheory.Chapter02}. We continue to use the locally
-constructed, natural-valued gcd, including $\gcd(0,0)=0$. Divisibility always
-means the existence of an integer multiplication witness.
-
-Two pairs with the same integer common divisors have equal gcds: for nonzero
-pairs, each gcd is bounded by the other by greatestness; a zero pair is
-recognized by having zero as a common divisor. This is the local lemma
-\texttt{gcd\_eq\_of\_common\_divisors} used below.
+We retain the nonnegative gcd, with $\gcd(0,0)=0$.
+Pairs with the same common divisors have equal gcds: for nonzero pairs,
+each gcd is at most the other; a zero pair is characterized by having zero
+as a common divisor.
 
 \begin{lemma} \label{nt:thm:gcd-remainder}
   If $a,b,q,r\in\Z$ and $a=qb+r$, then $\gcd(a,b)=\gcd(b,r)$. No sign or size condition on the remainder is needed for this identity.
@@ -437,7 +432,7 @@ $a=qb+r$ with $0\le r<b$, and is followed by $(b,r)$.
           Int.lcm_zero_right]
   \end{lean}
 
-  Otherwise the standard lcm is a positive common multiple. It divides every positive common multiple $c$, so it is at most $c$. The previously proved uniqueness of the least positive common multiple identifies it with our construction. The conversion of positive $c$ to a natural number leaves its value unchanged.
+  Otherwise the standard lcm is a positive common multiple. It divides every positive common multiple $c$, so it is at most $c$. The previously proved uniqueness of the least positive common multiple identifies it with our construction.
 
   \begin{lean}
     · apply lcm_eq_of_least a b ha hb (Int.lcm a b)

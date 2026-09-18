@@ -1,6 +1,5 @@
 For integers $c,z$, define $c\mid z$ to mean that $z=ck$ for some
-$k\in\Z$. We use this existential definition directly, including when $c=0$.
-The Lean declarations below belong to \texttt{ElementaryNumberTheory.Chapter02}.
+$k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{theorem} \label{nt:thm:positive-common-divisor}
   Suppose $a,b\in\Z$ are not both zero. There is a positive natural number $d$ which divides both $a$ and $b$, is an integer linear combination of them, and is divisible by every common divisor.
@@ -544,7 +543,7 @@ The Lean declarations below belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{lemma}
 
 \begin{proof}
-  If the inputs are not both zero, the locally constructed gcd divides each input, so it divides the standard gcd. The standard gcd also divides each input, so our proved common-divisor property gives the reverse divisibility. Two natural numbers dividing one another are equal.
+  If the inputs are not both zero, each gcd divides the other by the common-divisor property. Since both are natural numbers, they are equal.
 
   \begin{lean}
     by_cases hab : a ≠ 0 ∨ b ≠ 0
