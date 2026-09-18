@@ -43,6 +43,14 @@ do not obtain them from a Mathlib gcd characterization. Integer divisibility
 uses the defining relation `a ∣ b ↔ ∃ k : ℤ, b = a * k`, with its witnesses
 expanded directly in proofs.
 
+After establishing the local characterizations independently, prove that the
+constructed gcd and lcm agree with `Int.gcd` and `Int.lcm`, including zero inputs.
+Their standard divisibility specifications, zero and positivity conventions,
+and elementary divisibility comparisons may be used in these terminal
+representation comparisons; they do not supply any argument in the local core
+proofs. This permits subsequent external reuse of the verified constructions
+through Mathlib's standard interfaces.
+
 No substantive number-theoretic property, even a short supporting lemma, is an
 accepted prerequisite merely because Mathlib supplies it. Prove needed properties
 from the accepted arithmetic and logical boundary and earlier local results.

@@ -412,3 +412,42 @@ $a=qb+r$ with $0\le r<b$, and is followed by $(b,r)$.
   \end{lean}
 
 \end{proof}
+
+% Lean source: Textbooks.ElementaryNumberTheory.Chapter02.LeastCommonMultiple.lcm_eq_int_lcm
+\begin{lemma} \label{nt:lem:lcm-eq-int-lcm}
+  For all integers $a,b$, the lcm constructed above agrees with Mathlib\textquotesingle s standard integer lcm, including zero inputs.
+
+  \begin{lean}
+    theorem lcm_eq_int_lcm (a b : ℤ) : lcm a b = Int.lcm a b
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  If either input is zero, both definitions give zero.
+
+  \begin{lean}
+    by_cases ha : a = 0
+
+    · simp only [ha, lcm, ne_eq, not_true_eq_false, false_and, ↓reduceDIte,
+        Int.lcm_zero_left]
+
+    · by_cases hb : b = 0
+
+      · simp only [hb, lcm, ne_eq, not_true_eq_false, and_false, ↓reduceDIte,
+          Int.lcm_zero_right]
+  \end{lean}
+
+  Otherwise the standard lcm is a positive common multiple. It divides every positive common multiple $c$, so it is at most $c$. The previously proved uniqueness of the least positive common multiple identifies it with our construction. The conversion of positive $c$ to a natural number leaves its value unchanged.
+
+  \begin{lean}
+    · apply lcm_eq_of_least a b ha hb (Int.lcm a b)
+        (Int.lcm_pos ha hb) (Int.dvd_lcm_left a b) (Int.dvd_lcm_right a b)
+      intro c hac hbc hc
+      apply Int.le_of_dvd hc
+      have hc' : (c.toNat : ℤ) = c := Int.toNat_of_nonneg hc.le
+      rw [← hc']
+      apply Int.natCast_dvd_natCast.mpr
+      exact Int.lcm_dvd (by rwa [hc']) (by rwa [hc'])
+  \end{lean}
+
+\end{proof}

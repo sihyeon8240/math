@@ -45,3 +45,7 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter02.lcm_spec
   - id: nt:thm:gcd-lcm-product
     declaration: ElementaryNumberTheory.Chapter02.gcd_mul_lcm
+  - id: nt:lem:gcd-eq-int-gcd
+    declaration: ElementaryNumberTheory.Chapter02.gcd_eq_int_gcd
+  - id: nt:lem:lcm-eq-int-lcm
+    declaration: ElementaryNumberTheory.Chapter02.lcm_eq_int_lcm

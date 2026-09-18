@@ -1,3 +1,4 @@
+import Mathlib.Data.Int.GCD
 import Textbooks.ElementaryNumberTheory.Chapter02.DivisionAlgorithm
 import Mathlib.Tactic.Ring
 
@@ -341,5 +342,23 @@ theorem eq_gcd_iff_common_divisor (a b d : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
       nlinarith
 
     exact le_antisymm hle hge
+
+/-- Lemma: the locally constructed gcd agrees with `Int.gcd`, including the zero pair.
+This representation bridge follows the local divisibility and uniqueness proofs;
+it is not used to supply their arguments. -/
+theorem gcd_eq_int_gcd (a b : ℤ) : gcd a b = Int.gcd a b := by
+  by_cases hab : a ≠ 0 ∨ b ≠ 0
+
+  · obtain ⟨_, hda, hdb, _, hgreatest⟩ := gcd_spec a b hab
+    apply Nat.dvd_antisymm
+
+    · exact Int.dvd_gcd hda hdb
+    · exact Int.natCast_dvd_natCast.mp
+        (hgreatest (Int.gcd a b) (Int.gcd_dvd_left a b) (Int.gcd_dvd_right a b))
+
+  · have ha : a = 0 := Classical.byContradiction (fun h => hab (Or.inl h))
+    have hb : b = 0 := Classical.byContradiction (fun h => hab (Or.inr h))
+    rw [ha, hb, gcd_zero_zero, Int.gcd_zero_left]
+    rfl
 
 end ElementaryNumberTheory.Chapter02

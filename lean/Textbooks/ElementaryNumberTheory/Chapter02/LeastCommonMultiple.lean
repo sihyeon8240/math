@@ -119,4 +119,26 @@ theorem gcd_mul_lcm (a b : ℤ) (ha : 0 < a) (hb : 0 < b) :
   rw [heq, hv]
   ring
 
+/-- Lemma: the locally constructed lcm agrees with `Int.lcm`, including zero inputs.
+The least-positive characterization has already been proved independently. -/
+theorem lcm_eq_int_lcm (a b : ℤ) : lcm a b = Int.lcm a b := by
+  by_cases ha : a = 0
+
+  · simp only [ha, lcm, ne_eq, not_true_eq_false, false_and, ↓reduceDIte,
+      Int.lcm_zero_left]
+
+  · by_cases hb : b = 0
+
+    · simp only [hb, lcm, ne_eq, not_true_eq_false, and_false, ↓reduceDIte,
+        Int.lcm_zero_right]
+
+    · apply lcm_eq_of_least a b ha hb (Int.lcm a b)
+        (Int.lcm_pos ha hb) (Int.dvd_lcm_left a b) (Int.dvd_lcm_right a b)
+      intro c hac hbc hc
+      apply Int.le_of_dvd hc
+      have hc' : (c.toNat : ℤ) = c := Int.toNat_of_nonneg hc.le
+      rw [← hc']
+      apply Int.natCast_dvd_natCast.mpr
+      exact Int.lcm_dvd (by rwa [hc']) (by rwa [hc'])
+
 end ElementaryNumberTheory.Chapter02

@@ -533,3 +533,37 @@ The Lean declarations below belong to \texttt{ElementaryNumberTheory.Chapter02}.
       exact le_antisymm hle hge
   \end{lean}
 \end{proof}
+
+% Lean source: Textbooks.ElementaryNumberTheory.Chapter02.GreatestCommonDivisor.gcd_eq_int_gcd
+\begin{lemma} \label{nt:lem:gcd-eq-int-gcd}
+  For all integers $a,b$, the nonnegative gcd constructed above agrees with Mathlib\textquotesingle s standard integer gcd, including $(a,b)=(0,0)$.
+
+  \begin{lean}
+    theorem gcd_eq_int_gcd (a b : ℤ) : gcd a b = Int.gcd a b
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  If the inputs are not both zero, the locally constructed gcd divides each input, so it divides the standard gcd. The standard gcd also divides each input, so our proved common-divisor property gives the reverse divisibility. Two natural numbers dividing one another are equal.
+
+  \begin{lean}
+    by_cases hab : a ≠ 0 ∨ b ≠ 0
+
+    · obtain ⟨_, hda, hdb, _, hgreatest⟩ := gcd_spec a b hab
+      apply Nat.dvd_antisymm
+
+      · exact Int.dvd_gcd hda hdb
+      · exact Int.natCast_dvd_natCast.mp
+          (hgreatest (Int.gcd a b) (Int.gcd_dvd_left a b) (Int.gcd_dvd_right a b))
+  \end{lean}
+
+  For the zero pair, both definitions give zero. This comparison identifies the representations after the local gcd properties have been established; none of those proofs uses the comparison.
+
+  \begin{lean}
+    · have ha : a = 0 := Classical.byContradiction (fun h => hab (Or.inl h))
+      have hb : b = 0 := Classical.byContradiction (fun h => hab (Or.inr h))
+      rw [ha, hb, gcd_zero_zero, Int.gcd_zero_left]
+      rfl
+  \end{lean}
+
+\end{proof}
