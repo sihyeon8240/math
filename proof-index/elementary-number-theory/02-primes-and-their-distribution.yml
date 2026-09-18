@@ -21,3 +21,35 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter02.existsUnique_canonical_factorization
   - id: nt:cor:canonical-factorization-product
     declaration: ElementaryNumberTheory.Chapter02.canonical_factorization_spec
+  - id: nt:lem:prime-divisor-exists
+    declaration: ElementaryNumberTheory.Chapter02.exists_prime_divisor
+  - id: nt:thm:composite-prime-divisor-sqrt
+    declaration: ElementaryNumberTheory.Chapter02.exists_prime_divisor_le_sqrt
+  - id: nt:lem:factorial-multiple
+    declaration: ElementaryNumberTheory.Chapter02.factorial_multiple
+  - id: nt:lem:prime-not-divide-consecutive
+    declaration: ElementaryNumberTheory.Chapter02.not_dvd_of_dvd_add_one
+  - id: nt:lem:prime-above-bound
+    declaration: ElementaryNumberTheory.Chapter02.exists_prime_gt
+  - id: nt:thm:infinitely-many-primes
+    declaration: ElementaryNumberTheory.Chapter02.infinite_primes
+  - id: nt:lem:next-prime-product-bound
+    declaration: ElementaryNumberTheory.Chapter02.nth_prime_le_prod_add_one
+  - id: nt:lem:prime-product-double-exponential
+    declaration: ElementaryNumberTheory.Chapter02.prod_initial_primes_lt
+  - id: nt:thm:nth-prime-double-exponential
+    declaration: ElementaryNumberTheory.Chapter02.nth_prime_le_double_exponential
+  - id: nt:thm:consecutive-composites
+    declaration: ElementaryNumberTheory.Chapter02.exists_consecutive_composites
+  - id: nt:lem:product-four-mul-add-one
+    declaration: ElementaryNumberTheory.Chapter02.prod_four_mul_add_one
+  - id: nt:lem:prime-remainders-four
+    declaration: ElementaryNumberTheory.Chapter02.prime_eq_two_or_mod_four
+  - id: nt:lem:prime-divisor-four-mul-add-three
+    declaration: ElementaryNumberTheory.Chapter02.exists_prime_divisor_mod_four_three
+  - id: nt:lem:prime-four-mul-add-three-above-bound
+    declaration: ElementaryNumberTheory.Chapter02.exists_prime_mod_four_three_gt
+  - id: nt:thm:infinitely-many-primes-four-mul-add-three
+    declaration: ElementaryNumberTheory.Chapter02.infinite_primes_four_mul_add_three
+  - id: nt:thm:prime-progression-common-difference
+    declaration: ElementaryNumberTheory.Chapter02.prime_dvd_common_difference

@@ -1,1 +1,303 @@
-%
+We continue to represent positive integers by natural numbers with explicit
+positivity assumptions. The Lean namespace is
+\texttt{ElementaryNumberTheory.Chapter02}.
+
+\begin{lemma} \label{nt:lem:prime-divisor-exists}
+  Every natural number $n>1$ has a prime divisor $p\le n$.
+
+  \begin{lean}
+    theorem exists_prime_divisor (n : ℕ) (hn : 1 < n) :
+        ∃ p : ℕ, isPrime p ∧ p ∣ n ∧ p ≤ n
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  The fundamental theorem of arithmetic supplies a nonempty list of prime factors. Take its first entry $p$ and write $n=pM$, where $M$ is the product of the remaining entries. Since $n>0$, we have $M\ge1$, so $p\le n$.
+
+  \begin{lean}
+    obtain ⟨l, hne, hl, hprod, _⟩ := fundamental_theorem_of_arithmetic n hn
+    cases l with
+    | nil => exact (hne rfl).elim
+    | cons p l =>
+      have hp := hl p List.mem_cons_self
+      have heq : n = p * l.prod := hprod.symm
+      have hpos : 0 < l.prod := by
+        nlinarith
+      exact ⟨p, hp, ⟨l.prod, heq⟩, by nlinarith⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:composite-prime-divisor-sqrt}
+  If $n>1$ is composite, it has a prime divisor $p$ satisfying $p\le\sqrt n$.
+  For integer $p$, this is equivalent to $p\le\lfloor\sqrt n\rfloor$; Lean uses the natural square root, characterized by $p\le\operatorname{sqrt}(n)$ if and only if $p^2\le n$.
+
+  \begin{lean}
+    theorem exists_prime_divisor_le_sqrt (n : ℕ) (hn : isComposite n) :
+        ∃ p : ℕ, isPrime p ∧ p ∣ n ∧ p ≤ Nat.sqrt n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Since $n$ is composite, choose a divisor $d$ other than $1$ and $n$, and write $n=dk$. Positivity and the proper-divisor condition give $d>1$ and $k>1$.
+
+  \begin{lean}
+    classical
+    have hdiv : ∃ d : ℕ, d ∣ n ∧ d ≠ 1 ∧ d ≠ n := by
+      simpa only [isPrime, hn.1, true_and, not_forall, not_or, exists_prop] using hn.2
+
+    obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
+    have hdpos : 0 < d := by
+      nlinarith [hn.1]
+    have hd : 1 < d := by
+      omega
+    have hkgt : 1 < k := by
+      by_contra h
+      have hk1 : k = 1 := by
+        nlinarith [hn.1]
+      simp only [hk1, mul_one] at hk
+      exact hdn hk.symm
+  \end{lean}
+
+  Choose a prime divisor $p$ of $\min(d,k)$. If $p$ divides $d$, write $d=pt$ and obtain $n=p(tk)$. If it divides $k$, write $k=pt$ and obtain $n=p(dt)$. Thus $p\mid n$ in either case.
+
+  \begin{lean}
+    obtain ⟨p, hp, ⟨t, ht⟩, hle⟩ := exists_prime_divisor (min d k) (by omega)
+    refine ⟨p, hp, ?_, Nat.le_sqrt.mpr ?_⟩
+
+    · rcases le_total d k with hdk | hkd
+
+      · rw [min_eq_left hdk] at ht
+        refine ⟨t * k, ?_⟩
+        rw [hk, ht]
+        ring
+      · rw [min_eq_right hkd] at ht
+        refine ⟨d * t, ?_⟩
+        rw [hk, ht]
+        ring
+  \end{lean}
+
+  The choice of $p$ gives $p\le d$ and $p\le k$. Therefore $p^2\le dk=n$, proving the square-root bound.
+
+  \begin{lean}
+    · have hpd : p ≤ d := le_trans hle (min_le_left _ _)
+      have hpk : p ≤ k := le_trans hle (min_le_right _ _)
+      nlinarith [Nat.mul_le_mul hpd hpk]
+  \end{lean}
+
+\end{proof}
+
+Consequently, a sieve need only test prime divisors up to the square root:
+a number greater than one with no such prime divisor cannot be composite.
+
+\begin{lemma} \label{nt:lem:factorial-multiple}
+  For natural numbers $k,n$ with $0<k\le n$, there is a natural number $t$ such that $n!=kt$.
+
+  \begin{lean}
+    theorem factorial_multiple (n k : ℕ) (hk : 0 < k) (hkn : k ≤ n) :
+        ∃ t : ℕ, n.factorial = k * t
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Induct on $n$. The case $n=0$ has no admissible $k$. At the next step, if $k=n+1$, use $(n+1)!=(n+1)n!$. Otherwise $k\le n$, and multiplying the inductive equality $n!=kt$ by $n+1$ gives the required witness.
+
+  \begin{lean}
+    induction n with
+    | zero => omega
+    | succ n ih =>
+      by_cases heq : k = n + 1
+
+      · exact ⟨n.factorial, by rw [heq, Nat.factorial_succ]⟩
+      · obtain ⟨t, ht⟩ := ih (by omega)
+        refine ⟨(n + 1) * t, ?_⟩
+        rw [Nat.factorial_succ, ht]
+        ring
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-not-divide-consecutive}
+  If a prime $p$ divides $M+1$, it does not divide $M$.
+
+  \begin{lean}
+    theorem not_dvd_of_dvd_add_one (p M : ℕ) (hp : isPrime p) (h : p ∣ M + 1) :
+        ¬p ∣ M
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  If $M=pj$ and $M+1=pk$, then $j<k$. Hence $M+p=p(j+1)\le pk=M+1$, implying $p\le1$, a contradiction.
+
+  \begin{lean}
+    rintro ⟨j, hj⟩
+    obtain ⟨k, hk⟩ := h
+    have hjk : j + 1 ≤ k := by
+      nlinarith [hp.1]
+    nlinarith [Nat.mul_le_mul_left p hjk, hp.1]
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-above-bound}
+  For every natural number $m$, some prime exceeds $m$.
+
+  \begin{lean}
+    theorem exists_prime_gt (m : ℕ) : ∃ p : ℕ, isPrime p ∧ m < p
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  The number $m!+1$ exceeds one, so it has a prime divisor $p$.
+
+  \begin{lean}
+    obtain ⟨p, hp, hdiv, _⟩ :=
+      exists_prime_divisor (m.factorial + 1) (by
+        have := Nat.factorial_pos m
+        omega)
+  \end{lean}
+
+  If $p\le m$, the factorial lemma gives $p\mid m!$. This contradicts the fact that a prime cannot divide both $m!$ and $m!+1$. Thus $p>m$.
+
+  \begin{lean}
+    refine ⟨p, hp, ?_⟩
+    by_contra h
+    obtain ⟨t, ht⟩ := factorial_multiple m p (lt_trans Nat.zero_lt_one hp.1) (by omega)
+    exact not_dvd_of_dvd_add_one p m.factorial hp hdiv ⟨t, ht⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:infinitely-many-primes}
+  There are infinitely many prime numbers.
+
+  \begin{lean}
+    theorem infinite_primes : Set.Infinite {p : ℕ | isPrime p}
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Every finite set of natural numbers is bounded. The preceding lemma produces a prime beyond any proposed bound, so the set of primes is infinite.
+
+  \begin{lean}
+    apply Set.infinite_of_forall_exists_gt
+    intro m
+    obtain ⟨p, hp, hgt⟩ := exists_prime_gt m
+    exact ⟨p, hp, hgt⟩
+  \end{lean}
+
+\end{proof}
+
+List the primes in increasing order as $p_1,p_2,\ldots$.
+The general enumeration \texttt{Nat.nth} starts at zero, so
+\texttt{Nat.nth isPrime i} denotes $p_{i+1}$. The infinitude just proved ensures
+that this enumeration always gives a prime, is increasing, and contains every
+prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
+
+\begin{lemma} \label{nt:lem:next-prime-product-bound}
+  For every $n\ge0$, the next prime satisfies $p_{n+1}\le P_n+1$.
+
+  \begin{lean}
+    theorem nth_prime_le_prod_add_one (n : ℕ) :
+        Nat.nth isPrime n ≤ (∏ i ∈ Finset.range n, Nat.nth isPrime i) + 1
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  All factors in $P_n$ are positive, and the empty product is also positive. Thus $P_n+1>1$.
+
+  \begin{lean}
+    classical
+    let P := ∏ i ∈ Finset.range n, Nat.nth isPrime i
+    have hP : 0 < P := by
+      apply Finset.prod_pos
+      intro i _
+      exact lt_trans Nat.zero_lt_one (Nat.nth_mem_of_infinite infinite_primes i).1
+  \end{lean}
+
+  Choose a prime divisor $q\le P_n+1$ and let its enumeration index be $k$, so $q=p_{k+1}$. If $k<n$, then $q$ is a factor of $P_n$, contradicting the consecutive-number lemma. Therefore $k\ge n$.
+
+  \begin{lean}
+    obtain ⟨q, hq, hdiv, hqle⟩ := exists_prime_divisor (P + 1) (by omega)
+    obtain ⟨k, hk⟩ := Nat.subset_range_nth (p := isPrime) (show q ∈ Set.ofPred isPrime from hq)
+    have hnk : n ≤ k := by
+      by_contra h
+      have hmem : k ∈ Finset.range n := Finset.mem_range.mpr (by omega)
+      have hfactor := Finset.prod_erase_mul (Finset.range n) (Nat.nth isPrime) hmem
+      have hqP : q ∣ P := by
+        refine ⟨∏ i ∈ (Finset.range n).erase k, Nat.nth isPrime i, ?_⟩
+        dsimp [P]
+        rw [← hfactor, hk, mul_comm]
+
+      exact not_dvd_of_dvd_add_one q P hq hdiv hqP
+  \end{lean}
+
+  Increasing order gives $p_{n+1}\le p_{k+1}=q\le P_n+1$.
+
+  \begin{lean}
+    calc
+      Nat.nth isPrime n ≤ Nat.nth isPrime k := Nat.nth_monotone infinite_primes hnk
+      _ = q := hk
+      _ ≤ P + 1 := hqle
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-product-double-exponential}
+  For every $n\ge0$, we have $P_n<2^{2^n}$.
+
+  \begin{lean}
+    theorem prod_initial_primes_lt (n : ℕ) :
+        (∏ i ∈ Finset.range n, Nat.nth isPrime i) < 2 ^ (2 ^ n)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Induct on $n$. For $n=0$, the assertion is $1<2$. If $P_n< B=2^{2^n}$, integrality gives $P_n+1\le B$, so the preceding bound yields $p_{n+1}\le B$.
+
+  \begin{lean}
+    induction n with
+    | zero => simp
+    | succ n ih =>
+      have hnext := nth_prime_le_prod_add_one n
+      have hbound : Nat.nth isPrime n ≤ 2 ^ (2 ^ n) := by
+        omega
+  \end{lean}
+
+  It follows that $P_{n+1}=P_np_{n+1}\le P_nB<B^2=2^{2^{n+1}}$.
+
+  \begin{lean}
+    rw [Finset.prod_range_succ]
+    calc
+      (∏ i ∈ Finset.range n, Nat.nth isPrime i) * Nat.nth isPrime n ≤
+          (∏ i ∈ Finset.range n, Nat.nth isPrime i) * 2 ^ (2 ^ n) :=
+        Nat.mul_le_mul_left _ hbound
+      _ < 2 ^ (2 ^ n) * 2 ^ (2 ^ n) :=
+        Nat.mul_lt_mul_of_pos_right ih (pow_pos (by omega) _)
+      _ = 2 ^ (2 ^ (n + 1)) := by
+        rw [pow_succ (2 : ℕ) n, pow_mul, pow_two]
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:nth-prime-double-exponential}
+  For the $n$th prime $p_n$, with $n\ge1$, we have $p_n\le2^{2^{n-1}}$.
+
+  \begin{lean}
+    theorem nth_prime_le_double_exponential (n : ℕ) (hn : 0 < n) :
+        Nat.nth isPrime (n - 1) ≤ 2 ^ (2 ^ (n - 1))
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Write $n=m+1$. The preceding lemmas give $p_n\le P_m+1$ and $P_m<2^{2^m}$. Since these are integers, $P_m+1\le2^{2^m}$, proving the assertion.
+
+  \begin{lean}
+    obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hn)
+    have hproduct := prod_initial_primes_lt m
+    have hnext := nth_prime_le_prod_add_one m
+    simpa only [Nat.succ_sub_one] using
+      (show Nat.nth isPrime m ≤ 2 ^ (2 ^ m) by omega)
+  \end{lean}
+
+\end{proof}

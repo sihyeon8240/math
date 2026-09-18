@@ -5,3 +5,5 @@ import Textbooks.ElementaryNumberTheory.Chapter01.LeastCommonMultiple
 import Textbooks.ElementaryNumberTheory.Chapter01.DiophantineEquations
 import Textbooks.ElementaryNumberTheory.Chapter02.Primes
 import Textbooks.ElementaryNumberTheory.Chapter02.PrimeFactorization
+import Textbooks.ElementaryNumberTheory.Chapter02.SieveOfEratosthenes
+import Textbooks.ElementaryNumberTheory.Chapter02.GoldbachConjecture
