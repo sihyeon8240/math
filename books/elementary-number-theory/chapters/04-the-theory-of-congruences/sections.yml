@@ -1,7 +1,5 @@
 schema_version: 1
 sections:
-- slug: carl-friedrich-gauss
-  title: Carl Friedrich Gauss
 - slug: basic-properties-of-congruence
   title: Basic Properties of Congruence
 - slug: binary-and-decimal-representations-of-integers

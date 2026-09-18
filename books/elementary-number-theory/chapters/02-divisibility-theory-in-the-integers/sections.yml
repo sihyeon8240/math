@@ -1,7 +1,5 @@
 schema_version: 1
 sections:
-- slug: early-number-theory
-  title: Early Number Theory
 - slug: the-division-algorithm
   title: The Division Algorithm
 - slug: the-greatest-common-divisor

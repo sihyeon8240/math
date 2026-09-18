@@ -1,7 +1,5 @@
 schema_version: 1
 sections:
-- slug: hardy-dickson-and-erdos
-  title: Hardy, Dickson, and Erd\"os
 - slug: primality-testing-and-factorization
   title: Primality Testing and Factorization
 - slug: an-application-to-factoring-remote-coin-flipping

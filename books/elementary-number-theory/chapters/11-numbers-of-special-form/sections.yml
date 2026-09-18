@@ -1,7 +1,5 @@
 schema_version: 1
 sections:
-- slug: marin-mersenne
-  title: Marin Mersenne
 - slug: perfect-numbers
   title: Perfect Numbers
 - slug: mersenne-primes-and-amicable-numbers
