@@ -1,0 +1,448 @@
+We retain the nonnegative gcd, with $\gcd(0,0)=0$.
+Pairs with the same common divisors have equal gcds: for nonzero pairs,
+each gcd is at most the other; a zero pair is characterized by having zero
+as a common divisor.
+
+\begin{lemma} \label{nt:thm:gcd-remainder}
+  If $a,b,q,r\in\Z$ and $a=qb+r$, then $\gcd(a,b)=\gcd(b,r)$. No sign or size condition on the remainder is needed for this identity.
+
+  \begin{lean}
+    theorem gcd_eq_gcd_remainder (a b q r : ℤ) (ha : a = q * b + r) :
+        gcd a b = gcd b r
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+
+  It suffices to compare common divisors. If $a=cu$ and $b=cv$, then $r=c(u-qv)$. Thus a common divisor of $a,b$ also divides $b,r$.
+
+  \begin{lean}
+    apply gcd_eq_of_common_divisors
+    intro c
+    constructor
+
+    · rintro ⟨⟨u, hu⟩, ⟨v, hv⟩⟩
+      refine ⟨⟨v, hv⟩, ⟨u - q * v, ?_⟩⟩
+      calc
+        r = a - q * b := by
+          linarith [ha]
+        _ = c * (u - q * v) := by
+          rw [hu, hv]
+          ring
+  \end{lean}
+
+  Conversely, if $b=cu$ and $r=cv$, then $a=c(qu+v)$. Both implications use explicit integer witnesses.
+
+  \begin{lean}
+    · rintro ⟨⟨u, hu⟩, ⟨v, hv⟩⟩
+      exact ⟨⟨q * u + v, by
+        rw [ha, hu, hv]
+        ring⟩, ⟨u, hu⟩⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:thm:gcd-abs}
+  For all integers $a,b$, taking absolute values leaves the gcd unchanged: $\gcd(|a|,|b|)=\gcd(a,b)$.
+
+  \begin{lean}
+    theorem gcd_abs (a b : ℤ) : gcd |a| |b| = gcd a b
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+
+  An integer $c$ divides $|z|$ exactly when it divides $z$. For $z\ge0$ this is immediate; for $z<0$, negate the multiplication witness. Apply this to both inputs and use the common-divisor characterization.
+
+  \begin{lean}
+    have hdiv (c z : ℤ) : c ∣ |z| ↔ c ∣ z := by
+      by_cases hz : 0 ≤ z
+
+      · rw [abs_of_nonneg hz]
+      · rw [abs_of_neg (lt_of_not_ge hz)]
+        constructor <;> rintro ⟨k, hk⟩ <;> exact ⟨-k, by linarith⟩
+
+    exact gcd_eq_of_common_divisors _ _ _ _ (fun c => by rw [hdiv, hdiv])
+  \end{lean}
+
+\end{proof}
+
+Absolute values reduce the computation to nonnegative inputs. No initial
+ordering is necessary: dividing a smaller input by a larger one simply gives
+quotient zero. A finite division trace records every quotient and remainder.
+Its terminal pair is $(g,0)$; each preceding pair $(a,b)$ satisfies
+$a=qb+r$ with $0\le r<b$, and is followed by $(b,r)$.
+
+\begin{definition}
+  The relation $\texttt{EuclideanTrace}\ a\ b\ g$ records such a finite computation. The natural number types encode nonnegativity, and $r<b$ records strict decrease.
+
+  \begin{lean}
+    inductive EuclideanTrace : ℕ → ℕ → ℕ → Prop
+      | done (a : ℕ) : EuclideanTrace a 0 a
+      | step (a b r g : ℕ) (q : ℤ) (hr : r < b)
+          (ha : (a : ℤ) = q * (b : ℤ) + (r : ℤ))
+          (tail : EuclideanTrace b r g) : EuclideanTrace a b g
+  \end{lean}
+\end{definition}
+
+\begin{theorem} \label{nt:thm:euclidean-termination}
+  For every $a,b\in\N$, a finite Euclidean division trace starts at $(a,b)$ and ends at some $(g,0)$.
+
+  \begin{lean}
+    theorem euclideanTrace_exists (a b : ℕ) : ∃ g, EuclideanTrace a b g
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+
+  Use strong induction on the second input, allowing the first input to vary. If the second input is zero, the computation has already ended.
+
+  \begin{lean}
+    induction b using Nat.strong_induction_on generalizing a with
+    | h b ih =>
+      by_cases hb : b = 0
+
+      · subst b
+        exact ⟨a, EuclideanTrace.done a⟩
+  \end{lean}
+
+  Otherwise the previously proved division algorithm supplies $a=qb+r$ with $r<b$. The induction hypothesis gives a finite trace from $(b,r)$; prefix the recorded division to obtain the required trace.
+
+  \begin{lean}
+    · obtain ⟨⟨q, r⟩, ⟨ha, hr⟩, _⟩ :=
+        existsUnique_quotient_remainder (a : ℤ) ⟨b, Nat.pos_of_ne_zero hb⟩
+
+      obtain ⟨g, hg⟩ := ih r hr b
+
+      exact ⟨g, EuclideanTrace.step a b r g q hr ha hg⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:euclidean-correctness}
+  If a Euclidean trace starts at $(a,b)$ and ends at $(g,0)$, then $\gcd(a,b)=g$.
+
+  \begin{lean}
+    theorem EuclideanTrace.gcd_eq {a b g : ℕ} (h : EuclideanTrace a b g) :
+        gcd (a : ℤ) (b : ℤ) = g
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+
+  Induct on the finite trace. At the terminal pair, $\gcd(a,0)=a$ for $a\in\N$, by greatestness (and the zero-pair convention). At each earlier division, the remainder lemma preserves the gcd, so the induction hypothesis gives the same terminal value.
+
+  \begin{lean}
+    induction h with
+    | done a => exact gcd_zero_right a
+    | step a b r g q hr ha tail ih =>
+      exact (gcd_eq_gcd_remainder _ _ q _ ha).trans ih
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:thm:euclidean-positive}
+  If the initial second input $b$ is positive, then the terminal entry $g$ of a Euclidean trace is positive. Hence it is the last nonzero remainder, or the initial divisor if the first remainder is zero.
+
+  \begin{lean}
+    theorem EuclideanTrace.positive {a b g : ℕ} (h : EuclideanTrace a b g)
+        (hb : 0 < b) : 0 < g
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+
+  The terminal entry equals $\gcd(a,b)$. Since $b>0$, the inputs are not both zero, and positivity follows from the local gcd specification.
+
+  \begin{lean}
+    rw [← h.gcd_eq]
+    exact (gcd_spec a b (Or.inr (by exact_mod_cast (ne_of_gt hb)))).1
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-positive-factor}
+  For integers $a,b,k$ with $k>0$, we have $\gcd(ka,kb)=k\gcd(a,b)$.
+
+  \begin{lean}
+    theorem gcd_mul_of_pos (a b k : ℤ) (hk : 0 < k) :
+        (gcd (k * a) (k * b) : ℤ) = k * (gcd a b : ℤ)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+
+  First assume $a,b$ are not both zero. Write $d=\gcd(a,b)$, $a=du$, $b=dv$, and $d=ax+by$. The scaled pair is not both zero, and $kd>0$.
+
+  \begin{lean}
+    by_cases hab : a ≠ 0 ∨ b ≠ 0
+
+    · obtain ⟨hdpos, ⟨u, hu⟩, ⟨v, hv⟩, ⟨x, y, hxy⟩, _⟩ := gcd_spec a b hab
+
+      have hpair : k * a ≠ 0 ∨ k * b ≠ 0 := by
+        rcases hab with ha | hb
+
+        · exact Or.inl (mul_ne_zero (ne_of_gt hk) ha)
+        · exact Or.inr (mul_ne_zero (ne_of_gt hk) hb)
+
+      have hdpos' : (0 : ℤ) < gcd a b := by
+        exact_mod_cast hdpos
+  \end{lean}
+
+  The witnesses $u,v$ show that $kd$ divides both scaled inputs. If $c$ divides them with $ka=cs$ and $kb=ct$, then $kd=k(ax+by)=c(sx+ty)$, so every common divisor divides $kd$. The local divisibility characterization identifies $kd$ as their gcd.
+
+  \begin{lean}
+    apply Eq.symm
+    apply (eq_gcd_iff_common_divisor _ _ _ hpair (mul_pos hk hdpos')).2
+    refine ⟨⟨u, by
+      nth_rw 1 [hu]
+      ring⟩, ⟨v, by
+        nth_rw 1 [hv]
+        ring⟩, ?_⟩
+    rintro c ⟨s, hs⟩ ⟨t, ht⟩
+    refine ⟨s * x + t * y, ?_⟩
+    calc
+      k * (gcd a b : ℤ) = (k * a) * x + (k * b) * y := by
+        rw [hxy]
+        ring
+      _ = c * (s * x + t * y) := by
+        rw [hs, ht]
+        ring
+  \end{lean}
+
+  If both original inputs are zero, both sides vanish by the zero-pair convention.
+
+  \begin{lean}
+    · push Not at hab
+
+      obtain ⟨rfl, rfl⟩ := hab
+
+      simp [gcd_zero_zero]
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:thm:gcd-nonzero-factor}
+  For integers $a,b$ and any nonzero integer $k$, we have $\gcd(ka,kb)=|k|\gcd(a,b)$.
+
+  \begin{lean}
+    theorem gcd_mul_of_ne_zero (a b k : ℤ) (hk : k ≠ 0) :
+        (gcd (k * a) (k * b) : ℤ) = |k| * (gcd a b : ℤ)
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+
+  Take absolute values of the scaled inputs, use $|kz|=|k||z|$, and apply the positive-factor result to $|k|>0$. Finally remove the absolute values from the original gcd.
+
+  \begin{lean}
+    calc
+      (gcd (k * a) (k * b) : ℤ) = gcd (|k| * |a|) (|k| * |b|) := by
+        rw [← gcd_abs (k * a) (k * b), abs_mul, abs_mul]
+      _ = |k| * (gcd |a| |b| : ℤ) := gcd_mul_of_pos _ _ _ (abs_pos.mpr hk)
+      _ = |k| * (gcd a b : ℤ) := by
+        rw [gcd_abs]
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:thm:positive-common-multiple}
+  Any two nonzero integers $a,b$ have a positive natural number that is divisible by both.
+
+  \begin{lean}
+    theorem exists_positive_common_multiple (a b : ℤ) (ha : a ≠ 0) (hb : b ≠ 0) :
+        ∃ m : ℕ, 0 < m ∧ a ∣ (m : ℤ) ∧ b ∣ (m : ℤ)
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+
+  The integer $(ab)^2$ is positive. Its natural-number representation has the same value, and $(ab)^2=a(ab^2)=b(a^2b)$ supplies the two divisibility witnesses.
+
+  \begin{lean}
+    have hp : 0 < (a * b) * (a * b) := mul_self_pos.mpr (mul_ne_zero ha hb)
+
+    refine ⟨((a * b) * (a * b)).toNat, ?_, ?_, ?_⟩
+
+    · omega
+    · rw [Int.toNat_of_nonneg (le_of_lt hp)]
+      exact ⟨a * b * b, by ring⟩
+
+    · rw [Int.toNat_of_nonneg (le_of_lt hp)]
+      exact ⟨a * a * b, by ring⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{definition}
+  For nonzero integers $a,b$, define $\operatorname{lcm}(a,b)$ to be the least positive common multiple, whose existence was just proved. Extend the definition by zero when either input is zero.
+
+  \begin{lean}
+    noncomputable def lcm (a b : ℤ) : ℕ :=
+      if h : a ≠ 0 ∧ b ≠ 0 then
+        Nat.find (exists_positive_common_multiple a b h.1 h.2)
+      else 0
+  \end{lean}
+\end{definition}
+
+\begin{theorem} \label{nt:thm:lcm-spec}
+  For nonzero integers $a,b$, the number $m=\operatorname{lcm}(a,b)$ is positive, satisfies $a\mid m$ and $b\mid m$, and obeys $m\le c$ for every positive integer common multiple $c$.
+
+  \begin{lean}
+    theorem lcm_spec (a b : ℤ) (ha : a ≠ 0) (hb : b ≠ 0) :
+        0 < lcm a b ∧ a ∣ (lcm a b : ℤ) ∧ b ∣ (lcm a b : ℤ) ∧
+          (∀ c : ℤ, a ∣ c → b ∣ c → 0 < c → (lcm a b : ℤ) ≤ c)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+
+  The least-element construction supplies positivity and both divisibility properties.
+
+  \begin{lean}
+    classical
+
+    rw [lcm, dif_pos ⟨ha, hb⟩]
+
+    obtain ⟨hp, hma, hmb⟩ := Nat.find_spec (exists_positive_common_multiple a b ha hb)
+
+    refine ⟨hp, hma, hmb, ?_⟩
+  \end{lean}
+
+  A positive integer common multiple $c$ is also a positive natural number with the same value. Minimality among natural common multiples gives $m\le c$, after converting back to integers.
+
+  \begin{lean}
+    intro c hac hbc hc
+
+    have hc' : (c.toNat : ℤ) = c := Int.toNat_of_nonneg (le_of_lt hc)
+
+    have hmin := Nat.find_min' (exists_positive_common_multiple a b ha hb)
+      (show 0 < c.toNat ∧ a ∣ (c.toNat : ℤ) ∧ b ∣ (c.toNat : ℤ) from
+        ⟨by omega, by rwa [hc'], by rwa [hc']⟩)
+
+    exact_mod_cast (show (Nat.find (exists_positive_common_multiple a b ha hb) : ℤ) ≤ c by
+      exact (Int.ofNat_le.mpr hmin).trans_eq hc')
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:gcd-lcm-product}
+  For positive integers $a,b$, we have $\gcd(a,b)\operatorname{lcm}(a,b)=ab$.
+
+  \begin{lean}
+    theorem gcd_mul_lcm (a b : ℤ) (ha : 0 < a) (hb : 0 < b) :
+        (gcd a b : ℤ) * (lcm a b : ℤ) = a * b
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+
+  Put $d=\gcd(a,b)>0$. Choose $u,v,x,y\in\Z$ such that $a=du$, $b=dv$, and $d=ax+by$. Since $b>0$, we have $v>0$. The positive integer $av$ is a common multiple because $av=bu$.
+
+  \begin{lean}
+    obtain ⟨hd, ⟨u, hu⟩, ⟨v, hv⟩, ⟨x, y, hxy⟩, _⟩ :=
+      gcd_spec a b (Or.inl (ne_of_gt ha))
+
+    generalize hg : gcd a b = d at *
+
+    have hd' : (0 : ℤ) < d := by
+      exact_mod_cast hd
+
+    have hvpos : 0 < v := by
+      nlinarith [hv]
+
+    have hmpos : 0 < a * v := mul_pos ha hvpos
+
+    have ham : a ∣ a * v := ⟨v, rfl⟩
+
+    have hbm : b ∣ a * v := ⟨u, by
+      rw [hu, hv]
+      ring⟩
+  \end{lean}
+
+  Every common multiple $c$ is divisible by $av$. Indeed, write $c=as=bt$ and multiply the Bezout identity by $c$: $dc=ab(tx+sy)=d\,av(tx+sy)$. Cancel the nonzero factor $d$ to obtain the required witness.
+
+  \begin{lean}
+    have hdiv (c : ℤ) (hac : a ∣ c) (hbc : b ∣ c) : a * v ∣ c := by
+      obtain ⟨s, hs⟩ := hac
+      obtain ⟨t, ht⟩ := hbc
+
+      refine ⟨t * x + s * y, ?_⟩
+      apply mul_left_cancel₀ (ne_of_gt hd')
+      calc
+        (d : ℤ) * c = (a * x + b * y) * c := by
+          rw [hxy]
+        _ = a * c * x + b * c * y := by
+          ring
+        _ = a * (b * t) * x + b * (a * s) * y := by
+          nth_rw 1 [ht]
+          rw [hs]
+        _ = (d : ℤ) * (a * v * (t * x + s * y)) := by
+          rw [hv]
+          ring
+  \end{lean}
+
+  Let $\ell=\operatorname{lcm}(a,b)>0$. Minimality gives $\ell\le av$, while the preceding argument gives $\ell=avk$. Positivity forces the integer $k\ge1$, so $\ell\ge av$. Therefore $\ell=av$, and $d\ell=dav=ab$.
+
+  \begin{lean}
+    obtain ⟨hlpos, hla, hlb, hleast⟩ := lcm_spec a b (ne_of_gt ha) (ne_of_gt hb)
+
+    have hle : (lcm a b : ℤ) ≤ a * v := hleast _ ham hbm hmpos
+
+    obtain ⟨k, hk⟩ := hdiv (lcm a b) hla hlb
+
+    have hlpos' : (0 : ℤ) < lcm a b := by
+      exact_mod_cast hlpos
+
+    have hkpos : 0 < k := by
+      nlinarith
+
+    have hkone : 1 ≤ k := hkpos
+
+    have heq : (lcm a b : ℤ) = a * v := by
+      nlinarith
+
+    rw [heq, hv]
+    ring
+  \end{lean}
+
+\end{proof}
+
+% Lean source: Textbooks.ElementaryNumberTheory.Chapter01.LeastCommonMultiple.lcm_eq_int_lcm
+\begin{lemma} \label{nt:lem:lcm-eq-int-lcm}
+  For all integers $a,b$, the lcm constructed above agrees with Mathlib\textquotesingle s standard integer lcm, including zero inputs.
+
+  \begin{lean}
+    theorem lcm_eq_int_lcm (a b : ℤ) : lcm a b = Int.lcm a b
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  If either input is zero, both definitions give zero.
+
+  \begin{lean}
+    by_cases ha : a = 0
+
+    · simp only [ha, lcm, ne_eq, not_true_eq_false, false_and, ↓reduceDIte,
+        Int.lcm_zero_left]
+
+    · by_cases hb : b = 0
+
+      · simp only [hb, lcm, ne_eq, not_true_eq_false, and_false, ↓reduceDIte,
+          Int.lcm_zero_right]
+  \end{lean}
+
+  Otherwise the standard lcm is a positive common multiple. It divides every positive common multiple $c$, so it is at most $c$. The previously proved uniqueness of the least positive common multiple identifies it with our construction.
+
+  \begin{lean}
+    · apply lcm_eq_of_least a b ha hb (Int.lcm a b)
+        (Int.lcm_pos ha hb) (Int.dvd_lcm_left a b) (Int.dvd_lcm_right a b)
+      intro c hac hbc hc
+      apply Int.le_of_dvd hc
+      have hc' : (c.toNat : ℤ) = c := Int.toNat_of_nonneg hc.le
+      rw [← hc']
+      apply Int.natCast_dvd_natCast.mpr
+      exact Int.lcm_dvd (by rwa [hc']) (by rwa [hc'])
+  \end{lean}
+
+\end{proof}

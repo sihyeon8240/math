@@ -70,7 +70,7 @@ explicitly, including when only the displayed code changes.
 ## Lean readability
 
 Use the division-algorithm proof in
-[`DivisionAlgorithm.lean`](../lean/Textbooks/ElementaryNumberTheory/Chapter02/DivisionAlgorithm.lean)
+[`DivisionAlgorithm.lean`](../lean/Textbooks/ElementaryNumberTheory/Chapter01/DivisionAlgorithm.lean)
 as a layout reference. Group a proof by mathematical reasoning units: setup,
 witness selection, local claims, case analysis, and the final conclusion.
 Separate these units with one blank line. Keep consecutive tactics that perform
@@ -332,7 +332,7 @@ lean/
   Textbooks/
     ElementaryNumberTheory/
       All.lean
-      Chapter02/
+      Chapter01/
         DivisionAlgorithm.lean
 ```
 
@@ -355,8 +355,8 @@ modules there and import earlier results as needed within the same book;
 imports must remain acyclic. Do not create empty topic placeholders.
 
 Module paths and declaration namespaces are separate. For example,
-`import Textbooks.ElementaryNumberTheory.Chapter02.DivisionAlgorithm` loads
-results declared in `namespace ElementaryNumberTheory.Chapter02`. Retain
+`import Textbooks.ElementaryNumberTheory.Chapter01.DivisionAlgorithm` loads
+results declared in `namespace ElementaryNumberTheory.Chapter01`. Retain
 `Textbooks` in filesystem paths and imports, but not in declaration names.
 Moving a declaration between topic files within a chapter must preserve its
 public name and proof-index link.

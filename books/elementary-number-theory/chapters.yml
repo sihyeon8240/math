@@ -1,7 +1,5 @@
 schema_version: 1
 chapters:
-- slug: preliminaries
-  title: Preliminaries
 - slug: divisibility-theory-in-the-integers
   title: Divisibility Theory in the Integers
 - slug: primes-and-their-distribution

@@ -1,0 +1,51 @@
+proofs:
+  - id: nt:thm:division-algorithm
+    declaration: ElementaryNumberTheory.Chapter01.existsUnique_quotient_remainder
+  - id: nt:thm:positive-common-divisor
+    declaration: ElementaryNumberTheory.Chapter01.exists_positive_common_divisor
+  - id: nt:thm:gcd-spec
+    declaration: ElementaryNumberTheory.Chapter01.gcd_spec
+  - id: nt:thm:common-divisor-le-gcd
+    declaration: ElementaryNumberTheory.Chapter01.common_divisor_le_gcd
+  - id: nt:thm:gcd-zero-zero
+    declaration: ElementaryNumberTheory.Chapter01.gcd_zero_zero
+  - id: nt:thm:gcd-eq-of-greatest
+    declaration: ElementaryNumberTheory.Chapter01.gcd_eq_of_greatest
+  - id: nt:thm:bezout
+    declaration: ElementaryNumberTheory.Chapter01.exists_gcd_eq_mul_add_mul
+  - id: nt:thm:gcd-linear-combinations
+    declaration: ElementaryNumberTheory.Chapter01.linear_combinations_eq_gcd_multiples
+  - id: nt:thm:gcd-one-bezout
+    declaration: ElementaryNumberTheory.Chapter01.gcd_eq_one_iff_exists_mul_add_mul
+  - id: nt:thm:gcd-div-gcd
+    declaration: ElementaryNumberTheory.Chapter01.gcd_div_gcd_eq_one
+  - id: nt:thm:coprime-product-divides
+    declaration: ElementaryNumberTheory.Chapter01.mul_dvd_of_coprime
+  - id: nt:thm:euclid-lemma
+    declaration: ElementaryNumberTheory.Chapter01.dvd_of_dvd_mul_of_coprime
+  - id: nt:thm:gcd-divisibility-characterization
+    declaration: ElementaryNumberTheory.Chapter01.eq_gcd_iff_common_divisor
+  - id: nt:thm:gcd-remainder
+    declaration: ElementaryNumberTheory.Chapter01.gcd_eq_gcd_remainder
+  - id: nt:thm:gcd-abs
+    declaration: ElementaryNumberTheory.Chapter01.gcd_abs
+  - id: nt:thm:euclidean-termination
+    declaration: ElementaryNumberTheory.Chapter01.euclideanTrace_exists
+  - id: nt:thm:euclidean-correctness
+    declaration: ElementaryNumberTheory.Chapter01.EuclideanTrace.gcd_eq
+  - id: nt:thm:euclidean-positive
+    declaration: ElementaryNumberTheory.Chapter01.EuclideanTrace.positive
+  - id: nt:thm:gcd-positive-factor
+    declaration: ElementaryNumberTheory.Chapter01.gcd_mul_of_pos
+  - id: nt:thm:gcd-nonzero-factor
+    declaration: ElementaryNumberTheory.Chapter01.gcd_mul_of_ne_zero
+  - id: nt:thm:positive-common-multiple
+    declaration: ElementaryNumberTheory.Chapter01.exists_positive_common_multiple
+  - id: nt:thm:lcm-spec
+    declaration: ElementaryNumberTheory.Chapter01.lcm_spec
+  - id: nt:thm:gcd-lcm-product
+    declaration: ElementaryNumberTheory.Chapter01.gcd_mul_lcm
+  - id: nt:lem:gcd-eq-int-gcd
+    declaration: ElementaryNumberTheory.Chapter01.gcd_eq_int_gcd
+  - id: nt:lem:lcm-eq-int-lcm
+    declaration: ElementaryNumberTheory.Chapter01.lcm_eq_int_lcm
