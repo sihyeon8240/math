@@ -1,4 +1,5 @@
-import Textbooks.LinearAlgebra.Chapter01.Dimension
+import Textbooks.LinearAlgebra.Chapter01.Bases
+import Mathlib.LinearAlgebra.Dimension.Finite
 import Mathlib.Data.Matrix.Basic
 import Mathlib.LinearAlgebra.Matrix.IsDiag
 import Mathlib.LinearAlgebra.Matrix.Symmetric
@@ -37,7 +38,10 @@ theorem transpose_apply {m n : ℕ} (A : MatrixSpace K m n) (i : Fin m) (j : Fin
 theorem diagonal_is_symmetric {n : ℕ} {A : MatrixSpace K n n} (h : A.IsDiag) : A.IsSymm := by
   ext i j
   by_cases hij : i = j
-  · subst j; rfl
+
+  · subst j
+    rfl
+
   · exact (h (fun hji => hij hji.symm)).trans (h hij).symm
 
 /-- Lemma: coefficients of matrix units are the entries of their sum. -/
@@ -49,10 +53,14 @@ theorem combination_matrixUnit {m n : ℕ} (a : Fin m × Fin n → K) (i : Fin m
 theorem matrixUnit_is_basis (m n : ℕ) :
     IsFiniteBasis (K := K) (matrixUnit (K := K) (m := m) (n := n)) := by
   refine ⟨Fintype.linearIndependent_iff.mpr ?_, ?_⟩
+
   · intro a ha p
     change linearCombination (matrixUnit (K := K)) a = 0 at ha
+
     have he := congrArg (fun A : MatrixSpace K m n => A p.1 p.2) ha
+
     simpa only [combination_matrixUnit, Matrix.zero_apply] using he
+
   · intro A
     refine ⟨fun p => A p.1 p.2, ?_⟩
     ext i j
@@ -61,6 +69,7 @@ theorem matrixUnit_is_basis (m n : ℕ) :
 /-- Theorem: the space of `m` by `n` matrices has dimension `m*n`. -/
 theorem finrank_matrixSpace (m n : ℕ) : Module.finrank K (MatrixSpace K m n) = m * n := by
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (matrixUnit_is_basis (K := K) m n)
+
   simpa only [Fintype.card_prod, Fintype.card_fin] using Module.finrank_eq_card_basis b
 
 end LinearAlgebra.Chapter02

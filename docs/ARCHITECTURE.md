@@ -2,11 +2,21 @@
 
 ## Philosophy
 
-This repository publishes multiple independently assembled mathematics textbooks through shared infrastructure. Each directory under `books/` owns its mathematical exposition, bibliography, metadata, and assembly order. Styles, reusable publishing templates, automation, and formal tooling are centralized so mechanical and formal improvements benefit every book consistently.
+This repository publishes multiple independently assembled mathematics textbooks
+through shared infrastructure. Each directory under `books/` owns its
+mathematical exposition, bibliography, metadata, and assembly order. Styles,
+reusable publishing templates, automation, and formal tooling are centralized so
+mechanical and formal improvements benefit every book consistently.
 
-Publication independence and formal dependency are separate properties. Do not merge books or share LaTeX mathematical sections between them. Book structure is generated from book-local contents manifests. Every PDF remains independently readable and buildable, while Lean formalizations depend on the pinned Mathlib revision for foundations deliberately omitted from exposition.
+Publication independence and formal dependency are separate properties. Do not
+merge books or share LaTeX mathematical sections between them. Book structure is
+generated from book-local contents manifests. Every PDF remains independently
+readable and buildable, while Lean formalizations depend on the pinned Mathlib
+revision for foundations deliberately omitted from exposition.
 
-Book-specific Lean modules do not directly import another textbook. Use existing Mathlib declarations for shared mathematics and keep book-specific wrapper theorems in their owning namespace. See [Lean formalization](formalization.md).
+Book-specific Lean modules do not directly import another textbook. Use existing
+Mathlib declarations for shared mathematics and keep book-specific wrapper
+theorems in their owning namespace. See [Lean formalization](formalization.md).
 
 ## Top-level directories
 
@@ -31,25 +41,58 @@ books.yml
             -> NN-section-name.tex
 ```
 
-`books.yml` registers textbooks and owns repository-level automation policy. Each book's `chapters.yml` contains the canonical ordered `chapters` list and an optional ordered `appendices` list; both entries have slugs and LaTeX titles. Each chapter or appendix `sections.yml` is the canonical ordered list of logical section slugs and LaTeX titles. Each logical section has exactly one source file. List position supplies the two-digit number, so numbers are not duplicated in YAML.
+`books.yml` registers textbooks and owns repository-level automation policy.
+Each book's `chapters.yml` contains the canonical ordered `chapters` list and an
+optional ordered `appendices` list; both entries have slugs and LaTeX titles.
+Each chapter or appendix `sections.yml` is the canonical ordered list of logical
+section slugs and LaTeX titles. Each logical section has exactly one source
+file. List position supplies the two-digit number, so numbers are not duplicated
+in YAML.
 
-`make contents chap` renders each complete `book.tex` from `common/templates/book.tex`, `books.yml`, and the book's `chapters.yml`; nonempty appendices begin with `\appendix` before `\backmatter`, using A, B, ... chapter numbers and independent section/theorem numbering. `make contents sec` generates every chapter and appendix `index.tex`, including `\chapter`, `\section`, and literal `\input` commands. `make contents all` runs both operations; `BOOK=<slug>` limits any form to one registered book, and `check` validates without writing. `make generated` runs contents generation before site generation. Generated assembly is committed so ordinary LaTeX tools can build directly, but it must never be edited by hand.
+`make contents chap` renders each complete `book.tex` from
+`common/templates/book.tex`, `books.yml`, and the book's `chapters.yml`;
+nonempty appendices begin with `\appendix` before `\backmatter`, using A, B, ...
+chapter numbers and independent section/theorem numbering.
 
-Section source files contain mathematical content and labels only. They do not declare `\section`, load packages, or determine assembly order. Each logical section is named `NN-section-name.tex` and occupies one file. `references.bib` and any substantive book-specific style or frontmatter overrides remain hand-maintained book-local sources. Appendix source follows the same section-only rule under `appendices/NN-name/`; its assembly is generated from the `appendices` list.
+`make contents sec` generates every chapter and appendix `index.tex`, including
+`\chapter`, `\section`, and literal `\input` commands.
 
-The complete `book.tex`, including its canonical manifest metadata, is generated
-from the shared template and committed with the other assembly so ordinary
-LaTeX tools can build directly. Book-local
-`frontmatter/title-and-copyright.tex` and `frontmatter/preface.tex` files may
-replace the corresponding shared presentation templates.
+`make contents all` runs both operations; `BOOK=<slug>` limits any form to one
+registered book, and `check` validates without writing. `make generated` runs
+contents generation before site generation.
+
+Generated assembly is committed so ordinary LaTeX tools can build directly, but
+it must never be edited by hand.
+
+Section source files contain mathematical content and labels only. They do not
+declare `\section`, load packages, or determine assembly order. Each logical
+section is named `NN-section-name.tex` and occupies one file. `references.bib`
+and any substantive book-specific style or frontmatter overrides remain
+hand-maintained book-local sources. Appendix source follows the same
+section-only rule under `appendices/NN-name/`; its assembly is generated from
+the `appendices` list.
+
+Book-local `frontmatter/title-and-copyright.tex` and `frontmatter/preface.tex`
+files may replace the corresponding shared presentation templates.
 
 ### Declarative contents contract
 
-Both contents manifests use `schema_version: 1`. Slugs are nonempty lowercase hyphenated identifiers and titles are nonempty, brace-balanced, single-line LaTeX strings. Lists must be nonempty and ordered. The `split` field is not supported. Unknown fields, duplicate slugs, missing manifests, missing content files, orphan files, and stale generated assembly are errors.
+Both contents manifests use `schema_version: 1`. Slugs are nonempty lowercase
+hyphenated identifiers and titles are nonempty, brace-balanced, single-line
+LaTeX strings. Lists must be nonempty and ordered. The `split` field is not
+supported. Unknown fields, duplicate slugs, missing manifests, missing content
+files, orphan files, and stale generated assembly are errors.
 
-The path rules are deterministic: chapter item `N` with slug `name` owns `chapters/NN-name/`, and appendix item `N` owns `appendices/NN-name/`; section item `N` with slug `topic` owns `NN-topic.tex`. Rename or reorder through YAML and the corresponding content paths together, then run `make contents all`. Do not add hand-written chapter or section commands to content files.
+The path rules are deterministic: chapter item `N` with slug `name` owns
+`chapters/NN-name/`, and appendix item `N` owns `appendices/NN-name/`; section
+item `N` with slug `topic` owns `NN-topic.tex`. Rename or reorder through YAML
+and the corresponding content paths together, then run `make contents all`. Do
+not add hand-written chapter or section commands to content files.
 
-`scripts/contents_manifest.py` is the reusable loader, validator, path mapper, and renderer. `scripts/generate-contents.py` is its command-line adapter. Source checks run generation in check mode before structural validation, README checks, and compilation.
+`scripts/contents_manifest.py` is the reusable loader, validator, path mapper,
+and renderer. `scripts/generate-contents.py` is its command-line adapter. Source
+checks run generation in check mode before structural validation, README checks,
+and compilation.
 
 ## Shared runtime configuration
 
@@ -58,7 +101,19 @@ config/toolchain.env       -> Docker, CI Python, Lean, and Python tooling consum
 config/container-image.txt -> local and devcontainer image consumers
 ```
 
-These two files are the canonical runtime configuration. Run `make config` after editing them to synchronize format-specific consumers, including `lean/lean-toolchain`, `lean/lakefile.toml`, `.github/requirements-ci.txt`, `pyproject.toml`, and `.devcontainer/devcontainer.json`. `make config check` fails on drift. CI derives a content-addressed image tag from the canonical image inputs, prepares that image once, and passes its tested digest to downstream checks and builds. `config/container-image.txt` remains the reviewed immutable reference for local and devcontainer consumers. `make image-pin` remains a narrow automation and recovery interface so the image workflow does not depend on synchronization implementation details; routine contributors do not need to invoke it.
+These two files are the canonical runtime configuration. Run `make config` after
+editing them to synchronize format-specific consumers, including
+`lean/lean-toolchain`, `lean/lakefile.toml`, `.github/requirements-ci.txt`,
+`pyproject.toml`, and `.devcontainer/devcontainer.json`. `make config check`
+fails on drift.
+
+CI derives a content-addressed image tag from the canonical image inputs,
+prepares that image once, and passes its tested digest to downstream checks and
+builds. `config/container-image.txt` remains the reviewed immutable reference
+for local and devcontainer consumers. `make image-pin` remains a narrow
+automation and recovery interface so the image workflow does not depend on
+synchronization implementation details; routine contributors do not need to
+invoke it.
 
 The shared preface loads `common/templates/formalization-versions.tex`, generated
 by `make config`. Lean's version comes from `config/toolchain.env`; Mathlib's
@@ -75,14 +130,22 @@ books.yml
     -> build / check / site / release
 ```
 
-`books.yml` owns each book's title, author, version, slug, short title, label prefix, optional Lean module, status, ordering, and build, check, release, and site flags. Automation consumes it through `scripts/books.py`, rather than discovering policy from README or LaTeX prose.
+`books.yml` owns each book's title, author, version, slug, short title, label
+prefix, optional Lean module, status, ordering, and build, check, release, and
+site flags. Automation consumes it through `scripts/books.py`, rather than
+discovering policy from README or LaTeX prose.
 
 A book with `site: true` must also have `build: true`. Affected-book planning
 combines manifest state, Git changes, and TeX dependencies; ambiguous build inputs
 safely select all build-enabled books. Site publication selects only site-enabled
 PDFs. Workflow files own the implementation details.
 
-Reusable manifest policy lives in `scripts/book_manifest.py`: it loads, normalizes, validates, queries, and safely saves manifest data. `scripts/books.py` is the stable command-line adapter responsible only for argument parsing, text/JSON presentation, diagnostics, and exit codes. Python repository checks import the domain module directly; shell automation continues to use the public CLI.
+Reusable manifest policy lives in `scripts/book_manifest.py`: it loads,
+normalizes, validates, queries, and safely saves manifest data.
+`scripts/books.py` is the stable command-line adapter responsible only for
+argument parsing, text/JSON presentation, diagnostics, and exit codes. Python
+repository checks import the domain module directly; shell automation continues
+to use the public CLI.
 
 The root README links to `books.yml` instead of duplicating its textbook
 metadata. Site book pages remain ignored metadata-only build input generated
@@ -98,7 +161,10 @@ from the same manifest.
 - Repository lifecycle automation belongs in `scripts/` and is driven by `books.yml`.
 - The root README points readers to `books.yml`; generated site metadata comes only from that manifest.
 
-Shared infrastructure may be centralized, but book contents remain local. `book.tex` uses common frontmatter directly and automatically selects a book-local file when an actual `frontmatter/title-and-copyright.tex` or `frontmatter/preface.tex` override exists.
+Shared infrastructure may be centralized, but book contents remain local.
+`book.tex` uses common frontmatter directly and automatically selects a
+book-local file when an actual `frontmatter/title-and-copyright.tex` or
+`frontmatter/preface.tex` override exists.
 
 ## Generated files and local outputs
 
@@ -129,7 +195,8 @@ its PDF snapshot separately from task branches and `main`.
 - `references.bib`: predictable book-local bibliography.
 - `local-style.sty`: optional book-local extensions to the shared mathematics package; omit it when unused.
 
-Numeric prefixes make reading order obvious in directory listings, while the manifests remain the authority on inclusion and order.
+Numeric prefixes make reading order obvious in directory listings, while the
+manifests remain the authority on inclusion and order.
 
 For section sources, `NN` is the two-digit logical section number, not a
 physical-file sequence number. Logical section numbers begin at `01` and are
@@ -146,7 +213,13 @@ letters and digits separated by single hyphens; for example,
 
 ### Labels
 
-Labels are repository-global. Use the owning book's `label_prefix` from `books.yml`; do not infer it from the subject name. Preserve this convention for chapters, sections, equations, theorems, and other labeled objects: it prevents collisions in repository-wide checks and makes diagnostics unambiguous. The descriptive component is hyphen-separated and may contain ASCII uppercase and lowercase letters and digits; capitalization may preserve mathematical identifiers such as `R`, `Q`, or `N`.
+Labels are repository-global. Use the owning book's `label_prefix` from
+`books.yml`; do not infer it from the subject name. Preserve this convention for
+chapters, sections, equations, theorems, and other labeled objects: it prevents
+collisions in repository-wide checks and makes diagnostics unambiguous. The
+descriptive component is hyphen-separated and may contain ASCII uppercase and
+lowercase letters and digits; capitalization may preserve mathematical
+identifiers such as `R`, `Q`, or `N`.
 
 ## Formal verification boundary
 
@@ -174,7 +247,12 @@ boundaries. See [source layout](formalization.md#source-layout) for details.
 
 ## Stability policy
 
-The directory layout, `books.yml` and proof-index schemas, metadata loading, chapter/index pattern, Lean dependency boundary, build scripts, automation, and CI are established interfaces. Preserve all existing commands and make the smallest compatible edit. Do not redesign these interfaces, merge books, introduce code generation, or add abstraction without a concrete maintenance benefit.
+The directory layout, `books.yml` and proof-index schemas, metadata loading,
+chapter/index pattern, Lean dependency boundary, build scripts, automation, and
+CI are established interfaces. Preserve all existing commands and make the
+smallest compatible edit. Do not redesign these interfaces, merge books,
+introduce code generation, or add abstraction without a concrete maintenance
+benefit.
 
 ### Multi-platform toolchain images
 
@@ -190,5 +268,6 @@ preparation, and affected-book validation on PRs and main. Required check names
 remain `Check sources` and `Verify textbook builds`. `scripts/verified-build.py`
 owns the verified PDF artifact contract and conservative reuse after merge;
 cache restores alone never count as validation. All PDF and metadata artifacts
-are generated under ignored `build/` directories. The [developer workflow](developer-workflow.md#continuous-integration)
+are generated under ignored `build/` directories. The
+[maintainer guide](maintainer-guide.md#ci-caches-and-verified-pdf-reuse)
 documents cache boundaries, artifact eligibility, expiration, and rebuild paths.

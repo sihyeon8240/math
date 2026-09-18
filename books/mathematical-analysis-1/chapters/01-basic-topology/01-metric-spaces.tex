@@ -4,17 +4,13 @@
     d(p,q)=0\iff p=q,\qquad d(p,q)=d(q,p),\qquad d(p,z)\leq d(p,q)+d(q,z).
   \]
   The last condition is the \textbf{triangle inequality}. The pair $(X,d)$ is a \textbf{metric space}.
-  \begin{lean}{The metric-space structure records the distance and its axioms.}
-    abbrev MetricStructure (A : Type*) := MetricSpace A
-  \end{lean}
-  \begin{lean}{For every $n\in\N$, $\R^{n}$ has its Euclidean norm, including the unique vector when $n=0$.}
-    abbrev Euclidean (n : ℕ) := EuclideanSpace ℝ (Fin n)
-  \end{lean}
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_metric
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_metric
 \begin{proposition} \label{an1:thm:standard-metric-on-Rn}
-  \begin{lean}{For $n\in\N$, the function $d(x,y)=\|x-y\|$ is a metric on $\R^{n}$.}
+  For $n\in\N$, the function $d(x,y)=\|x-y\|$ is a metric on $\R^{n}$.
+
+  \begin{lean}
     theorem euclidean_metric (n : ℕ) :
         (∀ x y : EuclideanSpace ℝ (Fin n), 0 ≤ ‖x - y‖) ∧
         (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = 0 ↔ x = y) ∧
@@ -25,170 +21,176 @@
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{The norm is nonnegative. It vanishes exactly at the zero vector, so $\|x-y\|=0$ precisely when $x=y$.}
+  The norm is nonnegative. It vanishes exactly at the zero vector, so $\|x-y\|=0$ precisely when $x=y$.
+
+  \begin{lean}
     refine ⟨fun x y => norm_nonneg _, ?_, ?_, ?_⟩
+
     · intro x y
       rw [norm_eq_zero, sub_eq_zero]
   \end{lean}
 
-  \begin{lean}{Reversing a difference changes only its sign and leaves its norm unchanged.}
+  Reversing a difference changes only its sign and leaves its norm unchanged.
+
+  \begin{lean}
     · intro x y
       exact norm_sub_rev x y
   \end{lean}
 
-  \begin{lean}{Write $x-z=(x-y)+(y-z)$ and apply the Euclidean norm triangle inequality. These norm facts are accepted finite-dimensional prerequisites.}
+  Write $x-z=(x-y)+(y-z)$ and apply the Euclidean norm triangle inequality.
+
+  \begin{lean}
     · intro x y z
       calc
-        ‖x - z‖ = ‖(x - y) + (y - z)‖ := by rw [sub_add_sub_cancel]
+        ‖x - z‖ = ‖(x - y) + (y - z)‖ := by
+          rw [sub_add_sub_cancel]
         _ ≤ ‖x - y‖ + ‖y - z‖ := norm_add_le _ _
   \end{lean}
 
 \end{proof}
 
-Euclidean spaces always use this standard metric. In particular, the zero-dimensional space is included, rather than excluded by convention.
+Euclidean spaces use this metric, including in dimension zero.
 
 \begin{definition} \label{an1:def:neighborhood-open-ball}
-  For $p\in X$ and $r>0$, define the \textbf{neighborhood} $N_r(p)=\{q:d(p,q)<r\}$ and the \textbf{deleted neighborhood} $\widetilde N_r(p)=N_r(p)\setminus\{p\}$. Metric symmetry allows the center to appear in either distance argument.
-  \begin{lean}{$N_r(p)$ is the open ball centered at $p$.}
-    abbrev neighborhood (p : X) (r : ℝ) : Set X := ball p r
-  \end{lean}
-  \begin{lean}{Removing the center gives $\widetilde N_r(p)$.}
-    abbrev deletedNeighborhood (p : X) (r : ℝ) : Set X := ball p r \ {p}
-  \end{lean}
+  For $p\in X$ and $r>0$, the \textbf{open ball} is
+  \[
+    B(p,r)=\{q\in X:d(q,p)<r\}.
+  \]
+  The \textbf{punctured ball} is $B(p,r)\setminus\{p\}=\{q\in X:0<d(q,p)<r\}$.
+  A \textbf{neighborhood} of $p$ is any set containing an open ball $B(p,r)$ with $r>0$. A neighborhood need not itself be open or a ball.
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.deleted_neighborhood_iff
-\begin{lemma} \label{an1:lem:deleted-neighborhood-iff}
-  \begin{lean}{$q\in\widetilde N_r(p)$ if and only if $0<d(q,p)<r$.}
-    theorem deleted_neighborhood_iff (p q : X) (r : ℝ) :
-        q ∈ deletedNeighborhood p r ↔ 0 < dist q p ∧ dist q p < r
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  \begin{lean}{The only additional condition after removing the center is $q\ne p$, which is equivalent to positive distance in a metric space.}
-    change (dist q p < r ∧ q ≠ p) ↔ _
-    rw [dist_pos]
-    exact and_comm
-  \end{lean}
-
-\end{proof}
-
 \begin{definition} \label{an1:def:limit-interior-isolated-points}
-  A point $p$ is a \textbf{limit point} of $E$ if every deleted neighborhood of $p$ meets $E$.
-  It is an \textbf{interior point} if some neighborhood lies in $E$, and an \textbf{isolated point} if some neighborhood meets $E$ exactly at $p$.
-  We write these sets as $E'$, $E^{\circ}$, and $E^{i}$, respectively.
-  \begin{lean}{$p\in E^{\prime}$ means that every positive radius admits a distinct point of $E$ within that distance.}
-    def limitPoints (E : Set X) : Set X :=
-      {p | ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r}
-  \end{lean}
-  \begin{lean}{$E^{\circ}$ is defined by contained positive-radius balls.}
-    def interiorPoints (E : Set X) : Set X :=
-      {p | ∃ r > 0, ball p r ⊆ E}
-  \end{lean}
-  \begin{lean}{$p\in E^{i}$ means $E\cap N_r(p)=\{p\}$ for some $r>0$. In particular $p\in E$.}
+  A point $p$ is a \textbf{limit point} of $E$ if every positive-radius punctured ball about $p$ meets $E$.
+  The set of limit points, or \textbf{derived set}, is denoted by $E'$.
+  A point is \textbf{interior} if some positive-radius ball about it lies in $E$; the set of interior points is denoted by $E^\circ$.
+  An \textbf{isolated point} of $E$ belongs to $E$ and is its only point in some ball. We write $\operatorname{Iso}(E)$ for the set of isolated points.
+  \begin{lean}
     def isolatedPoints (E : Set X) : Set X :=
       {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
   \end{lean}
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.interior_iff
-\begin{lemma} \label{an1:lem:interior-iff}
-  \begin{lean}{$p\in E^{\circ}$ if and only if some $r>0$ satisfies $N_r(p)\subseteq E$.}
-    theorem interior_iff (E : Set X) (p : X) :
-        p ∈ interiorPoints E ↔ ∃ r > 0, ball p r ⊆ E
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_derivedSet_iff
+\begin{lemma} \label{an1:lem:mem-derivedSet-iff}
+  $p\in E^{\prime}$ if and only if every $r>0$ admits $q\in E$ with $q\ne p$ and $d(q,p)<r$.
+
+  \begin{lean}
+    theorem mem_derivedSet_iff (E : Set X) (p : X) :
+        p ∈ derivedSet E ↔ ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{This is the defining condition for an interior point.}
-    rfl
+  Every positive-radius ball is a neighborhood, so the neighborhood condition supplies a distinct point in that ball.
+
+  \begin{lean}
+    rw [mem_derivedSet, accPt_iff_nhds]
+    constructor
+
+    · intro h r hr
+      obtain ⟨q, ⟨hq, hE⟩, hne⟩ := h (ball p r) (Metric.ball_mem_nhds p hr)
+      exact ⟨q, hE, hne, hq⟩
   \end{lean}
 
-\end{proof}
+  Conversely, a neighborhood contains a positive-radius ball. A distinct point of the set in that ball also belongs to the neighborhood.
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.interiorPoints_eq_interior
-\begin{lemma} \label{an1:lem:interiorPoints-eq-interior}
-  \begin{lean}{The ball-defined interior equals the standard interior.}
-    theorem interiorPoints_eq_interior (E : Set X) : interiorPoints E = interior E
+  \begin{lean}
+    · intro h U hU
+      obtain ⟨r, hr, hsub⟩ := Metric.mem_nhds_iff.mp hU
+      obtain ⟨q, hE, hne, hq⟩ := h r hr
+      exact ⟨q, ⟨hsub hq, hE⟩, hne⟩
   \end{lean}
-\end{lemma}
-
-\begin{proof}
-  \begin{lean}{A point lies in the standard interior when the set is a neighborhood of that point. The metric neighborhood interface says precisely that it contains a positive-radius ball.}
-    ext p
-    exact (mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff).symm
-  \end{lean}
-
 \end{proof}
 
 \begin{definition} \label{an1:def:open-closed-sets}
-  A set $E$ is \textbf{open} when every point of $E$ is interior, and \textbf{closed} when $E^{\prime}\subseteq E$.
-  Write $\mathcal O(X)$ and $\mathcal C(X)$ for the respective collections.
-  These definitions express the stated conditions directly. Their agreement with the standard predicates is verified below.
-  \begin{lean}{$\mathcal O(X)$ is the collection of open sets.}
-    def openSets : Set (Set X) := {E | E ⊆ interiorPoints E}
-  \end{lean}
-  \begin{lean}{$\mathcal C(X)$ is the collection of closed sets.}
-    def closedSets : Set (Set X) := {E | limitPoints E ⊆ E}
-  \end{lean}
+  A set $E$ is \textbf{open} if every point of $E$ is interior, and \textbf{closed} if its complement is open.
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_openSets_iff
-\begin{lemma} \label{an1:lem:mem-openSets-iff}
-  \begin{lean}{The locally defined open sets are exactly the sets satisfying the standard open-set predicate.}
-    theorem mem_openSets_iff (E : Set X) : E ∈ openSets ↔ IsOpen E
+\begin{definition} \label{an1:def:closure}
+  The \textbf{closure} $\overline E$ consists of points whose every positive-radius ball meets $E$.
+\end{definition}
+
+\begin{definition} \label{an1:def:bounded-perfect-dense-sets}
+  A set $E$ is \textbf{bounded} if there is a common upper bound for distances between its points.
+  Equivalently, when $X$ is nonempty, $E$ lies in a positive-radius ball, as proved below. Subsets of the empty space are bounded.
+  A set is \textbf{perfect} if it is closed and each of its points is a limit point.
+  A set is \textbf{dense} if $\overline E=X$.
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isBounded_iff
+\begin{lemma} \label{an1:lem:isBounded-iff}
+  $E$ is bounded if and only if, whenever $X$ is nonempty, some $p\in X$ and $r>0$ satisfy $E\subseteq B(p,r)$.
+
+  \begin{lean}
+    theorem isBounded_iff (E : Set X) :
+        Bornology.IsBounded E ↔ (Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{The metric open-set interface expresses the same condition: every point of the set has a ball contained in it.}
-    exact Metric.isOpen_iff.symm
+  Suppose all pairwise distances in $E$ are at most $C$. If $E$ is empty, any center in $X$ and radius $1$ suffice. Otherwise choose $p\in E$ and radius $\max(C,0)+1$.
+
+  \begin{lean}
+    rw [Metric.isBounded_iff]
+    constructor
+
+    · rintro ⟨C, hC⟩ hX
+      rcases E.eq_empty_or_nonempty with rfl | ⟨p, hp⟩
+
+      · obtain ⟨p⟩ := hX
+        exact ⟨p, 1, zero_lt_one, empty_subset _⟩
+
+      · refine ⟨p, max C 0 + 1, by linarith [le_max_right C 0], ?_⟩
+        intro q hq
+        exact (hC hq hp).trans_lt (by linarith [le_max_left C 0])
   \end{lean}
 
+  Conversely, two points of a ball of radius $r$ are at distance at most $2r$, by the triangle inequality. If $X$ is empty there are no points to check, and zero is a bound.
+
+  \begin{lean}
+    · intro h
+      by_cases hX : Nonempty X
+
+      · obtain ⟨p, r, _, hs⟩ := h hX
+        refine ⟨r + r, ?_⟩
+        intro x hx y hy
+        have hx' : dist x p < r := hs hx
+        have hy' : dist p y < r := by simpa only [mem_ball, dist_comm] using hs hy
+        exact (dist_triangle x p y).trans (add_le_add hx'.le hy'.le)
+
+      · refine ⟨0, ?_⟩
+        intro x
+        exact (hX ⟨x⟩).elim
+  \end{lean}
 \end{proof}
-
-\begin{definition} \label{an1:def:closure}
-  The \textbf{closure} of $E$ is $\overline E=E\cup E^{\prime}$. We define this union directly and prove its agreement with the standard closure below.
-  \begin{lean}{$\overline E$ denotes the closure of $E$.}
-    def setClosure (E : Set X) : Set X := E ∪ limitPoints E
-  \end{lean}
-\end{definition}
-
-\begin{definition} \label{an1:def:bounded-perfect-dense-sets}
-  A set $E$ is \textbf{bounded} if, whenever $X$ is nonempty, $E$ is contained in some positive-radius ball.
-  Write $\mathcal B(X)$ for the bounded sets. This convention also treats subsets of the empty space as bounded.
-  A set is \textbf{perfect} if $E=E^{\prime}$ and \textbf{dense} if $\overline E=X$.
-  \begin{lean}{When the ambient space has a point, a bounded set lies in a ball.}
-    def bounded (E : Set X) : Prop :=
-      Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r
-  \end{lean}
-  \begin{lean}{A perfect set equals its set of limit points.}
-    abbrev perfect (E : Set X) : Prop := E = limitPoints E
-  \end{lean}
-  \begin{lean}{A dense set has the whole ambient space as its closure.}
-    abbrev dense (E : Set X) : Prop := setClosure E = univ
-  \end{lean}
-\end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.ball_open
 \begin{proposition} \label{an1:thm:neighborhood-is-open}
-  \begin{lean}{Every ball $N_r(p)$ is open. This also holds for nonpositive $r$, when the ball is empty.}
+  Every ball $B(p,r)$ is open. This also holds for nonpositive $r$, when the ball is empty.
+
+  \begin{lean}
     theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r)
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Suppose $q\in N_r(p)$. The remaining distance $\delta=r-d(q,p)$ is positive.}
+  Suppose $q\in B(p,r)$. The remaining distance $\delta=r-d(q,p)$ is positive.
+
+  \begin{lean}
     apply Metric.isOpen_iff.mpr
     intro q hq
     refine ⟨r - dist q p, sub_pos.mpr hq, ?_⟩
   \end{lean}
 
-  \begin{lean}{If $d(s,q)<\delta$, the triangle inequality gives $d(s,p)\leq d(s,q)+d(q,p)<r$. Thus the ball of radius $\delta$ about $q$ stays inside $N_r(p)$.}
+  If $d(s,q)<\delta$, the triangle inequality gives $d(s,p)\leq d(s,q)+d(q,p)<r$. Thus the ball of radius $\delta$ about $q$ stays inside $B(p,r)$.
+
+  \begin{lean}
     intro s hs
     change dist s p < r
+
     have ht := dist_triangle s q p
+
     change dist s q < r - dist q p at hs
     linarith
   \end{lean}
@@ -197,7 +199,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.finite_positive_lower_bound
 \begin{lemma} \label{an1:lem:finite-positive-lower-bound}
-  \begin{lean}{For a finite index set $S$ and positive numbers $r_i$ for $i\in S$, there is $\delta>0$ with $\delta\leq r_i$ for every $i\in S$.}
+  For a finite index set $S$ and positive numbers $r_i$ for $i\in S$, there is $\delta>0$ with $\delta\leq r_i$ for every $i\in S$.
+
+  \begin{lean}
     theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
         (r : ι → ℝ) (hr : ∀ i ∈ s, 0 < r i) :
         ∃ δ > 0, ∀ i ∈ s, δ ≤ r i
@@ -205,15 +209,20 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Use induction on $S$. For the empty set, $\delta=1$ works. On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the remaining indices. It stays positive and is below every required radius.}
+  Use induction on $S$. For the empty set, $\delta=1$ works. On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the remaining indices. It stays positive and is below every required radius.
+
+  \begin{lean}
     classical
+
     induction s using Finset.induction_on with
     | empty => exact ⟨1, zero_lt_one, by simp only [Finset.notMem_empty, false_implies, implies_true]⟩
     | @insert i s hi ih =>
       obtain ⟨δ, hδ, hle⟩ := ih (fun j hj => hr j (Finset.mem_insert_of_mem hj))
+
       refine ⟨min (r i) δ, lt_min (hr i (Finset.mem_insert_self i s)) hδ, ?_⟩
       intro j hj
       rcases Finset.mem_insert.mp hj with rfl | hj
+
       · exact min_le_left _ _
       · exact (min_le_right _ _).trans (hle j hj)
   \end{lean}
@@ -222,114 +231,160 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.limit_point_infinite
 \begin{proposition} \label{an1:thm:limit-point-neighborhood-contains-infinite-elements}
-  \begin{lean}{If $p\in E^{\prime}$ and $r>0$, then $E\cap N_r(p)$ is infinite.}
+  If $p\in E^{\prime}$ and $r>0$, then $E\cap B(p,r)$ is infinite.
+
+  \begin{lean}
     theorem limit_point_infinite (E : Set X) (p : X)
-        (hp : p ∈ limitPoints E) (r : ℝ) (hr : 0 < r) :
+        (hp : p ∈ derivedSet E) (r : ℝ) (hr : 0 < r) :
         (E ∩ ball p r).Infinite
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Assume instead that this intersection is finite. After deleting $p$, its points still form a finite set, and all their distances from $p$ are positive.}
+  Assume instead that this intersection is finite. After deleting $p$, its points still form a finite set, and all their distances from $p$ are positive.
+
+  \begin{lean}
     classical
+
     intro hf
+
     let s := (hf.subset (show (E ∩ ball p r) \ {p} ⊆ E ∩ ball p r from sdiff_subset)).toFinset
+
     have hpos : ∀ q ∈ s, 0 < dist q p := by
       intro q hq
+
       have h := (Set.Finite.mem_toFinset _).mp hq
+
       exact dist_pos.mpr h.2
   \end{lean}
 
-  \begin{lean}{Choose a common positive lower bound $\delta$ for those distances. The limit-point condition supplies a distinct point of $E$ within $\min(r,\delta)$ of $p$. It belongs to the finite set but has distance less than its lower bound, a contradiction.}
+  Choose a common positive lower bound $\delta$ for those distances. The limit-point condition supplies a distinct point of $E$ within $\min(r,\delta)$ of $p$. It belongs to the finite set but has distance less than its lower bound, a contradiction.
+
+  \begin{lean}
     obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s (fun q => dist q p) hpos
-    obtain ⟨q, hq, hqp, hdist⟩ := hp (min r δ) (lt_min hr hδ)
+    obtain ⟨q, hq, hqp, hdist⟩ := (mem_derivedSet_iff E p).mp hp (min r δ) (lt_min hr hδ)
+
     have hqs : q ∈ s := (Set.Finite.mem_toFinset _).mpr
       ⟨⟨hq, hdist.trans_le (min_le_left _ _)⟩, hqp⟩
+
     exact (not_lt_of_ge (hle q hqs)) (hdist.trans_le (min_le_right _ _))
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_iff_compl_limitPoints
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_iff_compl_derivedSet
 \begin{proposition} \label{an1:thm:complement-of-open-set-is-closed}
-  \begin{lean}{$E$ is open if and only if $E^{c}$ contains all its limit points, that is, $E^{c}$ is closed.}
-    theorem open_iff_compl_limitPoints (E : Set X) :
-        IsOpen E ↔ limitPoints Eᶜ ⊆ Eᶜ
+  $E$ is open if and only if $E^{c}$ contains all its limit points, that is, $E^{c}$ is closed.
+
+  \begin{lean}
+    theorem open_iff_compl_derivedSet (E : Set X) :
+        IsOpen E ↔ derivedSet Eᶜ ⊆ Eᶜ
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{If $E$ is open, a point in $E$ has a ball contained in $E$. Such a ball prevents that point from being a limit point of the complement.}
+  If $E$ is open, a point in $E$ has a ball contained in $E$. Such a ball prevents that point from being a limit point of the complement.
+
+  \begin{lean}
     classical
+
     constructor
+
     · intro h p hp hpe
+
       obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp h p hpe
-      obtain ⟨q, hq, _, hd⟩ := hp r hr
+      obtain ⟨q, hq, _, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
+
       exact hq (hball hd)
   \end{lean}
 
-  \begin{lean}{Conversely, suppose the complement contains its limit points. If $p\in E$ had no ball contained in $E$, each ball would contain a point outside $E$. That point differs from $p$, making $p$ a limit point of the complement and contradicting $p\in E$.}
+  Conversely, suppose the complement contains its limit points. If $p\in E$ had no ball contained in $E$, each ball would contain a point outside $E$. That point differs from $p$, making $p$ a limit point of the complement and contradicting $p\in E$.
+
+  \begin{lean}
     · intro h
       apply Metric.isOpen_iff.mpr
       intro p hp
       by_contra hn
-      have hl : p ∈ limitPoints Eᶜ := by
+
+      have hl : p ∈ derivedSet Eᶜ := by
+        rw [mem_derivedSet_iff]
         intro r hr
+
         have hnsub : ¬ ball p r ⊆ E := fun hs => hn ⟨r, hr, hs⟩
+
         obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hnsub
+
         refine ⟨q, hqe, ?_, hq⟩
         intro heq
         exact hqe (heq.symm ▸ hp)
+
       exact h hl hp
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_iff_limitPoints
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_iff_derivedSet
 \begin{lemma} \label{an1:lem:closed-iff-limitPoints}
-  \begin{lean}{The standard closed-set predicate is equivalent to $E^{\prime}\subseteq E$.}
-    theorem closed_iff_limitPoints (E : Set X) :
-        IsClosed E ↔ limitPoints E ⊆ E
+  $E$ is closed if and only if $E^{\prime}\subseteq E$.
+
+  \begin{lean}
+    theorem closed_iff_derivedSet (E : Set X) :
+        IsClosed E ↔ derivedSet E ⊆ E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{A set is closed precisely when its complement is open. Apply the preceding result to $E^{c}$ and take its complement twice.}
-    have h := open_iff_compl_limitPoints Eᶜ
+  A set is closed precisely when its complement is open. Apply the preceding result to $E^{c}$ and take its complement twice.
+
+  \begin{lean}
+    have h := open_iff_compl_derivedSet Eᶜ
+
     rw [compl_compl] at h
     exact isOpen_compl_iff.symm.trans h
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_closedSets_iff
-\begin{lemma} \label{an1:lem:mem-closedSets-iff}
-  \begin{lean}{The locally defined closed sets are exactly the sets satisfying the standard closed-set predicate.}
-    theorem mem_closedSets_iff (E : Set X) : E ∈ closedSets ↔ IsClosed E
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.perfect_iff
+\begin{lemma} \label{an1:lem:perfect-iff}
+  $E$ is perfect if and only if $E=E^{\prime}$.
+
+  \begin{lean}
+    theorem perfect_iff (E : Set X) : Perfect E ↔ E = derivedSet E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{The preceding complement argument proves that closedness is equivalent to containing every limit point. Reverse that equivalence.}
-    exact (closed_iff_limitPoints E).symm
-  \end{lean}
+  Closedness is equivalent to $E^{\prime}\subseteq E$, by the preceding result. Every point being a limit point says $E\subseteq E^{\prime}$. Together these are equality.
 
+  \begin{lean}
+    rw [perfect_def]
+    change (IsClosed E ∧ E ⊆ derivedSet E) ↔ E = derivedSet E
+    rw [closed_iff_derivedSet]
+    exact ⟨fun h => subset_antisymm h.2 h.1, fun h => ⟨h.symm.subset, h.subset⟩⟩
+  \end{lean}
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_union
 \begin{proposition} \label{an1:thm:arbitrary-union-of-open-sets-is-open}
-  \begin{lean}{For any indexed family of open sets $(E_i)$, the union $\bigcup_i E_i$ is open.}
+  For any indexed family of open sets $(E_i)$, the union $\bigcup_i E_i$ is open.
+
+  \begin{lean}
     theorem open_union {ι : Type*} (E : ι → Set X)
         (h : ∀ i, IsOpen (E i)) : IsOpen (⋃ i, E i)
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{A point in the union belongs to one member $E_i$. Choose a ball contained in that member; the same ball is contained in the union. This argument also covers an empty family, since then there is no point to consider.}
+  A point in the union belongs to one member $E_i$. Choose a ball contained in that member; the same ball is contained in the union. This argument also covers an empty family, since then there is no point to consider.
+
+  \begin{lean}
     apply Metric.isOpen_iff.mpr
     intro p hp
+
     obtain ⟨i, hi⟩ := mem_iUnion.mp hp
     obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (h i) p hi
+
     exact ⟨r, hr, fun q hq => mem_iUnion.mpr ⟨i, hs hq⟩⟩
   \end{lean}
 
@@ -337,21 +392,28 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_intersection
 \begin{corollary} \label{an1:cor:arbitrary-intersection-of-closed-sets-is-closed}
-  \begin{lean}{For any indexed family of closed sets $(E_i)$, the intersection $\bigcap_i E_i$ is closed.}
+  For any indexed family of closed sets $(E_i)$, the intersection $\bigcap_i E_i$ is closed.
+
+  \begin{lean}
     theorem closed_intersection {ι : Type*} (E : ι → Set X)
         (h : ∀ i, IsClosed (E i)) : IsClosed (⋂ i, E i)
   \end{lean}
 \end{corollary}
 
 \begin{proof}
-  \begin{lean}{A limit point of the intersection is a limit point of each member: every nearby witness in the intersection belongs to that member. Each member is closed, so it contains the point; consequently the intersection contains it.}
-    apply (closed_iff_limitPoints _).mpr
+  A limit point of the intersection is a limit point of each member: every nearby witness in the intersection belongs to that member. Each member is closed, so it contains the point; consequently the intersection contains it.
+
+  \begin{lean}
+    apply (closed_iff_derivedSet _).mpr
     intro p hp
     apply mem_iInter.mpr
     intro i
-    apply (closed_iff_limitPoints _).mp (h i)
+    apply (closed_iff_derivedSet _).mp (h i)
+    rw [mem_derivedSet_iff]
     intro r hr
-    obtain ⟨q, hq, hn, hd⟩ := hp r hr
+
+    obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
+
     exact ⟨q, mem_iInter.mp hq i, hn, hd⟩
   \end{lean}
 
@@ -359,18 +421,24 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_intersection
 \begin{lemma} \label{an1:lem:open-intersection}
-  \begin{lean}{The intersection of two open sets is open.}
+  The intersection of two open sets is open.
+
+  \begin{lean}
     theorem open_intersection (E F : Set X) (hE : IsOpen E) (hF : IsOpen F) :
         IsOpen (E ∩ F)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{At a point of the intersection, choose one positive radius for each set. The smaller radius gives a ball lying in both sets.}
+  At a point of the intersection, choose one positive radius for each set. The smaller radius gives a ball lying in both sets.
+
+  \begin{lean}
     apply Metric.isOpen_iff.mpr
     intro p hp
+
     obtain ⟨r, hr, hEr⟩ := Metric.isOpen_iff.mp hE p hp.1
     obtain ⟨s, hs, hFs⟩ := Metric.isOpen_iff.mp hF p hp.2
+
     refine ⟨min r s, lt_min hr hs, ?_⟩
     intro q hq
     change dist q p < min r s at hq
@@ -381,7 +449,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_finite_intersection
 \begin{proposition} \label{an1:thm:finite-intersection-of-open-sets-is-open}
-  \begin{lean}{A finite intersection of open sets is open. In particular this applies to $\bigcap_{j=0}^{n-1}E_j$ for every $n\in\N$.}
+  A finite intersection of open sets is open. In particular this applies to $\bigcap_{j=0}^{n-1}E_j$ for every $n\in\N$.
+
+  \begin{lean}
     theorem open_finite_intersection {ι : Type*} (s : Finset ι)
         (E : ι → Set X) (hE : ∀ i ∈ s, IsOpen (E i)) :
         IsOpen (⋂ i ∈ s, E i)
@@ -389,12 +459,16 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{For no indices the intersection is $X$, which contains a unit ball about each of its points. Adjoining one index replaces an already open finite intersection by its intersection with one more open set, so induction completes the proof.}
+  For no indices the intersection is $X$, which contains a unit ball about each of its points. Adjoining one index replaces an already open finite intersection by its intersection with one more open set, so induction completes the proof.
+
+  \begin{lean}
     classical
+
     induction s using Finset.induction_on with
     | empty =>
       simp only [Finset.notMem_empty, iInter_of_empty, iInter_univ]
       exact Metric.isOpen_iff.mpr (fun p _ => ⟨1, zero_lt_one, subset_univ _⟩)
+
     | @insert i s hi ih =>
       rw [Finset.set_biInter_insert]
       exact open_intersection _ _ (hE i (Finset.mem_insert_self i s))
@@ -405,7 +479,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_finite_union
 \begin{corollary} \label{an1:cor:finite-union-of-closed-sets-is-closed}
-  \begin{lean}{A finite union of closed sets is closed, including the union over no indices.}
+  A finite union of closed sets is closed, including the union over no indices.
+
+  \begin{lean}
     theorem closed_finite_union {ι : Type*} (s : Finset ι)
         (E : ι → Set X) (hE : ∀ i ∈ s, IsClosed (E i)) :
         IsClosed (⋃ i ∈ s, E i)
@@ -413,75 +489,84 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{corollary}
 
 \begin{proof}
-  \begin{lean}{The complements are open, so their finite intersection is open. By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that union is closed.}
+  The complements are open, so their finite intersection is open. By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that union is closed.
+
+  \begin{lean}
     have ho := open_finite_intersection s (fun i => (E i)ᶜ)
       (fun i hi => (hE i hi).isOpen_compl)
+
     have heq : (⋃ i ∈ s, E i)ᶜ = ⋂ i ∈ s, (E i)ᶜ := by
       ext p
       simp only [mem_compl_iff, mem_iUnion, mem_iInter, not_exists]
+
     exact isOpen_compl_iff.mp (heq ▸ ho)
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_eq_union_limitPoints
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_eq_union_derivedSet
 \begin{lemma} \label{an1:lem:closure-eq-union-limitPoints}
-  \begin{lean}{$\overline E=E\cup E^{\prime}$, so the standard closure agrees with the textbook definition.}
-    theorem closure_eq_union_limitPoints (E : Set X) :
-        closure E = E ∪ limitPoints E
+  $\overline E=E\cup E^{\prime}$, relating closure to the derived set.
+
+  \begin{lean}
+    theorem closure_eq_union_derivedSet (E : Set X) :
+        closure E = E ∪ derivedSet E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{If $p\in\overline E$, every ball about $p$ meets $E$. Either $p\in E$, or each such witness differs from $p$, making $p$ a limit point.}
+  If $p\in\overline E$, every ball about $p$ meets $E$. Either $p\in E$, or each such witness differs from $p$, making $p$ a limit point.
+
+  \begin{lean}
     classical
+
     ext p
     constructor
+
     · intro hp
       by_cases he : p ∈ E
+
       · exact Or.inl he
       · right
+        rw [mem_derivedSet_iff]
         intro r hr
+
         obtain ⟨q, hq, hd⟩ := Metric.mem_closure_iff.mp hp r hr
+
         exact ⟨q, hq, fun h => he (h ▸ hq), by rwa [dist_comm]⟩
   \end{lean}
 
-  \begin{lean}{Conversely, a point of $E$ itself witnesses that every ball meets $E$. For a limit point, use the distinct witness in each deleted ball. Both cases give membership in the closure.}
+  Conversely, a point of $E$ itself witnesses that every ball meets $E$. For a limit point, use the distinct witness in each deleted ball. Both cases give membership in the closure.
+
+  \begin{lean}
     · intro hp
       apply Metric.mem_closure_iff.mpr
       intro r hr
       rcases hp with hp | hp
+
       · exact ⟨p, hp, by simpa only [dist_self] using hr⟩
-      · obtain ⟨q, hq, _, hd⟩ := hp r hr
+
+      · obtain ⟨q, hq, _, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
+
         exact ⟨q, hq, by rwa [dist_comm]⟩
-  \end{lean}
-
-\end{proof}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.setClosure_eq_closure
-\begin{lemma} \label{an1:lem:setClosure-eq-closure}
-  \begin{lean}{The locally defined closure equals the standard closure.}
-    theorem setClosure_eq_closure (E : Set X) : setClosure E = closure E
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  \begin{lean}{The preceding ball argument identifies the standard closure with the union of the set and its limit points, exactly our definition.}
-    exact (closure_eq_union_limitPoints E).symm
   \end{lean}
 
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subset_closure
 \begin{lemma} \label{an1:lem:subset-closure}
-  \begin{lean}{Every set is contained in its closure.}
+  Every set is contained in its closure.
+
+  \begin{lean}
     theorem subset_closure (E : Set X) : E ⊆ closure E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{In the local definition, a point of the original set belongs to the left member of the union. Transfer this inclusion to the standard notation.}
-    rw [← setClosure_eq_closure]
+  By the preceding characterization, every point of $E$ belongs to the left member of the union $E\cup E^{\prime}$.
+
+  \begin{lean}
+    rw [closure_eq_union_derivedSet]
     exact fun _ hp => Or.inl hp
   \end{lean}
 
@@ -489,21 +574,29 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_closed
 \begin{lemma} \label{an1:lem:closure-closed}
-  \begin{lean}{The closure of any set is closed.}
+  The closure of any set is closed.
+
+  \begin{lean}
     theorem closure_closed (E : Set X) : IsClosed (closure E)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Suppose $p$ is a limit point of $\overline E$ and $r>0$. Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$. The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.}
-    apply (closed_iff_limitPoints _).mpr
+  Suppose $p$ is a limit point of $\overline E$ and $r>0$. Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$. The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.
+
+  \begin{lean}
+    apply (closed_iff_derivedSet _).mpr
     intro p hp
     apply Metric.mem_closure_iff.mpr
     intro r hr
-    obtain ⟨q, hq, _, hdq⟩ := hp (r / 2) (half_pos hr)
+
+    obtain ⟨q, hq, _, hdq⟩ := (mem_derivedSet_iff _ _).mp hp (r / 2) (half_pos hr)
     obtain ⟨s, hs, hds⟩ := Metric.mem_closure_iff.mp hq (r / 2) (half_pos hr)
+
     refine ⟨s, hs, ?_⟩
+
     have ht := dist_triangle p q s
+
     rw [dist_comm q p] at hdq
     linarith
   \end{lean}
@@ -512,7 +605,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_properties
 \begin{proposition} \label{an1:thm:properties-of-closure}
-  \begin{lean}{For every $E\subseteq X$: $\overline E$ is closed; $E=\overline E$ if and only if $E$ is closed; and every closed set $F$ containing $E$ also contains $\overline E$.}
+  For every $E\subseteq X$: $\overline E$ is closed; $E=\overline E$ if and only if $E$ is closed; and every closed set $F$ containing $E$ also contains $\overline E$.
+
+  \begin{lean}
     theorem closure_properties (E : Set X) :
         IsClosed (closure E) ∧ (E = closure E ↔ IsClosed E) ∧
         (∀ F : Set X, IsClosed F → E ⊆ F → closure E ⊆ F)
@@ -520,25 +615,35 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{We have just proved that $\overline E$ is closed. Therefore $E=\overline E$ implies that $E$ is closed. Conversely, closedness gives $E^{\prime}\subseteq E$, so $E\cup E^{\prime}=E$.}
+  We have just proved that $\overline E$ is closed. Therefore $E=\overline E$ implies that $E$ is closed. Conversely, closedness gives $E^{\prime}\subseteq E$, so $E\cup E^{\prime}=E$.
+
+  \begin{lean}
     refine ⟨closure_closed E, ?_, ?_⟩
+
     · constructor
       · intro h
         rw [h]
         exact closure_closed E
+
       · intro h
-        rw [closure_eq_union_limitPoints]
-        exact (union_eq_left.mpr ((closed_iff_limitPoints E).mp h)).symm
+        rw [closure_eq_union_derivedSet]
+        exact (union_eq_left.mpr ((closed_iff_derivedSet E).mp h)).symm
   \end{lean}
 
-  \begin{lean}{Let $F$ be closed with $E\subseteq F$. A point of $\overline E$ either lies in $E$, hence in $F$, or is a limit point of $E$. In the latter case the same nearby witnesses make it a limit point of $F$, which belongs to $F$ by closedness.}
+  Let $F$ be closed with $E\subseteq F$. A point of $\overline E$ either lies in $E$, hence in $F$, or is a limit point of $E$. In the latter case the same nearby witnesses make it a limit point of $F$, which belongs to $F$ by closedness.
+
+  \begin{lean}
     · intro F hF hEF p hp
-      rw [closure_eq_union_limitPoints] at hp
+      rw [closure_eq_union_derivedSet] at hp
       rcases hp with hp | hp
+
       · exact hEF hp
-      · apply (closed_iff_limitPoints F).mp hF
+      · apply (closed_iff_derivedSet F).mp hF
+        rw [mem_derivedSet_iff]
         intro r hr
-        obtain ⟨q, hq, hn, hd⟩ := hp r hr
+
+        obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
+
         exact ⟨q, hEF hq, hn, hd⟩
   \end{lean}
 
@@ -546,26 +651,35 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.supremum_in_closure
 \begin{proposition} \label{an1:thm:supremum-in-closure}
-  \begin{lean}{If $E\subseteq\R$ is nonempty and bounded above, then $\sup E\in\overline E$. If $E$ is also closed, then $\sup E\in E$.}
+  If $E\subseteq\R$ is nonempty and bounded above, then $\sup E\in\overline E$. If $E$ is also closed, then $\sup E\in E$.
+
+  \begin{lean}
     theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
         sSup E ∈ closure E ∧ (IsClosed E → sSup E ∈ E)
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Write $c=\sup E$. For any $r>0$, the smaller number $c-r$ is not an upper bound, so choose $q\in E$ with $c-r<q\leq c$. Then $|c-q|<r$, proving that every ball about $c$ meets $E$.}
+  Write $c=\sup E$. For any $r>0$, the smaller number $c-r$ is not an upper bound, so choose $q\in E$ with $c-r<q\leq c$. Then $|c-q|<r$, proving that every ball about $c$ meets $E$.
+
+  \begin{lean}
     have hc : sSup E ∈ closure E := by
       apply Metric.mem_closure_iff.mpr
       intro r hr
+
       obtain ⟨q, hq, hlt⟩ := exists_lt_of_lt_csSup hne (sub_lt_self (sSup E) hr)
+
       refine ⟨q, hq, ?_⟩
       rw [Real.dist_eq, abs_of_nonneg (sub_nonneg.mpr (le_csSup hb hq))]
       linarith
   \end{lean}
 
-  \begin{lean}{When $E$ is closed, its closure equals $E$, so the established closure membership is membership in $E$ itself.}
+  When $E$ is closed, its closure equals $E$, so the established closure membership is membership in $E$ itself.
+
+  \begin{lean}
     exact ⟨hc, fun h => by
       have heq := (closure_properties E).2.1.mpr h
+
       rw [← heq] at hc
       exact hc⟩
   \end{lean}
@@ -574,40 +688,62 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_eq_diff
 \begin{proposition} \label{an1:thm:isolated-points-are-self-minus-limit-points}
-  \begin{lean}{$E^{i}=E\setminus E^{\prime}$.}
-    theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E
+  $\operatorname{Iso}(E)=E\setminus E^{\prime}$.
+
+  \begin{lean}
+    theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ derivedSet E
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{If $E\cap N_r(p)=\{p\}$, then $p\in E$ and no distinct point of $E$ is in that ball. This contradicts the limit-point condition, so $p\notin E^{\prime}$.}
+  If $E\cap B(p,r)=\{p\}$, then $p\in E$ and no distinct point of $E$ is in that ball. This contradicts the limit-point condition, so $p\notin E^{\prime}$.
+
+  \begin{lean}
     classical
+
     ext p
     constructor
+
     · rintro ⟨r, hr, heq⟩
+
       have hp : p ∈ E ∩ ball p r := heq.symm ▸ (mem_singleton p)
+
       refine ⟨hp.1, ?_⟩
       intro hl
-      obtain ⟨q, hq, hn, hd⟩ := hl r hr
+
+      obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hl r hr
+
       have hmem : q ∈ E ∩ ball p r := ⟨hq, hd⟩
+
       rw [heq, mem_singleton_iff] at hmem
       exact hn hmem
   \end{lean}
 
-  \begin{lean}{Conversely, if $p\in E$ but $p\notin E^{\prime}$, some positive-radius ball contains no distinct point of $E$. Its intersection with $E$ is therefore exactly $\{p\}$.}
+  Conversely, if $p\in E$ but $p\notin E^{\prime}$, some positive-radius ball contains no distinct point of $E$. Its intersection with $E$ is therefore exactly $\{p\}$.
+
+  \begin{lean}
     · rintro ⟨hp, hn⟩
+
       have hex : ∃ r > 0, ∀ q ∈ E, dist q p < r → q = p := by
         by_contra h
         push Not at h
-        exact hn (fun r hr => by
-          obtain ⟨q, hq, hd, hne⟩ := h r hr
-          exact ⟨q, hq, hne, hd⟩)
+        apply hn
+        rw [mem_derivedSet_iff]
+        intro r hr
+
+        obtain ⟨q, hq, hd, hne⟩ := h r hr
+
+        exact ⟨q, hq, hne, hd⟩
+
       obtain ⟨r, hr, h⟩ := hex
+
       refine ⟨r, hr, ?_⟩
       ext q
       constructor
+
       · intro hq
         exact h q hq.1 hq.2
+
       · intro hq
         rw [mem_singleton_iff] at hq
         subst q
@@ -618,67 +754,85 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.compl_interior_eq_closure_compl
 \begin{lemma} \label{an1:lem:complement-of-interior-is-closure-of-complement}
-  \begin{lean}{$(E^{\circ})^{c}=\overline{E^{c}}$.}
+  $(E^{\circ})^{c}=\overline{E^{c}}$.
+
+  \begin{lean}
     theorem compl_interior_eq_closure_compl (E : Set X) :
         (interior E)ᶜ = closure Eᶜ
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Failure to be interior means that no positive-radius ball lies in $E$. Thus every such ball contains a point of $E^{c}$, giving membership in its closure. Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.}
+  Failure to be interior means that no positive-radius ball lies in $E$. Thus every such ball contains a point of $E^{c}$, giving membership in its closure. Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.
+
+  \begin{lean}
     classical
+
     ext p
     rw [mem_compl_iff, mem_interior_iff_mem_nhds, Metric.mem_nhds_iff,
       Metric.mem_closure_iff]
     constructor
+
     · intro h r hr
+
       have hn : ¬ ball p r ⊆ E := fun hs => h ⟨r, hr, hs⟩
+
       obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hn
+
       exact ⟨q, hqe, by rwa [dist_comm]⟩
+
     · intro h ⟨r, hr, hs⟩
+
       obtain ⟨q, hq, hd⟩ := h r hr
+
       exact hq (hs (by simpa only [mem_ball, dist_comm] using hd))
   \end{lean}
 
 \end{proof}
 
 \begin{definition} \label{an1:def:boundary}
-  The \textbf{boundary} is $\partial E=\overline E\cap\overline{E^{c}}$.
-  Equivalently, $\partial E=\overline E\setminus E^{\circ}$.
-  \begin{lean}{The boundary is the intersection of the two locally defined closures.}
-    def boundary (E : Set X) : Set X := setClosure E ∩ setClosure Eᶜ
-  \end{lean}
+  The \textbf{boundary} is $\partial E=\overline E\setminus E^{\circ}$.
+  The next lemma identifies it with $\overline E\cap\overline{E^{c}}$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.boundary_eq
 \begin{lemma} \label{an1:lem:boundary-eq}
-  \begin{lean}{$\partial E=\overline E\cap\overline{E^{c}}$.}
+  $\partial E=\overline E\cap\overline{E^{c}}$.
+
+  \begin{lean}
     theorem boundary_eq (E : Set X) :
-        boundary E = closure E ∩ closure Eᶜ
+        frontier E = closure E ∩ closure Eᶜ
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Replace each locally defined closure by its verified standard representation. The difference formula follows from the preceding complement-of-interior lemma.}
-    rw [boundary, setClosure_eq_closure, setClosure_eq_closure]
+  Write the difference as an intersection with the complement of the interior. The preceding lemma identifies this complement with the closure of the complement.
+
+  \begin{lean}
+    rw [frontier, sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.zero_dimensional
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.zero_dimensional
 \begin{lemma} \label{an1:lem:zero-dimensional}
-  \begin{lean}{Any two points of $\R^{0}$ are equal, and every deleted neighborhood in $\R^{0}$ is empty.}
+  Any two points of $\R^{0}$ are equal, and every punctured ball in $\R^{0}$ is empty.
+
+  \begin{lean}
     theorem zero_dimensional (p q : EuclideanSpace ℝ (Fin 0)) (r : ℝ) :
-        p = q ∧ deletedNeighborhood p r = ∅
+        p = q ∧ ball p r \ {p} = ∅
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{There are no coordinates on which two empty tuples can differ, so they are equal. Removing the center consequently removes every possible point of a ball.}
+  There are no coordinates on which two empty tuples can differ, so they are equal. Removing the center consequently removes every possible point of a ball.
+
+  \begin{lean}
     have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by
       intro x y
       ext j
       exact Fin.elim0 j
+
     refine ⟨heq p q, ?_⟩
     apply Set.eq_empty_iff_forall_notMem.mpr
     intro x hx
@@ -687,9 +841,11 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_punctured_ball
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_punctured_ball
 \begin{lemma} \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
-  \begin{lean}{For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the deleted neighborhood $\widetilde N_r(p)$ is nonempty.}
+  For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the punctured ball $B(p,r)\setminus\{p\}$ is nonempty.
+
+  \begin{lean}
     theorem euclidean_punctured_ball (n : ℕ+)
         (p : EuclideanSpace ℝ (Fin n)) (r : ℝ) (hr : 0 < r) :
         ∃ q : EuclideanSpace ℝ (Fin n), q ≠ p ∧ dist q p < r
@@ -697,15 +853,23 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Since $n>0$, the coordinate vector $e_0$ exists. Put $v=(r/2)e_0$, so $\|v\|=r/2>0$. The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.}
+  Since $n>0$, the coordinate vector $e_0$ exists. Put $v=(r/2)e_0$, so $\|v\|=r/2>0$. The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.
+
+  \begin{lean}
     let v : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single ⟨0, n.pos⟩ (r / 2)
+
     have hv : ‖v‖ = r / 2 := by
       rw [PiLp.norm_single, Real.norm_eq_abs, abs_of_pos (half_pos hr)]
+
     refine ⟨p + v, ?_, ?_⟩
+
     · intro heq
+
       have hz : v = 0 := add_left_cancel (heq.trans (add_zero p).symm)
+
       rw [hz, norm_zero] at hv
       linarith
+
     · rw [dist_eq_norm, add_sub_cancel_left, hv]
       linarith
   \end{lean}
@@ -714,50 +878,70 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_limit_compl
 \begin{lemma} \label{an1:lem:isolated-limit-compl}
-  \begin{lean}{If every positive-radius deleted ball in $X$ is nonempty, then $E^{i}\subseteq(E^{c})^{\prime}$.}
+  If every positive-radius deleted ball in $X$ is nonempty, then $\operatorname{Iso}(E)\subseteq(E^{c})^{\prime}$.
+
+  \begin{lean}
     theorem isolated_limit_compl (E : Set X)
         (hX : ∀ p : X, ∀ r > 0, ∃ q : X, q ≠ p ∧ dist q p < r) :
-        isolatedPoints E ⊆ limitPoints Eᶜ
+        isolatedPoints E ⊆ derivedSet Eᶜ
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{For an isolated point $p$, choose $r>0$ with $E\cap N_r(p)=\{p\}$. For any $s>0$, take a distinct point within $\min(r,s)$ of $p$. It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.}
+  For an isolated point $p$, choose $r>0$ with $E\cap B(p,r)=\{p\}$. For any $s>0$, take a distinct point within $\min(r,s)$ of $p$. It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.
+
+  \begin{lean}
     intro p hp
+
     obtain ⟨r, hr, heq⟩ := hp
+
+    rw [mem_derivedSet_iff]
     intro s hs
+
     obtain ⟨q, hne, hd⟩ := hX p (min r s) (lt_min hr hs)
+
     refine ⟨q, ?_, hne, hd.trans_le (min_le_right _ _)⟩
     intro hq
+
     have hm : q ∈ E ∩ ball p r := ⟨hq, hd.trans_le (min_le_left _ _)⟩
+
     rw [heq, mem_singleton_iff] at hm
     exact hne hm
   \end{lean}
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.euclidean_boundary
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_boundary
 \begin{proposition} \label{an1:thm:properties-of-boundary-in-rn}
-  \begin{lean}{For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial E=E^{i}\cup(E^{c})^{i}\cup(E^{\prime}\cap(E^{c})^{\prime})$.}
+  For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial E=\operatorname{Iso}(E)\cup\operatorname{Iso}(E^{c})\cup(E^{\prime}\cap(E^{c})^{\prime})$.
+
+  \begin{lean}
     theorem euclidean_boundary (n : ℕ+)
         (E : Set (EuclideanSpace ℝ (Fin n))) :
         frontier E = isolatedPoints E ∪ isolatedPoints Eᶜ ∪
-          (limitPoints E ∩ limitPoints Eᶜ)
+          (derivedSet E ∩ derivedSet Eᶜ)
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{An isolated point of either side is a limit point of the other, by the preceding two results. Expand the two closures in $\partial E$ as the set together with its limit points. Separate points which fail one of the two limit-point conditions from those satisfying both. The former are exactly the isolated points of one side; the latter form $E^{\prime}\cap(E^{c})^{\prime}$.}
+  An isolated point of either side is a limit point of the other, by the preceding two results. Expand the two closures in $\partial E$ as the set together with its limit points. Separate points which fail one of the two limit-point conditions from those satisfying both. The former are exactly the isolated points of one side; the latter form $E^{\prime}\cap(E^{c})^{\prime}$.
+
+  \begin{lean}
     have hE := isolated_limit_compl E (euclidean_punctured_ball n)
+
     have hEc := isolated_limit_compl Eᶜ (euclidean_punctured_ball n)
+
     rw [compl_compl] at hEc
     rw [isolated_eq_diff] at hE hEc
     rw [frontier, sdiff_eq_compl_inter,
-      compl_interior_eq_closure_compl, closure_eq_union_limitPoints,
-      closure_eq_union_limitPoints, isolated_eq_diff, isolated_eq_diff]
+      compl_interior_eq_closure_compl, closure_eq_union_derivedSet,
+      closure_eq_union_derivedSet, isolated_eq_diff, isolated_eq_diff]
     ext p
+
     have h1 := @hE p
+
     have h2 := @hEc p
+
     simp only [mem_inter_iff, mem_union, mem_sdiff, mem_compl_iff] at *
     tauto
   \end{lean}
@@ -766,7 +950,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subspace_metric
 \begin{proposition} \label{an1:lem:subspace-metric}
-  \begin{lean}{For $Y\subseteq X$, restricting $d$ to $Y\times Y$ gives a metric on $Y$, with the same distances.}
+  For $Y\subseteq X$, restricting $d$ to $Y\times Y$ gives a metric on $Y$, with the same distances.
+
+  \begin{lean}
     theorem subspace_metric (Y : Set X) (p q z : Y) :
         dist p q = dist p.val q.val ∧ 0 ≤ dist p q ∧
         (dist p q = 0 ↔ p = q) ∧ dist p q = dist q p ∧
@@ -775,7 +961,9 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Nonnegativity, symmetry, and the triangle inequality are inherited from $X$. Distance zero means equality of the underlying points, which is also equality as points of $Y$.}
+  Nonnegativity, symmetry, and the triangle inequality are inherited from $X$. Distance zero means equality of the underlying points, which is also equality as points of $Y$.
+
+  \begin{lean}
     exact ⟨rfl, dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
   \end{lean}
 
@@ -784,46 +972,50 @@ Euclidean spaces always use this standard metric. In particular, the zero-dimens
 The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to write $d(p,q)$ for its distance.
 
 \begin{definition} \label{an1:def:relative-open-closed-sets}
-  For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ if each $p\in E$ has a radius $r>0$ with $Y\cap N_r(p)\subseteq E$.
-  It is \textbf{closed relative to} $Y$ if $E^{\prime}\cap Y\subseteq E$.
-  The first condition is the ball definition in the subspace; the equivalence for closedness is checked below.
-  \begin{lean}{Relative openness means openness of $E$ as a subset of the subspace $Y$.}
-    def relativeOpen (E Y : Set X) : Prop :=
-      E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ openSets
-  \end{lean}
-  \begin{lean}{Relative closedness means closedness of that subset of $Y$.}
-    def relativeClosed (E Y : Set X) : Prop :=
-      E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ closedSets
-  \end{lean}
+  For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ when it is open as a subset of the subspace $Y$. Equivalently, each $p\in E$ has $r>0$ with $Y\cap B(p,r)\subseteq E$.
+  It is \textbf{closed relative to} $Y$ when it is closed in that subspace. The next lemma characterizes this by $E^{\prime}\cap Y\subseteq E$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_closed
 \begin{lemma} \label{an1:lem:relative-closed}
-  \begin{lean}{For $E\subseteq Y$, $E$ is closed in $Y$ if and only if $E^{\prime}\cap Y\subseteq E$.}
+  For $E\subseteq Y$, $E$ is closed in $Y$ if and only if $E^{\prime}\cap Y\subseteq E$.
+
+  \begin{lean}
     theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
-        IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ limitPoints E ∩ Y ⊆ E
+        IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ derivedSet E ∩ Y ⊆ E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{A point of $Y$ that is an ambient limit point of $E$ is a subspace limit point: every witness lies in $E\subseteq Y$, and its distance is unchanged.}
-    rw [closed_iff_limitPoints]
+  A point of $Y$ that is an ambient limit point of $E$ is a subspace limit point: every witness lies in $E\subseteq Y$, and its distance is unchanged.
+
+  \begin{lean}
+    rw [closed_iff_derivedSet]
     constructor
   \end{lean}
 
-  \begin{lean}{Conversely, each subspace witness has an underlying point in $E$ with the same positive distance. Thus a subspace limit point is an ambient limit point lying in $Y$, and the stated condition puts it in $E$.}
+  Conversely, each subspace witness has an underlying point in $E$ with the same positive distance. Thus a subspace limit point is an ambient limit point lying in $Y$, and the stated condition puts it in $E$.
+
+  \begin{lean}
     · intro h p hp
-      apply h (show (⟨p, hp.2⟩ : Y) ∈ limitPoints (Subtype.val ⁻¹' E) from ?_)
+      apply h (show (⟨p, hp.2⟩ : Y) ∈ derivedSet (Subtype.val ⁻¹' E) from ?_)
+      rw [mem_derivedSet_iff]
       intro r hr
-      obtain ⟨q, hq, hne, hd⟩ := hp.1 r hr
+
+      obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp.1 r hr
+
       refine ⟨⟨q, hEY hq⟩, hq, ?_, hd⟩
       intro heq
       exact hne (congrArg Subtype.val heq)
+
     · intro h p hp
       apply h
       refine ⟨?_, p.property⟩
+      rw [mem_derivedSet_iff]
       intro r hr
-      obtain ⟨q, hq, hne, hd⟩ := hp r hr
+
+      obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
+
       exact ⟨q.val, hq, fun heq => hne (Subtype.ext heq), hd⟩
   \end{lean}
 
@@ -831,7 +1023,9 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_open
 \begin{proposition} \label{an1:thm:open-set-relative-to-subspace}
-  \begin{lean}{For $E\subseteq Y\subseteq X$, $E$ is open in $Y$ if and only if $E=V\cap Y$ for some open $V\subseteq X$.}
+  For $E\subseteq Y\subseteq X$, $E$ is open in $Y$ if and only if $E=V\cap Y$ for some open $V\subseteq X$.
+
+  \begin{lean}
     theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
         IsOpen ((Subtype.val : Y → X) ⁻¹' E) ↔
           ∃ V : Set X, IsOpen V ∧ E = V ∩ Y
@@ -839,34 +1033,54 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Suppose $E$ is open in $Y$. For each $p\in E$, choose $r_p>0$ with $Y\cap N_{r_p}(p)\subseteq E$.}
+  Suppose $E$ is open in $Y$. For each $p\in E$, choose $r_p>0$ with $Y\cap B(p,r_p)\subseteq E$.
+
+  \begin{lean}
     classical
+
     constructor
+
     · intro h
+
       have hex : ∀ p : E, ∃ r > 0, Y ∩ ball p.val r ⊆ E := by
         intro p
+
         obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp h ⟨p.val, hEY p.property⟩ p.property
-        exact ⟨r, hr, fun q hq => hs (show (⟨q, hq.1⟩ : Y) ∈ ball ⟨p.val, hEY p.property⟩ r from hq.2)⟩
+
+        exact ⟨r, hr, fun q hq =>
+          hs (show (⟨q, hq.1⟩ : Y) ∈ ball ⟨p.val, hEY p.property⟩ r from hq.2)⟩
   \end{lean}
 
-  \begin{lean}{Let $V$ be the union of these ambient balls. It is open. Each point of $E$ lies in its own ball and in $Y$; conversely, a point in $V\cap Y$ lies in one chosen ball, whose intersection with $Y$ lies in $E$. Hence $E=V\cap Y$.}
+  Let $V$ be the union of these ambient balls. It is open. Each point of $E$ lies in its own ball and in $Y$; conversely, a point in $V\cap Y$ lies in one chosen ball, whose intersection with $Y$ lies in $E$. Hence $E=V\cap Y$.
+
+  \begin{lean}
     choose r hr hs using hex
+
     refine ⟨⋃ p : E, ball p.val (r p), open_union _ (fun p => ball_open _ _), ?_⟩
     ext q
     constructor
+
     · intro hq
       exact ⟨mem_iUnion.mpr ⟨⟨q, hq⟩, by simpa only [mem_ball, dist_self] using hr ⟨q, hq⟩⟩, hEY hq⟩
+
     · rintro ⟨hq, hy⟩
+
       obtain ⟨p, hp⟩ := mem_iUnion.mp hq
+
       exact hs p ⟨hy, hp⟩
   \end{lean}
 
-  \begin{lean}{Conversely, choose an ambient ball inside $V$ about each point of $E=V\cap Y$. Restricting this ball to $Y$ produces a subspace ball inside $E$.}
+  Conversely, choose an ambient ball inside $V$ about each point of $E=V\cap Y$. Restricting this ball to $Y$ produces a subspace ball inside $E$.
+
+  \begin{lean}
     · rintro ⟨V, hV, heq⟩
       apply Metric.isOpen_iff.mpr
       intro p hp
+
       have hpV : p.val ∈ V := (show p.val ∈ V ∩ Y from heq ▸ hp).1
+
       obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp hV p.val hpV
+
       refine ⟨r, hr, ?_⟩
       intro q hq
       change q.val ∈ E

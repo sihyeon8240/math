@@ -21,10 +21,7 @@ eof_formatter="$repository_root/scripts/normalize-eof.sh"
 cruft_directory="$(mktemp -d)"
 trap 'rm -rf "$cruft_directory"' EXIT
 
-# A cached entry means that this exact file content has already passed the
-# current formatter. Including the script and latexindent version in the cache
-# namespace invalidates old results whenever the formatting rules or toolchain
-# change.
+# Reuse checks only while the source, formatting rules, and tool version match.
 cache_root="${FORMAT_TEX_CACHE_DIR:-$repository_root/.latexindent_cache}"
 script_hash="$(sha256sum "$0" "$eof_formatter")"
 latexindent_version="$(latexindent --version | head -n 1)"
@@ -32,37 +29,12 @@ cache_namespace="$(printf '%s\n%s\n' "$script_hash" "$latexindent_version" | sha
 cache_directory="$cache_root/$cache_namespace"
 mkdir -p "$cache_directory"
 
-# Keep Lean relative indentation, but place its least-indented nonblank line
-# one defaultIndent inside the environment. Captions may span lines and contain
-# nested or escaped braces. Normalize their continuation lines separately from
-# Lean, retaining relative indentation within each part.
+# Preserve relative Lean indentation inside code-only environments.
 normalize_lean_indentation() {
   perl -0777 -pe '
-    s{^([\t ]*)(\\begin\{lean\}[\t ]*(?<caption>\{(?:\\.|%[^\n]*\n|[^{}\\%]|(?&caption))*\})[^\n]*\n)(.*?)^[\t ]*(\\end\{lean\}[\t ]*(?:%[^\n]*)?$)}
+    s{^([\t ]*)(\\begin\{lean\}[\t ]*(?:%[^\n]*)?\n)(.*?)^[\t ]*(\\end\{lean\}[\t ]*(?:%[^\n]*)?$)}
      {
-       my ($indent, $opening, $caption, $body, $closing) = ($1, $2, $3, $4, $5);
-       if ($caption =~ /\n/) {
-         my $inner = substr($caption, 1, length($caption) - 2);
-         my $own_closing = $inner =~ s/\n[\t ]*$//;
-         my ($first, $rest) = split /\n/, $inner, 2;
-         if (defined $rest) {
-           my $common;
-           while ($rest =~ /^([\t ]*)\S/gm) {
-             my $prefix = $1;
-             if (!defined $common) { $common = $prefix; }
-             else {
-               chop $common while length($common) && index($prefix, $common) != 0;
-             }
-           }
-           if (defined $common) {
-             $rest =~ s/^\Q$common\E(?=[^\n]*\S)/$indent . "    "/gme;
-           }
-           $inner = $first . "\n" . $rest;
-         }
-         $inner .= "\n" . $indent . "  " if $own_closing;
-         my $normalized = "{" . $inner . "}";
-         $opening =~ s/\Q$caption\E/$normalized/;
-       }
+       my ($indent, $opening, $body, $closing) = ($1, $2, $3, $4);
        my $common;
        while ($body =~ /^([\t ]*)\S/gm) {
          my $prefix = $1;

@@ -55,7 +55,10 @@ class PublishReleaseTests(unittest.TestCase):
         self.state.write_text(json.dumps({"draft": None, "assets": {}, "calls": []}))
         gh = self.bin / "gh"
         gh.write_text("""#!/usr/bin/env python3
-import json, os, pathlib, sys
+import json
+import os
+import pathlib
+import sys
 path = pathlib.Path(os.environ["FAKE_GH_STATE"])
 s = json.loads(path.read_text())
 a = sys.argv[1:]

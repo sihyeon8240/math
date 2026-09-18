@@ -43,6 +43,13 @@ def _entries(path: Path, field: str, allowed: set[str]) -> list[dict]:
     values = data.get(field)
     if not isinstance(values, list) or not values:
         raise ValueError(f"{path}: {field} must be a non-empty list")
+    _validate_entries(path, field, values, allowed)
+    return values
+
+
+def _validate_entries(
+    path: Path, field: str, values: list[dict], allowed: set[str]
+) -> None:
     seen: set[str] = set()
     for number, item in enumerate(values, 1):
         prefix = f"{path}: {field}[{number}]"
@@ -70,7 +77,6 @@ def _entries(path: Path, field: str, allowed: set[str]) -> list[dict]:
             raise ValueError(
                 f"{prefix}.title must be a non-empty, balanced single-line string"
             )
-    return values
 
 
 def load_book_contents(book_dir: Path) -> tuple[list[dict], list[dict]]:
@@ -94,32 +100,7 @@ def load_book_contents(book_dir: Path) -> tuple[list[dict], list[dict]]:
             raise ValueError(
                 f"{path}: appendices must be a non-empty list when present"
             )
-        seen: set[str] = set()
-        for number, item in enumerate(values, 1):
-            prefix = f"{path}: {field}[{number}]"
-            if not isinstance(item, dict):
-                raise ValueError(f"{prefix} must be a mapping")
-            unknown = set(item) - {"slug", "title"}
-            if unknown:
-                raise ValueError(
-                    f"{prefix}: unknown field(s): {', '.join(sorted(unknown))}"
-                )
-            slug, title = item.get("slug"), item.get("title")
-            if not isinstance(slug, str) or not SLUG.fullmatch(slug):
-                raise ValueError(f"{prefix}.slug must be lowercase hyphenated text")
-            if slug in seen:
-                raise ValueError(f"{path}: duplicate {field[:-1]} slug {slug!r}")
-            seen.add(slug)
-            if (
-                not isinstance(title, str)
-                or not title.strip()
-                or "\n" in title
-                or "\r" in title
-                or not has_balanced_braces(title)
-            ):
-                raise ValueError(
-                    f"{prefix}.title must be a non-empty, balanced single-line string"
-                )
+        _validate_entries(path, field, values, {"slug", "title"})
     return chapters, appendices
 
 

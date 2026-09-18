@@ -25,11 +25,12 @@ and registers the book in `books.yml`. The lower-level `books.py add` command
 only registers an existing directory.
 
 The scaffold includes `formalization.md` from the
-[formalization boundary template](../common/templates/formalization.md). Complete
-its book-specific starting assumptions, accepted results, core developments,
-and external exceptions before adding formalized results. Record Mathlib
-correspondences in Lean comments under the [citation policy](formalization.md#statements-and-citation-policy).
-The template supplies no common mathematical prerequisites.
+[formalization boundary template](../common/templates/formalization.md).
+Complete its book-specific starting assumptions, accepted results, core
+developments, and external exceptions before adding formalized results. Record
+Mathlib correspondences in Lean comments under the
+[citation policy](formalization.md#statements-and-citation-policy). The template
+supplies no common mathematical prerequisites.
 
 ### Generated assembly and section files
 
@@ -85,10 +86,12 @@ are unnumbered; proof is the standard `amsthm` environment. Use `ax` as the
 label type for numbered axioms.
 
 For formalized declarations, preserve the environment kind in the Lean
-docstring and record the proof dependency role separately, following
+docstring, following
 [declaration kinds and proof roles](formalization.md#proof-roles-and-permitted-dependencies).
 For example, a `corollary` proved from earlier local results uses
-`Corollary (Core result):`; a `definition` uses `Definition:`. A textbook
+`Corollary:`; a `definition` uses `Definition:`. Omit printed textbook
+numbers and parenthesized proof-role tags from Lean comments. Explain relevant
+prerequisites in ordinary prose when needed. A textbook
 `axiom` must be represented by explicit assumptions or a checked result within
 the accepted boundary, never by a new unchecked Lean `axiom` declaration.
 
@@ -236,30 +239,41 @@ before introducing or documenting a command.
 
 ### Paired mathematical prose and Lean code
 
-The shared `lean` environment takes mathematical prose as its argument and
-literal Lean code as its body. It prints the code in a monospaced, bordered box;
-do not nest a `verbatim` environment inside it.
+Write mathematical prose as ordinary LaTeX immediately before the shared `lean`
+environment. The environment takes no arguments and contains only literal Lean
+code, printed in a monospaced, bordered box. Do not nest a `verbatim` environment
+inside it.
 
 ```tex
-\begin{lean}{The two remainders are equal: $r'=r$.}
-  have hrr : r' = r := by rw [hqq] at ha'; linarith
+The two remainders are equal: $r'=r$.
+
+\begin{lean}
+  have hrr : r' = r := by
+    rw [hqq] at ha'
+    linarith
 \end{lean}
 ```
 
+Group displayed proofs by mathematical reasoning unit using the
+[Lean readability conventions](formalization.md#lean-readability), matching the
+checked source. Use blank lines between local claims and substantial branches,
+and indent nested proofs consistently.
+
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment
-and condenses consecutive blank lines. It also aligns multiline prose arguments:
-continuation text starts two indentation levels inside `\begin{lean}`, and a
-closing brace on its own line starts one level inside. Relative indentation
-within the prose is preserved; format its mathematical structure manually.
+and condenses consecutive blank lines. Format the preceding prose using normal
+LaTeX indentation, independently of the code.
 Put only mathematical statements in the prose, without step titles or
 explanations of Lean commands.
 
-Each explanation/code pair is a `minipage` and cannot split across pages.
-Keep a pair shorter than one text page. Split long arguments into consecutive
-mathematical reasoning units with their corresponding code; do not reduce font
-size or omit reasoning merely to fit a box. Review the rendered pages for large
-blank areas, overflow, and awkward transitions.
+Prose and display math follow normal LaTeX page flow independently of the code.
+Code boxes can split across pages, requiring room for six lines before splitting
+so short boxes normally stay together.
+Long boxes continue with side borders and an open edge at the page break. Keep
+explanations short and organize arguments into mathematical reasoning units with
+their corresponding code; do not reduce font size or omit reasoning to fit a
+page. Review page breaks for detached explanations, overflow, and awkward
+transitions.
 
 ### Fonts and Unicode
 

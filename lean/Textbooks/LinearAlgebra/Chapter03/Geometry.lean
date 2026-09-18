@@ -1,5 +1,5 @@
-import Textbooks.LinearAlgebra.Chapter03.LinearMappings
 import Mathlib.Analysis.Convex.Basic
+import Mathlib.Data.Real.Basic
 
 namespace LinearAlgebra.Chapter03
 
@@ -15,13 +15,18 @@ abbrev IsConvex (S : Set V) : Prop := Convex ℝ S
 theorem mem_lineSegment_iff (v w x : V) :
     x ∈ lineSegment v w ↔ ∃ t : ℝ, 0 ≤ t ∧ t ≤ 1 ∧ (1 - t) • v + t • w = x := by
   constructor
+
   · rintro ⟨a, b, ha, hb, hab, he⟩
     refine ⟨b, hb, ?_, ?_⟩
+
     · calc
         b ≤ a + b := le_add_of_nonneg_left ha
         _ = 1 := hab
+
     · have h : 1 - b = a := (eq_sub_iff_add_eq.mpr hab).symm
+
       simpa only [h] using he
+
   · rintro ⟨t, ht, ht1, he⟩
     exact ⟨1 - t, t, sub_nonneg.mpr ht1, ht, sub_add_cancel 1 t, he⟩
 
@@ -29,9 +34,13 @@ theorem mem_lineSegment_iff (v w x : V) :
 theorem convex_iff_segments (S : Set V) :
     IsConvex S ↔ ∀ v ∈ S, ∀ w ∈ S, lineSegment v w ⊆ S := by
   constructor
+
   · intro h v hv w hw x hx
+
     obtain ⟨a, b, ha, hb, hab, rfl⟩ := hx
+
     exact h hv hw ha hb hab
+
   · intro h v hv w hw a b ha hb hab
     exact h v hv w hw ⟨a, b, ha, hb, hab, rfl⟩
 
@@ -45,11 +54,17 @@ theorem image_lineSegment (f : V →ₗ[ℝ] W) (v w : V) :
     f '' lineSegment v w = lineSegment (f v) (f w) := by
   ext y
   constructor
+
   · rintro ⟨x, hx, rfl⟩
+
     obtain ⟨t, ht, ht1, rfl⟩ := (mem_lineSegment_iff v w x).mp hx
+
     exact (mem_lineSegment_iff _ _ _).mpr ⟨t, ht, ht1, (map_segment_point f v w t).symm⟩
+
   · intro hy
+
     obtain ⟨t, ht, ht1, he⟩ := (mem_lineSegment_iff _ _ _).mp hy
+
     refine ⟨(1 - t) • v + t • w, (mem_lineSegment_iff _ _ _).mpr ⟨t, ht, ht1, rfl⟩, ?_⟩
     exact (map_segment_point f v w t).trans he
 
@@ -58,7 +73,9 @@ theorem image_convex (f : V →ₗ[ℝ] W) {S : Set V} (hS : IsConvex S) : IsCon
   apply (convex_iff_segments _).mpr
   rintro _ ⟨v, hv, rfl⟩ _ ⟨w, hw, rfl⟩ y hy
   rw [← image_lineSegment] at hy
+
   obtain ⟨x, hx, he⟩ := hy
+
   exact ⟨x, (convex_iff_segments S).mp hS v hv w hw hx, he⟩
 
 end LinearAlgebra.Chapter03

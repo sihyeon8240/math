@@ -15,8 +15,12 @@ theorem map_sub (f : V →ₗ[K] W) (x y : V) : f (x - y) = f x - f y := by
 /-- Definition: the kernel as a subspace, with its closure proof. -/
 def kernelSubspace (f : V →ₗ[K] W) : Submodule K V :=
   subspaceOfClosed {x | f x = 0} (map_zero f)
-    (fun x hx y hy => by change f (x + y) = 0; rw [f.map_add, hx, hy, add_zero])
-    (fun c x hx => by change f (c • x) = 0; rw [f.map_smul, hx, scalar_smul_zero])
+    (fun x hx y hy => by
+      change f (x + y) = 0
+      rw [f.map_add, hx, hy, add_zero])
+    (fun c x hx => by
+      change f (c • x) = 0
+      rw [f.map_smul, hx, scalar_smul_zero])
 
 /-- Proposition: the constructed kernel is the standard kernel. -/
 theorem kernelSubspace_eq_ker (f : V →ₗ[K] W) : kernelSubspace f = LinearMap.ker f := rfl
@@ -34,12 +38,16 @@ theorem imageSubspace_eq_range (f : V →ₗ[K] W) : imageSubspace f = LinearMap
 theorem ker_eq_bot_iff_injective (f : V →ₗ[K] W) :
     LinearMap.ker f = ⊥ ↔ Function.Injective f := by
   constructor
+
   · intro h x y he
+
     have hm : x - y ∈ LinearMap.ker f := by
       change f (x - y) = 0
       rw [map_sub, he, sub_self]
+
     rw [h, Submodule.mem_bot] at hm
     exact sub_eq_zero.mp hm
+
   · intro h
     apply bot_unique
     intro x hx
@@ -60,9 +68,15 @@ theorem independent_map {ι : Type*} [Fintype ι] (f : V →ₗ[K] W) (hf : Func
 theorem range_eq_top_iff_surjective (f : V →ₗ[K] W) :
     LinearMap.range f = ⊤ ↔ Function.Surjective f := by
   constructor
+
   · intro h y
-    have hy : y ∈ LinearMap.range f := by rw [h]; trivial
+
+    have hy : y ∈ LinearMap.range f := by
+      rw [h]
+      trivial
+
     exact hy
+
   · intro h
     apply top_unique
     intro y _
@@ -73,17 +87,22 @@ theorem basis_map {ι : Type*} [Fintype ι] (f : V →ₗ[K] W) (hf : Function.B
     {v : ι → V} (hv : IsFiniteBasis (K := K) v) : IsFiniteBasis (K := K) (fun i => f (v i)) := by
   refine ⟨independent_map f hf.1 hv.1, ?_⟩
   intro y
+
   obtain ⟨x, rfl⟩ := hf.2 y
   obtain ⟨a, ha⟩ := hv.2 x
+
   exact ⟨a, (map_combination f v a).symm.trans (congrArg f ha)⟩
 
 /-- Theorem: bijective linear maps preserve finite dimension. -/
 theorem finrank_eq_of_bijective [Module.Finite K V] (f : V →ₗ[K] W)
     (hf : Function.Bijective f) : Module.finrank K V = Module.finrank K W := by
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
+
   have hb : IsFiniteBasis (K := K) (fun x : s => (x : V)) :=
-    (finiteBasis_iff _).mpr ⟨basisOfSet hs, Module.Basis.coe_mk _ _⟩
+    isFiniteBasis_coe_of_isBasisOf hs
+
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (basis_map f hf hb)
+
   rw [← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs,
     Module.finrank_eq_card_basis b, Fintype.card_coe]
 
@@ -91,6 +110,7 @@ theorem finrank_eq_of_bijective [Module.Finite K V] (f : V →ₗ[K] W)
 theorem finite_subspace [Module.Finite K V] (S : Submodule K V) : Module.Finite K S := by
   obtain ⟨t, ht⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
   obtain ⟨s, hs, _⟩ := subspace_has_basis t ht.2 S
+
   exact Module.Finite.of_basis (subspaceBasis hs)
 
 end LinearAlgebra.Chapter03

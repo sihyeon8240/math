@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 PYTHON="${PYTHON:-python3}"
+
 site_pages="$(mktemp -d)"
 trap 'rm -rf -- "$site_pages"' EXIT
+
 if ! command -v rg >/dev/null 2>&1; then
   echo "error: required command 'rg' (ripgrep) was not found in PATH" >&2
   exit 127
@@ -13,10 +16,12 @@ if ! command -v shellcheck >/dev/null 2>&1; then
   echo "error: required command 'shellcheck' was not found in PATH" >&2
   exit 127
 fi
+
 for script in scripts/*.sh; do
   bash -n "$script"
 done
 shellcheck --severity=error scripts/*.sh
+
 "$PYTHON" scripts/books.py validate
 "$PYTHON" scripts/generate-contents.py all --check
 "$PYTHON" scripts/check-architecture.py
@@ -68,10 +73,12 @@ mapfile -t python_files < <(find scripts -type f -name '*.py' -print | sort)
 if ((${#python_files[@]})); then
   "$PYTHON" -m py_compile "${python_files[@]}"
 fi
+
 mapfile -t tex_files < <(
   find books common/templates -type f -name '*.tex' -print 2>/dev/null | sort
 )
 "$PYTHON" scripts/check-labels.py "${tex_files[@]}"
+
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   generated_directories='(^|/)(__pycache__|vscode-build|build|dist|\.lake'
   generated_directories+='|context.tex|tree.txt)/'

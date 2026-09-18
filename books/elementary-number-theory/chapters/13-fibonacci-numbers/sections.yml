@@ -1,0 +1,6 @@
+schema_version: 1
+sections:
+- slug: the-fibonacci-sequence
+  title: The Fibonacci Sequence
+- slug: certain-identities-involving-fibonacci-numbers
+  title: Certain Identities Involving Fibonacci Numbers

@@ -67,6 +67,38 @@ match the checked source. A successful PDF build only establishes that the
 code can be typeset. Contributors and reviewers must check this correspondence
 explicitly, including when only the displayed code changes.
 
+## Lean readability
+
+Use the division-algorithm proof in
+[`DivisionAlgorithm.lean`](../lean/Textbooks/ElementaryNumberTheory/Chapter01/DivisionAlgorithm.lean)
+as a layout reference. Group a proof by mathematical reasoning units: setup,
+witness selection, local claims, case analysis, and the final conclusion.
+Separate these units with one blank line. Keep consecutive tactics that perform
+one short calculation together; do not insert a blank line after every tactic.
+
+Indent each nested `by` proof and branch body by two spaces. Align sibling
+`·` branches and named cases, and distinguish substantial branches with blank
+lines. Wrap long declaration hypotheses and conclusions with four-space
+continuations; wrap long applications, constructors, and rewrite lists at their
+argument boundaries. Aim to keep lines within 100 characters.
+
+Put named local proofs on multiple lines. Expand multi-step inline proofs into
+indented tactic blocks, while retaining compact single-step arguments such as
+`by ring`. Preserve the goal behavior of `<;>` when wrapping it. Keep `calc`
+steps aligned and their supporting proofs indented beneath the relevant step.
+Comments should briefly explain a non-obvious reason or constraint; use proof
+structure and spacing rather than long comment blocks to show the argument.
+
+Apply the same reasoning-unit layout to Lean shown in LaTeX. Copy from the
+checked source and adjust only the surrounding presentation indentation. Keep
+explanations immediately before their code in the source, and allow long boxes
+to continue on the next page. Review page breaks after adding whitespace; see
+[displayed-code correspondence](#displayed-code-correspondence) and the
+[paired-code layout guidance](writing-guide.md#paired-mathematical-prose-and-lean-code).
+Formatting is not a reason to change declarations, dependencies, or proof steps.
+Run `make lean check`, `make check source`, and the affected books' strict builds;
+when displayed code changes, also run `make format tex check`.
+
 ## Trust and dependency model
 
 The checked proof chain is:
@@ -117,13 +149,21 @@ Current book policies are:
 - [Mathematical Analysis II](../books/mathematical-analysis-2/formalization.md).
 
 Each policy records starting structures, accepted results, results developed in
-the book, and scoped external exceptions. Describe
-mathematical boundaries precisely enough to decide whether a proof is allowed;
-"basic algebra" or "results from other subjects" alone is insufficient. Before
-using a substantive external result outside the recorded boundary, amend the
-owning policy and review that amendment together with its first use. An exception
-must identify the result, where it is allowed, and why it is needed. Acceptance
-in one book does not authorize use in another.
+the book, and scoped external exceptions. Keep it concise and organize accepted
+background by mathematical topic. Name individual results when needed to draw a
+significant boundary, rather than listing every routine set operation or
+arithmetic helper. Broad labels such as "basic algebra" alone are insufficient
+when they leave unclear whether a core result is already assumed.
+
+Preserve the accepted scope when simplifying a policy. Link to this guide for
+common proof and interface rules; keep Lean API names, representation details,
+and proof recipes beside the relevant declarations or in the exposition. Record
+verified coverage in proof indexes, not in prerequisite policies.
+
+Before using a substantive external result outside the recorded boundary, amend
+the owning policy and review that amendment together with its first use. An
+exception must identify the result, where it is allowed, and why it is needed.
+Acceptance in one book does not authorize use in another.
 
 ## Proof roles and permitted dependencies
 
@@ -139,24 +179,28 @@ unchanged.
 | Supporting lemma | Reuse Mathlib for logical, representational, and elementary computational steps within the book's boundary; classify substantive new mathematics as a prerequisite or core result. |
 
 For new or revised mathematical declarations, begin the Lean declaration
-docstring with `Kind (Role):` for proved statements and `Definition:` for
+docstring with `Kind:` for proved statements and `Definition:` for
 definitions. Use the capitalized LaTeX environment name as the kind:
 `Theorem`, `Lemma`, `Proposition`, or `Corollary`. These kinds all use Lean
 `theorem` declarations; Lean syntax does not determine the textbook kind.
 When no corresponding textbook statement exists yet, choose the kind that
-matches its intended exposition. For example:
+matches its intended exposition. Describe the mathematics without printed
+textbook numbers or parenthesized proof-role tags. Keep textbook links in the
+proof index using stable LaTeX labels. For example:
 
 ```lean
 /-- Definition: the nonnegative greatest common divisor, with value zero
 when both inputs are zero. -/
-/-- Theorem (Core result): Bezout's identity for the locally constructed gcd. -/
-/-- Lemma (Supporting lemma): an elementary representation conversion. -/
-/-- Corollary (Core result): a consequence of an earlier local theorem. -/
-/-- Proposition (Prerequisite): an accepted result cited from Mathlib. -/
+/-- Theorem: Bezout's identity for the locally constructed gcd. -/
+/-- Lemma: an elementary representation conversion. -/
+/-- Corollary: a consequence of an earlier local theorem. -/
+/-- Proposition: an accepted result cited from Mathlib. -/
 ```
 
-The two classifications are independent: a corollary may be a core result,
-and a statement printed as a theorem may serve as a supporting lemma.
+Proof roles govern dependency review rather than docstring formatting: a
+corollary may be a core result, and a statement printed as a theorem may serve
+as a supporting lemma. Explain accepted prerequisites and dependency choices
+in ordinary prose where needed; no role tag is required.
 Definitions, including `noncomputable def` declarations, introduce mathematical
 objects, relations, or constructions. State their meaning and conventions;
 classify their proved properties separately. A construction requiring an
@@ -167,7 +211,7 @@ theorems.
 For the LaTeX `axiom` environment, preserve the textbook kind with `Axiom:`
 when documenting an explicit hypothesis or a structure's assumption field.
 If the statement is instead proved from the accepted boundary, use
-`Axiom (Role):` on that theorem and explain that it is an axiom only in the
+`Axiom:` on that theorem and explain that it is an axiom only in the
 textbook presentation. Never translate the environment into a new unchecked
 Lean `axiom` declaration. The repository's proof-safety requirements and the
 book's prerequisite boundary still apply. Other exposition environments, such
@@ -233,6 +277,28 @@ permission and scope of external results. Verify declaration names against the
 pinned Mathlib revision rather than guessing them. Exhaustive inventories of
 elementary helper lemmas are unnecessary.
 
+## Mathematical language and standard interfaces
+
+Analysis and algebra books may retain ordinary classical set-and-function
+language while using Lean's type-theoretic foundations. Represent an ambient
+space by a type, its subsets by `Set`, a subset used as a space by its subtype,
+and indexed families by functions. This is not a formalization of the ZFC axiom
+system or an identification of types with sets in a ZFC universe. Books studying
+foundations must specify their object theory separately.
+
+Prefer standard Mathlib structures, predicates, and operations in statements.
+Explain their elementary characterizations in the textbook instead of creating
+parallel definitions solely to reproduce printed notation. Define a collection
+such as `{U : Set X | IsOpen U}` only when the collection itself is needed.
+Keep ball notation distinct from general neighborhood notation.
+
+A local construction is justified when its construction is part of the lesson
+or the textbook convention differs. Prove its agreement with the standard
+interface, preserving empty cases and explicit hypotheses, and use that
+interface in later developments. Adopting a standard definition does not permit
+replacing a core proof by its Mathlib counterpart. Establish substantive
+characterizations locally when they are part of the book's mathematical content.
+
 ## Declaration naming
 
 Follow [Mathlib naming conventions](https://leanprover-community.github.io/contribute/naming.html):
@@ -266,7 +332,7 @@ lean/
   Textbooks/
     ElementaryNumberTheory/
       All.lean
-      Chapter02/
+      Chapter01/
         DivisionAlgorithm.lean
 ```
 
@@ -289,8 +355,8 @@ modules there and import earlier results as needed within the same book;
 imports must remain acyclic. Do not create empty topic placeholders.
 
 Module paths and declaration namespaces are separate. For example,
-`import Textbooks.ElementaryNumberTheory.Chapter02.DivisionAlgorithm` loads
-results declared in `namespace ElementaryNumberTheory.Chapter02`. Retain
+`import Textbooks.ElementaryNumberTheory.Chapter01.DivisionAlgorithm` loads
+results declared in `namespace ElementaryNumberTheory.Chapter01`. Retain
 `Textbooks` in filesystem paths and imports, but not in declaration names.
 Moving a declaration between topic files within a chapter must preserve its
 public name and proof-index link.
@@ -310,6 +376,7 @@ Set `autoImplicit false` in repository modules. Do not use `sorry`, `admit`,
 or new unchecked `axiom` declarations in checked sources.
 
 ## Linking a verified proof
+
 A verified LaTeX theorem needs two parts:
 
 1. A repository-global theorem label such as `an1:thm:compactness`.
@@ -338,6 +405,9 @@ Labels must belong to a `theorem`, `lemma`, `proposition`, or `corollary`
 environment within that shard's source directory. A theorem-like label on a
 section, definition, equation, or literal code sample is not a verified result.
 Labels and declarations must be unique across both kinds of shard.
+Register only results already present in these LaTeX environments. Keep Lean-only
+helper results in the Lean sources without proof-index entries until they have
+a corresponding textbook result.
 
 Appendix proofs use the same book prerequisite policy, proof roles, import
 boundary, and review requirements as chapter proofs. Include appendix modules
@@ -398,7 +468,8 @@ together. Ordinary checks must not run `lake update`.
 ## Scope and coverage
 
 Do not claim that an entire textbook is formally verified merely because the
-Lean project builds. Coverage is the set of entries loaded from the chapter
-shards under `proof-index/`.
+Lean project builds. Coverage counts textbook theorem, lemma, proposition, and
+corollary environments linked through `proof-index/`, once per environment,
+relative to all such environments in the book. Lean-only results are excluded.
 Material omitted pedagogically may be supplied by Mathlib and should be described
 as a prerequisite at chapter or book level.

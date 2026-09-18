@@ -1,8 +1,10 @@
 import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
+import Mathlib.Tactic.Ring
+import Mathlib.Topology.Connected.Basic
 
 /-! Core connectedness on the real line from the least-upper-bound property.
-The book permits the empty set to be connected. Its separated-set definition
-is recorded explicitly below, avoiding a nonemptiness assumption. -/
+The book permits the empty set to be connected, represented by `IsPreconnected`.
+The closure-based separation criterion is proved before the interval theorem. -/
 
 set_option autoImplicit false
 
@@ -11,22 +13,71 @@ namespace MathematicalAnalysis1.Chapter01
 open Set Metric
 
 /-- Definition: The separated-set formulation used in the textbook. -/
-def separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
+def Separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
   Disjoint (closure A) B ∧ Disjoint A (closure B)
 
-/-- Definition: The textbook convention includes the empty set. -/
-def connected {X : Type*} [MetricSpace X] (E : Set X) : Prop :=
-  ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ separated A B
+/-- Lemma: `IsPreconnected` expresses the absence of a separation, including for
+an empty set. `isPreconnected_closed_iff` is the closed-cover representation. -/
+theorem isPreconnected_iff {X : Type*} [MetricSpace X] (E : Set X) :
+    IsPreconnected E ↔
+      ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ Separated A B := by
+  classical
+
+  rw [isPreconnected_closed_iff]
+  constructor
+
+  · intro h A B hA hB heq hsep
+    have hcover : E ⊆ closure A ∪ closure B := by
+      rw [heq]
+      exact union_subset_union (subset_closure A) (subset_closure B)
+
+    obtain ⟨a, ha⟩ := hA
+    obtain ⟨b, hb⟩ := hB
+    obtain ⟨x, hx, hxA, hxB⟩ := h (closure A) (closure B)
+      (closure_closed A) (closure_closed B) hcover
+      ⟨a, heq.symm ▸ Or.inl ha, subset_closure A ha⟩
+      ⟨b, heq.symm ▸ Or.inr hb, subset_closure B hb⟩
+
+    rw [heq] at hx
+    rcases hx with hx | hx
+
+    · exact Set.disjoint_left.mp hsep.2 hx hxB
+    · exact Set.disjoint_left.mp hsep.1 hxA hx
+
+  · intro h F G hF hG hcover hEF hEG
+    by_contra hn
+    have heq : E = (E ∩ F) ∪ (E ∩ G) := by
+      ext x
+      exact ⟨fun hx => (hcover hx).elim (fun hF => Or.inl ⟨hx, hF⟩)
+        (fun hG => Or.inr ⟨hx, hG⟩), fun hx => hx.elim And.left And.left⟩
+
+    apply h (E ∩ F) (E ∩ G) hEF hEG heq
+    constructor
+
+    · apply Set.disjoint_left.mpr
+      intro x hx hEG
+      have hxF := (closure_properties (E ∩ F)).2.2 F hF inter_subset_right hx
+      exact hn ⟨x, hEG.1, hxF, hEG.2⟩
+
+    · apply Set.disjoint_left.mpr
+      intro x hEF hx
+      have hxG := (closure_properties (E ∩ G)).2.2 G hG inter_subset_right hx
+      exact hn ⟨x, hEF.1, hEF.2, hxG⟩
 
 /-- Lemma: closure preserves a real upper bound. -/
 theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
     ∀ x ∈ closure A, x ≤ c := by
   intro x hx
   by_contra hn
+
   have hc : c < x := lt_of_not_ge hn
+
   obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (x - c) (sub_pos.mpr hc)
+
   rw [Real.dist_eq, abs_lt] at hd
+
   have hyc := h y hy
+
   linarith
 
 /-- Lemma: closure preserves a real lower bound. -/
@@ -34,101 +85,165 @@ theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
     ∀ x ∈ closure A, c ≤ x := by
   intro x hx
   by_contra hn
+
   have hc : x < c := lt_of_not_ge hn
+
   obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (c - x) (sub_pos.mpr hc)
+
   rw [Real.dist_eq, abs_lt] at hd
+
   have hcy := h y hy
+
   linarith
 
 /-- Lemma: the supremum between points in opposite
 separated sets cannot belong to either side of an interval. -/
 theorem no_separation_of_between (E A B : Set ℝ)
     (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
-    (heq : E = A ∪ B) (hsep : separated A B)
+    (heq : E = A ∪ B) (hsep : Separated A B)
     (a b : ℝ) (ha : a ∈ A) (hb : b ∈ B) (hab : a < b) : False := by
   let S := A ∩ Icc a b
+
   have hane : a ∈ S := ⟨ha, le_rfl, hab.le⟩
+
   have hne : S.Nonempty := ⟨a, hane⟩
+
   have hbd : BddAbove S := ⟨b, fun x hx => hx.2.2⟩
+
   let c := sSup S
+
   have hac : a ≤ c := le_csSup hbd hane
+
   have hcb : c ≤ b := csSup_le hne (fun x hx => hx.2.2)
+
   have hcS : c ∈ closure S := (supremum_in_closure S hne hbd).1
+
   have hcA : c ∈ closure A := (closure_properties S).2.2 (closure A)
     (closure_closed A) (fun x hx => subset_closure A hx.1) hcS
+
   have hcnotB : c ∉ B := fun h => Set.disjoint_left.mp hsep.1 hcA h
+
   have hcltb : c < b := lt_of_le_of_ne hcb (fun h => hcnotB (h.symm ▸ hb))
+
   have hcE : c ∈ E := by
     by_cases he : a = c
+
     · rw [← he, heq]
       exact Or.inl ha
+
     · exact hbetween a (heq.symm ▸ Or.inl ha) b (heq.symm ▸ Or.inr hb) c
         (lt_of_le_of_ne hac he) hcltb
+
   have hcain : c ∈ A := (show c ∈ A ∪ B from heq ▸ hcE).resolve_right hcnotB
+
   have hcnotclB : c ∉ closure B := fun h => Set.disjoint_left.mp hsep.2 hcain h
+
   have hex : ∃ r > 0, ∀ y ∈ B, r ≤ dist c y := by
     by_contra h
     push Not at h
     exact hcnotclB (Metric.mem_closure_iff.mpr h)
+
   obtain ⟨r, hr, hfar⟩ := hex
+
   let δ := min r (b - c) / 2
+
   have hδ : 0 < δ := half_pos (lt_min hr (sub_pos.mpr hcltb))
+
   have hδr : δ < r := (half_lt_self (lt_min hr (sub_pos.mpr hcltb))).trans_le (min_le_left _ _)
+
   have hδb : δ < b - c := (half_lt_self (lt_min hr (sub_pos.mpr hcltb))).trans_le (min_le_right _ _)
+
   let x := c + δ
-  have hax : a < x := by dsimp [x]; linarith
-  have hxb : x < b := by dsimp [x]; linarith
+
+  have hax : a < x := by
+    dsimp [x]
+    linarith
+
+  have hxb : x < b := by
+    dsimp [x]
+    linarith
+
   have hxE := hbetween a (heq.symm ▸ Or.inl ha) b (heq.symm ▸ Or.inr hb) x hax hxb
+
   have hxnotB : x ∉ B := by
     intro hx
+
     have hdist := hfar x hx
+
     have hd : dist c x = δ := by
-      rw [Real.dist_eq, show c - x = -δ by dsimp [x]; ring, abs_neg, abs_of_pos hδ]
+      rw [Real.dist_eq, show c - x = -δ by
+        dsimp [x]
+        ring, abs_neg, abs_of_pos hδ]
+
     rw [hd] at hdist
     linarith
+
   have hxA := (show x ∈ A ∪ B from heq ▸ hxE).resolve_right hxnotB
+
   have hxc : x ≤ c := le_csSup hbd (show x ∈ S from ⟨hxA, hax.le, hxb.le⟩)
   dsimp [x] at hxc
   linarith
 
 /-- Theorem: real connected sets are exactly the sets containing all
 points between any two of their elements. -/
-theorem connected_iff_between (E : Set ℝ) :
-    connected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by
+theorem isPreconnected_iff_between (E : Set ℝ) :
+    IsPreconnected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by
   classical
+
+  rw [isPreconnected_iff]
   constructor
+
   · intro hc a ha b hb x hax hxb
     by_contra hx
+
     let A := E ∩ Iio x
+
     let B := E ∩ Ioi x
+
     have heq : E = A ∪ B := by
       ext y
       constructor
+
       · intro hy
         rcases lt_trichotomy y x with h | h | h
+
         · exact Or.inl ⟨hy, h⟩
         · exact False.elim (hx (h ▸ hy))
         · exact Or.inr ⟨hy, h⟩
       · rintro (h | h) <;> exact h.1
+
     apply hc A B ⟨a, ha, hax⟩ ⟨b, hb, hxb⟩ heq
     constructor
+
     · apply Set.disjoint_left.mpr
       intro y hy hB
+
       have hle := closure_upper_bound A x (fun z hz => hz.2.le) y hy
+
       exact (not_lt_of_ge hle) hB.2
+
     · apply Set.disjoint_left.mpr
       intro y hA hy
+
       have hle := closure_lower_bound B x (fun z hz => hz.2.le) y hy
+
       exact (not_lt_of_ge hle) hA.2
+
   · intro h A B hA hB heq hsep
+
     obtain ⟨a, ha⟩ := hA
     obtain ⟨b, hb⟩ := hB
+
     have hne : a ≠ b := by
       intro he
       exact Set.disjoint_left.mp hsep.1 (subset_closure A ha) (he.symm ▸ hb)
+
     rcases lt_or_gt_of_ne hne with hab | hba
+
     · exact no_separation_of_between E A B h heq hsep a b ha hb hab
-    · have hsep' : separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
+
+    · have hsep' : Separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
+
       exact no_separation_of_between E B A h (heq.trans (union_comm _ _)) hsep' b a hb ha hba
 
 end MathematicalAnalysis1.Chapter01

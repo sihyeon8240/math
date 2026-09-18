@@ -1,7 +1,5 @@
 schema_version: 1
 sections:
-- slug: linear-transformations
-  title: Linear Algebra Prerequisites
 - slug: differentiation
   title: Differentiation
 - slug: the-contraction-principle
@@ -12,8 +10,6 @@ sections:
   title: The Implicit Function Theorem
 - slug: the-rank-theorem
   title: The Rank Theorem
-- slug: determinants
-  title: Determinant Notation
 - slug: derivatives-of-higher-order
   title: Derivatives of Higher Order
 - slug: differentiation-of-integrals

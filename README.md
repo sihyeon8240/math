@@ -1,16 +1,25 @@
 # Mathematics Textbooks
 
-This book-oriented monorepo manages mathematics textbooks written in LaTeX as versioned works in progress. Textbook content and repository code use different licenses; see [Licensing](#licensing).
+This book-oriented monorepo manages mathematics textbooks written in LaTeX as
+versioned works in progress. Textbook content and repository code use different
+licenses; see [Licensing](#licensing).
 
-Every book can continue to change and expand. A successful build confirms that the current source compiles, not that its mathematics is complete or free of errors.
+Every book can continue to change and expand. A successful build confirms that
+the current source compiles, not that its mathematics is complete or free of
+errors.
 
 ## Books
 
-[`books.yml`](books.yml) is the canonical textbook registry. Book-local `chapters.yml` and `sections.yml` files are the canonical contents hierarchy and generate LaTeX assembly.
+[`books.yml`](books.yml) is the canonical textbook registry. Book-local
+`chapters.yml` and `sections.yml` files are the canonical contents hierarchy and
+generate LaTeX assembly.
 
 ## Quick start
 
-The easiest supported setup is the development container. Local setup requirements are documented in the [developer workflow](docs/developer-workflow.md); `make doctor env` verifies them. Then run:
+The easiest supported setup is the development container. Local setup
+requirements are documented in the
+[developer workflow](docs/developer-workflow.md); `make doctor env` verifies
+them. Then run:
 
 ```sh
 make doctor env
@@ -27,8 +36,10 @@ Use `make help` for the complete command interface. Common tasks are:
 | Inspect repository or book health | `make report`, `make doctor books [BOOK=<slug>]` |
 | Create a textbook | `make new-book SLUG=<slug> TITLE="<title>"` |
 
-Choose required checks by [change category](docs/CONTRIBUTING.md#validation-by-change-category).
-See the [developer workflow](docs/developer-workflow.md) for formatting, generated content, focused checks, CI, and release commands.
+Choose required checks by
+[change category](docs/CONTRIBUTING.md#validation-by-change-category). See the
+[developer workflow](docs/developer-workflow.md) for formatting, generated
+content, focused checks, CI, and release commands.
 
 ## Repository layout
 
@@ -41,20 +52,38 @@ See the [developer workflow](docs/developer-workflow.md) for formatting, generat
 - `docs/`: architecture, contribution, authoring, and maintenance guides
 
 Make-based build output belongs under ignored `build/`; LaTeX Workshop uses
-ignored `vscode-build/`. See the [repository architecture](docs/ARCHITECTURE.md) for file ownership, assembly rules, metadata, and generated files.
+ignored `vscode-build/`. See the [repository architecture](docs/ARCHITECTURE.md)
+for file ownership, assembly rules, metadata, and generated files.
 
 ## Formal verification
 
-Lean kernel-checks selected statements; it does not certify an entire textbook. Verified LaTeX statements are linked to checked declarations through chapter or appendix proof-index entries. See the [Lean formalization guide](docs/formalization.md) for the trust boundary and workflow.
+Lean kernel-checks selected statements; it does not certify an entire textbook.
+Verified LaTeX statements are linked to checked declarations through chapter or
+appendix proof-index entries. See the
+[Lean formalization guide](docs/formalization.md) for the trust boundary and
+workflow.
 
 ## Contributing
 
-Report errors with the book and source location. Before submitting changes, read the [contributing guide](docs/CONTRIBUTING.md); authors should also follow the [textbook writing guide](docs/writing-guide.md).
+Report errors with the book and source location. Before submitting changes, read
+the [contributing guide](docs/CONTRIBUTING.md); authors should also follow the
+[textbook writing guide](docs/writing-guide.md).
 
 ## Licensing
 
-Textbook content remains under the terms recorded in [LICENSE-CONTENT](LICENSE-CONTENT), currently CC BY 4.0. Repository code and automation are under the [MIT License](LICENSE-CODE), including `scripts/`, the `Makefile`, repository-authored build, validation, distribution and release automation, repository-authored workflow and development-environment configuration, and `common/styles/`. This does not apply MIT to textbook content, trademarks, or third-party material. External dependencies remain under their own licenses.
+Textbook content remains under the terms recorded in
+[LICENSE-CONTENT](LICENSE-CONTENT), currently CC BY 4.0. Repository code and
+automation are under the [MIT License](LICENSE-CODE), including `scripts/`, the
+`Makefile`, repository-authored build, validation, distribution and release
+automation, repository-authored workflow and development-environment
+configuration, and `common/styles/`. This does not apply MIT to textbook
+content, trademarks, or third-party material. External dependencies remain under
+their own licenses.
 
 ## Documentation
 
-The [documentation map](docs/README.md) directs contributors, authors, and maintainers to the authoritative guide for each task. Structural policy lives in the [repository architecture](docs/ARCHITECTURE.md), while current book metadata and automation flags live in `books.yml` and are explained in [site metadata](docs/site-metadata.md).
+The [documentation map](docs/README.md) directs contributors, authors, and
+maintainers to the authoritative guide for each task. Structural policy lives in
+the [repository architecture](docs/ARCHITECTURE.md), while current book metadata
+and automation flags live in `books.yml` and are explained in
+[site metadata](docs/site-metadata.md).

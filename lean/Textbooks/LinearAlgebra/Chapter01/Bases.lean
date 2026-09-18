@@ -30,7 +30,9 @@ theorem coefficients_unique {ι : Type*} [Fintype ι] {v : ι → V}
   have hz : ∑ i, (a i - b i) • v i = 0 := by
     simp only [sub_smul, Finset.sum_sub_distrib]
     exact sub_eq_zero.mpr h
+
   have hc := Fintype.linearIndependent_iff.mp hv _ hz
+
   funext i
   exact sub_eq_zero.mp (hc i)
 
@@ -39,6 +41,7 @@ theorem exists_unique_coordinates {ι : Type*} [Fintype ι] {v : ι → V}
     (hv : IsFiniteBasis (K := K) v) (x : V) :
     ∃! a : ι → K, linearCombination v a = x := by
   obtain ⟨a, ha⟩ := hv.2 x
+
   exact ⟨a, ha, fun b hb => coefficients_unique hv.1 (hb.trans ha.symm)⟩
 
 /-- Definition: the coordinate tuple of a vector in a finite basis. -/
@@ -55,14 +58,20 @@ theorem combination_coordinates {ι : Type*} [Fintype ι] {v : ι → V}
 theorem finiteBasis_iff {ι : Type*} [Fintype ι] (v : ι → V) :
     IsFiniteBasis (K := K) v ↔ ∃ b : Module.Basis ι K V, ⇑b = v := by
   constructor
+
   · intro hv
+
     have hs : (⊤ : Submodule K V) ≤ span K (Set.range v) := by
       intro x _
       exact (mem_span_range_iff_exists_fun K).mpr (hv.2 x)
+
     exact ⟨Module.Basis.mk hv.1 hs, Module.Basis.coe_mk _ _⟩
+
   · rintro ⟨b, rfl⟩
     refine ⟨b.linearIndependent, fun x => ?_⟩
-    exact (mem_span_range_iff_exists_fun K).mp (by rw [b.span_eq]; trivial)
+    exact (mem_span_range_iff_exists_fun K).mp (by
+      rw [b.span_eq]
+      trivial)
 
 /-- Definition: standard unit vectors in a coordinate space. -/
 def standardVector {n : ℕ} (i : Fin n) : CoordinateSpace K n :=
@@ -79,7 +88,9 @@ theorem standard_is_basis (n : ℕ) :
     IsFiniteBasis (K := K) (standardVector (K := K) (n := n)) := by
   refine ⟨Fintype.linearIndependent_iff.mpr ?_, fun x => ⟨x, combination_standard x⟩⟩
   intro a ha i
+
   have h : a = 0 := (combination_standard a).symm.trans ha
+
   exact congrFun h i
 
 /-- Definition: maximal independence among a specified set of allowable vectors. -/
@@ -97,29 +108,40 @@ would express the new vector in the old span. -/
 theorem independent_insert {s : Set V} {x : V} (hs : LinearIndepOn K id s)
     (hx : x ∉ span K s) : LinearIndepOn K id (insert x s) := by
   classical
+
   apply linearIndepOn_iff'.mpr
   intro t a ht ha i hi
   change ∑ y ∈ t, a y • y = 0 at ha
   by_cases hxt : x ∈ t
+
   · have ht' : (↑(t.erase x) : Set V) ⊆ s := by
       intro y hy
       exact (ht (Finset.mem_of_mem_erase hy)).resolve_left (Finset.ne_of_mem_erase hy)
+
     have he : a x • x + ∑ y ∈ t.erase x, a y • y = 0 := by
-      rw [← Finset.sum_insert (f := fun y => a y • y) (Finset.notMem_erase x t), Finset.insert_erase hxt]
+      rw [← Finset.sum_insert (f := fun y => a y • y) (Finset.notMem_erase x t),
+        Finset.insert_erase hxt]
       exact ha
+
     have hax : a x = 0 := by
       by_contra hn
       apply hx
+
       have hm : a x • x ∈ span K s := by
         rw [eq_neg_of_add_eq_zero_left he]
         exact (span K s).neg_mem ((span K s).sum_mem fun y hy =>
           (span K s).smul_mem _ (subset_span (ht' hy)))
+
       have := (span K s).smul_mem (a x)⁻¹ hm
+
       simpa only [smul_smul, inv_mul_cancel₀ hn, one_smul] using this
+
     by_cases hix : i = x
+
     · simpa only [hix] using hax
     · apply linearIndepOn_iff'.mp hs (t.erase x) a ht' _ i (Finset.mem_erase.mpr ⟨hix, hi⟩)
       simpa only [hax, zero_smul, zero_add, id_eq] using he
+
   · apply linearIndepOn_iff'.mp hs t a _ ha i hi
     intro y hy
     exact (ht hy).resolve_left (fun he => hxt (he ▸ hy))
@@ -137,12 +159,16 @@ theorem maximal_is_basis {s : Finset V} {t : Set V}
     (h : MaximalIndependentIn (K := K) (s : Set V) t) (ht : span K t = ⊤) :
     IsFiniteBasis (K := K) (fun x : s => (x : V)) := by
   refine ⟨h.2.1, fun x => ?_⟩
+
   have he : span K (s : Set V) = ⊤ := by
     apply top_unique
     rw [← ht]
     exact span_le.mpr (maximal_spans h)
+
   apply (mem_span_range_iff_exists_fun K).mp
-  rw [show Set.range (fun x : s => (x : V)) = (s : Set V) by ext; simp, he]
+  rw [show Set.range (fun x : s => (x : V)) = (s : Set V) by
+    ext
+    simp, he]
   trivial
 
 end LinearAlgebra.Chapter01

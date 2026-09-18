@@ -14,6 +14,7 @@ import Textbooks.LinearAlgebra.Chapter03.KernelImage
 import Textbooks.LinearAlgebra.Chapter03.RankNullity
 import Textbooks.LinearAlgebra.Chapter03.Composition
 import Textbooks.LinearAlgebra.Chapter03.Geometry
+import Textbooks.LinearAlgebra.Chapter03.Isomorphisms
 
 /-! Formalization entry point for *Linear Algebra*. -/
 

@@ -71,9 +71,11 @@ theorem inverse_unique {n : ℕ} {A B C : MatrixSpace K n n}
     (hB : B * A = 1) (hC : A * C = 1) : B = C := by
   calc
     B = B * 1 := (mul_one B).symm
-    _ = B * (A * C) := by rw [hC]
+    _ = B * (A * C) := by
+      rw [hC]
     _ = (B * A) * C := (mul_assoc B A C).symm
-    _ = C := by rw [hB, one_mul]
+    _ = C := by
+      rw [hB, one_mul]
 
 /-- Definition: the inverse of a nonsingular matrix. -/
 noncomputable def inverse {n : ℕ} {A : MatrixSpace K n n} (h : IsNonsingular A) :

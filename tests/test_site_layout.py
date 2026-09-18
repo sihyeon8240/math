@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import unittest
 from pathlib import Path
 
@@ -62,6 +63,14 @@ class SiteStylesheetTests(unittest.TestCase):
         self.assertIn("gap: clamp(0.75rem, 1.5vw, 1.25rem);", css)
         self.assertNotIn(".book-card:not(:nth-child", css)
         self.assertNotIn(".book-card:nth-child", css)
+
+    def test_mobile_project_link_height_belongs_to_its_own_rule(self):
+        css = (REPO_ROOT / "site/assets/index.css").read_text(encoding="utf-8")
+        mobile = css.split("@media (max-width: 40rem) {", 1)[1]
+        project_link = re.search(r"\.project-link\s*\{([^{}]*)\}", mobile)
+
+        self.assertIsNotNone(project_link)
+        self.assertIn("min-height: 6rem;", project_link[1])
 
     def test_pages_use_shared_external_stylesheet(self):
         contracts = (

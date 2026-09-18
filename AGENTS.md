@@ -66,6 +66,31 @@ install and cache configuration pointed at that file.
   Run `make contents all BOOK=<slug>` after contents-manifest edits. See `docs/ARCHITECTURE.md`.
 - If a shared style changes, consider and validate its effect on every textbook.
 
+## Code readability and maintainability
+
+- Follow `.editorconfig` and the existing language formatters: four spaces for
+  Python, two spaces by default, and tabs for Make recipes; honor file-specific
+  exceptions. Use `make format`
+  with the appropriate `py`, `sh`, or `tex` scope; do not hand-format against it.
+- Separate logical steps with blank lines. Wrap long expressions and commands
+  at meaningful boundaries, without splitting literal values or changing output.
+  Keep trailing whitespace absent and exactly one final newline.
+- Use descriptive names, straightforward conditions, and early returns where
+  they reduce nesting. Expand multi-step one-liners. Extract helpers for repeated
+  logic or distinct responsibilities, not merely to shorten a function.
+- Keep comments concise: explain non-obvious reasons, constraints, or invariants
+  near the relevant code. Avoid document-like comment blocks, decorative banners,
+  and comments that restate the code. Keep detailed guidance in `docs/`.
+- Apply the same readability standards to tests and embedded scripts. Preserve
+  intentional malformed fixtures and whitespace-sensitive literals.
+- Preserve behavior, diagnostics, and interfaces during readability refactors.
+  In TeX, Lean, YAML, shell, and templates, check that whitespace changes do not
+  alter parsing, typesetting, quoting, or generated output. Edit generators rather
+  than generated files, and keep displayed Lean synchronized with checked sources.
+- Review all relevant languages, but leave already clear code alone. Keep
+  formatting-only changes separate from structural refactors and run the checks
+  required by `docs/CONTRIBUTING.md#validation-by-change-category`.
+
 ## Mathematical exposition
 
 - For new or mathematically revised theorems selected for formalization, pair
@@ -75,6 +100,19 @@ install and cache configuration pointed at that file.
 - Check Lean first, keep displayed code synchronized with the checked source,
   and review the mathematical correspondence under `docs/formalization.md`.
   Do not convert unrelated existing content as part of a documentation edit.
+
+## Prerequisite policy documents
+
+- Keep `books/<slug>/formalization.md` concise: accepted mathematical background,
+  subjects developed in the book, and significant boundaries or scoped exceptions.
+  Group routine facts by topic; name individual results when needed to distinguish
+  accepted prerequisites from material the book must prove.
+- Preserve mathematical scope when shortening these documents. Broad subject names
+  must not silently authorize core results or stronger external theory.
+- Link to `docs/formalization.md` for common proof and interface rules. Keep Lean
+  API inventories, representation details, and proof recipes beside the relevant
+  Lean declarations or in the exposition; use proof indexes for verified coverage.
+  Do not grow prerequisite policies into implementation guides or progress reports.
 
 ## Lean source organization
 
@@ -87,6 +125,13 @@ install and cache configuration pointed at that file.
   `Textbooks` prefix.
   Keep `Textbooks` in module paths and imports. Book-level `All.lean` files are
   aggregation entry points, not mathematical sources.
+- Format Lean proofs by reasoning unit: separate setup, local claims, case
+  branches, and conclusions with single blank lines; indent nested proofs by
+  two spaces and wrap long signatures and expressions. Keep short related tactics
+  together, expand multi-step inline proofs, and keep comments brief. Apply the
+  same layout to displayed Lean, preserving its checked-source correspondence.
+  Keep mathematical prose outside the argument-free `lean` code environment.
+  See `docs/formalization.md#lean-readability`.
 - Update imports and proof-index entries together when moving or renaming
   declarations. Follow `docs/formalization.md` and run `make lean check`.
 

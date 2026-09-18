@@ -29,7 +29,11 @@ else
     cpu_count="$(sysctl -n hw.ncpu 2>/dev/null || true)"
   fi
   [[ "$cpu_count" =~ ^[1-9][0-9]*$ ]] || cpu_count=2
-  if ((cpu_count > 4)); then jobs=4; else jobs="$cpu_count"; fi
+  if ((cpu_count > 4)); then
+    jobs=4
+  else
+    jobs="$cpu_count"
+  fi
 fi
 
 if [[ ! "$jobs" =~ ^[1-9][0-9]*$ ]]; then
@@ -52,7 +56,9 @@ if ((${#books[@]} == 0)); then
 fi
 
 log_dir="$(mktemp -d "${TMPDIR:-/tmp}/book-build-all.XXXXXXXX")"
-cleanup() { rm -rf "$log_dir"; }
+cleanup() {
+  rm -rf "$log_dir"
+}
 trap cleanup EXIT
 trap 'exit 130' HUP INT TERM
 
@@ -98,6 +104,7 @@ start_book() {
 finish_one() {
   local completed_pid status slug log pid
   local -a remaining_pids=()
+  # A failed child must be recorded without aborting the other builds.
   set +e
   wait -n -p completed_pid
   status=$?

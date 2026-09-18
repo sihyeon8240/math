@@ -89,3 +89,27 @@ def command_arguments(text: str, names: set[str]) -> list[CommandArgument]:
             continue
         found.append(CommandArgument(match.group("name"), argument, match.start()))
     return found
+
+
+def theorem_label_groups(text: str) -> list[set[str]]:
+    """Return one label set per result environment, including unlabeled results."""
+    stack: list[tuple[str, set[str] | None]] = []
+    literal = {"lean", "verbatim", "Verbatim", "minted", "lstlisting"}
+    results = {"theorem", "lemma", "proposition", "corollary"}
+    groups: list[set[str]] = []
+    for command in command_arguments(text, {"begin", "end", "label"}):
+        if stack and stack[-1][0] in literal:
+            if command.name == "end" and command.argument == stack[-1][0]:
+                stack.pop()
+            continue
+        if command.name == "begin":
+            labels = set() if command.argument in results else None
+            if labels is not None:
+                groups.append(labels)
+            stack.append((command.argument, labels))
+        elif command.name == "end":
+            if stack and stack[-1][0] == command.argument:
+                stack.pop()
+        elif stack and stack[-1][1] is not None:
+            stack[-1][1].add(command.argument)
+    return groups

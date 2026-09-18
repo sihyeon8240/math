@@ -1,9 +1,11 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{textbook-code}[2026/09/12 Mathematical prose with Lean code]
+\ProvidesPackage{textbook-code}[2026/09/18 Breakable Lean code boxes]
 
 \RequirePackage{fontspec}
 \RequirePackage{xcolor}
 \RequirePackage{minted}
+\RequirePackage{tcolorbox}
+\tcbuselibrary{breakable,skins}
 
 % Use only fonts shipped with the supported TeX Live environment. In
 % particular, DejaVu Sans Mono lacks indexed union/intersection glyphs.
@@ -25,30 +27,36 @@
 
 \usemintedstyle{friendly}
 
-\newenvironment{lean}[1]{%
+\newenvironment{lean}{%
   \VerbatimEnvironment
 
-  % Finish a pending theorem/proof label before placing a full-width pair.
+  % Finish a pending theorem/proof label before placing a full-width code box.
   \if@inlabel\noindent\par\fi
 
-  \par\addvspace{\medskipamount}%
-  \noindent
-  \begin{minipage}[t]{\linewidth}%
-
-    #1\par
-
+  \begin{tcolorbox}[
+      enhanced jigsaw,
+      breakable,
+      lines before break=6,
+      colback=white,
+      colframe=black!25,
+      boxrule=0.4pt,
+      sharp corners,
+      boxsep=0pt,
+      left=3mm,
+      right=3mm,
+      top=3mm,
+      bottom=3mm,
+      before skip=\medskipamount,
+      after skip=0pt
+    ]%
     \begin{minted}[
       fontfamily=textbookcode,
       fontsize=\small,
-      frame=single,
-      rulecolor=\color{black!25},
-      framesep=3mm,
       autogobble,
       breaklines
     ]{lean4}%
 }{%
     \end{minted}
-
-  \end{minipage}%
+  \end{tcolorbox}%
   \par\addvspace{\medskipamount}%
 }

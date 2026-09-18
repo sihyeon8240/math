@@ -103,6 +103,28 @@ def verify_archive(data: bytes, expected: dict, run: dict) -> dict[str, bytes]:
         return files
 
 
+def restore_artifact(
+    repository: str, artifact: dict, expected: dict, run: dict, directory: Path
+) -> None:
+    data = command(
+        "gh",
+        "api",
+        f"repos/{repository}/actions/artifacts/{artifact['id']}/zip",
+    )
+    if artifact.get("digest") != f"sha256:{checksum(data)}":
+        raise ValueError("GitHub artifact digest mismatch")
+    files = verify_archive(data, expected, run)
+    directory.mkdir(parents=True, exist_ok=True)
+    for name, content in files.items():
+        (directory / name).write_bytes(content)
+    command(
+        "python3",
+        "scripts/check-log.py",
+        "--strict",
+        str(directory / "book.log"),
+    )
+
+
 def restore(expected: dict, directory: Path) -> bool:
     repository = os.environ["GITHUB_REPOSITORY"]
     commit = os.environ["GITHUB_SHA"]
@@ -134,23 +156,7 @@ def restore(expected: dict, directory: Path) -> bool:
                 ):
                     continue
                 try:
-                    data = command(
-                        "gh",
-                        "api",
-                        f"repos/{repository}/actions/artifacts/{artifact['id']}/zip",
-                    )
-                    if artifact.get("digest") != f"sha256:{checksum(data)}":
-                        raise ValueError("GitHub artifact digest mismatch")
-                    files = verify_archive(data, expected, run)
-                    directory.mkdir(parents=True, exist_ok=True)
-                    for name, content in files.items():
-                        (directory / name).write_bytes(content)
-                    command(
-                        "python3",
-                        "scripts/check-log.py",
-                        "--strict",
-                        str(directory / "book.log"),
-                    )
+                    restore_artifact(repository, artifact, expected, run, directory)
                     print(
                         f"Reused verified PDF from PR #{pull['number']}, run {run['id']}"
                     )

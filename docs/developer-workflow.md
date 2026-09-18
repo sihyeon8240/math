@@ -1,6 +1,8 @@
 # Developer workflow
 
-This guide describes ordinary repository operations. [the architecture guide](ARCHITECTURE.md) remains authoritative for structure and metadata ownership.
+This guide describes ordinary repository operations.
+[The architecture guide](ARCHITECTURE.md) remains authoritative for structure
+and metadata ownership.
 
 ## Development environment
 
@@ -8,8 +10,10 @@ The publishing compiler is LuaLaTeX through `latexmk`. Tool versions are owned b
 `config/toolchain.env`. The reviewed local and devcontainer image pin lives in
 `config/container-image.txt`; CI prepares an image from canonical build inputs
 and passes its tested immutable digest to downstream jobs. Lean consumes the
-synchronized `lean/lean-toolchain` and the locked Mathlib dependency. The development container is the supported setup; for local
-requirements, inspect the canonical configuration and run `make doctor env`.
+synchronized `lean/lean-toolchain` and the locked Mathlib dependency.
+
+The development container is the supported setup; for local requirements,
+inspect the canonical configuration and run `make doctor env`.
 After changing shared configuration, run `make config` and `make config check`.
 
 ## Daily development workflow
@@ -28,7 +32,13 @@ the next batch. Before removing the old branch, confirm that all work was
 included in the merge or preserved elsewhere. Start with fresh branch history
 after a squash merge to avoid carrying already merged commits into the next PR.
 
-Run `make doctor env`, make focused changes, and build and check the affected book with `make books BOOK=<slug> check`. Select the required checks from [Contributing](CONTRIBUTING.md#validation-by-change-category) before review. Make-based build files stay under the ignored `build/` directory, while LaTeX Workshop writes to the ignored `vscode-build/` directory. Release packages are retained as GitHub Actions artifacts.
+Run `make doctor env`, make focused changes, and build and check the affected
+book with `make books BOOK=<slug> check`. Select the required checks from
+[Contributing](CONTRIBUTING.md#validation-by-change-category) before review.
+
+Make-based build files stay under the ignored `build/` directory, while LaTeX
+Workshop writes to the ignored `vscode-build/` directory. Release packages are
+retained as GitHub Actions artifacts.
 
 ## Cleaning outputs and caches
 
@@ -114,7 +124,12 @@ checking proofs and building books. Use the focused
 
 ## Review
 
-Review for scope, mathematical correctness, source rights, metadata ownership, and accidental generated files. Confirm every new chapter and section is included, labels use the book prefix, bibliography keys are unique, and frontmatter overrides exist only for substantive customization. Pull requests state affected books, validation commands, unresolved pre-existing warnings, and unavailable local-only assets.
+Review for scope, mathematical correctness, source rights, metadata ownership,
+and accidental generated files. Confirm every new chapter and section is
+included, labels use the book prefix, bibliography keys are unique, and
+frontmatter overrides exist only for substantive customization. Pull requests
+state affected books, validation commands, unresolved pre-existing warnings, and
+unavailable local-only assets.
 
 ## CI and publication
 
@@ -131,29 +146,11 @@ permissions, concurrency, and publication implementation.
 start independently; image preparation runs once and its immutable digest is
 shared by formatting and PDF jobs. Both events still validate sources and Lean.
 
-Lean caches `.lake` by OS, architecture, toolchain, dependency lock, Lake
-configuration, and Lean sources. LaTeX caches each book's `build/<slug>/` by OS,
-architecture, image digest, and source tree, with fallback only within the same
-book and image. Cache hits still run the normal build and strict checks. GitHub
-cache scope means PR caches are generally unavailable to main; main warms its
-own caches, which subsequent PRs can restore.
-
-After a merge, each affected PDF job first looks for a successful `build.yml`
-PR run for the merged PR's head in this repository. Reuse requires an identical
-full Git tree (including workflows and build settings), image index digest,
-platform, validation policy, run ID/attempt, and PDF/log checksums. The downloaded
-archive must also match GitHub's artifact digest, and its log is strictly checked
-again. A match skips the TeX container build and republishes the verified PDF as
-the current run's artifact for the existing snapshot pipeline.
-
-Verified artifacts expire after 14 days. Missing, expired, mismatched, fork,
-failed-run, or unavailable artifacts fall back to a normal cached build. Lookup
-is bounded to 30 matching successful runs and 100 artifacts per run. Full-tree
-matching is deliberately conservative: even an unrelated change after PR
-validation can cause a rebuild. Merge, squash, and rebase do not need identical
-commit SHAs when their final source trees match. A manual **Build textbooks**
-dispatch skips PR reuse and builds every enabled book. Bump the cache versions
-or `strict-pdf-v1` policy when their corresponding semantics change.
+Cache restores still run normal validation. After a merge, CI may reuse a
+verified PR artifact when its full source tree and build environment match;
+otherwise it builds the affected PDF normally. See the
+[maintainer guide](maintainer-guide.md#ci-caches-and-verified-pdf-reuse) for cache
+boundaries, artifact eligibility, and rebuild procedures.
 
 ### Development PDF snapshots
 
@@ -190,51 +187,5 @@ and submit the usual batch PR. Merging the release preparation authorizes automa
 public release; no second approval is required. The old `make publish` interface
 has been removed.
 
-`build.yml` compares the PR base or the main push's `before` commit with the
-checked-out manifest, independently of the development snapshot baseline.
-Release books are included in the PDF build matrix even if the snapshot has
-already advanced. PRs validate the plan without publishing. Ordinary manual
-**Build textbooks** runs refresh development PDFs only.
-
-After the main source, Lean, formatting, and strict PDF gates pass, `build.yml`
-calls `release.yml` with the release book matrix. The build jobs package the
-strictly checked PDFs and `SHA256SUMS` into `<slug>-release` artifacts retained
-for 90 days. The publication jobs use those same-run packages and tag the exact
-validated `GITHUB_SHA`, even when `main` has since advanced. They never use the
-mutable `generated-pdfs` snapshot as a release source. Pages deployment and
-versioned releases are independent consumers of the validated build.
-
-Each publication creates an annotated `<slug>-v<version>` tag, stages a draft,
-uploads `<slug>-v<version>.pdf` and `SHA256SUMS`, downloads and verifies both, then
-automatically publishes the draft. Versions with a prerelease suffix are marked
-as prereleases. Releases use their book tag as the title; GitHub-generated notes
-are repository-wide. No book claims the repository-wide `Latest` designation.
-The release process does not change the descriptive book `status` in `books.yml`.
-Only publication jobs receive repository-content write permission for releases.
-Tag pushes no longer trigger a separate release workflow.
-
-#### Recovering an interrupted release
-
-- Use **Re-run failed jobs** on the original main **Build textbooks** run. Its
-  original event, commit, plan, and retained package identify the release even
-  after `main` advances. Do not dispatch a new build to recover an old version.
-- If publication failed after packaging, retain the original `<slug>-release`
-  artifact. Avoid rerunning successful build jobs: a rebuilt PDF can differ in
-  bytes, and an existing immutable artifact must not be replaced.
-- Re-enabling a previously published book does not reset its release history.
-  Choose a higher version if its current version already has a tag; the existing
-  tag conflict guard still applies.
-- An existing tag must be annotated and point to the same validated commit.
-  Existing draft assets must match the original package byte for byte; only
-  missing assets are uploaded. Conflicts stop publication without overwriting.
-- An already-public release is left unchanged on retry. If publication succeeded
-  just before the job lost its connection, a retry therefore completes safely.
-- If a retained package has expired or conflicting bytes cannot be recovered,
-  leave the draft unpublished and prepare a reviewed higher version. Never move
-  an existing tag or overwrite public assets to force recovery.
-- Concurrent runs are isolated by book and source commit. A later main commit
-  does not suppress an earlier version's publication. Main push runs have separate
-  concurrency groups per commit; development snapshot writes remain serialized.
-  If a run is cancelled or
-  fails, recover that original run explicitly; later pushes do not implicitly
-  backfill missed versions.
+For publication artifacts, tags, and failure recovery, see the
+[maintainer publication procedures](maintainer-guide.md#release-publication).

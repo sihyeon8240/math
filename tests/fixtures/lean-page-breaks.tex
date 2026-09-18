@@ -1,0 +1,130 @@
+\documentclass{article}
+\usepackage[paperheight=150mm,paperwidth=160mm,margin=20mm]{geometry}
+\usepackage{textbook-code}
+\setminted{escapeinside=||}
+
+\begin{document}
+\noindent\rule{0pt}{95mm}Filler before a short pair.\label{before-short}
+\par
+The short code box stays on one page.\label{short-prose}
+
+\begin{lean}
+  |\label{short-start}|example (n : ℕ) : n = n := by
+    rfl|\label{short-end}|
+\end{lean}
+
+\clearpage
+\noindent\rule{0pt}{70mm}Filler before a long pair.\label{before-long}
+\par
+The following code is longer than one page.
+The code continues across several pages without overflowing the text area.
+\label{long-prose}
+
+\begin{lean}
+  |\label{long-start}|-- Start of a deliberately long typesetting specimen.
+  example (n : ℕ) : n + 1 = n + 1 := by rfl
+  example (n : ℕ) : n + 2 = n + 2 := by rfl
+  example (n : ℕ) : n + 3 = n + 3 := by rfl
+  example (n : ℕ) : n + 4 = n + 4 := by rfl
+  example (n : ℕ) : n + 5 = n + 5 := by rfl|\label{long-sixth}|
+  example (n : ℕ) : n + 6 = n + 6 := by rfl
+  example (n : ℕ) : n + 7 = n + 7 := by rfl
+  example (n : ℕ) : n + 8 = n + 8 := by rfl
+  example (n : ℕ) : n + 9 = n + 9 := by rfl
+  example (n : ℕ) : n + 10 = n + 10 := by rfl
+  example (n : ℕ) : n + 11 = n + 11 := by rfl
+  example (n : ℕ) : n + 12 = n + 12 := by rfl
+  example (n : ℕ) : n + 13 = n + 13 := by rfl
+  example (n : ℕ) : n + 14 = n + 14 := by rfl
+  example (n : ℕ) : n + 15 = n + 15 := by rfl
+  example (n : ℕ) : n + 16 = n + 16 := by rfl
+  example (n : ℕ) : n + 17 = n + 17 := by rfl
+  example (n : ℕ) : n + 18 = n + 18 := by rfl
+  example (n : ℕ) : n + 19 = n + 19 := by rfl
+  example (n : ℕ) : n + 20 = n + 20 := by rfl
+  example (n : ℕ) : n + 21 = n + 21 := by rfl
+  example (n : ℕ) : n + 22 = n + 22 := by rfl
+  example (n : ℕ) : n + 23 = n + 23 := by rfl
+  example (n : ℕ) : n + 24 = n + 24 := by rfl
+  example (n : ℕ) : n + 25 = n + 25 := by rfl
+  example (n : ℕ) : n + 26 = n + 26 := by rfl
+  example (n : ℕ) : n + 27 = n + 27 := by rfl
+  example (n : ℕ) : n + 28 = n + 28 := by rfl
+  example (n : ℕ) : n + 29 = n + 29 := by rfl
+  example (n : ℕ) : n + 30 = n + 30 := by rfl
+  example (n : ℕ) : n + 31 = n + 31 := by rfl
+  example (n : ℕ) : n + 32 = n + 32 := by rfl
+  example (n : ℕ) : n + 33 = n + 33 := by rfl
+  example (n : ℕ) : n + 34 = n + 34 := by rfl
+  example (n : ℕ) : n + 35 = n + 35 := by rfl
+  example (n : ℕ) : n + 36 = n + 36 := by rfl
+  example (n : ℕ) : n + 37 = n + 37 := by rfl
+  example (n : ℕ) : n + 38 = n + 38 := by rfl
+  example (n : ℕ) : n + 39 = n + 39 := by rfl
+  example (n : ℕ) : n + 40 = n + 40 := by rfl
+  example (n : ℕ) : n + 41 = n + 41 := by rfl
+  example (n : ℕ) : n + 42 = n + 42 := by rfl
+  example (n : ℕ) : n + 43 = n + 43 := by rfl
+  example (n : ℕ) : n + 44 = n + 44 := by rfl
+  example (n : ℕ) : n + 45 = n + 45 := by rfl
+  example (n : ℕ) : n + 46 = n + 46 := by rfl
+  example (n : ℕ) : n + 47 = n + 47 := by rfl
+  example (n : ℕ) : n + 48 = n + 48 := by rfl
+  example (n : ℕ) : n + 49 = n + 49 := by rfl
+  example (n : ℕ) : n + 50 = n + 50 := by rfl
+  example (n : ℕ) : n + 51 = n + 51 := by rfl
+  example (n : ℕ) : n + 52 = n + 52 := by rfl
+  example (n : ℕ) : n + 53 = n + 53 := by rfl
+  example (n : ℕ) : n + 54 = n + 54 := by rfl
+  example (n : ℕ) : n + 55 = n + 55 := by rfl
+  example (n : ℕ) : n + 56 = n + 56 := by rfl
+  example (n : ℕ) : n + 57 = n + 57 := by rfl
+  example (n : ℕ) : n + 58 = n + 58 := by rfl
+  example (n : ℕ) : n + 59 = n + 59 := by rfl
+  example (n : ℕ) : n + 60 = n + 60 := by rfl
+  example (n : ℕ) : n + 61 = n + 61 := by rfl
+  example (n : ℕ) : n + 62 = n + 62 := by rfl
+  example (n : ℕ) : n + 63 = n + 63 := by rfl
+  example (n : ℕ) : n + 64 = n + 64 := by rfl
+  example (n : ℕ) : n + 65 = n + 65 := by rfl
+  example (n : ℕ) : n + 66 = n + 66 := by rfl
+  example (n : ℕ) : n + 67 = n + 67 := by rfl
+  example (n : ℕ) : n + 68 = n + 68 := by rfl
+  example (n : ℕ) : n + 69 = n + 69 := by rfl
+  example (n : ℕ) : n + 70 = n + 70 := by rfl
+  example (n : ℕ) : n + 71 = n + 71 := by rfl
+  example (n : ℕ) : n + 72 = n + 72 := by rfl
+  example (n : ℕ) : n + 73 = n + 73 := by rfl
+  example (n : ℕ) : n + 74 = n + 74 := by rfl
+  example (n : ℕ) : n + 75 = n + 75 := by rfl
+  example (n : ℕ) : n + 76 = n + 76 := by rfl
+  example (n : ℕ) : n + 77 = n + 77 := by rfl
+  example (n : ℕ) : n + 78 = n + 78 := by rfl
+  example (n : ℕ) : n + 79 = n + 79 := by rfl
+  example (n : ℕ) : n + 80 = n + 80 := by rfl
+  example (n : ℕ) : n + 81 = n + 81 := by rfl
+  example (n : ℕ) : n + 82 = n + 82 := by rfl
+  example (n : ℕ) : n + 83 = n + 83 := by rfl
+  example (n : ℕ) : n + 84 = n + 84 := by rfl
+  example (n : ℕ) : n + 85 = n + 85 := by rfl
+  example (n : ℕ) : n + 86 = n + 86 := by rfl
+  example (n : ℕ) : n + 87 = n + 87 := by rfl
+  example (n : ℕ) : n + 88 = n + 88 := by rfl
+  example (n : ℕ) : n + 89 = n + 89 := by rfl
+  example (n : ℕ) : n + 90 = n + 90 := by rfl
+  -- End of the typesetting specimen.
+  |\label{long-end}|
+\end{lean}
+\clearpage
+\noindent\rule{0pt}{85mm}Filler before a displayed equation.
+\par
+The identity is
+\[
+  n = n.\label{display-prose}
+\]
+
+\begin{lean}
+  |\label{display-start}|example (n : ℕ) : n = n := by
+    rfl
+\end{lean}
+\end{document}

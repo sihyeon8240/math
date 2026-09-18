@@ -1,19 +1,23 @@
 # Contributing
 
-Thank you for helping improve these textbooks. Keep mathematical-content changes separate from repository maintenance whenever possible.
+Thank you for helping improve these textbooks. Keep mathematical-content changes
+separate from repository maintenance whenever possible.
 
 ## Contribution workflow
 
 ### Reporting errors
 
-Open a GitHub Issue for typographical errors, mathematical errors, missing citations, broken references, or build failures. Include:
+Open a GitHub Issue for typographical errors, mathematical errors, missing
+citations, broken references, or build failures. Include:
 
 - the textbook and chapter or section;
 - the source path or PDF page when known;
 - the current statement;
 - the proposed correction and mathematical justification.
 
-Use a Pull Request for a focused correction after checking that an Issue does not already cover it. Discuss a new chapter, major reorganization, notation change, or shared-style redesign in an Issue before implementation.
+Use a Pull Request for a focused correction after checking that an Issue does
+not already cover it. Discuss a new chapter, major reorganization, notation
+change, or shared-style redesign in an Issue before implementation.
 
 ### Development checks
 
@@ -28,13 +32,11 @@ and mathematical fidelity explicitly; CI does not establish either.
 
 ### Pull requests
 
-Follow the [local batch workflow](developer-workflow.md#daily-development-workflow):
-keep `main` synchronized with `origin/main`, accumulate focused commits on
-`local-work`, and submit a manageable batch in one PR. Unrelated changes belong
-in separate commits; large or risky changes, or changes likely to be deferred
-independently, belong in separate PRs. The owner merges after the required
-GitHub Actions checks pass. Recreate `local-work` from the updated `main` after
-each merged batch. Never commit or push directly to `main`.
+Follow the [local batch workflow](developer-workflow.md#daily-development-workflow)
+for branch setup, synchronization, and cleanup. Submit a manageable batch in one
+PR. Unrelated changes belong in separate commits; large or risky changes, or
+changes likely to be deferred independently, belong in separate PRs. The owner
+merges after the required GitHub Actions checks pass.
 
 Run the checks required by [Validation by change category](#validation-by-change-category).
 If a required check cannot run locally, explain why in the PR. Describe affected
