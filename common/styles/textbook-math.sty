@@ -24,19 +24,12 @@
 \newcommand{\veps}{\varepsilon}
 \newcommand{\vnot}{\varnothing}
 
-% Full-width display math and right-aligned annotations
+% Full-width display math
 \AtBeginDocument{%
   \everymath{\displaystyle}%
   \everydisplay\expandafter{\the\everydisplay
     \displaywidth=\textwidth
     \displayindent=0pt
-  }%
-}
-\newcommand{\by}[1]{%
-  \makebox[0pt][l]{%
-    \makebox[\dimexpr\textwidth/2\relax][r]{%
-      {#1}%
-    }%
   }%
 }
 
