@@ -6,9 +6,8 @@ import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Push
 
 /-! Metric topology developed from balls and the metric axioms.
-The metric ball and open-set characterizations are representational bridges.
-Characterization lemmas connect the standard interfaces to balls and distance;
-the core results use explicit metric arguments. The owning book policy specifies this boundary. -/
+Use Mathlib's metric interfaces directly; the core results use explicit metric arguments.
+The owning book policy specifies this boundary. -/
 
 set_option autoImplicit false
 
@@ -17,12 +16,6 @@ namespace MathematicalAnalysis1.Chapter01
 open Set Metric
 
 variable {X : Type*} [MetricSpace X]
-
-/-- Lemma: general neighborhoods contain a positive-radius ball.
-Mathlib counterpart: `Metric.mem_nhds_iff`. -/
-theorem mem_nhds_iff (E : Set X) (p : X) :
-    E ∈ nhds p ↔ ∃ r > 0, ball p r ⊆ E := by
-  exact Metric.mem_nhds_iff
 
 /-- Lemma: the standard derived set has the punctured-ball characterization. -/
 theorem mem_derivedSet_iff (E : Set X) (p : X) :
@@ -42,16 +35,6 @@ theorem mem_derivedSet_iff (E : Set X) (p : X) :
 /-- Definition: an isolated point belongs to E and is alone in some ball. -/
 def isolatedPoints (E : Set X) : Set X :=
   {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
-
-/-- Lemma: interior points are exactly the points with a ball contained in the set. -/
-theorem interior_iff (E : Set X) (p : X) :
-    p ∈ interior E ↔ ∃ r > 0, ball p r ⊆ E := by
-  exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
-
-/-- Lemma: openness is characterized by a contained ball at every point. -/
-theorem isOpen_iff (E : Set X) :
-    IsOpen E ↔ ∀ p ∈ E, ∃ r > 0, ball p r ⊆ E := by
-  exact Metric.isOpen_iff
 
 /-- Lemma: boundedness is containment in a ball when the ambient space is nonempty.
 The pairwise-distance characterization also covers the empty space. -/
@@ -83,13 +66,6 @@ theorem isBounded_iff (E : Set X) :
     · refine ⟨0, ?_⟩
       intro x
       exact (hX ⟨x⟩).elim
-
-/-- Lemma: removing the center of a ball is equivalent to positive distance. -/
-theorem mem_punctured_ball_iff (p q : X) (r : ℝ) :
-    q ∈ ball p r \ {p} ↔ 0 < dist q p ∧ dist q p < r := by
-  change (dist q p < r ∧ q ≠ p) ↔ _
-  rw [dist_pos]
-  exact and_comm
 
 /-- Proposition: a ball is open, using the remaining distance to its edge. -/
 theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r) := by

@@ -56,49 +56,9 @@ Euclidean spaces use this metric, including in dimension zero.
   \[
     B(p,r)=\{q\in X:d(q,p)<r\}.
   \]
-  The \textbf{punctured ball} is $B(p,r)\setminus\{p\}$.
+  The \textbf{punctured ball} is $B(p,r)\setminus\{p\}=\{q\in X:0<d(q,p)<r\}$.
   A \textbf{neighborhood} of $p$ is any set containing an open ball $B(p,r)$ with $r>0$. A neighborhood need not itself be open or a ball.
-  We write $U\in\mathcal N(p)$ when $U$ is a neighborhood of $p$.
 \end{definition}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_nhds_iff
-\begin{lemma} \label{an1:lem:mem-nhds-iff}
-  $U$ is a neighborhood of $p$ if and only if it contains $B(p,r)$ for some $r>0$.
-
-  \begin{lean}
-    theorem mem_nhds_iff (E : Set X) (p : X) :
-        E ∈ nhds p ↔ ∃ r > 0, ball p r ⊆ E
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  The metric neighborhood interface expresses exactly the contained-ball condition.
-
-  \begin{lean}
-    exact Metric.mem_nhds_iff
-  \end{lean}
-\end{proof}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_punctured_ball_iff
-\begin{lemma} \label{an1:lem:deleted-neighborhood-iff}
-  $q\in B(p,r)\setminus\{p\}$ if and only if $0<d(q,p)<r$.
-
-  \begin{lean}
-    theorem mem_punctured_ball_iff (p q : X) (r : ℝ) :
-        q ∈ ball p r \ {p} ↔ 0 < dist q p ∧ dist q p < r
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  Removing the center imposes $q\ne p$, equivalently $d(q,p)>0$.
-
-  \begin{lean}
-    change (dist q p < r ∧ q ≠ p) ↔ _
-    rw [dist_pos]
-    exact and_comm
-  \end{lean}
-
-\end{proof}
 
 \begin{definition} \label{an1:def:limit-interior-isolated-points}
   A point $p$ is a \textbf{limit point} of $E$ if every positive-radius punctured ball about $p$ meets $E$.
@@ -143,46 +103,9 @@ Euclidean spaces use this metric, including in dimension zero.
   \end{lean}
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.interior_iff
-\begin{lemma} \label{an1:lem:interior-iff}
-  $p\in E^{\circ}$ if and only if some $r>0$ satisfies $B(p,r)\subseteq E$.
-
-  \begin{lean}
-    theorem interior_iff (E : Set X) (p : X) :
-        p ∈ interior E ↔ ∃ r > 0, ball p r ⊆ E
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  A point is interior exactly when the set is its neighborhood; use the contained-ball characterization.
-
-  \begin{lean}
-    exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
-  \end{lean}
-
-\end{proof}
-
 \begin{definition} \label{an1:def:open-closed-sets}
   A set $E$ is \textbf{open} if every point of $E$ is interior, and \textbf{closed} if its complement is open.
 \end{definition}
-
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isOpen_iff
-\begin{lemma} \label{an1:lem:isOpen-iff}
-  $E$ is open if and only if every $p\in E$ has a positive-radius ball contained in $E$.
-
-  \begin{lean}
-    theorem isOpen_iff (E : Set X) :
-        IsOpen E ↔ ∀ p ∈ E, ∃ r > 0, ball p r ⊆ E
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  The metric open-set interface is the pointwise contained-ball characterization.
-
-  \begin{lean}
-    exact Metric.isOpen_iff
-  \end{lean}
-\end{proof}
 
 \begin{definition} \label{an1:def:closure}
   The \textbf{closure} $\overline E$ consists of points whose every positive-radius ball meets $E$.

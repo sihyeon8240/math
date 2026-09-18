@@ -8,25 +8,6 @@ The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' r
   A sequence is \textbf{convergent} if it has a limit in its ambient space and \textbf{divergent} otherwise.
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.tendsto_iff
-\begin{lemma} \label{an1:lem:tendsto-iff}
-  The standard sequence limit is equivalent to the epsilon condition above.
-
-  \begin{lean}
-    theorem tendsto_iff (u : ℕ → X) (p : X) :
-        Filter.Tendsto u Filter.atTop (nhds p) ↔
-          ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  Balls form a neighborhood basis at $p$, and tails describe eventual membership in $\N$, giving the epsilon condition.
-
-  \begin{lean}
-    exact Metric.tendsto_atTop
-  \end{lean}
-\end{proof}
-
 \begin{definition} \label{an1:def:bounded-sequence}
   A sequence is \textbf{bounded} if its range $\{u_n:n\in\N\}$ is bounded.
 \end{definition}
@@ -45,7 +26,7 @@ The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' r
   Use convergence with $\varepsilon=1$ to choose $N$ beyond which every term is within $1$ of $p$. Set $R=1+\sum_{n=0}^{N-1}d(u_n,p)>0$.
 
   \begin{lean}
-    rw [tendsto_iff] at h
+    rw [Metric.tendsto_atTop] at h
     apply (isBounded_iff (range u)).mpr
     intro _
 
@@ -95,7 +76,7 @@ The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' r
   If $p\ne q$, let $r=d(p,q)>0$. Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both points. The triangle inequality would then give $d(p,q)<r$, a contradiction.
 
   \begin{lean}
-    rw [tendsto_iff] at hp hq
+    rw [Metric.tendsto_atTop] at hp hq
     by_contra hne
 
     have hd : 0 < dist p q := dist_pos.mpr hne
@@ -186,7 +167,7 @@ The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' r
   If $u_n\to p$, choose its threshold $N$. Every exceptional index is less than $N$, so the exception set is contained in a finite initial segment.
 
   \begin{lean}
-    rw [tendsto_iff]
+    rw [Metric.tendsto_atTop]
     constructor
   \end{lean}
 
@@ -244,7 +225,7 @@ The range $\{u_n:n\in\N\}$ records values; ``finitely many exceptional terms'' r
   Given $\varepsilon>0$, the reciprocal estimate makes $1/(n+1)<\varepsilon$ for all sufficiently large $n$. The chosen distance is smaller still, so $u_n\to p$.
 
   \begin{lean}
-    rw [tendsto_iff]
+    rw [Metric.tendsto_atTop]
     intro ε hε
 
     obtain ⟨N, hN⟩ := reciprocal_small ε hε

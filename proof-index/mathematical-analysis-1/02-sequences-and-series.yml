@@ -13,5 +13,3 @@ proofs:
   declaration: MathematicalAnalysis1.Chapter02.sequence_at_limit_point
 - id: an1:thm:neighborhood
   declaration: MathematicalAnalysis1.Chapter02.neighborhood_characterization
-- id: an1:lem:tendsto-iff
-  declaration: MathematicalAnalysis1.Chapter02.tendsto_iff

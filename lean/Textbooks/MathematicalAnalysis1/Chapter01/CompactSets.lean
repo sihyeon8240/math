@@ -5,7 +5,6 @@ import Mathlib.Tactic.Convert
 import Mathlib.Tactic.Positivity
 
 /-! Core compactness results from the finite-open-subcover definition.
-`isCompact_iff_finite_subcover` only translates Mathlib's filter representation.
 No compactness, sequential compactness, or completeness theorem is used as a
 substitute for the arguments below. -/
 
@@ -18,19 +17,6 @@ open Set Metric
 universe u
 
 variable {X : Type u} [MetricSpace X]
-
-/-- Lemma: the standard compactness predicate is equivalent to finite open subcovers. -/
-theorem isCompact_iff_finite_subcover (E : Set X) :
-    IsCompact E ↔ ∀ {ι : Type u} (U : ι → Set X),
-      (∀ i, IsOpen (U i)) → E ⊆ ⋃ i, U i → ∃ s : Finset ι, E ⊆ ⋃ i ∈ s, U i := by
-  constructor
-
-  · intro h ι U hU hc
-    exact h.elim_finite_subcover U hU hc
-
-  · intro h
-    apply isCompact_of_finite_subcover
-    exact h
 
 /-- Proposition: a finite union of balls avoiding an exterior point still
 avoids a sufficiently small ball about that point. -/

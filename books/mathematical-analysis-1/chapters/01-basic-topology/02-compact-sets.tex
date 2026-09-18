@@ -7,32 +7,6 @@
   A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.isCompact_iff_finite_subcover
-\begin{lemma} \label{an1:lem:isCompact-iff-finite-subcover}
-  $E$ is compact if and only if every family of open sets covering it has a finite subfamily still covering it.
-
-  \begin{lean}
-    theorem isCompact_iff_finite_subcover (E : Set X) :
-        IsCompact E ↔ ∀ {ι : Type u} (U : ι → Set X),
-          (∀ i, IsOpen (U i)) → E ⊆ ⋃ i, U i → ∃ s : Finset ι, E ⊆ ⋃ i ∈ s, U i
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  Both directions are the finite-subcover characterization of compactness.
-
-  \begin{lean}
-    constructor
-
-    · intro h ι U hU hc
-      exact h.elim_finite_subcover U hU hc
-
-    · intro h
-      apply isCompact_of_finite_subcover
-      exact h
-  \end{lean}
-\end{proof}
-
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_subspace
 \begin{proposition} \label{an1:thm:compactness-preserved-under-subspace}
   For $E\subseteq Y\subseteq X$, $E$ is compact in the subspace $Y$ if and only if it is compact in $X$.

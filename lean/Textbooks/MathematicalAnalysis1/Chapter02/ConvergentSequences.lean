@@ -14,16 +14,10 @@ open MathematicalAnalysis1.Chapter01
 
 variable {X : Type*} [MetricSpace X]
 
-/-- Lemma: sequence convergence is the epsilon characterization of `Filter.Tendsto`. -/
-theorem tendsto_iff (u : ℕ → X) (p : X) :
-    Filter.Tendsto u Filter.atTop (nhds p) ↔
-      ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε := by
-  exact Metric.tendsto_atTop
-
 /-- Lemma: a finite initial segment and a bounded tail have a common bound. -/
 theorem convergent_bounded (u : ℕ → X) (p : X) (h : Filter.Tendsto u Filter.atTop (nhds p)) :
     Bornology.IsBounded (range u) := by
-  rw [tendsto_iff] at h
+  rw [Metric.tendsto_atTop] at h
   apply (isBounded_iff (range u)).mpr
   intro _
 
@@ -54,7 +48,7 @@ theorem convergent_bounded (u : ℕ → X) (p : X) (h : Filter.Tendsto u Filter.
 theorem limit_unique (u : ℕ → X) (p q : X)
     (hp : Filter.Tendsto u Filter.atTop (nhds p))
     (hq : Filter.Tendsto u Filter.atTop (nhds q)) : p = q := by
-  rw [tendsto_iff] at hp hq
+  rw [Metric.tendsto_atTop] at hp hq
   by_contra hne
 
   have hd : 0 < dist p q := dist_pos.mpr hne
@@ -79,7 +73,7 @@ theorem convergent_properties (u : ℕ → X) (p : X) (hp : Filter.Tendsto u Fil
 /-- Lemma: finite exceptional indices, rather than finitely many values. -/
 theorem tendsto_iff_finite_exceptions (u : ℕ → X) (p : X) :
     Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
-  rw [tendsto_iff]
+  rw [Metric.tendsto_atTop]
   constructor
 
   · intro h ε hε
@@ -129,7 +123,7 @@ theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ derivedSet E) :
   choose u hu hne hd using hex
 
   refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
-  rw [tendsto_iff]
+  rw [Metric.tendsto_atTop]
   intro ε hε
 
   obtain ⟨N, hN⟩ := reciprocal_small ε hε
