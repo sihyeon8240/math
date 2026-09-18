@@ -383,17 +383,13 @@ class FormatTexTests(unittest.TestCase):
             for name in ("format-tex.sh", "normalize-eof.sh"):
                 shutil.copy2(ROOT / "scripts" / name, scripts / name)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
-            body = (
-                "      Since $b$ is positive, $1\\le b$.\n"
-                "    }\n"
-                "  classical\n"
-                "  have h : 0 ≤ a := by\n"
-                "    nlinarith\n"
-            )
+            body = "  classical\n  have h : 0 ≤ a := by\n    nlinarith\n"
             source = (
                 "\\begin{proof}\n"
-                "  \\begin{lean}{\n" + body + "\\end{lean} % keep comment\n"
-                "  \\begin{lean}{Already aligned}\n"
+                "  Since $b$ is positive, $1\\le b$.\n\n"
+                "  \\begin{lean}\n" + body + "\\end{lean} % keep comment\n"
+                "  Already aligned.\n\n"
+                "  \\begin{lean}\n"
                 "    exact h\n"
                 "  \\end{lean}\n"
                 "\\end{proof}\n"
@@ -403,20 +399,22 @@ class FormatTexTests(unittest.TestCase):
                 "  classical\n  have h : 0 ≤ a := by\n    nlinarith\n",
                 "    classical\n    have h : 0 ≤ a := by\n      nlinarith\n",
             )
-            # Top-level definitions, over-indented proofs, nested caption braces,
-            # and blank lines must all retain their relative Lean structure.
+            # Preserve relative indentation for definitions, proofs, and blank lines.
             extra = (
-                "\\begin{lean}{An $\\{x\\}$ and \\textbf{nested} caption}\n"
+                "An $\\{x\\}$ and \\textbf{nested} explanation.\n\n"
+                "\\begin{lean} % code only\n"
                 "abbrev neighborhood (p : X) (r : ℝ) : Set X := ball p r\n"
                 "\n"
                 "example : True := by\n"
                 "  trivial\n"
                 "\\end{lean}\n"
-                "\\begin{lean}{Over-indented}\n"
+                "Over-indented.\n\n"
+                "\\begin{lean}\n"
                 "        example : True := by\n"
                 "          trivial\n"
                 "\\end{lean}\n"
-                "\\begin{lean}{Empty}\n"
+                "Empty.\n\n"
+                "\\begin{lean}\n"
                 "\\end{lean}\n"
             )
             source += extra
@@ -456,7 +454,7 @@ class FormatTexTests(unittest.TestCase):
             self.assertEqual(path.read_text(encoding="utf-8"), expected)
 
     @unittest.skipUnless(shutil.which("latexindent"), "latexindent is required")
-    def test_multiline_caption_indentation_is_checked(self) -> None:
+    def test_prose_and_code_indentation_are_checked_independently(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             scripts = root / "scripts"
@@ -466,13 +464,13 @@ class FormatTexTests(unittest.TestCase):
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
             source = (
                 "\\begin{theorem}\n"
-                "  \\begin{lean}{\n"
                 "Suppose $a\\in\\Z$. % unmatched { in a comment\n"
                 "Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
                 "\\[\n"
                 "  a=a.\n"
                 "\\]\n"
-                "}\n"
+                "\n"
+                "  \\begin{lean}\n"
                 "    example (a : ℤ) : a = a := by\n"
                 "      rfl\n"
                 "  \\end{lean}\n"
@@ -484,13 +482,13 @@ class FormatTexTests(unittest.TestCase):
                 "\\[\n"
                 "  a=a.\n"
                 "\\]\n"
-                "}\n",
-                "      Suppose $a\\in\\Z$. % unmatched { in a comment\n"
-                "      Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
-                "      \\[\n"
-                "        a=a.\n"
-                "      \\]\n"
-                "    }\n",
+                "\n",
+                "  Suppose $a\\in\\Z$. % unmatched { in a comment\n"
+                "  Use \\textbf{nested {braces}} and $\\{a\\}$.\n"
+                "  \\[\n"
+                "    a=a.\n"
+                "  \\]\n"
+                "\n",
             )
             path = root / "theorem.tex"
             path.write_text(source, encoding="utf-8")
@@ -518,8 +516,8 @@ class FormatTexTests(unittest.TestCase):
                 result = run(*arguments)
                 self.assertEqual(result.returncode, 0, result.stderr)
                 self.assertEqual(path.read_text(), expected)
-            # Changing only the closing brace must invalidate the cached success.
-            path.write_text(expected.replace("    }\n", "}\n"))
+            # A Lean indentation change must invalidate the cached success.
+            path.write_text(expected.replace("  \\end{lean}\n", "\\end{lean}\n"))
             result = run("--check")
             self.assertEqual(result.returncode, 1, result.stderr)
 

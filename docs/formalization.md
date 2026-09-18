@@ -91,7 +91,8 @@ structure and spacing rather than long comment blocks to show the argument.
 
 Apply the same reasoning-unit layout to Lean shown in LaTeX. Copy from the
 checked source and adjust only the surrounding presentation indentation. Keep
-pairs within one page and review page breaks after adding whitespace; see
+explanations immediately before their code in the source, and allow long boxes
+to continue on the next page. Review page breaks after adding whitespace; see
 [displayed-code correspondence](#displayed-code-correspondence) and the
 [paired-code layout guidance](writing-guide.md#paired-mathematical-prose-and-lean-code).
 Formatting is not a reason to change declarations, dependencies, or proof steps.

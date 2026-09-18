@@ -134,7 +134,7 @@ class ProofLinkTests(unittest.TestCase):
             r"\begin{theorem}\end{theorem}\label{sa:thm:result}",
             r"\begin{theorem}\begin{equation}\label{sa:thm:result}"
             r"\end{equation}\end{theorem}",
-            r"\begin{lean}{Example}\begin{theorem}\label{sa:thm:result}"
+            r"\begin{lean}\begin{theorem}\label{sa:thm:result}"
             r"\end{theorem}\end{lean}",
         ):
             with self.subTest(body=body):

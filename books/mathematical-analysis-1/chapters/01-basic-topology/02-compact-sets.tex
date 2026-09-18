@@ -1,11 +1,15 @@
 \begin{definition} \label{an1:def:open-cover}
   A family $(G_i)_{i\in I}$ is an \textbf{open cover} of $E$ if each $G_i$ is open and $E\subseteq\bigcup_{i\in I}G_i$.
   For $S\subseteq I$, the subfamily indexed by $S$ is a \textbf{subcover} if it still covers $E$.
-  \begin{lean}{An open cover consists of open sets whose union contains $E$.}
+  An open cover consists of open sets whose union contains $E$.
+
+  \begin{lean}
     abbrev openCover {ι : Type*} (E : Set X) (U : ι → Set X) : Prop :=
       (∀ i, IsOpen (U i)) ∧ E ⊆ ⋃ i, U i
   \end{lean}
-  \begin{lean}{A subcover keeps only indices in $S$ and still contains $E$ in its union.}
+  A subcover keeps only indices in $S$ and still contains $E$ in its union.
+
+  \begin{lean}
     abbrev subcover {ι : Type*} (E : Set X) (U : ι → Set X) (S : Set ι) : Prop :=
       E ⊆ ⋃ i ∈ S, U i
   \end{lean}
@@ -15,7 +19,9 @@
   A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
   Write $\mathcal K(X)$ for the collection of compact sets. In the proofs, a finite index set is represented by a \texttt{Finset}.
   The definition below quantifies over index types in the same universe as the ambient space. The following bridge verifies its agreement with the standard predicate, which also handles covers with other index universes. The Lean context declares \texttt{universe u} and \texttt{variable \{X : Type u\} [MetricSpace X]}.
-  \begin{lean}{$\mathcal K(X)$ consists of the compact subsets of $X$.}
+  $\mathcal K(X)$ consists of the compact subsets of $X$.
+
+  \begin{lean}
     def compactSets : Set (Set X) :=
       {E | ∀ {ι : Type u} (U : ι → Set X), openCover E U →
         ∃ s : Finset ι, subcover E U (s : Set ι)}
@@ -24,13 +30,17 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.mem_compactSets_iff
 \begin{lemma} \label{an1:lem:mem-compactSets-iff}
-  \begin{lean}{The finite-open-subcover definition agrees with the standard compact-set predicate.}
+  The finite-open-subcover definition agrees with the standard compact-set predicate.
+
+  \begin{lean}
     theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{In either direction, unpack an open cover into openness and coverage and retain the same finite index set. The standard finite-subcover interface changes only the representation of compactness.}
+  In either direction, unpack an open cover into openness and coverage and retain the same finite index set. The standard finite-subcover interface changes only the representation of compactness.
+
+  \begin{lean}
     constructor
 
     · intro h
@@ -46,14 +56,18 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_subspace
 \begin{proposition} \label{an1:thm:compactness-preserved-under-subspace}
-  \begin{lean}{For $E\subseteq Y\subseteq X$, $E$ is compact in the subspace $Y$ if and only if it is compact in $X$.}
+  For $E\subseteq Y\subseteq X$, $E$ is compact in the subspace $Y$ if and only if it is compact in $X$.
+
+  \begin{lean}
     theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
         IsCompact ((Subtype.val : Y → X) ⁻¹' E) ↔ IsCompact E
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{First suppose $E$ is compact in $Y$. Restrict an ambient open cover to $Y$. An ambient ball contained in a cover member restricts to a subspace ball, so each restricted member is open.}
+  First suppose $E$ is compact in $Y$. Restrict an ambient open cover to $Y$. An ambient ball contained in a cover member restricts to a subspace ball, so each restricted member is open.
+
+  \begin{lean}
     classical
 
     constructor
@@ -72,7 +86,9 @@
         exact ⟨r, hr, fun q hq => hs hq⟩
   \end{lean}
 
-  \begin{lean}{The restricted family covers $E$ in $Y$. A finite subcover there gives the same finite collection of ambient members covering $E$ in $X$.}
+  The restricted family covers $E$ in $Y$. A finite subcover there gives the same finite collection of ambient members covering $E$ in $X$.
+
+  \begin{lean}
     have hcov : (Subtype.val : Y → X) ⁻¹' E ⊆ ⋃ i, Subtype.val ⁻¹' U i := by
       intro p hp
 
@@ -91,7 +107,9 @@
     exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hpi⟩⟩
   \end{lean}
 
-  \begin{lean}{Conversely, let a family of subspace-open sets cover $E$. Each member is the intersection with $Y$ of an ambient open set, by the relative-open-set proposition.}
+  Conversely, let a family of subspace-open sets cover $E$. Each member is the intersection with $Y$ of an ambient open set, by the relative-open-set proposition.
+
+  \begin{lean}
     · intro h
       apply isCompact_of_finite_subcover
       intro ι U hU hc
@@ -109,7 +127,9 @@
         exact hU i
   \end{lean}
 
-  \begin{lean}{Choose those ambient open sets. They cover $E$ in $X$, so compactness gives finitely many of them.}
+  Choose those ambient open sets. They cover $E$ in $X$, so compactness gives finitely many of them.
+
+  \begin{lean}
     choose V hV heq using hex
 
     have hcov : E ⊆ ⋃ i, V i := by
@@ -123,7 +143,9 @@
       exact mem_iUnion.mpr ⟨i, hm.1⟩
   \end{lean}
 
-  \begin{lean}{For a point of $E\subseteq Y$, membership in a chosen ambient set is membership in its intersection with $Y$. Thus the corresponding finitely many original members cover $E$ in the subspace.}
+  For a point of $E\subseteq Y$, membership in a chosen ambient set is membership in its intersection with $Y$. Thus the corresponding finitely many original members cover $E$ in the subspace.
+
+  \begin{lean}
     obtain ⟨s, hs⟩ := h.elim_finite_subcover V hV hcov
 
     refine ⟨s, ?_⟩
@@ -145,13 +167,17 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_closed
 \begin{proposition} \label{an1:thm:compact-set-is-closed}
-  \begin{lean}{Every compact subset $E$ of a metric space is closed.}
+  Every compact subset $E$ of a metric space is closed.
+
+  \begin{lean}
     theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{To prove that $E^{c}$ is open, fix $p\notin E$. For each $q\in E$, let $r_q=d(q,p)/2>0$. The balls $N_{r_q}(q)$ cover $E$.}
+  To prove that $E^{c}$ is open, fix $p\notin E$. For each $q\in E$, let $r_q=d(q,p)/2>0$. The balls $N_{r_q}(q)$ cover $E$.
+
+  \begin{lean}
     classical
 
     apply isOpen_compl_iff.mp
@@ -169,14 +195,18 @@
       exact mem_iUnion.mpr ⟨⟨q, hq⟩, by simpa only [mem_ball, dist_self] using hr ⟨q, hq⟩⟩
   \end{lean}
 
-  \begin{lean}{Take a finite subcover and a common positive lower bound $\delta$ for its radii. This is also possible when the finite subcover is empty.}
+  Take a finite subcover and a common positive lower bound $\delta$ for its radii. This is also possible when the finite subcover is empty.
+
+  \begin{lean}
     obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun q => ball_open _ _) hcover
     obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s r (fun q _ => hr q)
 
     refine ⟨δ, hδ, ?_⟩
   \end{lean}
 
-  \begin{lean}{If $x\in N_\delta(p)\cap E$, one of the selected balls contains $x$. Then $d(q,p)\leq d(q,x)+d(x,p)<r_q+\delta\leq 2r_q=d(q,p)$, a contradiction. Hence $N_\delta(p)\subseteq E^{c}$.}
+  If $x\in N_\delta(p)\cap E$, one of the selected balls contains $x$. Then $d(q,p)\leq d(q,x)+d(x,p)<r_q+\delta\leq 2r_q=d(q,p)$, a contradiction. Hence $N_\delta(p)\subseteq E^{c}$.
+
+  \begin{lean}
     intro x hx hxe
 
     obtain ⟨q, hq⟩ := mem_iUnion.mp (hs hxe)
@@ -198,13 +228,17 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_bounded
 \begin{proposition} \label{an1:thm:compact-set-is-bounded}
-  \begin{lean}{Every compact subset of a metric space is bounded, with the stated empty-space convention.}
+  Every compact subset of a metric space is bounded, with the stated empty-space convention.
+
+  \begin{lean}
     theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{If $X$ is nonempty, choose $p\in X$. The balls $N_{n+1}(p)$, for $n\in\N$, cover $E$: every real distance is below some natural number by the Archimedean property.}
+  If $X$ is nonempty, choose $p\in X$. The balls $N_{n+1}(p)$, for $n\in\N$, cover $E$: every real distance is below some natural number by the Archimedean property.
+
+  \begin{lean}
     classical
 
     intro hX
@@ -221,7 +255,9 @@
         linarith⟩
   \end{lean}
 
-  \begin{lean}{Choose a finite subcover and set $R=1+\sum_{n\in S}(n+1)$. This is positive, even when $S$ is empty.}
+  Choose a finite subcover and set $R=1+\sum_{n\in S}(n+1)$. This is positive, even when $S$ is empty.
+
+  \begin{lean}
     obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun n => ball_open _ _) hc
 
     let R : ℝ := 1 + ∑ n ∈ s, (n + 1 : ℝ)
@@ -234,7 +270,9 @@
       linarith, ?_⟩
   \end{lean}
 
-  \begin{lean}{Each $q\in E$ belongs to a selected ball. Its radius is at most the sum of all selected radii, so $d(q,p)<R$. Thus $E\subseteq N_R(p)$.}
+  Each $q\in E$ belongs to a selected ball. Its radius is at most the sum of all selected radii, so $d(q,p)<R$. Thus $E\subseteq N_R(p)$.
+
+  \begin{lean}
     intro q hq
 
     obtain ⟨n, hn⟩ := mem_iUnion.mp (hs hq)
@@ -253,14 +291,18 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.closed_subset_compact
 \begin{proposition} \label{an1:thm:closed-subset-of-compact-set-is-compact}
-  \begin{lean}{If $E$ is compact, $F$ is closed, and $F\subseteq E$, then $F$ is compact.}
+  If $E$ is compact, $F$ is closed, and $F\subseteq E$, then $F$ is compact.
+
+  \begin{lean}
     theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
         (hF : IsClosed F) (hFE : F ⊆ E) : IsCompact F
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{Take an open cover of $F$. Add the open set $F^{c}$, giving the added member its own index distinct from the original indices.}
+  Take an open cover of $F$. Add the open set $F^{c}$, giving the added member its own index distinct from the original indices.
+
+  \begin{lean}
     classical
 
     apply isCompact_of_finite_subcover
@@ -277,7 +319,9 @@
       | some j => exact hU j
   \end{lean}
 
-  \begin{lean}{The enlarged family covers $E$: points in $F$ are covered by the original family, and the others lie in $F^{c}$. Select a finite subcover of $E$.}
+  The enlarged family covers $E$: points in $F$ are covered by the original family, and the others lie in $F^{c}$. Select a finite subcover of $E$.
+
+  \begin{lean}
     have hc : E ⊆ ⋃ i, V i := by
       intro x _
       by_cases hx : x ∈ F
@@ -291,7 +335,9 @@
     obtain ⟨s, hs⟩ := hE.elim_finite_subcover V hV hc
   \end{lean}
 
-  \begin{lean}{Discard the added member and keep the selected original indices. A point of $F$ cannot lie in $F^{c}$, so it remains covered. This gives a finite subcover of $F$.}
+  Discard the added member and keep the selected original indices. A point of $F$ cannot lie in $F^{c}$, so it remains covered. This gives a finite subcover of $F$.
+
+  \begin{lean}
     refine ⟨s.biUnion Option.toFinset, ?_⟩
     intro x hx
 
@@ -309,14 +355,18 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.infinite_subset_limit_point
 \begin{theorem} \label{an1:thm:infinite-subset-of-compact-set-has-limit-point}
-  \begin{lean}{If $E$ is compact and $F\subseteq E$ is infinite, then $F^{\prime}\cap E\ne\varnothing$.}
+  If $E$ is compact and $F\subseteq E$ is infinite, then $F^{\prime}\cap E\ne\varnothing$.
+
+  \begin{lean}
     theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
         (hFE : F ⊆ E) (hF : F.Infinite) : (limitPoints F ∩ E).Nonempty
   \end{lean}
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{Assume there is no such limit point. Then each $p\in E$ has a radius $r_p>0$ for which the only possible point of $F$ inside $N_{r_p}(p)$ is $p$ itself. Otherwise every radius would have a distinct witness, making $p$ a limit point.}
+  Assume there is no such limit point. Then each $p\in E$ has a radius $r_p>0$ for which the only possible point of $F$ inside $N_{r_p}(p)$ is $p$ itself. Otherwise every radius would have a distinct witness, making $p$ a limit point.
+
+  \begin{lean}
     classical
 
     by_contra hn
@@ -334,7 +384,9 @@
       exact ⟨q, hq, hne, hd⟩
   \end{lean}
 
-  \begin{lean}{These balls cover $E$, so choose finitely many of them.}
+  These balls cover $E$, so choose finitely many of them.
+
+  \begin{lean}
     choose r hr hsingle using hlocal
 
     have hc : E ⊆ ⋃ p : E, ball p.val (r p) := by
@@ -344,7 +396,9 @@
     obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun p => ball_open _ _) hc
   \end{lean}
 
-  \begin{lean}{Every point of $F$ lies in one of the selected balls and must equal its center. Hence $F$ is contained in the finite set of selected centers, contradicting its infinitude.}
+  Every point of $F$ lies in one of the selected balls and must equal its center. Hence $F$ is contained in the finite set of selected centers, contradicting its infinitude.
+
+  \begin{lean}
     apply hF
     apply (s.finite_toSet.image Subtype.val).subset
     intro q hq
@@ -359,7 +413,9 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_finite_intersection
 \begin{theorem} \label{an1:thm:finite-compact-intersection-property}
-  \begin{lean}{Suppose $(K_i)_{i\in I}$ are compact and every finite intersection $\bigcap_{i\in S}K_i$ is nonempty, including the intersection over no indices. Then $\bigcap_{i\in I}K_i$ is nonempty.}
+  Suppose $(K_i)_{i\in I}$ are compact and every finite intersection $\bigcap_{i\in S}K_i$ is nonempty, including the intersection over no indices. Then $\bigcap_{i\in I}K_i$ is nonempty.
+
+  \begin{lean}
     theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
         (hK : ∀ i, IsCompact (K i))
         (hfinite : ∀ s : Finset ι, (⋂ i ∈ s, K i).Nonempty) :
@@ -368,7 +424,9 @@
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{First suppose $I$ has an index $i_0$. If the full intersection were empty, the complements of the $K_i$ would cover $K_{i_0}$. These complements are open because compact sets are closed.}
+  First suppose $I$ has an index $i_0$. If the full intersection were empty, the complements of the $K_i$ would cover $K_{i_0}$. These complements are open because compact sets are closed.
+
+  \begin{lean}
     classical
 
     by_cases hi : Nonempty ι
@@ -386,7 +444,9 @@
         exact hp (mem_iUnion.mpr ⟨i, hpi⟩)
   \end{lean}
 
-  \begin{lean}{A finite subcover would make the intersection over its indices together with $i_0$ empty. The finite-intersection hypothesis instead supplies a point in all these sets, contradicting that subcover.}
+  A finite subcover would make the intersection over its indices together with $i_0$ empty. The finite-intersection hypothesis instead supplies a point in all these sets, contradicting that subcover.
+
+  \begin{lean}
     obtain ⟨s, hs⟩ := (hK i₀).elim_finite_subcover _
       (fun i => (compact_closed _ (hK i)).isOpen_compl) hc
 
@@ -400,7 +460,9 @@
     exact hpi (mem_iInter.mp (mem_iInter.mp hp i) (Finset.mem_insert_of_mem his))
   \end{lean}
 
-  \begin{lean}{If $I$ is empty, the hypothesis for the empty finite index set supplies a point of $X$. It automatically belongs to every member of the empty family.}
+  If $I$ is empty, the hypothesis for the empty finite index set supplies a point of $X$. It automatically belongs to every member of the empty family.
+
+  \begin{lean}
     · obtain ⟨p, _⟩ := hfinite ∅
 
       refine ⟨p, mem_iInter.mpr ?_⟩
@@ -412,7 +474,9 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.nested_intervals
 \begin{lemma} \label{an1:lem:nested-intervals}
-  \begin{lean}{Let $(a_n)$ and $(b_n)$ be real sequences indexed by $n\in\N$ with $a_n\leq a_{n+1}\leq b_{n+1}\leq b_n$. There exists $x\in\R$ with $a_n\leq x\leq b_n$ for every $n$, so the nested intervals have nonempty intersection.}
+  Let $(a_n)$ and $(b_n)$ be real sequences indexed by $n\in\N$ with $a_n\leq a_{n+1}\leq b_{n+1}\leq b_n$. There exists $x\in\R$ with $a_n\leq x\leq b_n$ for every $n$, so the nested intervals have nonempty intersection.
+
+  \begin{lean}
     theorem nested_intervals (a b : ℕ → ℝ)
         (h : ∀ n, a n ≤ a (n + 1) ∧ a (n + 1) ≤ b (n + 1) ∧ b (n + 1) ≤ b n) :
         ∃ x : ℝ, ∀ n, a n ≤ x ∧ x ≤ b n
@@ -420,7 +484,9 @@
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{The left endpoints increase and the right endpoints decrease. For any $n,m$, compare the indices: if $n\leq m$, then $a_n\leq a_m\leq b_m$; otherwise $a_n\leq b_n\leq b_m$. Thus each $b_m$ bounds all left endpoints.}
+  The left endpoints increase and the right endpoints decrease. For any $n,m$, compare the indices: if $n\leq m$, then $a_n\leq a_m\leq b_m$; otherwise $a_n\leq b_n\leq b_m$. Thus each $b_m$ bounds all left endpoints.
+
+  \begin{lean}
     have ha : Monotone a := monotone_nat_of_le_succ (fun n => (h n).1)
 
     have hb : Antitone b := antitone_nat_of_succ_le (fun n => (h n).2.2)
@@ -435,7 +501,9 @@
       · exact (hab n).trans (hb hmn)
   \end{lean}
 
-  \begin{lean}{The set of left endpoints contains $a_0$ and is bounded above by $b_0$. Its supremum exists. Each $a_n$ is below that supremum, and each $b_n$ is an upper bound for it, giving a point in every interval.}
+  The set of left endpoints contains $a_0$ and is bounded above by $b_0$. Its supremum exists. Each $a_n$ is below that supremum, and each $b_n$ is an upper bound for it, giving a point in every interval.
+
+  \begin{lean}
     have hne : (range a).Nonempty := ⟨a 0, mem_range_self 0⟩
 
     have hbd : BddAbove (range a) := ⟨b 0, by
@@ -453,7 +521,9 @@
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.nested_cells
 \begin{theorem} \label{an1:thm:nested-k-cells}
-  \begin{lean}{Let $k\in\N$ and let real endpoints satisfy $a_{n,j}\leq a_{n+1,j}\leq b_{n+1,j}\leq b_{n,j}$ for every $n\in\N$ and $0\leq j<k$. Then the cells $\prod_{j=0}^{k-1}[a_{n,j},b_{n,j}]$ have nonempty intersection.}
+  Let $k\in\N$ and let real endpoints satisfy $a_{n,j}\leq a_{n+1,j}\leq b_{n+1,j}\leq b_{n,j}$ for every $n\in\N$ and $0\leq j<k$. Then the cells $\prod_{j=0}^{k-1}[a_{n,j},b_{n,j}]$ have nonempty intersection.
+
+  \begin{lean}
     theorem nested_cells (k : ℕ) (a b : ℕ → Fin k → ℝ)
         (h : ∀ n j, a n j ≤ a (n + 1) j ∧
           a (n + 1) j ≤ b (n + 1) j ∧ b (n + 1) j ≤ b n j) :
@@ -462,7 +532,9 @@
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{For each coordinate, apply the nested-interval result and choose a point belonging to every interval in that coordinate. The resulting vector belongs to every cell. When $k=0$, the choice has no coordinates and produces the unique empty tuple.}
+  For each coordinate, apply the nested-interval result and choose a point belonging to every interval in that coordinate. The resulting vector belongs to every cell. When $k=0$, the choice has no coordinates and produces the unique empty tuple.
+
+  \begin{lean}
     have hex : ∀ j, ∃ x : ℝ, ∀ n, a n j ≤ x ∧ x ≤ b n j :=
       fun j => nested_intervals (fun n => a n j) (fun n => b n j) (fun n => h n j)
 
@@ -478,7 +550,9 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_image
 \begin{lemma} \label{an1:lem:compact-image}
-  \begin{lean}{For topological spaces $A$ and $B$, if $K\subseteq A$ is compact and $f:A\to B$ is continuous, then $f(K)$ is compact.}
+  For topological spaces $A$ and $B$, if $K\subseteq A$ is compact and $f:A\to B$ is continuous, then $f(K)$ is compact.
+
+  \begin{lean}
     theorem compact_image {A B : Type*} [TopologicalSpace A] [TopologicalSpace B]
         (K : Set A) (hK : IsCompact K) (f : A → B) (hf : Continuous f) :
         IsCompact (f '' K)
@@ -486,7 +560,9 @@ The next supporting argument applies more generally to topological spaces: their
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Pull an open cover of $f(K)$ back along $f$. The inverse images are open and cover $K$, so finitely many cover it.}
+  Pull an open cover of $f(K)$ back along $f$. The inverse images are open and cover $K$, so finitely many cover it.
+
+  \begin{lean}
     apply isCompact_of_finite_subcover
     intro ι U hU hc
 
@@ -500,7 +576,9 @@ The next supporting argument applies more generally to topological spaces: their
     obtain ⟨s, hs⟩ := hK.elim_finite_subcover _ (fun i => (hU i).preimage hf) hcov
   \end{lean}
 
-  \begin{lean}{Every point of $f(K)$ has a preimage in $K$. That preimage belongs to a selected inverse image, so the point belongs to the corresponding selected cover member.}
+  Every point of $f(K)$ has a preimage in $K$. That preimage belongs to a selected inverse image, so the point belongs to the corresponding selected cover member.
+
+  \begin{lean}
     refine ⟨s, ?_⟩
     rintro y ⟨x, hx, rfl⟩
 
@@ -514,14 +592,18 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.singleton_compact
 \begin{lemma} \label{an1:lem:singleton-compact}
-  \begin{lean}{A singleton in any metric space is compact.}
+  A singleton in any metric space is compact.
+
+  \begin{lean}
     theorem singleton_compact {A : Type*} [MetricSpace A] (a : A) :
         IsCompact ({a} : Set A)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{One member of any cover contains its sole point. The subfamily containing only that member already covers the singleton.}
+  One member of any cover contains its sole point. The subfamily containing only that member already covers the singleton.
+
+  \begin{lean}
     apply isCompact_of_finite_subcover
     intro ι U _ hc
 
@@ -538,13 +620,17 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.interval_compact
 \begin{lemma} \label{an1:lem:interval-compact}
-  \begin{lean}{If $a,b\in\R$ and $a\leq b$, then $[a,b]$ is compact.}
+  If $a,b\in\R$ and $a\leq b$, then $[a,b]$ is compact.
+
+  \begin{lean}
     theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Fix an open cover. Let $T$ consist of the endpoints $x\in[a,b]$ for which $[a,x]$ has a finite subcover. A cover member containing $a$ covers $[a,a]$, so $a\in T$.}
+  Fix an open cover. Let $T$ consist of the endpoints $x\in[a,b]$ for which $[a,x]$ has a finite subcover. A cover member containing $a$ covers $[a,a]$, so $a\in T$.
+
+  \begin{lean}
     classical
 
     apply isCompact_of_finite_subcover
@@ -564,7 +650,9 @@ The next supporting argument applies more generally to topological spaces: their
       exact mem_iUnion.mpr ⟨i₀, mem_iUnion.mpr ⟨Finset.mem_singleton_self _, hi₀⟩⟩
   \end{lean}
 
-  \begin{lean}{The set $T$ is nonempty and bounded above by $b$. Let $c=\sup T$; then $a\leq c\leq b$. Choose a cover member containing $c$ and a radius $r>0$ whose ball about $c$ stays in that member.}
+  The set $T$ is nonempty and bounded above by $b$. Let $c=\sup T$; then $a\leq c\leq b$. Choose a cover member containing $c$ and a radius $r>0$ whose ball about $c$ stays in that member.
+
+  \begin{lean}
     have hne : T.Nonempty := ⟨a, ha⟩
 
     have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
@@ -579,7 +667,9 @@ The next supporting argument applies more generally to topological spaces: their
     obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp (hU i) c hi
   \end{lean}
 
-  \begin{lean}{Choose $t\in T$ with $c-r/2<t$. Set $d=\min(b,c+r/2)$, which is at least $c$. We will extend a finite cover of $[a,t]$ to $[a,d]$ by adjoining the chosen member.}
+  Choose $t\in T$ with $c-r/2<t$. Set $d=\min(b,c+r/2)$, which is at least $c$. We will extend a finite cover of $[a,t]$ to $[a,d]$ by adjoining the chosen member.
+
+  \begin{lean}
     obtain ⟨t, ht, hct⟩ := exists_lt_of_lt_csSup hne (show c - r / 2 < sSup T by
       dsimp [c]
       linarith)
@@ -594,7 +684,9 @@ The next supporting argument applies more generally to topological spaces: their
       refine ⟨⟨hac.trans hcd, min_le_left _ _⟩, insert i s, ?_⟩
   \end{lean}
 
-  \begin{lean}{A point $x\in[a,d]$ with $x\leq t$ is covered by the old subcover. Otherwise $c-r/2<t<x\leq c+r/2$, so $x$ is in the chosen ball. Therefore $d\in T$.}
+  A point $x\in[a,d]$ with $x\leq t$ is covered by the old subcover. Otherwise $c-r/2<t<x\leq c+r/2$, so $x$ is in the chosen ball. Therefore $d\in T$.
+
+  \begin{lean}
     intro x hx
     by_cases hxt : x ≤ t
 
@@ -613,7 +705,9 @@ The next supporting argument applies more generally to topological spaces: their
       exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨Finset.mem_insert_self _ _, hball hxball⟩⟩
   \end{lean}
 
-  \begin{lean}{Since $c$ is an upper bound of $T$, we have $d\leq c$. If $c<b$, both $b$ and $c+r/2$ are greater than $c$, which would give $d>c$. Hence $c=b$ and $d=b$. The finite subcover witnessing $d\in T$ covers the whole interval.}
+  Since $c$ is an upper bound of $T$, we have $d\leq c$. If $c<b$, both $b$ and $c+r/2$ are greater than $c$, which would give $d>c$. Hence $c=b$ and $d=b$. The finite subcover witnessing $d\in T$ covers the whole interval.
+
+  \begin{lean}
     have hdc : d ≤ c := le_csSup hb hd
 
     have hbc : b ≤ c := by
@@ -633,7 +727,9 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_product
 \begin{lemma} \label{an1:lem:compact-product}
-  \begin{lean}{For compact sets $K\subseteq A$ and $L\subseteq B$ in metric spaces, $K\times L$ is compact in the product metric $d((x,y),(x^{\prime},y^{\prime}))=\max(d(x,x^{\prime}),d(y,y^{\prime}))$.}
+  For compact sets $K\subseteq A$ and $L\subseteq B$ in metric spaces, $K\times L$ is compact in the product metric $d((x,y),(x^{\prime},y^{\prime}))=\max(d(x,x^{\prime}),d(y,y^{\prime}))$.
+
+  \begin{lean}
     theorem compact_product {A B : Type*} [MetricSpace A] [MetricSpace B]
         (K : Set A) (L : Set B) (hK : IsCompact K) (hL : IsCompact L) :
         IsCompact (K ×ˢ L)
@@ -641,7 +737,9 @@ The next supporting argument applies more generally to topological spaces: their
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Fix an open cover and $x\in K$. For each $y\in L$, choose a cover member and a product ball of radius $r_y>0$ about $(x,y)$ contained in it.}
+  Fix an open cover and $x\in K$. For each $y\in L$, choose a cover member and a product ball of radius $r_y>0$ about $(x,y)$ contained in it.
+
+  \begin{lean}
     classical
 
     apply isCompact_of_finite_subcover
@@ -661,7 +759,9 @@ The next supporting argument applies more generally to topological spaces: their
         exact ⟨i, r, hr, hs⟩
   \end{lean}
 
-  \begin{lean}{The balls about the $y$ coordinates cover $L$. Compactness selects finitely many; take a common positive lower bound $\delta$ for their radii.}
+  The balls about the $y$ coordinates cover $L$. Compactness selects finitely many; take a common positive lower bound $\delta$ for their radii.
+
+  \begin{lean}
     choose i r hr hs using hlocal
 
     have hcov : L ⊆ ⋃ y : L, ball y.val (r y) := by
@@ -672,7 +772,9 @@ The next supporting argument applies more generally to topological spaces: their
     obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound t r (fun y _ => hr y)
   \end{lean}
 
-  \begin{lean}{If $d(x^{\prime},x)<\delta$ and $y^{\prime}\in L$, choose a selected ball containing $y^{\prime}$. Both coordinate distances are below its radius, so $(x^{\prime},y^{\prime})$ lies in its original cover member. Thus finitely many members cover the whole strip $N_\delta(x)\times L$.}
+  If $d(x^{\prime},x)<\delta$ and $y^{\prime}\in L$, choose a selected ball containing $y^{\prime}$. Both coordinate distances are below its radius, so $(x^{\prime},y^{\prime})$ lies in its original cover member. Thus finitely many members cover the whole strip $N_\delta(x)\times L$.
+
+  \begin{lean}
     refine ⟨δ, hδ, t.image i, ?_⟩
     intro x' hx' y hy
 
@@ -686,7 +788,9 @@ The next supporting argument applies more generally to topological spaces: their
     exact mem_iUnion.mpr ⟨i z, mem_iUnion.mpr ⟨Finset.mem_image.mpr ⟨z, hzt, rfl⟩, hs z hpair⟩⟩
   \end{lean}
 
-  \begin{lean}{Choose such a strip and finite index set for each $x\in K$. Their balls cover $K$, so finitely many strips suffice.}
+  Choose such a strip and finite index set for each $x\in K$. Their balls cover $K$, so finitely many strips suffice.
+
+  \begin{lean}
     choose δ hδ s hs using htube
 
     have hcov : K ⊆ ⋃ x : K, ball x.val (δ x) := by
@@ -696,7 +800,9 @@ The next supporting argument applies more generally to topological spaces: their
     obtain ⟨t, ht⟩ := hK.elim_finite_subcover _ (fun x => ball_open _ _) hcov
   \end{lean}
 
-  \begin{lean}{Take the union of the finite index sets for those strips. For any $(x,y)\in K\times L$, one selected strip contains it, and its associated members cover it. The resulting finite family covers the product.}
+  Take the union of the finite index sets for those strips. For any $(x,y)\in K\times L$, one selected strip contains it, and its associated members cover it. The resulting finite family covers the product.
+
+  \begin{lean}
     refine ⟨t.biUnion s, ?_⟩
     rintro ⟨x, y⟩ ⟨hx, hy⟩
 
@@ -713,14 +819,18 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.pi_cell_compact
 \begin{lemma} \label{an1:lem:pi-cell-compact}
-  \begin{lean}{For $n\in\N$ and real endpoints $a_j\leq b_j$ for $0\leq j<n$, the coordinate box $\{x: a_j\leq x_j\leq b_j\text{ for all }j\}$ is compact in the finite-coordinate product metric.}
+  For $n\in\N$ and real endpoints $a_j\leq b_j$ for $0\leq j<n$, the coordinate box $\{x: a_j\leq x_j\leq b_j\text{ for all }j\}$ is compact in the finite-coordinate product metric.
+
+  \begin{lean}
     theorem pi_cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
         IsCompact {x : Fin n → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j}
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Induct on $n$. With no coordinates, every vector is the same empty tuple, so the box is a compact singleton.}
+  Induct on $n$. With no coordinates, every vector is the same empty tuple, so the box is a compact singleton.
+
+  \begin{lean}
     induction n with
     | zero =>
       have heq : {x : Fin 0 → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j} = {fun j => Fin.elim0 j} := by
@@ -739,7 +849,9 @@ The next supporting argument applies more generally to topological spaces: their
       exact singleton_compact _
   \end{lean}
 
-  \begin{lean}{For $n+1$ coordinates, separate coordinate $0$ from the remaining $n$. The map adjoining that first coordinate is continuous: each output-coordinate distance is bounded by the maximum product distance of the inputs, so $\delta=\varepsilon$ suffices. The interval for coordinate $0$ and the remaining box are compact, so their product is compact.}
+  For $n+1$ coordinates, separate coordinate $0$ from the remaining $n$. The map adjoining that first coordinate is continuous: each output-coordinate distance is bounded by the maximum product distance of the inputs, so $\delta=\varepsilon$ suffices. The interval for coordinate $0$ and the remaining box are compact, so their product is compact.
+
+  \begin{lean}
     | succ n ih =>
       let K := {x : Fin n → ℝ | ∀ j, a j.succ ≤ x j ∧ x j ≤ b j.succ}
 
@@ -764,7 +876,9 @@ The next supporting argument applies more generally to topological spaces: their
         (ih (fun j => a j.succ) (fun j => b j.succ) (fun j => hab j.succ))
   \end{lean}
 
-  \begin{lean}{The image of this product is exactly the desired box: its first coordinate lies in the first interval, and the tail lies in the remaining intervals. Conversely, split any vector in the box into its first coordinate and tail. Compactness of continuous images completes the induction.}
+  The image of this product is exactly the desired box: its first coordinate lies in the first interval, and the tail lies in the remaining intervals. Conversely, split any vector in the box into its first coordinate and tail. Compactness of continuous images completes the induction.
+
+  \begin{lean}
     have heq : f '' (Icc (a 0) (b 0) ×ˢ K) =
         {x : Fin (n + 1) → ℝ | ∀ j, a j ≤ x j ∧ x j ≤ b j} := by
       ext x
@@ -786,14 +900,18 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.continuous_to_euclidean
 \begin{lemma} \label{an1:lem:continuous-to-euclidean}
-  \begin{lean}{The coordinate identity from the finite-product metric on $\mathbb R^n$ to the Euclidean metric is continuous, including $n=0$.}
+  The coordinate identity from the finite-product metric on $\mathbb R^n$ to the Euclidean metric is continuous, including $n=0$.
+
+  \begin{lean}
     theorem continuous_to_euclidean (n : ℕ) :
         Continuous (fun x : Fin n → ℝ => (WithLp.toLp 2 x : EuclideanSpace ℝ (Fin n)))
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Fix $\varepsilon>0$ and take $\delta=\varepsilon/(n+1)>0$. For two vectors within product distance $\delta$, let $D$ be that product distance and $d$ their Euclidean distance.}
+  Fix $\varepsilon>0$ and take $\delta=\varepsilon/(n+1)>0$. For two vectors within product distance $\delta$, let $D$ be that product distance and $d$ their Euclidean distance.
+
+  \begin{lean}
     apply Metric.continuous_iff.mpr
     intro x ε hε
 
@@ -814,7 +932,9 @@ The next supporting argument applies more generally to topological spaces: their
     have hd : 0 ≤ d := dist_nonneg
   \end{lean}
 
-  \begin{lean}{Each coordinate distance is at most $D$. Squaring these nonnegative inequalities and summing the $n$ terms gives $d^2\le nD^2$ by the Euclidean distance formula.}
+  Each coordinate distance is at most $D$. Squaring these nonnegative inequalities and summing the $n$ terms gives $d^2\le nD^2$ by the Euclidean distance formula.
+
+  \begin{lean}
     have hsquare : d ^ 2 ≤ (n : ℝ) * D ^ 2 := by
       rw [PiLp.dist_sq_eq_of_L2]
       calc
@@ -832,7 +952,9 @@ The next supporting argument applies more generally to topological spaces: their
             Fintype.card_fin, nsmul_eq_mul]
   \end{lean}
 
-  \begin{lean}{Since $n\le(n+1)^2$ and both distances are nonnegative, $d\le(n+1)D$. The choice $D<\varepsilon/(n+1)$ therefore gives $d<\varepsilon$. This estimate also covers the empty coordinate type.}
+  Since $n\le(n+1)^2$ and both distances are nonnegative, $d\le(n+1)D$. The choice $D<\varepsilon/(n+1)$ therefore gives $d<\varepsilon$. This estimate also covers the empty coordinate type.
+
+  \begin{lean}
     have hbound : d ≤ ((n : ℝ) + 1) * D := by
       have hextra : 0 ≤ ((n : ℝ) ^ 2 + n + 1) * D ^ 2 :=
         mul_nonneg (by positivity) (sq_nonneg D)
@@ -852,14 +974,18 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.cell_compact
 \begin{theorem} \label{an1:thm:k-cell-is-compact}
-  \begin{lean}{For every $n\in\N$ and real endpoints $a_j\leq b_j$, the cell $\prod_{j=0}^{n-1}[a_j,b_j]$ is compact in $\R^{n}$.}
+  For every $n\in\N$ and real endpoints $a_j\leq b_j$, the cell $\prod_{j=0}^{n-1}[a_j,b_j]$ is compact in $\R^{n}$.
+
+  \begin{lean}
     theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) :
         IsCompact {x : EuclideanSpace ℝ (Fin n) | ∀ j, a j ≤ x j ∧ x j ≤ b j}
   \end{lean}
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{The preceding distance estimate proves continuity of the coordinate identity from the product description to the Euclidean description. Its image is exactly the same coordinate box, so the preceding result and compactness of continuous images apply. This includes $n=0$.}
+  The preceding distance estimate proves continuity of the coordinate identity from the product description to the Euclidean description. Its image is exactly the same coordinate box, so the preceding result and compactness of continuous images apply. This includes $n=0$.
+
+  \begin{lean}
     have h := compact_image _ (pi_cell_compact n a b hab)
       (fun x : Fin n → ℝ => (WithLp.toLp 2 x : EuclideanSpace ℝ (Fin n)))
       (continuous_to_euclidean n)
@@ -879,13 +1005,17 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.closed_interval_compact
 \begin{corollary} \label{an1:cor:closed-interval-in-R-is-compact}
-  \begin{lean}{For $a,b\in\R$ with $a\leq b$, the closed interval $[a,b]$ is compact.}
+  For $a,b\in\R$ with $a\leq b$, the closed interval $[a,b]$ is compact.
+
+  \begin{lean}
     theorem closed_interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b)
   \end{lean}
 \end{corollary}
 
 \begin{proof}
-  \begin{lean}{This is the real interval result established in the construction of compact cells.}
+  This is the real interval result established in the construction of compact cells.
+
+  \begin{lean}
     exact interval_compact a b hab
   \end{lean}
 
@@ -893,14 +1023,18 @@ The next supporting argument applies more generally to topological spaces: their
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.heine_borel
 \begin{theorem} \label{an1:thm:heine-borel-theorem}
-  \begin{lean}{For $n\in\N$ and $E\subseteq\R^{n}$, $E$ is compact if and only if it is closed and bounded. This is the \textbf{Heine--Borel theorem}.}
+  For $n\in\N$ and $E\subseteq\R^{n}$, $E$ is compact if and only if it is closed and bounded. This is the \textbf{Heine--Borel theorem}.
+
+  \begin{lean}
     theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
         IsCompact E ↔ IsClosed E ∧ bounded E
   \end{lean}
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{A compact set is closed and bounded by the metric-space results above. Conversely, suppose $E$ is closed and bounded. Euclidean space has a zero vector even in dimension zero, so choose a ball $N_r(p)$ containing $E$.}
+  A compact set is closed and bounded by the metric-space results above. Conversely, suppose $E$ is closed and bounded. Euclidean space has a zero vector even in dimension zero, so choose a ball $N_r(p)$ containing $E$.
+
+  \begin{lean}
     constructor
 
     · intro h
@@ -911,7 +1045,9 @@ The next supporting argument applies more generally to topological spaces: their
       obtain ⟨p, r, hr, hs⟩ := hb ⟨0⟩
   \end{lean}
 
-  \begin{lean}{The box with coordinate intervals $[p_j-r,p_j+r]$ is compact. Each coordinate difference is bounded in absolute value by the Euclidean norm, so a point in $N_r(p)$ lies in this box. Hence $E$ is a closed subset of a compact set and is compact.}
+  The box with coordinate intervals $[p_j-r,p_j+r]$ is compact. Each coordinate difference is bounded in absolute value by the Euclidean norm, so a point in $N_r(p)$ lies in this box. Hence $E$ is a closed subset of a compact set and is compact.
+
+  \begin{lean}
     let K : Set (EuclideanSpace ℝ (Fin n)) := {x | ∀ j, p j - r ≤ x j ∧ x j ≤ p j + r}
 
     have hk : IsCompact K := cell_compact n _ _ (fun j => by linarith)

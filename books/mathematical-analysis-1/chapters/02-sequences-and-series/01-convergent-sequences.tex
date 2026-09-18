@@ -6,28 +6,38 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
   A \textbf{sequence} in $X$ is a function $u:\N\to X$, with terms $u_n=u(n)$.
   It \textbf{converges to} $p\in X$ if for every $\varepsilon>0$ there is $N\in\N$ such that $d(u_n,p)<\varepsilon$ whenever $n\geq N$.
   We write $u_n\to p$ or $\lim_{n\to\infty}u_n=p$. A sequence is \textbf{convergent} if it has a limit, and \textbf{divergent} otherwise.
-  \begin{lean}{Eventually every term is within any prescribed positive distance of $p$.}
+  Eventually every term is within any prescribed positive distance of $p$.
+
+  \begin{lean}
     def convergesTo (u : ℕ → X) (p : X) : Prop :=
       ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε
   \end{lean}
-  \begin{lean}{A convergent sequence has a limit in its ambient space.}
+  A convergent sequence has a limit in its ambient space.
+
+  \begin{lean}
     abbrev convergent (u : ℕ → X) : Prop := ∃ p : X, convergesTo u p
   \end{lean}
-  \begin{lean}{A divergent sequence has no limit in that space.}
+  A divergent sequence has no limit in that space.
+
+  \begin{lean}
     abbrev divergent (u : ℕ → X) : Prop := ¬ convergent u
   \end{lean}
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergesTo_iff_tendsto
 \begin{lemma} \label{an1:lem:convergesTo-iff-tendsto}
-  \begin{lean}{The epsilon definition of $u_n\to p$ agrees with the standard Lean limit of a sequence.}
+  The epsilon definition of $u_n\to p$ agrees with the standard Lean limit of a sequence.
+
+  \begin{lean}
     theorem convergesTo_iff_tendsto (u : ℕ → X) (p : X) :
         convergesTo u p ↔ Filter.Tendsto u Filter.atTop (nhds p)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{The neighborhoods of a point in a metric space have positive-radius balls as a basis, and the eventual sets of natural indices have tails as a basis. Expressing the limit with these bases gives exactly the stated epsilon condition.}
+  The neighborhoods of a point in a metric space have positive-radius balls as a basis, and the eventual sets of natural indices have tails as a basis. Expressing the limit with these bases gives exactly the stated epsilon condition.
+
+  \begin{lean}
     exact Metric.tendsto_atTop.symm
   \end{lean}
 
@@ -35,21 +45,27 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 \begin{definition} \label{an1:def:bounded-sequence}
   A sequence is \textbf{bounded} if its range $\{u_n:n\in\N\}$ is bounded.
-  \begin{lean}{Boundedness concerns the set of values of the sequence.}
+  Boundedness concerns the set of values of the sequence.
+
+  \begin{lean}
     abbrev boundedSequence (u : ℕ → X) : Prop := bounded (range u)
   \end{lean}
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergent_bounded
 \begin{lemma} \label{an1:lem:convergent-bounded}
-  \begin{lean}{If $u_n\to p$ in a metric space, then the range of $u$ is bounded.}
+  If $u_n\to p$ in a metric space, then the range of $u$ is bounded.
+
+  \begin{lean}
     theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
         bounded (range u)
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{Use convergence with $\varepsilon=1$ to choose $N$ beyond which every term is within $1$ of $p$. Set $R=1+\sum_{n=0}^{N-1}d(u_n,p)>0$.}
+  Use convergence with $\varepsilon=1$ to choose $N$ beyond which every term is within $1$ of $p$. Set $R=1+\sum_{n=0}^{N-1}d(u_n,p)>0$.
+
+  \begin{lean}
     intro _
 
     obtain ⟨N, hN⟩ := h 1 zero_lt_one
@@ -64,7 +80,9 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
       linarith, ?_⟩
   \end{lean}
 
-  \begin{lean}{For $n<N$, the distance $d(u_n,p)$ is at most the finite sum defining $R-1$. For $n\geq N$, it is less than $1\leq R$. Thus every term lies in $N_R(p)$. The argument still works if the initial segment is empty.}
+  For $n<N$, the distance $d(u_n,p)$ is at most the finite sum defining $R-1$. For $n\geq N$, it is less than $1\leq R$. Thus every term lies in $N_R(p)$. The argument still works if the initial segment is empty.
+
+  \begin{lean}
     rintro x ⟨n, rfl⟩
     change dist (u n) p < R
     by_cases hn : n < N
@@ -83,14 +101,18 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.limit_unique
 \begin{lemma} \label{an1:lem:limit-unique}
-  \begin{lean}{If a sequence converges to both $p$ and $q$ in a metric space, then $p=q$.}
+  If a sequence converges to both $p$ and $q$ in a metric space, then $p=q$.
+
+  \begin{lean}
     theorem limit_unique (u : ℕ → X) (p q : X)
         (hp : convergesTo u p) (hq : convergesTo u q) : p = q
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{If $p\ne q$, let $r=d(p,q)>0$. Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both points. The triangle inequality would then give $d(p,q)<r$, a contradiction.}
+  If $p\ne q$, let $r=d(p,q)>0$. Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both points. The triangle inequality would then give $d(p,q)<r$, a contradiction.
+
+  \begin{lean}
     by_contra hne
 
     have hd : 0 < dist p q := dist_pos.mpr hne
@@ -112,14 +134,18 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergent_properties
 \begin{proposition} \label{an1:thm:convergent-sequence-is-bounded}
-  \begin{lean}{A convergent sequence is bounded and has a unique limit.}
+  A convergent sequence is bounded and has a unique limit.
+
+  \begin{lean}
     theorem convergent_properties (u : ℕ → X) (p : X) (hp : convergesTo u p) :
         bounded (range u) ∧ ∀ q : X, convergesTo u q → p = q
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  \begin{lean}{The two preceding arguments give boundedness of the range and equality of any other limit with the given one.}
+  The two preceding arguments give boundedness of the range and equality of any other limit with the given one.
+
+  \begin{lean}
     exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
   \end{lean}
 
@@ -127,14 +153,18 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.reciprocal_small
 \begin{lemma} \label{an1:lem:reciprocal-small}
-  \begin{lean}{For every $\varepsilon>0$, some $N\in\N$ satisfies $1/(n+1)<\varepsilon$ for all $n\geq N$.}
+  For every $\varepsilon>0$, some $N\in\N$ satisfies $1/(n+1)<\varepsilon$ for all $n\geq N$.
+
+  \begin{lean}
     theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
         ∃ N : ℕ, ∀ n ≥ N, 1 / ((n : ℝ) + 1) < ε
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{By the Archimedean property, choose $N>1/\varepsilon$. For $n\geq N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$. Dividing by $n+1>0$ proves the claim.}
+  By the Archimedean property, choose $N>1/\varepsilon$. For $n\geq N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$. Dividing by $n+1>0$ proves the claim.
+
+  \begin{lean}
     obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
 
     refine ⟨N, ?_⟩
@@ -161,18 +191,24 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.convergesTo_iff_finite_exceptions
 \begin{lemma} \label{an1:lem:convergesTo-iff-finite-exceptions}
-  \begin{lean}{$u_n\to p$ if and only if, for every $\varepsilon>0$, the set of indices $\{n\in\N:d(u_n,p)\geq\varepsilon\}$ is finite.}
+  $u_n\to p$ if and only if, for every $\varepsilon>0$, the set of indices $\{n\in\N:d(u_n,p)\geq\varepsilon\}$ is finite.
+
+  \begin{lean}
     theorem convergesTo_iff_finite_exceptions (u : ℕ → X) (p : X) :
         convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{If $u_n\to p$, choose its threshold $N$. Every exceptional index is less than $N$, so the exception set is contained in a finite initial segment.}
+  If $u_n\to p$, choose its threshold $N$. Every exceptional index is less than $N$, so the exception set is contained in a finite initial segment.
+
+  \begin{lean}
     constructor
   \end{lean}
 
-  \begin{lean}{Conversely, a finite set of natural indices has an upper bound $N$, including when it is empty. No index $n\geq N+1$ can be exceptional. Therefore every such term is within $\varepsilon$ of $p$, proving convergence.}
+  Conversely, a finite set of natural indices has an upper bound $N$, including when it is empty. No index $n\geq N+1$ can be exceptional. Therefore every such term is within $\varepsilon$ of $p$, proving convergence.
+
+  \begin{lean}
     · intro h ε hε
 
       obtain ⟨N, hN⟩ := h ε hε
@@ -200,14 +236,18 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.sequence_at_limit_point
 \begin{lemma} \label{an1:lem:sequence-at-limit-point}
-  \begin{lean}{If $p\in E^{\prime}$, there is a sequence $(u_n)$ of points in $E\setminus\{p\}$ that converges to $p$.}
+  If $p\in E^{\prime}$, there is a sequence $(u_n)$ of points in $E\setminus\{p\}$ that converges to $p$.
+
+  \begin{lean}
     theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
         ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ convergesTo u p
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  \begin{lean}{For each $n\in\N$, use the limit-point condition to choose $u_n\in E$, distinct from $p$, with $d(u_n,p)<1/(n+1)$.}
+  For each $n\in\N$, use the limit-point condition to choose $u_n\in E$, distinct from $p$, with $d(u_n,p)<1/(n+1)$.
+
+  \begin{lean}
     have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
       fun n => hp _ (by positivity)
 
@@ -216,7 +256,9 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
     refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
   \end{lean}
 
-  \begin{lean}{Given $\varepsilon>0$, the reciprocal estimate makes $1/(n+1)<\varepsilon$ for all sufficiently large $n$. The chosen distance is smaller still, so $u_n\to p$.}
+  Given $\varepsilon>0$, the reciprocal estimate makes $1/(n+1)<\varepsilon$ for all sufficiently large $n$. The chosen distance is smaller still, so $u_n\to p$.
+
+  \begin{lean}
     intro ε hε
 
     obtain ⟨N, hN⟩ := reciprocal_small ε hε
@@ -228,7 +270,9 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter02.ConvergentSequences.neighborhood_characterization
 \begin{theorem} \label{an1:thm:neighborhood}
-  \begin{lean}{A sequence converges to $p$ exactly when every neighborhood $N_\varepsilon(p)$ contains all but finitely many of its terms, counted by indices. Also, if $p\in E^{\prime}$, a sequence in $E\setminus\{p\}$ converges to $p$.}
+  A sequence converges to $p$ exactly when every neighborhood $N_\varepsilon(p)$ contains all but finitely many of its terms, counted by indices. Also, if $p\in E^{\prime}$, a sequence in $E\setminus\{p\}$ converges to $p$.
+
+  \begin{lean}
     theorem neighborhood_characterization (u : ℕ → X) (p : X) :
         (convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
         (∀ E : Set X, p ∈ limitPoints E →
@@ -237,7 +281,9 @@ The terms of a sequence retain their indices even when values repeat: $\{u_n:n\i
 \end{theorem}
 
 \begin{proof}
-  \begin{lean}{The finite-exception characterization proves the first assertion, including its converse. The construction from shrinking deleted neighborhoods proves the second assertion, with the terms explicitly required to belong to $E\setminus\{p\}$.}
+  The finite-exception characterization proves the first assertion, including its converse. The construction from shrinking deleted neighborhoods proves the second assertion, with the terms explicitly required to belong to $E\setminus\{p\}$.
+
+  \begin{lean}
     exact ⟨convergesTo_iff_finite_exceptions u p, fun E hp => sequence_at_limit_point E p hp⟩
   \end{lean}
 

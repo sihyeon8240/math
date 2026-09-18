@@ -117,6 +117,7 @@ install and cache configuration pointed at that file.
   two spaces and wrap long signatures and expressions. Keep short related tactics
   together, expand multi-step inline proofs, and keep comments brief. Apply the
   same layout to displayed Lean, preserving its checked-source correspondence.
+  Keep mathematical prose outside the argument-free `lean` code environment.
   See `docs/formalization.md#lean-readability`.
 - Update imports and proof-index entries together when moving or renaming
   declarations. Follow `docs/formalization.md` and run `make lean check`.
