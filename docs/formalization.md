@@ -269,6 +269,28 @@ permission and scope of external results. Verify declaration names against the
 pinned Mathlib revision rather than guessing them. Exhaustive inventories of
 elementary helper lemmas are unnecessary.
 
+## Mathematical language and standard interfaces
+
+Analysis and algebra books may retain ordinary classical set-and-function
+language while using Lean's type-theoretic foundations. Represent an ambient
+space by a type, its subsets by `Set`, a subset used as a space by its subtype,
+and indexed families by functions. This is not a formalization of the ZFC axiom
+system or an identification of types with sets in a ZFC universe. Books studying
+foundations must specify their object theory separately.
+
+Prefer standard Mathlib structures, predicates, and operations in statements.
+Explain their elementary characterizations in the textbook instead of creating
+parallel definitions solely to reproduce printed notation. Define a collection
+such as `{U : Set X | IsOpen U}` only when the collection itself is needed.
+Keep ball notation distinct from general neighborhood notation.
+
+A local construction is justified when its construction is part of the lesson
+or the textbook convention differs. Prove its agreement with the standard
+interface, preserving empty cases and explicit hypotheses, and use that
+interface in later developments. Adopting a standard definition does not permit
+replacing a core proof by its Mathlib counterpart. Establish substantive
+characterizations locally when they are part of the book's mathematical content.
+
 ## Declaration naming
 
 Follow [Mathlib naming conventions](https://leanprover-community.github.io/contribute/naming.html):
