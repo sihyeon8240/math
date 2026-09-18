@@ -69,12 +69,6 @@ def subspaceOfClosed (W : Set V) (h0 : (0 : V) ∈ W)
   add_mem' := fun hu hv => ha _ hu _ hv
   smul_mem' := hs
 
-/-- Definition: intersection of two subspaces, with its closure proof. -/
-def intersection (U W : Submodule K V) : Submodule K V :=
-  subspaceOfClosed (U ∩ W : Set V) ⟨U.zero_mem, W.zero_mem⟩
-    (fun _ hu _ hv => ⟨U.add_mem hu.1 hv.1, W.add_mem hu.2 hv.2⟩)
-    (fun c _ hv => ⟨U.smul_mem c hv.1, W.smul_mem c hv.2⟩)
-
 /-- Definition: a finite linear combination. -/
 def linearCombination {ι : Type*} [Fintype ι] (v : ι → V) (a : ι → K) : V :=
   ∑ i, a i • v i
