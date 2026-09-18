@@ -11,9 +11,6 @@ namespace MathematicalAnalysis1.Chapter01
 
 open Set Metric
 
-/-- Definition: Euclidean n-space, including the zero-dimensional case. -/
-abbrev Euclidean (n : ℕ) := EuclideanSpace ℝ (Fin n)
-
 /-- Proposition: the Euclidean norm gives a metric. -/
 theorem euclidean_metric (n : ℕ) :
     (∀ x y : EuclideanSpace ℝ (Fin n), 0 ≤ ‖x - y‖) ∧
@@ -60,7 +57,7 @@ theorem euclidean_punctured_ball (n : ℕ+)
 theorem euclidean_boundary (n : ℕ+)
     (E : Set (EuclideanSpace ℝ (Fin n))) :
     frontier E = isolatedPoints E ∪ isolatedPoints Eᶜ ∪
-      (limitPoints E ∩ limitPoints Eᶜ) := by
+      (derivedSet E ∩ derivedSet Eᶜ) := by
   have hE := isolated_limit_compl E (euclidean_punctured_ball n)
 
   have hEc := isolated_limit_compl Eᶜ (euclidean_punctured_ball n)
@@ -68,8 +65,8 @@ theorem euclidean_boundary (n : ℕ+)
   rw [compl_compl] at hEc
   rw [isolated_eq_diff] at hE hEc
   rw [frontier, sdiff_eq_compl_inter,
-    compl_interior_eq_closure_compl, closure_eq_union_limitPoints,
-    closure_eq_union_limitPoints, isolated_eq_diff, isolated_eq_diff]
+    compl_interior_eq_closure_compl, closure_eq_union_derivedSet,
+    closure_eq_union_derivedSet, isolated_eq_diff, isolated_eq_diff]
   ext p
 
   have h1 := @hE p
@@ -81,7 +78,7 @@ theorem euclidean_boundary (n : ℕ+)
 
 /-- Lemma: the zero-dimensional case: there is only one vector and no deleted ball. -/
 theorem zero_dimensional (p q : EuclideanSpace ℝ (Fin 0)) (r : ℝ) :
-    p = q ∧ deletedNeighborhood p r = ∅ := by
+    p = q ∧ ball p r \ {p} = ∅ := by
   have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by
     intro x y
     ext j

@@ -1,20 +1,77 @@
 \begin{definition} \label{an1:def:connected-set}
   Sets $A,B\subseteq X$ are \textbf{separated} if $\overline A\cap B=A\cap\overline B=\varnothing$.
-  A set $E$ is \textbf{connected} if it cannot be expressed as the union of two nonempty separated sets; otherwise it is \textbf{disconnected}.
-  The empty set is connected under this convention. The union equality automatically makes both sets subsets of $E$.
-  Two sets are separated when neither meets the closure of the other.
-
   \begin{lean}
-    def separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
+    def Separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
       Disjoint (closure A) B ∧ Disjoint A (closure B)
   \end{lean}
-  A connected set admits no separation into two nonempty parts.
+  A set $E$ is \textbf{connected} if it cannot be expressed as the union of two nonempty separated sets; otherwise it is \textbf{disconnected}.
+  The empty set is connected under this convention. We therefore use Mathlib's \texttt{IsPreconnected E}; \texttt{IsConnected E} additionally requires $E$ to be nonempty.
+  The following lemma relates the standard predicate to the separation criterion.
+\end{definition}
+
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets.isPreconnected_iff
+\begin{lemma} \label{an1:lem:isPreconnected-iff}
+  $E$ is preconnected if and only if it has no decomposition into two nonempty separated sets.
 
   \begin{lean}
-    def connected {X : Type*} [MetricSpace X] (E : Set X) : Prop :=
-      ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ separated A B
+    theorem isPreconnected_iff {X : Type*} [MetricSpace X] (E : Set X) :
+        IsPreconnected E ↔
+          ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ Separated A B
   \end{lean}
-\end{definition}
+\end{lemma}
+
+\begin{proof}
+  Use the closed-cover characterization of preconnectedness. If $E=A\cup B$ is a separation, the closed sets $\overline A$ and $\overline B$ cover $E$ and both meet it. Preconnectedness supplies a point of $E$ in both closures, contradicting separation whichever part contains it.
+
+  \begin{lean}
+    classical
+
+    rw [isPreconnected_closed_iff]
+    constructor
+
+    · intro h A B hA hB heq hsep
+      have hcover : E ⊆ closure A ∪ closure B := by
+        rw [heq]
+        exact union_subset_union (subset_closure A) (subset_closure B)
+
+      obtain ⟨a, ha⟩ := hA
+      obtain ⟨b, hb⟩ := hB
+      obtain ⟨x, hx, hxA, hxB⟩ := h (closure A) (closure B)
+        (closure_closed A) (closure_closed B) hcover
+        ⟨a, heq.symm ▸ Or.inl ha, subset_closure A ha⟩
+        ⟨b, heq.symm ▸ Or.inr hb, subset_closure B hb⟩
+
+      rw [heq] at hx
+      rcases hx with hx | hx
+
+      · exact Set.disjoint_left.mp hsep.2 hx hxB
+      · exact Set.disjoint_left.mp hsep.1 hxA hx
+  \end{lean}
+
+  Conversely, let closed sets $F,G$ cover $E$ and both meet it. If their intersection misses $E$, then $E=(E\cap F)\cup(E\cap G)$. The closure of $E\cap F$ lies in $F$, and the closure of $E\cap G$ lies in $G$, by the previously proved closure property. Thus the two nonempty parts are separated, a contradiction.
+
+  \begin{lean}
+    · intro h F G hF hG hcover hEF hEG
+      by_contra hn
+      have heq : E = (E ∩ F) ∪ (E ∩ G) := by
+        ext x
+        exact ⟨fun hx => (hcover hx).elim (fun hF => Or.inl ⟨hx, hF⟩)
+          (fun hG => Or.inr ⟨hx, hG⟩), fun hx => hx.elim And.left And.left⟩
+
+      apply h (E ∩ F) (E ∩ G) hEF hEG heq
+      constructor
+
+      · apply Set.disjoint_left.mpr
+        intro x hx hEG
+        have hxF := (closure_properties (E ∩ F)).2.2 F hF inter_subset_right hx
+        exact hn ⟨x, hEG.1, hxF, hEG.2⟩
+
+      · apply Set.disjoint_left.mpr
+        intro x hEF hx
+        have hxG := (closure_properties (E ∩ G)).2.2 G hG inter_subset_right hx
+        exact hn ⟨x, hEF.1, hEF.2, hxG⟩
+  \end{lean}
+\end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets.closure_upper_bound
 \begin{lemma} \label{an1:lem:closure-upper-bound}
@@ -84,7 +141,7 @@
   \begin{lean}
     theorem no_separation_of_between (E A B : Set ℝ)
         (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
-        (heq : E = A ∪ B) (hsep : separated A B)
+        (heq : E = A ∪ B) (hsep : Separated A B)
         (a b : ℝ) (ha : a ∈ A) (hb : b ∈ B) (hab : a < b) : False
   \end{lean}
 \end{lemma}
@@ -194,13 +251,13 @@
 
 \end{proof}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets.connected_iff_between
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.ConnectedSets.isPreconnected_iff_between
 \begin{theorem} \label{an1:thm:connected-sets-in-R}
   A set $E\subseteq\R$ is connected if and only if, whenever $a,b\in E$ and $a<x<b$, one has $x\in E$.
 
   \begin{lean}
-    theorem connected_iff_between (E : Set ℝ) :
-        connected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E
+    theorem isPreconnected_iff_between (E : Set ℝ) :
+        IsPreconnected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E
   \end{lean}
 \end{theorem}
 
@@ -210,6 +267,7 @@
   \begin{lean}
     classical
 
+    rw [isPreconnected_iff]
     constructor
 
     · intro hc a ha b hb x hax hxb
@@ -269,7 +327,7 @@
 
       · exact no_separation_of_between E A B h heq hsep a b ha hb hab
 
-      · have hsep' : separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
+      · have hsep' : Separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
 
         exact no_separation_of_between E B A h (heq.trans (union_comm _ _)) hsep' b a hb ha hba
   \end{lean}

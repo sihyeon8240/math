@@ -1,57 +1,39 @@
 \begin{definition} \label{an1:def:open-cover}
   A family $(G_i)_{i\in I}$ is an \textbf{open cover} of $E$ if each $G_i$ is open and $E\subseteq\bigcup_{i\in I}G_i$.
-  For $S\subseteq I$, the subfamily indexed by $S$ is a \textbf{subcover} if it still covers $E$.
-  An open cover consists of open sets whose union contains $E$.
-
-  \begin{lean}
-    abbrev openCover {ι : Type*} (E : Set X) (U : ι → Set X) : Prop :=
-      (∀ i, IsOpen (U i)) ∧ E ⊆ ⋃ i, U i
-  \end{lean}
-  A subcover keeps only indices in $S$ and still contains $E$ in its union.
-
-  \begin{lean}
-    abbrev subcover {ι : Type*} (E : Set X) (U : ι → Set X) (S : Set ι) : Prop :=
-      E ⊆ ⋃ i ∈ S, U i
-  \end{lean}
+  For $S\subseteq I$, the subfamily indexed by $S$ is a \textbf{subcover} if $E\subseteq\bigcup_{i\in S}G_i$.
+  The family retains its original indices; finite index sets are represented by \texttt{Finset}.
 \end{definition}
 
 \begin{definition} \label{an1:def:compact}
   A set $E$ is \textbf{compact} if every open cover admits a finite subcover.
-  Write $\mathcal K(X)$ for the collection of compact sets. In the proofs, a finite index set is represented by a \texttt{Finset}.
-  The definition below quantifies over index types in the same universe as the ambient space. The following bridge verifies its agreement with the standard predicate, which also handles covers with other index universes. The Lean context declares \texttt{universe u} and \texttt{variable \{X : Type u\} [MetricSpace X]}.
-  $\mathcal K(X)$ consists of the compact subsets of $X$.
-
-  \begin{lean}
-    def compactSets : Set (Set X) :=
-      {E | ∀ {ι : Type u} (U : ι → Set X), openCover E U →
-        ∃ s : Finset ι, subcover E U (s : Set ι)}
-  \end{lean}
+  We use \texttt{IsCompact E}. Its finite-open-subcover characterization is recorded below, in the Lean context \texttt{universe u} and \texttt{variable \{X : Type u\} [MetricSpace X]}.
+  Index types in the same universe suffice for this characterization; the standard predicate also handles covers indexed in other universes.
 \end{definition}
 
-% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.mem_compactSets_iff
-\begin{lemma} \label{an1:lem:mem-compactSets-iff}
-  The finite-open-subcover definition agrees with the standard compact-set predicate.
+% Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.isCompact_iff_finite_subcover
+\begin{lemma} \label{an1:lem:isCompact-iff-finite-subcover}
+  $E$ is compact if and only if every family of open sets covering it has a finite subfamily still covering it.
 
   \begin{lean}
-    theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E
+    theorem isCompact_iff_finite_subcover (E : Set X) :
+        IsCompact E ↔ ∀ {ι : Type u} (U : ι → Set X),
+          (∀ i, IsOpen (U i)) → E ⊆ ⋃ i, U i → ∃ s : Finset ι, E ⊆ ⋃ i ∈ s, U i
   \end{lean}
 \end{lemma}
 
 \begin{proof}
-  In either direction, unpack an open cover into openness and coverage and retain the same finite index set. The standard finite-subcover interface changes only the representation of compactness.
+  The finite-subcover interface expresses compactness with the same open sets, coverage inclusion, and finite set of indices in both directions.
 
   \begin{lean}
     constructor
 
+    · intro h ι U hU hc
+      exact h.elim_finite_subcover U hU hc
+
     · intro h
       apply isCompact_of_finite_subcover
-      intro ι U hU hc
-      exact h U ⟨hU, hc⟩
-
-    · intro h ι U hU
-      exact h.elim_finite_subcover U hU.1 hU.2
+      exact h
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.CompactSets.compact_subspace
@@ -175,7 +157,7 @@
 \end{proposition}
 
 \begin{proof}
-  To prove that $E^{c}$ is open, fix $p\notin E$. For each $q\in E$, let $r_q=d(q,p)/2>0$. The balls $N_{r_q}(q)$ cover $E$.
+  To prove that $E^{c}$ is open, fix $p\notin E$. For each $q\in E$, let $r_q=d(q,p)/2>0$. The balls $B(q,r_q)$ cover $E$.
 
   \begin{lean}
     classical
@@ -204,7 +186,7 @@
     refine ⟨δ, hδ, ?_⟩
   \end{lean}
 
-  If $x\in N_\delta(p)\cap E$, one of the selected balls contains $x$. Then $d(q,p)\leq d(q,x)+d(x,p)<r_q+\delta\leq 2r_q=d(q,p)$, a contradiction. Hence $N_\delta(p)\subseteq E^{c}$.
+  If $x\in B(p,\delta)\cap E$, one of the selected balls contains $x$. Then $d(q,p)\leq d(q,x)+d(x,p)<r_q+\delta\leq 2r_q=d(q,p)$, a contradiction. Hence $B(p,\delta)\subseteq E^{c}$.
 
   \begin{lean}
     intro x hx hxe
@@ -231,16 +213,17 @@
   Every compact subset of a metric space is bounded, with the stated empty-space convention.
 
   \begin{lean}
-    theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E
+    theorem compact_bounded (E : Set X) (hE : IsCompact E) : Bornology.IsBounded E
   \end{lean}
 \end{proposition}
 
 \begin{proof}
-  If $X$ is nonempty, choose $p\in X$. The balls $N_{n+1}(p)$, for $n\in\N$, cover $E$: every real distance is below some natural number by the Archimedean property.
+  If $X$ is nonempty, choose $p\in X$. The balls $B(p,n+1)$, for $n\in\N$, cover $E$: every real distance is below some natural number by the Archimedean property.
 
   \begin{lean}
     classical
 
+    apply (isBounded_iff E).mpr
     intro hX
 
     obtain ⟨p⟩ := hX
@@ -270,7 +253,7 @@
       linarith, ?_⟩
   \end{lean}
 
-  Each $q\in E$ belongs to a selected ball. Its radius is at most the sum of all selected radii, so $d(q,p)<R$. Thus $E\subseteq N_R(p)$.
+  Each $q\in E$ belongs to a selected ball. Its radius is at most the sum of all selected radii, so $d(q,p)<R$. Thus $E\subseteq B(p,R)$.
 
   \begin{lean}
     intro q hq
@@ -359,12 +342,12 @@
 
   \begin{lean}
     theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
-        (hFE : F ⊆ E) (hF : F.Infinite) : (limitPoints F ∩ E).Nonempty
+        (hFE : F ⊆ E) (hF : F.Infinite) : (derivedSet F ∩ E).Nonempty
   \end{lean}
 \end{theorem}
 
 \begin{proof}
-  Assume there is no such limit point. Then each $p\in E$ has a radius $r_p>0$ for which the only possible point of $F$ inside $N_{r_p}(p)$ is $p$ itself. Otherwise every radius would have a distinct witness, making $p$ a limit point.
+  Assume there is no such limit point. Then each $p\in E$ has a radius $r_p>0$ for which the only possible point of $F$ inside $B(p,r_p)$ is $p$ itself. Otherwise every radius would have a distinct witness, making $p$ a limit point.
 
   \begin{lean}
     classical
@@ -377,6 +360,7 @@
       push Not at h
       apply hn
       refine ⟨p.val, ?_, p.property⟩
+      rw [mem_derivedSet_iff]
       intro r hr
 
       obtain ⟨q, hq, hd, hne⟩ := h r hr
@@ -772,7 +756,7 @@ The next supporting argument applies more generally to topological spaces: their
     obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound t r (fun y _ => hr y)
   \end{lean}
 
-  If $d(x^{\prime},x)<\delta$ and $y^{\prime}\in L$, choose a selected ball containing $y^{\prime}$. Both coordinate distances are below its radius, so $(x^{\prime},y^{\prime})$ lies in its original cover member. Thus finitely many members cover the whole strip $N_\delta(x)\times L$.
+  If $d(x^{\prime},x)<\delta$ and $y^{\prime}\in L$, choose a selected ball containing $y^{\prime}$. Both coordinate distances are below its radius, so $(x^{\prime},y^{\prime})$ lies in its original cover member. Thus finitely many members cover the whole strip $B(x,\delta)\times L$.
 
   \begin{lean}
     refine ⟨δ, hδ, t.image i, ?_⟩
@@ -1027,12 +1011,12 @@ The next supporting argument applies more generally to topological spaces: their
 
   \begin{lean}
     theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
-        IsCompact E ↔ IsClosed E ∧ bounded E
+        IsCompact E ↔ IsClosed E ∧ Bornology.IsBounded E
   \end{lean}
 \end{theorem}
 
 \begin{proof}
-  A compact set is closed and bounded by the metric-space results above. Conversely, suppose $E$ is closed and bounded. Euclidean space has a zero vector even in dimension zero, so choose a ball $N_r(p)$ containing $E$.
+  A compact set is closed and bounded by the metric-space results above. Conversely, suppose $E$ is closed and bounded. Euclidean space has a zero vector even in dimension zero, so choose a ball $B(p,r)$ containing $E$.
 
   \begin{lean}
     constructor
@@ -1042,10 +1026,10 @@ The next supporting argument applies more generally to topological spaces: their
 
     · rintro ⟨hc, hb⟩
 
-      obtain ⟨p, r, hr, hs⟩ := hb ⟨0⟩
+      obtain ⟨p, r, hr, hs⟩ := (isBounded_iff E).mp hb ⟨0⟩
   \end{lean}
 
-  The box with coordinate intervals $[p_j-r,p_j+r]$ is compact. Each coordinate difference is bounded in absolute value by the Euclidean norm, so a point in $N_r(p)$ lies in this box. Hence $E$ is a closed subset of a compact set and is compact.
+  The box with coordinate intervals $[p_j-r,p_j+r]$ is compact. Each coordinate difference is bounded in absolute value by the Euclidean norm, so a point in $B(p,r)$ lies in this box. Hence $E$ is a closed subset of a compact set and is compact.
 
   \begin{lean}
     let K : Set (EuclideanSpace ℝ (Fin n)) := {x | ∀ j, p j - r ≤ x j ∧ x j ≤ p j + r}

@@ -1,12 +1,14 @@
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.DerivedSet
+import Mathlib.Topology.Perfect
 import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Push
 
 /-! Metric topology developed from balls and the metric axioms.
 The metric ball and open-set characterizations are representational bridges.
-Representation lemmas expose definitions only; the core results use explicit
-metric arguments. The owning book policy specifies this boundary. -/
+Characterization lemmas connect the standard interfaces to balls and distance;
+the core results use explicit metric arguments. The owning book policy specifies this boundary. -/
 
 set_option autoImplicit false
 
@@ -16,75 +18,75 @@ open Set Metric
 
 variable {X : Type*} [MetricSpace X]
 
-/-- Definition: metric spaces reuse the standard structure and its distance axioms. -/
-abbrev MetricStructure (A : Type*) := MetricSpace A
+/-- Lemma: general neighborhoods contain a positive-radius ball.
+Mathlib counterpart: `Metric.mem_nhds_iff`. -/
+theorem mem_nhds_iff (E : Set X) (p : X) :
+    E ∈ nhds p ↔ ∃ r > 0, ball p r ⊆ E := by
+  exact Metric.mem_nhds_iff
 
-/-- Definition: a neighborhood is a ball with distance measured to its center. -/
-abbrev neighborhood (p : X) (r : ℝ) : Set X := ball p r
+/-- Lemma: the standard derived set has the punctured-ball characterization. -/
+theorem mem_derivedSet_iff (E : Set X) (p : X) :
+    p ∈ derivedSet E ↔ ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r := by
+  rw [mem_derivedSet, accPt_iff_nhds]
+  constructor
 
-/-- Definition: a deleted neighborhood excludes its center. -/
-abbrev deletedNeighborhood (p : X) (r : ℝ) : Set X := ball p r \ {p}
+  · intro h r hr
+    obtain ⟨q, ⟨hq, hE⟩, hne⟩ := h (ball p r) (Metric.ball_mem_nhds p hr)
+    exact ⟨q, hE, hne, hq⟩
 
-/-- Definition: every positive-radius ball meets E away from its center. -/
-def limitPoints (E : Set X) : Set X :=
-  {p | ∀ r : ℝ, 0 < r → ∃ q ∈ E, q ≠ p ∧ dist q p < r}
-
-/-- Definition: an interior point has a ball contained in E. -/
-def interiorPoints (E : Set X) : Set X :=
-  {p | ∃ r > 0, ball p r ⊆ E}
-
-/-- Definition: every point of an open set is interior. -/
-def openSets : Set (Set X) := {E | E ⊆ interiorPoints E}
-
-/-- Definition: a closed set contains all of its limit points. -/
-def closedSets : Set (Set X) := {E | limitPoints E ⊆ E}
-
-/-- Definition: the closure adjoins all limit points. -/
-def setClosure (E : Set X) : Set X := E ∪ limitPoints E
-
-/-- Definition: boundary points lie in both complementary closures. -/
-def boundary (E : Set X) : Set X := setClosure E ∩ setClosure Eᶜ
-
-/-- Definition: relative openness uses the same ball definition on the subtype. -/
-def relativeOpen (E Y : Set X) : Prop :=
-  E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ openSets
-
-/-- Definition: relative closedness uses limit points in the subtype. -/
-def relativeClosed (E Y : Set X) : Prop :=
-  E ⊆ Y ∧ (Subtype.val : Y → X) ⁻¹' E ∈ closedSets
-
-/-- Definition: boundedness also covers an empty ambient space. -/
-def bounded (E : Set X) : Prop :=
-  Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r
+  · intro h U hU
+    obtain ⟨r, hr, hsub⟩ := Metric.mem_nhds_iff.mp hU
+    obtain ⟨q, hE, hne, hq⟩ := h r hr
+    exact ⟨q, ⟨hsub hq, hE⟩, hne⟩
 
 /-- Definition: an isolated point belongs to E and is alone in some ball. -/
 def isolatedPoints (E : Set X) : Set X :=
   {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
 
-/-- Definition: a perfect set equals its limit-point set. -/
-abbrev perfect (E : Set X) : Prop := E = limitPoints E
-
-/-- Definition: a dense set has the whole space as its closure. -/
-abbrev dense (E : Set X) : Prop := setClosure E = univ
-
-/-- Lemma: the interior-point characterization is its local definition. -/
+/-- Lemma: interior points are exactly the points with a ball contained in the set. -/
 theorem interior_iff (E : Set X) (p : X) :
-    p ∈ interiorPoints E ↔ ∃ r > 0, ball p r ⊆ E := by
-  rfl
+    p ∈ interior E ↔ ∃ r > 0, ball p r ⊆ E := by
+  exact mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff
 
-/-- Lemma: the ball-defined interior agrees with Mathlib's
-neighborhood representation (`Metric.mem_nhds_iff`). -/
-theorem interiorPoints_eq_interior (E : Set X) : interiorPoints E = interior E := by
-  ext p
-  exact (mem_interior_iff_mem_nhds.trans Metric.mem_nhds_iff).symm
+/-- Lemma: openness is characterized by a contained ball at every point. -/
+theorem isOpen_iff (E : Set X) :
+    IsOpen E ↔ ∀ p ∈ E, ∃ r > 0, ball p r ⊆ E := by
+  exact Metric.isOpen_iff
 
-/-- Lemma: `Metric.isOpen_iff` unfolds metric openness. -/
-theorem mem_openSets_iff (E : Set X) : E ∈ openSets ↔ IsOpen E := by
-  exact Metric.isOpen_iff.symm
+/-- Lemma: boundedness is containment in a ball when the ambient space is nonempty.
+The pairwise-distance characterization also covers the empty space. -/
+theorem isBounded_iff (E : Set X) :
+    Bornology.IsBounded E ↔ (Nonempty X → ∃ p : X, ∃ r > 0, E ⊆ ball p r) := by
+  rw [Metric.isBounded_iff]
+  constructor
 
-/-- Lemma: Representation bridge for the punctured ball's positive-distance formula. -/
-theorem deleted_neighborhood_iff (p q : X) (r : ℝ) :
-    q ∈ deletedNeighborhood p r ↔ 0 < dist q p ∧ dist q p < r := by
+  · rintro ⟨C, hC⟩ hX
+    rcases E.eq_empty_or_nonempty with rfl | ⟨p, hp⟩
+
+    · obtain ⟨p⟩ := hX
+      exact ⟨p, 1, zero_lt_one, empty_subset _⟩
+
+    · refine ⟨p, max C 0 + 1, by linarith [le_max_right C 0], ?_⟩
+      intro q hq
+      exact (hC hq hp).trans_lt (by linarith [le_max_left C 0])
+
+  · intro h
+    by_cases hX : Nonempty X
+
+    · obtain ⟨p, r, _, hs⟩ := h hX
+      refine ⟨r + r, ?_⟩
+      intro x hx y hy
+      have hx' : dist x p < r := hs hx
+      have hy' : dist p y < r := by simpa only [mem_ball, dist_comm] using hs hy
+      exact (dist_triangle x p y).trans (add_le_add hx'.le hy'.le)
+
+    · refine ⟨0, ?_⟩
+      intro x
+      exact (hX ⟨x⟩).elim
+
+/-- Lemma: removing the center of a ball is equivalent to positive distance. -/
+theorem mem_punctured_ball_iff (p q : X) (r : ℝ) :
+    q ∈ ball p r \ {p} ↔ 0 < dist q p ∧ dist q p < r := by
   change (dist q p < r ∧ q ≠ p) ↔ _
   rw [dist_pos]
   exact and_comm
@@ -123,7 +125,7 @@ theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
 
 /-- Proposition: a limit point has infinitely many nearby points. -/
 theorem limit_point_infinite (E : Set X) (p : X)
-    (hp : p ∈ limitPoints E) (r : ℝ) (hr : 0 < r) :
+    (hp : p ∈ derivedSet E) (r : ℝ) (hr : 0 < r) :
     (E ∩ ball p r).Infinite := by
   classical
 
@@ -139,7 +141,7 @@ theorem limit_point_infinite (E : Set X) (p : X)
     exact dist_pos.mpr h.2
 
   obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s (fun q => dist q p) hpos
-  obtain ⟨q, hq, hqp, hdist⟩ := hp (min r δ) (lt_min hr hδ)
+  obtain ⟨q, hq, hqp, hdist⟩ := (mem_derivedSet_iff E p).mp hp (min r δ) (lt_min hr hδ)
 
   have hqs : q ∈ s := (Set.Finite.mem_toFinset _).mpr
     ⟨⟨hq, hdist.trans_le (min_le_left _ _)⟩, hqp⟩
@@ -147,8 +149,8 @@ theorem limit_point_infinite (E : Set X) (p : X)
   exact (not_lt_of_ge (hle q hqs)) (hdist.trans_le (min_le_right _ _))
 
 /-- Proposition: complements exchange openness and containing limit points. -/
-theorem open_iff_compl_limitPoints (E : Set X) :
-    IsOpen E ↔ limitPoints Eᶜ ⊆ Eᶜ := by
+theorem open_iff_compl_derivedSet (E : Set X) :
+    IsOpen E ↔ derivedSet Eᶜ ⊆ Eᶜ := by
   classical
 
   constructor
@@ -156,7 +158,7 @@ theorem open_iff_compl_limitPoints (E : Set X) :
   · intro h p hp hpe
 
     obtain ⟨r, hr, hball⟩ := Metric.isOpen_iff.mp h p hpe
-    obtain ⟨q, hq, _, hd⟩ := hp r hr
+    obtain ⟨q, hq, _, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
 
     exact hq (hball hd)
 
@@ -165,7 +167,8 @@ theorem open_iff_compl_limitPoints (E : Set X) :
     intro p hp
     by_contra hn
 
-    have hl : p ∈ limitPoints Eᶜ := by
+    have hl : p ∈ derivedSet Eᶜ := by
+      rw [mem_derivedSet_iff]
       intro r hr
 
       have hnsub : ¬ ball p r ⊆ E := fun hs => hn ⟨r, hr, hs⟩
@@ -179,17 +182,19 @@ theorem open_iff_compl_limitPoints (E : Set X) :
     exact h hl hp
 
 /-- Lemma: Representational bridge for the textbook's definition of closedness. -/
-theorem closed_iff_limitPoints (E : Set X) :
-    IsClosed E ↔ limitPoints E ⊆ E := by
-  have h := open_iff_compl_limitPoints Eᶜ
+theorem closed_iff_derivedSet (E : Set X) :
+    IsClosed E ↔ derivedSet E ⊆ E := by
+  have h := open_iff_compl_derivedSet Eᶜ
 
   rw [compl_compl] at h
   exact isOpen_compl_iff.symm.trans h
 
-/-- Lemma: the local closed-set definition agrees with Mathlib,
-using the previously proved complement argument. -/
-theorem mem_closedSets_iff (E : Set X) : E ∈ closedSets ↔ IsClosed E := by
-  exact (closed_iff_limitPoints E).symm
+/-- Lemma: a perfect set equals its derived set, including the empty set. -/
+theorem perfect_iff (E : Set X) : Perfect E ↔ E = derivedSet E := by
+  rw [perfect_def]
+  change (IsClosed E ∧ E ⊆ derivedSet E) ↔ E = derivedSet E
+  rw [closed_iff_derivedSet]
+  exact ⟨fun h => subset_antisymm h.2 h.1, fun h => ⟨h.symm.subset, h.subset⟩⟩
 
 /-- Proposition: an arbitrary union inherits a ball from one member. -/
 theorem open_union {ι : Type*} (E : ι → Set X)
@@ -205,14 +210,15 @@ theorem open_union {ι : Type*} (E : ι → Set X)
 /-- Corollary: intersections preserve the limit-point condition. -/
 theorem closed_intersection {ι : Type*} (E : ι → Set X)
     (h : ∀ i, IsClosed (E i)) : IsClosed (⋂ i, E i) := by
-  apply (closed_iff_limitPoints _).mpr
+  apply (closed_iff_derivedSet _).mpr
   intro p hp
   apply mem_iInter.mpr
   intro i
-  apply (closed_iff_limitPoints _).mp (h i)
+  apply (closed_iff_derivedSet _).mp (h i)
+  rw [mem_derivedSet_iff]
   intro r hr
 
-  obtain ⟨q, hq, hn, hd⟩ := hp r hr
+  obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
 
   exact ⟨q, mem_iInter.mp hq i, hn, hd⟩
 
@@ -260,8 +266,8 @@ theorem closed_finite_union {ι : Type*} (s : Finset ι)
   exact isOpen_compl_iff.mp (heq ▸ ho)
 
 /-- Lemma: the standard closure equals the set plus its limit points. -/
-theorem closure_eq_union_limitPoints (E : Set X) :
-    closure E = E ∪ limitPoints E := by
+theorem closure_eq_union_derivedSet (E : Set X) :
+    closure E = E ∪ derivedSet E := by
   classical
 
   ext p
@@ -272,6 +278,7 @@ theorem closure_eq_union_limitPoints (E : Set X) :
 
     · exact Or.inl he
     · right
+      rw [mem_derivedSet_iff]
       intro r hr
 
       obtain ⟨q, hq, hd⟩ := Metric.mem_closure_iff.mp hp r hr
@@ -285,29 +292,24 @@ theorem closure_eq_union_limitPoints (E : Set X) :
 
     · exact ⟨p, hp, by simpa only [dist_self] using hr⟩
 
-    · obtain ⟨q, hq, _, hd⟩ := hp r hr
+    · obtain ⟨q, hq, _, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
 
       exact ⟨q, hq, by rwa [dist_comm]⟩
 
-/-- Lemma: the locally defined closure agrees with Mathlib,
-using the previously proved punctured-ball argument. -/
-theorem setClosure_eq_closure (E : Set X) : setClosure E = closure E := by
-  exact (closure_eq_union_limitPoints E).symm
-
-/-- Lemma: a set is contained in its closure by the union definition.
+/-- Lemma: a set is contained in its closure by the proved union characterization.
 Mathlib counterpart: `subset_closure`. -/
 theorem subset_closure (E : Set X) : E ⊆ closure E := by
-  rw [← setClosure_eq_closure]
+  rw [closure_eq_union_derivedSet]
   exact fun _ hp => Or.inl hp
 
 /-- Lemma: closure contains its own limit points. -/
 theorem closure_closed (E : Set X) : IsClosed (closure E) := by
-  apply (closed_iff_limitPoints _).mpr
+  apply (closed_iff_derivedSet _).mpr
   intro p hp
   apply Metric.mem_closure_iff.mpr
   intro r hr
 
-  obtain ⟨q, hq, _, hdq⟩ := hp (r / 2) (half_pos hr)
+  obtain ⟨q, hq, _, hdq⟩ := (mem_derivedSet_iff _ _).mp hp (r / 2) (half_pos hr)
   obtain ⟨s, hs, hds⟩ := Metric.mem_closure_iff.mp hq (r / 2) (half_pos hr)
 
   refine ⟨s, hs, ?_⟩
@@ -329,18 +331,19 @@ theorem closure_properties (E : Set X) :
       exact closure_closed E
 
     · intro h
-      rw [closure_eq_union_limitPoints]
-      exact (union_eq_left.mpr ((closed_iff_limitPoints E).mp h)).symm
+      rw [closure_eq_union_derivedSet]
+      exact (union_eq_left.mpr ((closed_iff_derivedSet E).mp h)).symm
 
   · intro F hF hEF p hp
-    rw [closure_eq_union_limitPoints] at hp
+    rw [closure_eq_union_derivedSet] at hp
     rcases hp with hp | hp
 
     · exact hEF hp
-    · apply (closed_iff_limitPoints F).mp hF
+    · apply (closed_iff_derivedSet F).mp hF
+      rw [mem_derivedSet_iff]
       intro r hr
 
-      obtain ⟨q, hq, hn, hd⟩ := hp r hr
+      obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
 
       exact ⟨q, hEF hq, hn, hd⟩
 
@@ -364,7 +367,7 @@ theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
     exact hc⟩
 
 /-- Proposition: an isolated point is exactly a non-limit point in the set. -/
-theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E := by
+theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ derivedSet E := by
   classical
 
   ext p
@@ -377,7 +380,7 @@ theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E := b
     refine ⟨hp.1, ?_⟩
     intro hl
 
-    obtain ⟨q, hq, hn, hd⟩ := hl r hr
+    obtain ⟨q, hq, hn, hd⟩ := (mem_derivedSet_iff _ _).mp hl r hr
 
     have hmem : q ∈ E ∩ ball p r := ⟨hq, hd⟩
 
@@ -389,10 +392,13 @@ theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ limitPoints E := b
     have hex : ∃ r > 0, ∀ q ∈ E, dist q p < r → q = p := by
       by_contra h
       push Not at h
-      exact hn (fun r hr => by
-        obtain ⟨q, hq, hd, hne⟩ := h r hr
+      apply hn
+      rw [mem_derivedSet_iff]
+      intro r hr
 
-        exact ⟨q, hq, hne, hd⟩)
+      obtain ⟨q, hq, hd, hne⟩ := h r hr
+
+      exact ⟨q, hq, hne, hd⟩
 
     obtain ⟨r, hr, h⟩ := hex
 
@@ -483,11 +489,12 @@ theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
 of its complement when the ambient space has no isolated points. -/
 theorem isolated_limit_compl (E : Set X)
     (hX : ∀ p : X, ∀ r > 0, ∃ q : X, q ≠ p ∧ dist q p < r) :
-    isolatedPoints E ⊆ limitPoints Eᶜ := by
+    isolatedPoints E ⊆ derivedSet Eᶜ := by
   intro p hp
 
   obtain ⟨r, hr, heq⟩ := hp
 
+  rw [mem_derivedSet_iff]
   intro s hs
 
   obtain ⟨q, hne, hd⟩ := hX p (min r s) (lt_min hr hs)
@@ -502,20 +509,21 @@ theorem isolated_limit_compl (E : Set X)
 
 /-- Lemma: the boundary definition agrees with the standard closures. -/
 theorem boundary_eq (E : Set X) :
-    boundary E = closure E ∩ closure Eᶜ := by
-  rw [boundary, setClosure_eq_closure, setClosure_eq_closure]
+    frontier E = closure E ∩ closure Eᶜ := by
+  rw [frontier, sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
 
 /-- Lemma: relative closedness is characterized by ambient limit points. -/
 theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
-    IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ limitPoints E ∩ Y ⊆ E := by
-  rw [closed_iff_limitPoints]
+    IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ derivedSet E ∩ Y ⊆ E := by
+  rw [closed_iff_derivedSet]
   constructor
 
   · intro h p hp
-    apply h (show (⟨p, hp.2⟩ : Y) ∈ limitPoints (Subtype.val ⁻¹' E) from ?_)
+    apply h (show (⟨p, hp.2⟩ : Y) ∈ derivedSet (Subtype.val ⁻¹' E) from ?_)
+    rw [mem_derivedSet_iff]
     intro r hr
 
-    obtain ⟨q, hq, hne, hd⟩ := hp.1 r hr
+    obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp.1 r hr
 
     refine ⟨⟨q, hEY hq⟩, hq, ?_, hd⟩
     intro heq
@@ -524,9 +532,10 @@ theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
   · intro h p hp
     apply h
     refine ⟨?_, p.property⟩
+    rw [mem_derivedSet_iff]
     intro r hr
 
-    obtain ⟨q, hq, hne, hd⟩ := hp r hr
+    obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
 
     exact ⟨q.val, hq, fun heq => hne (Subtype.ext heq), hd⟩
 

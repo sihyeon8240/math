@@ -2,7 +2,7 @@ proofs:
 - id: an1:thm:standard-metric-on-Rn
   declaration: MathematicalAnalysis1.Chapter01.euclidean_metric
 - id: an1:lem:deleted-neighborhood-iff
-  declaration: MathematicalAnalysis1.Chapter01.deleted_neighborhood_iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_punctured_ball_iff
 - id: an1:lem:interior-iff
   declaration: MathematicalAnalysis1.Chapter01.interior_iff
 - id: an1:thm:neighborhood-is-open
@@ -12,9 +12,9 @@ proofs:
 - id: an1:thm:limit-point-neighborhood-contains-infinite-elements
   declaration: MathematicalAnalysis1.Chapter01.limit_point_infinite
 - id: an1:thm:complement-of-open-set-is-closed
-  declaration: MathematicalAnalysis1.Chapter01.open_iff_compl_limitPoints
+  declaration: MathematicalAnalysis1.Chapter01.open_iff_compl_derivedSet
 - id: an1:lem:closed-iff-limitPoints
-  declaration: MathematicalAnalysis1.Chapter01.closed_iff_limitPoints
+  declaration: MathematicalAnalysis1.Chapter01.closed_iff_derivedSet
 - id: an1:thm:arbitrary-union-of-open-sets-is-open
   declaration: MathematicalAnalysis1.Chapter01.open_union
 - id: an1:cor:arbitrary-intersection-of-closed-sets-is-closed
@@ -26,7 +26,7 @@ proofs:
 - id: an1:cor:finite-union-of-closed-sets-is-closed
   declaration: MathematicalAnalysis1.Chapter01.closed_finite_union
 - id: an1:lem:closure-eq-union-limitPoints
-  declaration: MathematicalAnalysis1.Chapter01.closure_eq_union_limitPoints
+  declaration: MathematicalAnalysis1.Chapter01.closure_eq_union_derivedSet
 - id: an1:lem:closure-closed
   declaration: MathematicalAnalysis1.Chapter01.closure_closed
 - id: an1:thm:properties-of-closure
@@ -92,18 +92,22 @@ proofs:
 - id: an1:lem:no-separation-of-between
   declaration: MathematicalAnalysis1.Chapter01.no_separation_of_between
 - id: an1:thm:connected-sets-in-R
-  declaration: MathematicalAnalysis1.Chapter01.connected_iff_between
-- id: an1:lem:interiorPoints-eq-interior
-  declaration: MathematicalAnalysis1.Chapter01.interiorPoints_eq_interior
-- id: an1:lem:mem-openSets-iff
-  declaration: MathematicalAnalysis1.Chapter01.mem_openSets_iff
-- id: an1:lem:mem-closedSets-iff
-  declaration: MathematicalAnalysis1.Chapter01.mem_closedSets_iff
-- id: an1:lem:setClosure-eq-closure
-  declaration: MathematicalAnalysis1.Chapter01.setClosure_eq_closure
+  declaration: MathematicalAnalysis1.Chapter01.isPreconnected_iff_between
 - id: an1:lem:subset-closure
   declaration: MathematicalAnalysis1.Chapter01.subset_closure
-- id: an1:lem:mem-compactSets-iff
-  declaration: MathematicalAnalysis1.Chapter01.mem_compactSets_iff
 - id: an1:lem:continuous-to-euclidean
   declaration: MathematicalAnalysis1.Chapter01.continuous_to_euclidean
+- id: an1:lem:mem-nhds-iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_nhds_iff
+- id: an1:lem:mem-derivedSet-iff
+  declaration: MathematicalAnalysis1.Chapter01.mem_derivedSet_iff
+- id: an1:lem:isOpen-iff
+  declaration: MathematicalAnalysis1.Chapter01.isOpen_iff
+- id: an1:lem:isBounded-iff
+  declaration: MathematicalAnalysis1.Chapter01.isBounded_iff
+- id: an1:lem:perfect-iff
+  declaration: MathematicalAnalysis1.Chapter01.perfect_iff
+- id: an1:lem:isCompact-iff-finite-subcover
+  declaration: MathematicalAnalysis1.Chapter01.isCompact_iff_finite_subcover
+- id: an1:lem:isPreconnected-iff
+  declaration: MathematicalAnalysis1.Chapter01.isPreconnected_iff

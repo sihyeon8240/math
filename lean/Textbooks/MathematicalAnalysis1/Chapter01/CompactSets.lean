@@ -19,31 +19,18 @@ universe u
 
 variable {X : Type u} [MetricSpace X]
 
-/-- Definition: Open covers and subcovers retain the original index set. -/
-abbrev openCover {ι : Type*} (E : Set X) (U : ι → Set X) : Prop :=
-  (∀ i, IsOpen (U i)) ∧ E ⊆ ⋃ i, U i
-
-/-- Definition: a subcover retains indices from a specified subset. -/
-abbrev subcover {ι : Type*} (E : Set X) (U : ι → Set X) (S : Set ι) : Prop :=
-  E ⊆ ⋃ i ∈ S, U i
-
-/-- Definition: every open cover has a finite subcover. -/
-def compactSets : Set (Set X) :=
-  {E | ∀ {ι : Type u} (U : ι → Set X), openCover E U →
-    ∃ s : Finset ι, subcover E U (s : Set ι)}
-
-/-- Lemma: finite open subcovers translate the standard
-filter encoding; no compactness result is assumed. -/
-theorem mem_compactSets_iff (E : Set X) : E ∈ compactSets ↔ IsCompact E := by
+/-- Lemma: the standard compactness predicate is equivalent to finite open subcovers. -/
+theorem isCompact_iff_finite_subcover (E : Set X) :
+    IsCompact E ↔ ∀ {ι : Type u} (U : ι → Set X),
+      (∀ i, IsOpen (U i)) → E ⊆ ⋃ i, U i → ∃ s : Finset ι, E ⊆ ⋃ i ∈ s, U i := by
   constructor
+
+  · intro h ι U hU hc
+    exact h.elim_finite_subcover U hU hc
 
   · intro h
     apply isCompact_of_finite_subcover
-    intro ι U hU hc
-    exact h U ⟨hU, hc⟩
-
-  · intro h ι U hU
-    exact h.elim_finite_subcover U hU.1 hU.2
+    exact h
 
 /-- Proposition: a finite union of balls avoiding an exterior point still
 avoids a sufficiently small ball about that point. -/
@@ -86,9 +73,10 @@ theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
 
 /-- Proposition: concentric balls cover the whole space; a finite subcover
 has a common bound, obtained here by a finite sum. -/
-theorem compact_bounded (E : Set X) (hE : IsCompact E) : bounded E := by
+theorem compact_bounded (E : Set X) (hE : IsCompact E) : Bornology.IsBounded E := by
   classical
 
+  apply (isBounded_iff E).mpr
   intro hX
 
   obtain ⟨p⟩ := hX
@@ -170,7 +158,7 @@ theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
 /-- Theorem: if every point has a ball meeting F at most at its center,
 a finite subcover would force F to be finite. -/
 theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
-    (hFE : F ⊆ E) (hF : F.Infinite) : (limitPoints F ∩ E).Nonempty := by
+    (hFE : F ⊆ E) (hF : F.Infinite) : (derivedSet F ∩ E).Nonempty := by
   classical
 
   by_contra hn
@@ -181,6 +169,7 @@ theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
     push Not at h
     apply hn
     refine ⟨p.val, ?_, p.property⟩
+    rw [mem_derivedSet_iff]
     intro r hr
 
     obtain ⟨q, hq, hd, hne⟩ := h r hr
@@ -681,7 +670,7 @@ theorem closed_interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b
 
 /-- Theorem: enclose a bounded set in a compact coordinate box. -/
 theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
-    IsCompact E ↔ IsClosed E ∧ bounded E := by
+    IsCompact E ↔ IsClosed E ∧ Bornology.IsBounded E := by
   constructor
 
   · intro h
@@ -689,7 +678,7 @@ theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :
 
   · rintro ⟨hc, hb⟩
 
-    obtain ⟨p, r, hr, hs⟩ := hb ⟨0⟩
+    obtain ⟨p, r, hr, hs⟩ := (isBounded_iff E).mp hb ⟨0⟩
 
     let K : Set (EuclideanSpace ℝ (Fin n)) := {x | ∀ j, p j - r ≤ x j ∧ x j ≤ p j + r}
 

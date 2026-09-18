@@ -52,14 +52,19 @@ counterparts as shortcuts in the core proofs.
 
 ## Definitions and proof dependencies
 
-Introduce the definitions needed by each formalized development explicitly.
-For metric topology, define interior points by contained positive-radius balls,
-closed sets by containment of limit points, closure as the union with the
-limit-point set, and boundary as the intersection of complementary closures.
-Define compactness by finite open subcovers, connectedness by the absence of a
-separation, and sequence convergence by the epsilon condition. Retain the
-book's empty-space, empty-set, zero-dimensional, and zero-based sequence
-conventions.
+Use Mathlib's standard predicates and operations as the public mathematical
+interface: `IsOpen`, `IsClosed`, `interior`, `closure`, `frontier`, `derivedSet`,
+`Bornology.IsBounded`, `Perfect`, `Dense`, `IsCompact`, and `Filter.Tendsto`.
+Explain them using balls, limit points, finite open subcovers, and epsilon
+conditions. State and prove the needed characterizations rather than defining
+parallel collections of open, closed, or compact sets. Use `Metric.ball` for
+open balls and `nhds` for general neighborhoods; a neighborhood need not be open.
+Use `IsPreconnected` for the book's connectedness convention, which includes
+the empty set, and prove its separation characterization before the interval
+result. `IsConnected` additionally requires nonemptiness.
+Retain the book's empty-space, empty-set, zero-dimensional, and zero-based
+sequence conventions. In particular, boundedness must not require the ambient
+space to be nonempty.
 
 Reuse standard real and Euclidean types, metric structures and their distance
 axioms, balls, subtypes with the inherited distance, and finite products with the
@@ -69,12 +74,15 @@ algebra boundary. This does not accept topological properties of those spaces.
 
 The standard topology and filter interfaces may encode these definitions.
 Use their ball, neighborhood, open-complement, finite-open-subcover, and epsilon
-characterizations only as representation bridges. Prove the textbook definitions'
-agreement with those interfaces explicitly before using the corresponding
-standard notation in subsequent arguments. In particular, the closed-set and
-closure bridges require the local limit-point arguments; they are not extra
-assumed topological theorems. The open-preimage characterization of continuity
-is likewise a definition interface, not permission to import continuity results.
+characterizations only as representation bridges. Prove the ball and separation
+characterizations needed by subsequent arguments explicitly. Standard notation
+may be used from the outset; it does not authorize invoking the corresponding
+substantive Mathlib theorems. In particular, the closed-set and closure bridges
+require the local limit-point arguments; they are not extra assumed topological
+theorems. The closed-cover characterization of preconnectedness is a
+representation interface; the separation bridge uses the locally proved closure
+properties. The open-preimage characterization of continuity is likewise a
+definition interface, not permission to import continuity results.
 
 No substantive topological or analytic result is accepted merely because it is a
 short Mathlib helper. Prove closure properties, compactness properties, and the

@@ -1,9 +1,10 @@
 import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
 import Mathlib.Tactic.Ring
+import Mathlib.Topology.Connected.Basic
 
 /-! Core connectedness on the real line from the least-upper-bound property.
-The book permits the empty set to be connected. Its separated-set definition
-is recorded explicitly below, avoiding a nonemptiness assumption. -/
+The book permits the empty set to be connected, represented by `IsPreconnected`.
+The closure-based separation criterion is proved before the interval theorem. -/
 
 set_option autoImplicit false
 
@@ -12,12 +13,56 @@ namespace MathematicalAnalysis1.Chapter01
 open Set Metric
 
 /-- Definition: The separated-set formulation used in the textbook. -/
-def separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
+def Separated {X : Type*} [MetricSpace X] (A B : Set X) : Prop :=
   Disjoint (closure A) B ∧ Disjoint A (closure B)
 
-/-- Definition: The textbook convention includes the empty set. -/
-def connected {X : Type*} [MetricSpace X] (E : Set X) : Prop :=
-  ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ separated A B
+/-- Lemma: `IsPreconnected` expresses the absence of a separation, including for
+an empty set. `isPreconnected_closed_iff` is the closed-cover representation. -/
+theorem isPreconnected_iff {X : Type*} [MetricSpace X] (E : Set X) :
+    IsPreconnected E ↔
+      ∀ A B : Set X, A.Nonempty → B.Nonempty → E = A ∪ B → ¬ Separated A B := by
+  classical
+
+  rw [isPreconnected_closed_iff]
+  constructor
+
+  · intro h A B hA hB heq hsep
+    have hcover : E ⊆ closure A ∪ closure B := by
+      rw [heq]
+      exact union_subset_union (subset_closure A) (subset_closure B)
+
+    obtain ⟨a, ha⟩ := hA
+    obtain ⟨b, hb⟩ := hB
+    obtain ⟨x, hx, hxA, hxB⟩ := h (closure A) (closure B)
+      (closure_closed A) (closure_closed B) hcover
+      ⟨a, heq.symm ▸ Or.inl ha, subset_closure A ha⟩
+      ⟨b, heq.symm ▸ Or.inr hb, subset_closure B hb⟩
+
+    rw [heq] at hx
+    rcases hx with hx | hx
+
+    · exact Set.disjoint_left.mp hsep.2 hx hxB
+    · exact Set.disjoint_left.mp hsep.1 hxA hx
+
+  · intro h F G hF hG hcover hEF hEG
+    by_contra hn
+    have heq : E = (E ∩ F) ∪ (E ∩ G) := by
+      ext x
+      exact ⟨fun hx => (hcover hx).elim (fun hF => Or.inl ⟨hx, hF⟩)
+        (fun hG => Or.inr ⟨hx, hG⟩), fun hx => hx.elim And.left And.left⟩
+
+    apply h (E ∩ F) (E ∩ G) hEF hEG heq
+    constructor
+
+    · apply Set.disjoint_left.mpr
+      intro x hx hEG
+      have hxF := (closure_properties (E ∩ F)).2.2 F hF inter_subset_right hx
+      exact hn ⟨x, hEG.1, hxF, hEG.2⟩
+
+    · apply Set.disjoint_left.mpr
+      intro x hEF hx
+      have hxG := (closure_properties (E ∩ G)).2.2 G hG inter_subset_right hx
+      exact hn ⟨x, hEF.1, hEF.2, hxG⟩
 
 /-- Lemma: closure preserves a real upper bound. -/
 theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
@@ -55,7 +100,7 @@ theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
 separated sets cannot belong to either side of an interval. -/
 theorem no_separation_of_between (E A B : Set ℝ)
     (hbetween : ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E)
-    (heq : E = A ∪ B) (hsep : separated A B)
+    (heq : E = A ∪ B) (hsep : Separated A B)
     (a b : ℝ) (ha : a ∈ A) (hb : b ∈ B) (hab : a < b) : False := by
   let S := A ∩ Icc a b
 
@@ -141,10 +186,11 @@ theorem no_separation_of_between (E A B : Set ℝ)
 
 /-- Theorem: real connected sets are exactly the sets containing all
 points between any two of their elements. -/
-theorem connected_iff_between (E : Set ℝ) :
-    connected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by
+theorem isPreconnected_iff_between (E : Set ℝ) :
+    IsPreconnected E ↔ ∀ a ∈ E, ∀ b ∈ E, ∀ x : ℝ, a < x → x < b → x ∈ E := by
   classical
 
+  rw [isPreconnected_iff]
   constructor
 
   · intro hc a ha b hb x hax hxb
@@ -196,7 +242,7 @@ theorem connected_iff_between (E : Set ℝ) :
 
     · exact no_separation_of_between E A B h heq hsep a b ha hb hab
 
-    · have hsep' : separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
+    · have hsep' : Separated B A := ⟨hsep.2.symm, hsep.1.symm⟩
 
       exact no_separation_of_between E B A h (heq.trans (union_comm _ _)) hsep' b a hb ha hba
 

@@ -14,27 +14,17 @@ open MathematicalAnalysis1.Chapter01
 
 variable {X : Type*} [MetricSpace X]
 
-/-- Definition: The epsilon definition for a sequence indexed from zero. -/
-def convergesTo (u : ℕ → X) (p : X) : Prop :=
-  ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε
-
-/-- Definition: a sequence has a limit in its ambient metric space. -/
-abbrev convergent (u : ℕ → X) : Prop := ∃ p : X, convergesTo u p
-
-/-- Definition: a sequence has no limit in its ambient metric space. -/
-abbrev divergent (u : ℕ → X) : Prop := ¬ convergent u
-
-/-- Definition: the range of the sequence is bounded. -/
-abbrev boundedSequence (u : ℕ → X) : Prop := bounded (range u)
-
-/-- Lemma: Representation bridge to the standard Mathlib limit. -/
-theorem convergesTo_iff_tendsto (u : ℕ → X) (p : X) :
-    convergesTo u p ↔ Filter.Tendsto u Filter.atTop (nhds p) := by
-  exact Metric.tendsto_atTop.symm
+/-- Lemma: sequence convergence is the epsilon characterization of `Filter.Tendsto`. -/
+theorem tendsto_iff (u : ℕ → X) (p : X) :
+    Filter.Tendsto u Filter.atTop (nhds p) ↔
+      ∀ ε : ℝ, 0 < ε → ∃ N : ℕ, ∀ n ≥ N, dist (u n) p < ε := by
+  exact Metric.tendsto_atTop
 
 /-- Lemma: a finite initial segment and a bounded tail have a common bound. -/
-theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
-    bounded (range u) := by
+theorem convergent_bounded (u : ℕ → X) (p : X) (h : Filter.Tendsto u Filter.atTop (nhds p)) :
+    Bornology.IsBounded (range u) := by
+  rw [tendsto_iff] at h
+  apply (isBounded_iff (range u)).mpr
   intro _
 
   obtain ⟨N, hN⟩ := h 1 zero_lt_one
@@ -62,7 +52,9 @@ theorem convergent_bounded (u : ℕ → X) (p : X) (h : convergesTo u p) :
 
 /-- Lemma: two distinct limits contradict the triangle inequality. -/
 theorem limit_unique (u : ℕ → X) (p q : X)
-    (hp : convergesTo u p) (hq : convergesTo u q) : p = q := by
+    (hp : Filter.Tendsto u Filter.atTop (nhds p))
+    (hq : Filter.Tendsto u Filter.atTop (nhds q)) : p = q := by
+  rw [tendsto_iff] at hp hq
   by_contra hne
 
   have hd : 0 < dist p q := dist_pos.mpr hne
@@ -80,13 +72,14 @@ theorem limit_unique (u : ℕ → X) (p q : X)
   linarith
 
 /-- Proposition: boundedness and uniqueness, paired with the printed theorem. -/
-theorem convergent_properties (u : ℕ → X) (p : X) (hp : convergesTo u p) :
-    bounded (range u) ∧ ∀ q : X, convergesTo u q → p = q := by
+theorem convergent_properties (u : ℕ → X) (p : X) (hp : Filter.Tendsto u Filter.atTop (nhds p)) :
+    Bornology.IsBounded (range u) ∧ ∀ q : X, Filter.Tendsto u Filter.atTop (nhds q) → p = q := by
   exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
 
 /-- Lemma: finite exceptional indices, rather than finitely many values. -/
-theorem convergesTo_iff_finite_exceptions (u : ℕ → X) (p : X) :
-    convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
+theorem tendsto_iff_finite_exceptions (u : ℕ → X) (p : X) :
+    Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
+  rw [tendsto_iff]
   constructor
 
   · intro h ε hε
@@ -127,14 +120,16 @@ theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
   nlinarith
 
 /-- Lemma: choose a distinct point within radius 1/(n+1). -/
-theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
-    ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ convergesTo u p := by
+theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ derivedSet E) :
+    ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ Filter.Tendsto u Filter.atTop (nhds p) := by
+  rw [mem_derivedSet_iff] at hp
   have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
     fun n => hp _ (by positivity)
 
   choose u hu hne hd using hex
 
   refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
+  rw [tendsto_iff]
   intro ε hε
 
   obtain ⟨N, hN⟩ := reciprocal_small ε hε
@@ -143,9 +138,9 @@ theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ limitPoints E) :
 
 /-- Theorem: Both parts of the neighborhood characterization in the textbook. -/
 theorem neighborhood_characterization (u : ℕ → X) (p : X) :
-    (convergesTo u p ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
-    (∀ E : Set X, p ∈ limitPoints E →
-      ∃ v : ℕ → X, (∀ n, v n ∈ E ∧ v n ≠ p) ∧ convergesTo v p) := by
-  exact ⟨convergesTo_iff_finite_exceptions u p, fun E hp => sequence_at_limit_point E p hp⟩
+    (Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
+    (∀ E : Set X, p ∈ derivedSet E →
+      ∃ v : ℕ → X, (∀ n, v n ∈ E ∧ v n ≠ p) ∧ Filter.Tendsto v Filter.atTop (nhds p)) := by
+  exact ⟨tendsto_iff_finite_exceptions u p, fun E hp => sequence_at_limit_point E p hp⟩
 
 end MathematicalAnalysis1.Chapter02
