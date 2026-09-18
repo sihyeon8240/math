@@ -149,13 +149,21 @@ Current book policies are:
 - [Mathematical Analysis II](../books/mathematical-analysis-2/formalization.md).
 
 Each policy records starting structures, accepted results, results developed in
-the book, and scoped external exceptions. Describe
-mathematical boundaries precisely enough to decide whether a proof is allowed;
-"basic algebra" or "results from other subjects" alone is insufficient. Before
-using a substantive external result outside the recorded boundary, amend the
-owning policy and review that amendment together with its first use. An exception
-must identify the result, where it is allowed, and why it is needed. Acceptance
-in one book does not authorize use in another.
+the book, and scoped external exceptions. Keep it concise and organize accepted
+background by mathematical topic. Name individual results when needed to draw a
+significant boundary, rather than listing every routine set operation or
+arithmetic helper. Broad labels such as "basic algebra" alone are insufficient
+when they leave unclear whether a core result is already assumed.
+
+Preserve the accepted scope when simplifying a policy. Link to this guide for
+common proof and interface rules; keep Lean API names, representation details,
+and proof recipes beside the relevant declarations or in the exposition. Record
+verified coverage in proof indexes, not in prerequisite policies.
+
+Before using a substantive external result outside the recorded boundary, amend
+the owning policy and review that amendment together with its first use. An
+exception must identify the result, where it is allowed, and why it is needed.
+Acceptance in one book does not authorize use in another.
 
 ## Proof roles and permitted dependencies
 

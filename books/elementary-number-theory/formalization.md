@@ -1,65 +1,46 @@
 # Elementary Number Theory: formalization boundary
 
 This document owns this book's mathematical prerequisites under the
-[repository Lean policy](../../docs/formalization.md). Nothing here establishes
-prerequisites for another book.
+[repository Lean policy](../../docs/formalization.md), which governs standard
+interfaces, independent proofs, and citations. These assumptions apply only to
+this book.
 
 ## Starting structures
 
-Accept classical logic, ordinary sets and functions, equality and equivalence
-relations, finite sets, and elementary finite sums and products. Accept natural
-numbers and integers with their basic arithmetic and order laws, induction,
-strong induction, and well-ordering of the natural numbers. Use Mathlib's
-standard number types; explain any textbook convention excluding zero.
+Accept classical logic, elementary sets and functions, and natural numbers and
+integers with their arithmetic and order laws, induction, strong induction, and
+well-ordering. Use the standard number types and explain any textbook convention
+excluding zero.
 
 ## Accepted results
 
-- Arithmetic identities, order compatibility, cancellation, and elementary
-  inequalities in natural numbers and integers.
-- Basic finite counting, reindexing of finite sums and products, and the
-  pigeonhole principle for finite sets.
-- Rational arithmetic and elementary polynomial operations, including evaluation
-  and algebraic identities, when needed for formulas.
+- Elementary arithmetic, order, finite sums and products, finite counting, and
+  the finite pigeonhole principle.
+- Rational arithmetic and elementary polynomial evaluation and identities when
+  needed for formulas.
 
-Well-ordering is an accepted prerequisite, even if its formulation is restated
-in the preliminaries. Acceptance of basic integer arithmetic does not include
-the quotient-remainder theorem or substantive divisibility results.
+Well-ordering is assumed, but the quotient-remainder theorem and substantive
+divisibility results are not part of the accepted arithmetic background.
 
 ## Results developed in this book
 
-Prove the division algorithm, gcd properties and Bezout's identity, Euclid's
-lemma and unique prime factorization, prime-number results, congruence results
-and the Chinese remainder theorem, Fermat's and Euler's theorems, arithmetic
-function identities, primitive-root results, and quadratic reciprocity. Develop
-the results selected from the later chapters on cryptography, special number
-forms, Diophantine equations, sums of squares, Fibonacci numbers, and continued
-fractions in the same order from the accepted boundary.
+Develop the division algorithm, gcd and the Euclidean algorithm, Bezout's
+identity, Euclid's lemma, prime factorization, congruences and the Chinese
+remainder theorem, Fermat's and Euler's theorems, arithmetic functions, primitive
+roots, and quadratic reciprocity. Develop selected later results on cryptography,
+special number forms, Diophantine equations, sums of squares, Fibonacci numbers,
+and continued fractions from this background and earlier local results.
 
-Introduce the number-theoretic definitions needed by each development explicitly.
-In the current gcd development, define the nonnegative gcd locally from a least
-positive integer linear combination, with value zero for the zero pair. Prove
-its common-divisor, greatestness, and uniqueness properties before using them;
-do not obtain them from a Mathlib gcd characterization. Integer divisibility
-uses the defining relation `a ∣ b ↔ ∃ k : ℤ, b = a * k`, with its witnesses
-expanded directly in proofs.
-
-After establishing the local characterizations independently, prove that the
-constructed gcd and lcm agree with `Int.gcd` and `Int.lcm`, including zero inputs.
-Their standard divisibility specifications, zero and positivity conventions,
-and elementary divisibility comparisons may be used in these terminal
-representation comparisons; they do not supply any argument in the local core
-proofs. This permits subsequent external reuse of the verified constructions
-through Mathlib's standard interfaces.
-
-No substantive number-theoretic property, even a short supporting lemma, is an
-accepted prerequisite merely because Mathlib supplies it. Prove needed properties
-from the accepted arithmetic and logical boundary and earlier local results.
-Elementary type conversions and the standard number types remain permitted.
+Construct gcd and lcm locally and prove their characterizations before comparing
+them with the standard definitions, including zero inputs. Use divisibility
+through its elementary witness relation in these core proofs.
 
 ## Scoped external exceptions
 
-No additional external theorem is initially approved. In particular, group
-orders and Lagrange's theorem are not prerequisites for the core proofs of
-Fermat's or Euler's theorem. An algebraic alternative proof or an application of
-analysis in prime distribution requires a documented exception specifying the
-result, its location, and its purpose before use.
+Standard gcd/lcm specifications and elementary divisibility comparisons may be
+used solely to identify the independently constructed values with the standard
+ones after the local proofs. They do not supply the core arguments.
+
+No other exceptions. Group orders and Lagrange's theorem are not prerequisites
+for the core proofs of Fermat's or Euler's theorem; algebraic alternatives or
+analytic applications require an explicit extension of this boundary.

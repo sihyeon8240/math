@@ -101,6 +101,19 @@ install and cache configuration pointed at that file.
   and review the mathematical correspondence under `docs/formalization.md`.
   Do not convert unrelated existing content as part of a documentation edit.
 
+## Prerequisite policy documents
+
+- Keep `books/<slug>/formalization.md` concise: accepted mathematical background,
+  subjects developed in the book, and significant boundaries or scoped exceptions.
+  Group routine facts by topic; name individual results when needed to distinguish
+  accepted prerequisites from material the book must prove.
+- Preserve mathematical scope when shortening these documents. Broad subject names
+  must not silently authorize core results or stronger external theory.
+- Link to `docs/formalization.md` for common proof and interface rules. Keep Lean
+  API inventories, representation details, and proof recipes beside the relevant
+  Lean declarations or in the exposition; use proof indexes for verified coverage.
+  Do not grow prerequisite policies into implementation guides or progress reports.
+
 ## Lean source organization
 
 - From the first result, put mathematical Lean sources in

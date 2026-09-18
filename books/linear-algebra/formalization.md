@@ -1,52 +1,42 @@
 # Linear Algebra: formalization boundary
 
 This document owns this book's mathematical prerequisites under the
-[repository Lean policy](../../docs/formalization.md). Nothing here establishes
-prerequisites for another book.
+[repository Lean policy](../../docs/formalization.md), which governs standard
+interfaces, independent proofs, and citations. These assumptions apply only to
+this book.
 
 ## Starting structures
 
-Accept classical logic, ordinary sets and functions, equivalence relations,
-natural-number induction, finite sets, and elementary finite sums and products.
-Accept fields and their algebraic laws, and the basic arithmetic of the real and
-complex numbers, including real order, nonnegative square roots, complex
-conjugation, and modulus. Use Mathlib's standard vector-space and linear-map
-structures as representations; their presence does not make linear-algebra
-results prerequisites.
+Accept classical logic, elementary sets and functions, induction, finite counting,
+and finite sums and products. Accept fields and the basic arithmetic of the real
+and complex numbers, including real order, nonnegative square roots, complex
+conjugation, and modulus.
 
 ## Accepted results
 
-- Field arithmetic, finite counting, finite sum and product identities, and
-  elementary real inequalities.
-- Elementary number theory of the integers: divisibility, the division
-  algorithm, gcd and the Euclidean algorithm, Bezout's identity, Euclid's lemma,
-  prime factorization, and basic congruence arithmetic. These are accepted
-  prerequisites, including when reviewed in this book; cite their Mathlib
-  declarations rather than importing the number-theory textbook. This does not
-  authorize advanced number theory or transfer integer results to polynomials
-  or matrices without the corresponding mathematical justification.
-- Polynomial evaluation, degree and coefficient rules, polynomial division over
-  a field, the factor theorem, root bounds, and polynomial gcd/Bezout identities.
+- Elementary integer number theory through divisibility, the division and
+  Euclidean algorithms, gcd and Bezout's identity, prime factorization, and
+  basic congruences.
+- Elementary polynomial algebra over a field through evaluation, degree rules,
+  division, the factor theorem, root bounds, and gcd/Bezout identities.
 
-Do not use polynomial facts about matrices, minimal polynomials, or characteristic
-polynomials as prerequisites merely because scalar polynomial algebra is allowed.
+Scalar polynomial facts do not automatically supply corresponding results about
+matrices, minimal polynomials, or characteristic polynomials.
 
 ## Results developed in this book
 
-Prove finite-dimensional basis existence and extension, dimension and exchange
-results, linear-map and matrix correspondence, rank-nullity, orthogonality and
-Gram-Schmidt, determinant properties, eigenvalue and eigenspace results, spectral
-results, triangulation, Cayley-Hamilton and primary decomposition, and the
-selected convex-set results. Establish the needed properties of vector spaces,
-linear maps, and matrices rather than taking those core properties from Mathlib.
+Develop finite-dimensional vector spaces, bases and exchange, dimension, linear
+maps and matrices, rank-nullity, orthogonality and Gram-Schmidt, determinants,
+eigenvalues, spectral results, triangulation, Cayley-Hamilton, primary
+decomposition, and the selected convex-set results.
+
+Standard vector-space and linear-map structures represent the objects; their
+availability does not make these results prerequisites. Arbitrary-dimensional
+basis existence and analytic compactness or separation theorems are outside the
+accepted background.
 
 ## Scoped external exceptions
 
-- Accept the fundamental theorem of algebra where complex eigenvalue existence
-  and triangularization require polynomial splitting. Cite it at first use;
-  prove the linear-algebra consequences locally.
-
-Other external results require an amendment identifying their scope and reason.
-This includes arbitrary-dimensional basis existence and analytic compactness or
-separation theorems used in the convex-sets chapter; they are not implicitly
-approved by the finite-dimensional or real-arithmetic prerequisites.
+Accept the fundamental theorem of algebra for complex eigenvalue existence and
+triangularization, where polynomial splitting is needed. Prove its
+linear-algebra consequences locally.
