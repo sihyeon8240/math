@@ -1,1 +1,508 @@
-%
+Positive integers are represented by natural numbers with explicit positivity
+hypotheses. Integer factors may still be negative or zero. The Lean declarations
+in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
+
+\begin{definition}
+  A natural number $p>1$ is \emph{prime} when every natural divisor is $1$ or $p$. Since $p>0$, zero cannot divide $p$; thus this is precisely the condition on positive divisors.
+
+  \begin{lean}
+    def isPrime (p : ℕ) : Prop :=
+      1 < p ∧ ∀ d : ℕ, d ∣ p → d = 1 ∨ d = p
+  \end{lean}
+\end{definition}
+
+\begin{definition}
+  A natural number $n>1$ which is not prime is \emph{composite}. In particular, neither zero nor one is prime or composite.
+
+  \begin{lean}
+    def isComposite (n : ℕ) : Prop :=
+      1 < n ∧ ¬isPrime n
+  \end{lean}
+\end{definition}
+
+\begin{lemma} \label{nt:lem:prime-interface}
+  The divisor definition of primality agrees with the standard predicate \texttt{Nat.Prime}.
+
+  \begin{lean}
+    theorem isPrime_iff_nat_prime (p : ℕ) : isPrime p ↔ Nat.Prime p
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  The standard divisor characterization requires $2\le p$ and that every divisor be $1$ or $p$. For natural numbers $2\le p$ is the same condition as $1<p$.
+
+  \begin{lean}
+    rw [Nat.prime_def]
+    rfl
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:prime-divides-product}
+  Let $p$ be prime and let $a,b\in\Z$. If $p\mid ab$, then $p\mid a$ or $p\mid b$.
+
+  \begin{lean}
+    theorem prime_dvd_mul (p : ℕ) (hp : isPrime p) (a b : ℤ)
+        (h : (p : ℤ) ∣ a * b) : (p : ℤ) ∣ a ∨ (p : ℤ) ∣ b
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  If $p\mid a$, the assertion is immediate. Otherwise, $p$ is nonzero because $p>1$.
+
+  \begin{lean}
+    classical
+    by_cases hpa : (p : ℤ) ∣ a
+
+    · exact Or.inl hpa
+
+    · have hnz : (p : ℤ) ≠ 0 := by
+        have := hp.1
+        omega
+  \end{lean}
+
+  The positive integer $d=\gcd(p,a)$ divides $p$, so it is $1$ or $p$. The second possibility would imply $p\mid a$, contrary to the assumption. Thus $\gcd(p,a)=1$.
+
+  \begin{lean}
+    obtain ⟨_, hdp, hda, _, _⟩ := Chapter01.gcd_spec (p : ℤ) a (Or.inl hnz)
+    have hd : Chapter01.gcd (p : ℤ) a ∣ p := Int.natCast_dvd_natCast.mp hdp
+    have hcoprime : Chapter01.gcd (p : ℤ) a = 1 := by
+      rcases hp.2 _ hd with hone | heq
+
+      · exact hone
+      · rw [heq] at hda
+        exact (hpa hda).elim
+  \end{lean}
+
+  The previously proved Euclid lemma for coprime integers now gives $p\mid b$.
+
+  \begin{lean}
+    exact Or.inr (Chapter01.dvd_of_dvd_mul_of_coprime (p : ℤ) a b hcoprime h)
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:cor:prime-divides-finite-product}
+  If a prime $p$ divides the product of a finite list of integers, then it divides at least one member of that list.
+
+  \begin{lean}
+    theorem prime_dvd_list_prod (p : ℕ) (hp : isPrime p) (l : List ℤ)
+        (h : (p : ℤ) ∣ l.prod) : ∃ a ∈ l, (p : ℤ) ∣ a
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  Induct on the list. The empty product is $1$. If $1=pk$, then $p>1$ forces $k>0$, whence $pk\ge p>1$, a contradiction.
+
+  \begin{lean}
+    induction l with
+    | nil =>
+      obtain ⟨k, hk⟩ := h
+      have hpos : (1 : ℤ) < p := by exact_mod_cast hp.1
+      change 1 = (p : ℤ) * k at hk
+      have hkpos : 0 < k := by nlinarith
+      nlinarith
+  \end{lean}
+
+  For a nonempty list with first entry $a$, the preceding theorem says that $p$ divides $a$ or the product of the remaining entries. In the latter case apply the induction hypothesis.
+
+  \begin{lean}
+    | cons a l ih =>
+      rcases prime_dvd_mul p hp a l.prod h with ha | hl
+
+      · exact ⟨a, List.mem_cons_self, ha⟩
+      · obtain ⟨b, hb, hpb⟩ := ih hl
+        exact ⟨b, List.mem_cons_of_mem a hb, hpb⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-divides-natural-product}
+  If $p$ is prime and $a,b\in\N$, then $p\mid ab$ implies $p\mid a$ or $p\mid b$.
+
+  \begin{lean}
+    theorem prime_dvd_mul_nat (p a b : ℕ) (hp : isPrime p) (h : p ∣ a * b) :
+        p ∣ a ∨ p ∣ b
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  View the natural numbers as integers and apply the product theorem. Divisibility of natural numbers is unchanged by this inclusion, so the conclusion returns to $\N$.
+
+  \begin{lean}
+    have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by exact_mod_cast h
+    rcases prime_dvd_mul p hp a b h' with ha | hb
+
+    · exact Or.inl (Int.natCast_dvd_natCast.mp ha)
+    · exact Or.inr (Int.natCast_dvd_natCast.mp hb)
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:cor:prime-in-prime-product}
+  If $p$ and all members of a finite list $q_1,\ldots,q_n$ are prime, and $p\mid q_1\cdots q_n$, then $p=q_k$ for some $1\le k\le n$. List membership expresses this conclusion without choosing an indexing convention.
+
+  \begin{lean}
+    theorem prime_eq_of_dvd_prod (p : ℕ) (hp : isPrime p) (l : List ℕ)
+        (hl : ∀ q ∈ l, isPrime q) (h : p ∣ l.prod) : p ∈ l
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  Induct on the list. As before, a prime cannot divide the empty product $1$.
+
+  \begin{lean}
+    induction l with
+    | nil =>
+      obtain ⟨k, hk⟩ := h
+      change 1 = p * k at hk
+      have hkpos : 0 < k := by nlinarith [hp.1]
+      nlinarith [hp.1]
+  \end{lean}
+
+  For a list beginning with $q$, either $p\mid q$ or $p$ divides the remaining product. In the first case the divisors of the prime $q$ give $p=1$ or $p=q$. Since $p>1$, only $p=q$ is possible.
+
+  \begin{lean}
+    | cons q l ih =>
+      rcases prime_dvd_mul_nat p q l.prod hp h with hq | ht
+
+      · rcases (hl q List.mem_cons_self).2 p hq with hone | heq
+
+        · have := hp.1
+          omega
+        · exact List.mem_cons.mpr (Or.inl heq)
+  \end{lean}
+
+  In the second case apply the induction hypothesis to the remaining prime entries.
+
+  \begin{lean}
+    · exact List.mem_cons.mpr
+        (Or.inr (ih (fun r hr => hl r (List.mem_cons_of_mem q hr)) ht))
+  \end{lean}
+
+\end{proof}
+
+A list records factors with their multiplicities. Its product is denoted by
+\texttt{List.prod}; the empty product is $1$. Two lists are permutations of each
+other when they have the same entries with the same multiplicities, possibly
+in different orders.
+
+\begin{lemma} \label{nt:lem:prime-factor-existence}
+  Every natural number $n>0$ is the product of a finite list of primes; for $n=1$ the list may be empty.
+
+  \begin{lean}
+    theorem exists_prime_factors (n : ℕ) (hn : 0 < n) :
+        ∃ l : List ℕ, (∀ p ∈ l, isPrime p) ∧ l.prod = n
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Use strong induction on $n$. The empty list has product $1$. If $n>1$ is prime, the one-element list containing $n$ has the required product.
+
+  \begin{lean}
+    classical
+    induction n using Nat.strong_induction_on with
+    | h n ih =>
+      by_cases hone : n = 1
+
+      · exact ⟨[], by simp, by simpa using hone.symm⟩
+
+      · have hgt : 1 < n := by omega
+        by_cases hp : isPrime n
+
+        · exact ⟨[n], by simpa, by simp⟩
+  \end{lean}
+
+  If $n>1$ is not prime, it has a divisor $d$ different from $1$ and $n$. Write $n=dk$. Positivity gives $d,k>0$. If $d\ge n$, then $k=1$, contradicting $d\ne n$; hence $d<n$. Also $d\ge2$, so $k<n$.
+
+  \begin{lean}
+    · have hdiv : ∃ d : ℕ, d ∣ n ∧ d ≠ 1 ∧ d ≠ n := by
+        simpa only [isPrime, hgt, true_and, not_forall, not_or, exists_prop] using hp
+
+      obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
+      have hdpos : 0 < d := by nlinarith
+      have hkpos : 0 < k := by nlinarith
+      have hdlt : d < n := by
+        by_contra h
+        have hk1 : k = 1 := by nlinarith
+        simp [hk1] at hk
+        exact hdn hk.symm
+
+      have hklt : k < n := by
+        have hd2 : 2 ≤ d := by omega
+        nlinarith
+  \end{lean}
+
+  By the induction hypothesis, $d$ and $k$ have prime factor lists. Concatenating them preserves primality of every entry, and its product is $dk=n$.
+
+  \begin{lean}
+    obtain ⟨l, hl, heql⟩ := ih d hdlt hdpos
+    obtain ⟨m, hm, heqm⟩ := ih k hklt hkpos
+    refine ⟨l ++ m, ?_, ?_⟩
+
+    · intro p hp
+      rcases List.mem_append.mp hp with hpl | hpm
+
+      · exact hl p hpl
+      · exact hm p hpm
+
+    · rw [List.prod_append, heql, heqm, ← hk]
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-factor-permutation}
+  Two finite lists of primes with the same product are permutations of one another.
+
+  \begin{lean}
+    theorem prime_factors_perm (l m : List ℕ) (hl : ∀ p ∈ l, isPrime p)
+        (hm : ∀ p ∈ m, isPrime p) (hprod : l.prod = m.prod) : l.Perm m
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Induct on the first list. If it is empty, its product is $1$. The second list cannot begin with a prime $q>1$, since $1=qM$ would imply $M>0$ and hence $qM>1$. Thus both lists are empty.
+
+  \begin{lean}
+    classical
+    induction l generalizing m with
+    | nil =>
+      cases m with
+      | nil => exact List.Perm.refl []
+      | cons q m =>
+        have hq := (hm q List.mem_cons_self).1
+        change 1 = q * m.prod at hprod
+        have hmpos : 0 < m.prod := by nlinarith
+        nlinarith
+  \end{lean}
+
+  If the first list begins with $p$, then $p$ divides the second product. The preceding corollary ensures that $p$ occurs in the second list.
+
+  \begin{lean}
+    | cons p l ih =>
+      have hp := hl p List.mem_cons_self
+      have hpm : p ∈ m := by
+        apply prime_eq_of_dvd_prod p hp m hm
+        exact ⟨l.prod, hprod.symm⟩
+  \end{lean}
+
+  Move one occurrence of $p$ to the front of the second list and remove it. Since $p>0$, cancellation shows that the two remaining products are equal.
+
+  \begin{lean}
+    have hperm : m.Perm (p :: m.erase p) := List.perm_cons_erase hpm
+    have htail : l.prod = (m.erase p).prod := by
+      have heq := hperm.prod_eq
+      simp only [List.prod_cons] at hprod heq
+      exact Nat.eq_of_mul_eq_mul_left hp.1.le (hprod.trans heq)
+  \end{lean}
+
+  The remaining lists still consist of primes, so the induction hypothesis makes them permutations. Restoring the removed occurrence of $p$ gives the desired permutation of the original lists.
+
+  \begin{lean}
+    have htailperm : l.Perm (m.erase p) := ih (m.erase p)
+      (fun q hq => hl q (List.mem_cons_of_mem p hq))
+      (fun q hq => hm q (List.mem_of_mem_erase hq)) htail
+
+    exact (List.Perm.cons p htailperm).trans hperm.symm
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:fundamental-theorem-arithmetic}
+  Every natural number $n>1$ is a prime or a product of primes. Its prime factor list is nonempty and is unique up to permutation; a list with one entry represents the prime case.
+
+  \begin{lean}
+    theorem fundamental_theorem_of_arithmetic (n : ℕ) (hn : 1 < n) :
+        ∃ l : List ℕ, l ≠ [] ∧ (∀ p ∈ l, isPrime p) ∧ l.prod = n ∧
+          ∀ m : List ℕ, (∀ p ∈ m, isPrime p) → m.prod = n → m.Perm l
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  The existence lemma gives a prime factor list for $n$. It cannot be empty, since the empty product is $1$ and $n>1$.
+
+  \begin{lean}
+    obtain ⟨l, hl, hprod⟩ := exists_prime_factors n (by omega)
+    refine ⟨l, ?_, hl, hprod, ?_⟩
+
+    · intro heq
+      subst l
+      simp only [List.prod_nil] at hprod
+      omega
+  \end{lean}
+
+  Any other prime factor list for $n$ has the same product, so the uniqueness lemma makes it a permutation of this list.
+
+  \begin{lean}
+    · intro m hm hmn
+      exact prime_factors_perm m l hm hl (hmn.trans hprod.symm)
+  \end{lean}
+
+\end{proof}
+
+To group equal prime factors, use a finitely supported function
+$e\colon\N\to\N$. Its support is the finite set of $p$ with $e(p)\ne0$;
+these and only these indices have positive exponents. In Lean this type is
+\texttt{Finsupp}, and its product means
+$\prod_{p\in\operatorname{supp}(e)}p^{e(p)}$. A multiset forgets the order of a
+list while retaining its multiplicities. Passing between multisets and exponent
+functions only groups or repeats entries; it does not invoke a factorization
+result.
+
+\begin{lemma} \label{nt:lem:unique-prime-exponents}
+  For every $n>0$ there is a unique finitely supported function $e\colon\N\to\N$ whose support consists of primes and for which $\prod_{p\in\operatorname{supp}(e)}p^{e(p)}=n$.
+
+  \begin{lean}
+    theorem existsUnique_prime_exponents (n : ℕ) (hn : 0 < n) :
+        ∃! e : ℕ →₀ ℕ, (∀ p ∈ e.support, isPrime p) ∧
+          e.prod (fun p k => p ^ k) = n
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Choose a prime factor list and let $e(p)$ count its occurrences of $p$. Every member of the support is prime. Grouping repeated factors replaces their product by the product of prime powers, still equal to $n$.
+
+  \begin{lean}
+    classical
+    obtain ⟨l, hl, hprod⟩ := exists_prime_factors n hn
+    let e := (l : Multiset ℕ).toFinsupp
+    have he : (∀ p ∈ e.support, isPrime p) ∧ e.prod (fun p k => p ^ k) = n := by
+      constructor
+
+      · intro p hp
+        exact hl p (by simpa [e] using hp)
+
+      · rw [← Finsupp.prod_toMultiset, Multiset.toFinsupp_toMultiset]
+        exact hprod
+  \end{lean}
+
+  For any other exponent function $f$, repeat each supported prime $p$ exactly $f(p)$ times to form a list. All its entries are prime, and its product is the specified power product $n$.
+
+  \begin{lean}
+    refine ⟨e, he, ?_⟩
+    rintro f ⟨hf, hfn⟩
+    let m := f.toMultiset.toList
+    have hm : ∀ p ∈ m, isPrime p := by
+      intro p hp
+      exact hf p (by simpa [m] using hp)
+
+    have hmprod : m.prod = n := by
+      rw [Multiset.prod_toList, Finsupp.prod_toMultiset]
+      exact hfn
+  \end{lean}
+
+  The uniqueness lemma makes the two expanded lists permutations. Their multisets, and hence all their multiplicities, agree. Thus $f=e$.
+
+  \begin{lean}
+    have hperm := prime_factors_perm m l hm hl (hmprod.trans hprod.symm)
+    have hmulti : f.toMultiset = (l : Multiset ℕ) := by
+      simpa [m] using Multiset.coe_eq_coe.mpr hperm
+
+    have heq := congrArg Multiset.toFinsupp hmulti
+    simpa [e] using heq
+  \end{lean}
+
+\end{proof}
+
+\begin{definition}
+  A \emph{canonical factorization} of $n$ is a pair $(L,e)$: the list $L$ is strictly increasing, its entries are exactly the support of the finitely supported exponent function $e$, every supported entry is prime, and the product of the corresponding prime powers is $n$. The notation \texttt{Pairwise} with $<$ requires every earlier entry to be less than every later entry.
+
+  \begin{lean}
+    def isCanonicalFactorization (n : ℕ) (r : List ℕ × (ℕ →₀ ℕ)) : Prop :=
+      r.1.Pairwise (· < ·) ∧ r.1.toFinset = r.2.support ∧
+        (∀ p ∈ r.2.support, isPrime p) ∧ r.2.prod (fun p k => p ^ k) = n
+  \end{lean}
+\end{definition}
+
+\begin{corollary} \label{nt:cor:unique-canonical-factorization}
+  Every natural number $n>1$ has exactly one canonical factorization $(L,e)$.
+
+  \begin{lean}
+    theorem existsUnique_canonical_factorization (n : ℕ) (hn : 1 < n) :
+        ∃! r : List ℕ × (ℕ →₀ ℕ), isCanonicalFactorization n r
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  Take the unique exponent function and arrange its finite support in increasing order. The support has no repeated elements, so the resulting list is strictly increasing.
+
+  \begin{lean}
+    classical
+    obtain ⟨e, he, huniq⟩ := existsUnique_prime_exponents n (by omega)
+    let l := e.support.sort (· ≤ ·)
+    have hl : l.Pairwise (· < ·) :=
+      List.sortedLT_iff_pairwise.mp (Finset.sortedLT_sort e.support)
+  \end{lean}
+
+  This pair is a canonical factorization. For any other pair $(M,f)$, uniqueness of prime exponents gives $f=e$.
+
+  \begin{lean}
+    refine ⟨(l, e), ⟨hl, Finset.sort_toFinset _ _, he⟩, ?_⟩
+    rintro ⟨m, f⟩ ⟨hm, hsupport, hf⟩
+    have hfe : f = e := huniq f hf
+    subst f
+  \end{lean}
+
+  The list $M$ is strictly increasing and has the same underlying finite set as $L$. Sorting this finite set therefore returns $M$ as well as $L$, so the lists agree and the pairs are equal.
+
+  \begin{lean}
+    have hsorted : e.support.sort (· ≤ ·) = m := by
+      rw [← hsupport]
+      exact (List.toFinset_sort (· ≤ ·) hm.nodup).mpr
+        (hm.imp (fun h => Nat.le_of_lt h))
+
+    exact Prod.ext hsorted.symm rfl
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:cor:canonical-factorization-product}
+  If $(L,e)$ is the canonical factorization of $n>1$, then $L$ is nonempty. Writing $L=(p_1,\ldots,p_r)$ and $k_i=e(p_i)$, we have
+  \[
+    n=p_1^{k_1}\cdots p_r^{k_r},\qquad
+    p_1<\cdots<p_r,\qquad k_i>0,
+  \]
+  and each $p_i$ is prime. Together with the preceding uniqueness result, this is the canonical prime-power form.
+
+  \begin{lean}
+    theorem canonical_factorization_spec (n : ℕ) (hn : 1 < n)
+        (r : List ℕ × (ℕ →₀ ℕ)) (hr : isCanonicalFactorization n r) :
+        r.1 ≠ [] ∧ r.1.Pairwise (· < ·) ∧
+          (∀ p ∈ r.1, isPrime p ∧ 0 < r.2 p) ∧
+          (r.1.map (fun p => p ^ r.2 p)).prod = n
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  The list has distinct entries and its underlying set is the support. Thus the product along the list equals the product over the support, which is $n$.
+
+  \begin{lean}
+    obtain ⟨hsorted, hsupport, hprime, hprod⟩ := hr
+    have hproduct : (r.1.map (fun p => p ^ r.2 p)).prod = n := by
+      rw [← List.prod_toFinset _ hsorted.nodup, hsupport]
+      exact hprod
+
+    refine ⟨?_, hsorted, ?_, hproduct⟩
+  \end{lean}
+
+  If the list were empty, this product would be $1$, contrary to $n>1$.
+
+  \begin{lean}
+    · intro hnil
+      rw [hnil] at hproduct
+      simp only [List.map_nil, List.prod_nil] at hproduct
+      omega
+  \end{lean}
+
+  Every listed prime belongs to the support. By definition of the support its exponent is nonzero, hence positive; primality is part of the canonical factorization condition.
+
+  \begin{lean}
+    · intro p hp
+      have hmem : p ∈ r.2.support := by
+        rw [← hsupport]
+        exact List.mem_toFinset.mpr hp
+
+      exact ⟨hprime p hmem, Nat.pos_of_ne_zero (Finsupp.mem_support_iff.mp hmem)⟩
+  \end{lean}
+
+\end{proof}

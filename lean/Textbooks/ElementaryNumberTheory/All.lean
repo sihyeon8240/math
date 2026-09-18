@@ -2,3 +2,6 @@ import Textbooks.ElementaryNumberTheory.Chapter01.DivisionAlgorithm
 import Textbooks.ElementaryNumberTheory.Chapter01.GreatestCommonDivisor
 import Textbooks.ElementaryNumberTheory.Chapter01.EuclideanAlgorithm
 import Textbooks.ElementaryNumberTheory.Chapter01.LeastCommonMultiple
+import Textbooks.ElementaryNumberTheory.Chapter01.DiophantineEquations
+import Textbooks.ElementaryNumberTheory.Chapter02.Primes
+import Textbooks.ElementaryNumberTheory.Chapter02.PrimeFactorization

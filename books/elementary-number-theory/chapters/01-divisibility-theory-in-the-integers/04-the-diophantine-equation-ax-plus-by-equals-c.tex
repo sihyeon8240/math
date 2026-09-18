@@ -1,1 +1,173 @@
-%
+All coefficients and unknowns are integers. We use the nonnegative gcd
+constructed above.
+
+The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
+
+\begin{theorem} \label{nt:thm:diophantine-solvability}
+  The equation $ax+by=c$ has an integer solution if and only if $\gcd(a,b)\mid c$. This includes $a=b=0$, when both conditions mean $c=0$.
+
+  \begin{lean}
+    theorem exists_mul_add_mul_eq_iff (a b c : ℤ) :
+        (∃ x y : ℤ, a * x + b * y = c) ↔ (gcd a b : ℤ) ∣ c
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  First suppose that the coefficients are not both zero. Write $a=du$, $b=dv$, and $d=ar+bs$, where $d=\gcd(a,b)>0$.
+
+  \begin{lean}
+    by_cases hab : a ≠ 0 ∨ b ≠ 0
+
+    · obtain ⟨_, ⟨u, hu⟩, ⟨v, hv⟩, ⟨r, s, hrs⟩, _⟩ := gcd_spec a b hab
+      generalize hg : gcd a b = d at *
+      constructor
+  \end{lean}
+
+  Any solution gives $c=ax+by=d(ux+vy)$, so $d\mid c$.
+
+  \begin{lean}
+    · rintro ⟨x, y, rfl⟩
+      refine ⟨u * x + v * y, ?_⟩
+      rw [hu, hv]
+      ring
+  \end{lean}
+
+  Conversely, if $c=dk$, multiplying the Bezout identity by $k$ gives the solution $x=rk$, $y=sk$.
+
+  \begin{lean}
+    · rintro ⟨k, rfl⟩
+      refine ⟨r * k, s * k, ?_⟩
+      rw [hrs]
+      ring
+  \end{lean}
+
+  If both coefficients vanish, their gcd is zero. The equation is solvable exactly when $c=0$, which is also the meaning of $0\mid c$.
+
+  \begin{lean}
+    · have ha : a = 0 := Classical.byContradiction (fun h => hab (Or.inl h))
+      have hb : b = 0 := Classical.byContradiction (fun h => hab (Or.inr h))
+      simp [ha, hb, gcd_zero_zero, eq_comm]
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:diophantine-general-solution}
+  Suppose $a,b$ are not both zero, put $d=\gcd(a,b)$, and fix a solution $(x_0,y_0)$ of $ax+by=c$. An integer pair $(x,y)$ is a solution if and only if, for some $t\in\Z$,
+  \[
+    x=x_0+\frac{b}{d}t,\qquad y=y_0-\frac{a}{d}t.
+  \]
+  The quotients are integers since $d$ divides both coefficients.
+
+  \begin{lean}
+    theorem mul_add_mul_eq_iff (a b c x₀ y₀ x y : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
+        (h₀ : a * x₀ + b * y₀ = c) :
+        a * x + b * y = c ↔ ∃ t : ℤ,
+          x = x₀ + (b / (gcd a b : ℤ)) * t ∧
+          y = y₀ - (a / (gcd a b : ℤ)) * t
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Choose $u,v,r,s$ with $a=du$, $b=dv$, and $d=ar+bs$. Since $d>0$, the exact quotients $a/d$ and $b/d$ are $u$ and $v$.
+
+  \begin{lean}
+    obtain ⟨hd, ⟨u, hu⟩, ⟨v, hv⟩, ⟨r, s, hrs⟩, _⟩ := gcd_spec a b hab
+    generalize hg : gcd a b = d at *
+
+    have hdne : (d : ℤ) ≠ 0 := by
+      exact_mod_cast (ne_of_gt hd)
+
+    have ha : a / (d : ℤ) = u := by
+      rw [hu]
+      exact Int.mul_ediv_cancel_left u hdne
+
+    have hb : b / (d : ℤ) = v := by
+      rw [hv]
+      exact Int.mul_ediv_cancel_left v hdne
+  \end{lean}
+
+  Substituting into the Bezout identity and cancelling $d$ gives $ur+vs=1$.
+
+  \begin{lean}
+    have hone : u * r + v * s = 1 := by
+      apply mul_left_cancel₀ hdne
+      calc
+        (d : ℤ) * (u * r + v * s) = a * r + b * s := by
+          rw [hu, hv]
+          ring
+        _ = (d : ℤ) * 1 := by linarith [hrs]
+
+    rw [ha, hb]
+    constructor
+  \end{lean}
+
+  For another solution, subtract the two equations and cancel $d$. With $X=x-x_0$ and $Y=y-y_0$, this gives $uX+vY=0$.
+
+  \begin{lean}
+    · intro h
+      have hdiff : u * (x - x₀) + v * (y - y₀) = 0 := by
+        apply mul_left_cancel₀ hdne
+        calc
+          (d : ℤ) * (u * (x - x₀) + v * (y - y₀)) =
+              (a * x + b * y) - (a * x₀ + b * y₀) := by
+                rw [hu, hv]
+                ring
+          _ = (d : ℤ) * 0 := by
+            rw [h, h₀]
+            ring
+  \end{lean}
+
+  Put $t=sX-rY$. Then $(ur+vs)X-r(uX+vY)=vt$ and $(ur+vs)Y-s(uX+vY)=-ut$. Hence $X=vt$ and $Y=-ut$, as required.
+
+  \begin{lean}
+    refine ⟨s * (x - x₀) - r * (y - y₀), ?_, ?_⟩
+
+    · nlinarith [congrArg (fun z => z * (x - x₀)) hone,
+        congrArg (fun z => z * r) hdiff]
+    · nlinarith [congrArg (fun z => z * (y - y₀)) hone,
+        congrArg (fun z => z * s) hdiff]
+  \end{lean}
+
+  Conversely, substitution of $x=x_0+vt$ and $y=y_0-ut$ cancels the terms involving $t$, because $av=bu$. The result is $ax_0+by_0=c$.
+
+  \begin{lean}
+    · rintro ⟨t, rfl, rfl⟩
+      calc
+        a * (x₀ + v * t) + b * (y₀ - u * t) = a * x₀ + b * y₀ := by
+          rw [hu, hv]
+          ring
+        _ = c := h₀
+  \end{lean}
+
+\end{proof}
+
+\begin{corollary} \label{nt:cor:diophantine-coprime}
+  If $\gcd(a,b)=1$ and $ax_0+by_0=c$, then the integer solutions are exactly $x=x_0+bt$, $y=y_0-at$ for $t\in\Z$.
+
+  \begin{lean}
+    theorem mul_add_mul_eq_iff_of_coprime (a b c x₀ y₀ x y : ℤ)
+        (hab : gcd a b = 1) (h₀ : a * x₀ + b * y₀ = c) :
+        a * x + b * y = c ↔ ∃ t : ℤ, x = x₀ + b * t ∧ y = y₀ - a * t
+  \end{lean}
+\end{corollary}
+
+\begin{proof}
+  The coefficients cannot both be zero, since $\gcd(0,0)=0$.
+
+  \begin{lean}
+    have hnz : a ≠ 0 ∨ b ≠ 0 := by
+      by_contra h
+      push Not at h
+      obtain ⟨rfl, rfl⟩ := h
+      rw [gcd_zero_zero] at hab
+      contradiction
+  \end{lean}
+
+  Apply the general solution formula and substitute $d=1$.
+
+  \begin{lean}
+    simpa only [hab, Nat.cast_one, Int.ediv_one] using
+      mul_add_mul_eq_iff a b c x₀ y₀ x y hnz h₀
+  \end{lean}
+
+\end{proof}

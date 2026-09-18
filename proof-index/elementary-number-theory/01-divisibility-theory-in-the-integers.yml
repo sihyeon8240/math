@@ -49,3 +49,9 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter01.gcd_eq_int_gcd
   - id: nt:lem:lcm-eq-int-lcm
     declaration: ElementaryNumberTheory.Chapter01.lcm_eq_int_lcm
+  - id: nt:thm:diophantine-solvability
+    declaration: ElementaryNumberTheory.Chapter01.exists_mul_add_mul_eq_iff
+  - id: nt:thm:diophantine-general-solution
+    declaration: ElementaryNumberTheory.Chapter01.mul_add_mul_eq_iff
+  - id: nt:cor:diophantine-coprime
+    declaration: ElementaryNumberTheory.Chapter01.mul_add_mul_eq_iff_of_coprime
