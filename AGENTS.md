@@ -116,6 +116,10 @@ install and cache configuration pointed at that file.
 
 ## Lean source organization
 
+- Before writing Lean code, check the project-wide `leanOptions` in
+  `lean/lakefile.toml` and other applicable settings. Rely on those defaults
+  instead of repeating them in individual modules.
+
 - From the first result, put mathematical Lean sources in
   `lean/Textbooks/<Book>/ChapterNN/<Topic>.lean` (or `AppendixNN` for appendices),
   using descriptive `UpperCamelCase` topic names. Never use flat chapter files or a numbered
