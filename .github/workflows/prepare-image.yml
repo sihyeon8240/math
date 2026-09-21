@@ -69,7 +69,7 @@ jobs:
       - name: Set the temporary image tag
         run: echo "BUILD_TAG=${IMAGE_NAME}:build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${ARCH}" >> "$GITHUB_ENV"
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - name: Login to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4
         with:
@@ -83,7 +83,7 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
           tags: type=raw,value=${{ needs.prepare.outputs.tag }}
       - name: Build image for smoke testing
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         with:
           context: .
           file: ./.devcontainer/Dockerfile
@@ -131,7 +131,7 @@ jobs:
       - name: Load repository configuration
         run: ./scripts/export-config.sh
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - name: Download tested image digests
         if: needs.prepare.outputs.exists != 'true'
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
