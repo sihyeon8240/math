@@ -17,7 +17,7 @@ before applying the paired exposition format in this guide.
 Create and register a book from the repository root with:
 
 ```sh
-make new-book SLUG=<slug> TITLE="<title>"
+make book new SLUG=<slug> TITLE="<title>"
 ```
 
 The script copies `common/templates/`, creates the first chapter and section,

@@ -155,7 +155,7 @@ Run the union of the applicable rows for a change that spans categories.
 | Change | Required local validation |
 |---|---|
 | Documentation only, including book prerequisite policies | `make check source`; review policy meaning manually |
-| Mathematical content or book-local presentation | `make format tex check`, `make check source`, and `make books BOOK=<slug> check strict` for each affected book |
+| Mathematical content or book-local presentation | `make format tex check`, `make check source`, and `make book BOOK=<slug> check strict` for each affected book |
 | Contents manifests, file moves, or generated assembly | Regenerate with `make contents all BOOK=<slug>`, then `make contents all check BOOK=<slug>`, `make check source`, and affected book builds with strict log checks |
 | Lean sources or proof-index entries | `make lean check`, `make check source`, and affected book builds with strict log checks; apply content formatting checks when TeX changes |
 | Python scripts or tests without PDF build effects | `make format py check`, `make test`, and `make check source` |
@@ -166,10 +166,10 @@ Run the union of the applicable rows for a change that spans categories.
 
 The complete suites are independent: `make check all strict` includes source,
 formatting, Lean, and LaTeX checks but does not run Python unit tests. Full checks
-build `check: true` books; `make books` without `BOOK` builds `build: true` books,
-while `make books check strict` selects `check: true` books. If a shared change
+build `check: true` books; `make book` without `BOOK` builds `build: true` books,
+while `make book check strict` selects `check: true` books. If a shared change
 affects a build-enabled book excluded from full checks, also run its explicit
-`make books BOOK=<slug> check strict` command.
+`make book BOOK=<slug> check strict` command.
 
 `make check source` runs ShellCheck at error severity and Bash syntax checks,
 but no formatter or Ruff checks. Run applicable format commands separately.

@@ -23,18 +23,20 @@ them. Then run:
 
 ```sh
 make doctor env
-make books BOOK=linear-algebra
+make book BOOK=linear-algebra
 ```
 
 Use `make help` for the complete command interface. Common tasks are:
 
 | Task | Command |
 |---|---|
-| Build one or all enabled books | `make books [BOOK=<slug>]` |
-| Build and check selected books' LaTeX logs | `make books [BOOK=<slug>] check [strict]` |
+| Open the toolchain in a terminal | `make image run` |
+| Build the local toolchain image | `make image build` |
+| Build one or all enabled books | `make book [BOOK=<slug>]` |
+| Build and check selected books' LaTeX logs | `make book [BOOK=<slug>] check [strict]` |
 | Run complete validation suites | `make test`, then `make check all strict` |
-| Inspect repository or book health | `make report`, `make doctor books [BOOK=<slug>]` |
-| Create a textbook | `make new-book SLUG=<slug> TITLE="<title>"` |
+| Inspect repository or book health | `make report`, `make doctor book [BOOK=<slug>]` |
+| Create a textbook | `make book new SLUG=<slug> TITLE="<title>"` |
 
 Choose required checks by
 [change category](docs/CONTRIBUTING.md#validation-by-change-category). See the

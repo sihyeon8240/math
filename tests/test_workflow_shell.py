@@ -267,7 +267,7 @@ printf '%s\\n' "$MANIFEST"
         self.assertIn("github.actor", wrapper)
         self.assertIn("dependabot[bot]", wrapper)
         self.assertIn("if: needs.prepare.outputs.exists != 'true'", text)
-        self.assertIn('make image-pin DIGEST="$DIGEST"', wrapper)
+        self.assertIn('make image pin DIGEST="$DIGEST"', wrapper)
         self.assertIn("prepare-image.yml", wrapper)
 
     def test_immutable_tag_check_covers_only_image_inputs(self):

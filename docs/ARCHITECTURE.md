@@ -110,7 +110,7 @@ fails on drift.
 CI derives a content-addressed image tag from the canonical image inputs,
 prepares that image once, and passes its tested digest to downstream checks and
 builds. `config/container-image.txt` remains the reviewed immutable reference
-for local and devcontainer consumers. `make image-pin` remains a narrow
+for local and devcontainer consumers. `make image pin` remains a narrow
 automation and recovery interface so the image workflow does not depend on
 synchronization implementation details; routine contributors do not need to
 invoke it.

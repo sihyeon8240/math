@@ -32,7 +32,7 @@ public interfaces and test every affected consumer.
 ## Release checklist
 
 - Prepare the first or an increasing version on a development branch with
-  `make release-prepare BOOK=<slug> VERSION=<version>` and review its generated
+  `make book release BOOK=<slug> VERSION=<version>` and review its generated
   assembly changes in the normal PR.
 - Confirm `build: true`. Enabling `release: true` requests first publication;
   subsequent releases require a version increase.
@@ -102,7 +102,7 @@ validation, and styling. Confirm that generated pages remain untracked.
 ## Drift detection
 
 Run `make check source` for structural validation, `make report` for repository
-health, and `make doctor books BOOK=<slug>` for advisory textbook inspections.
+health, and `make doctor book BOOK=<slug>` for advisory textbook inspections.
 Compare changes against architecture rather than historical accidents. Before
 changing common styles, scripts, or templates, document the motivation, test
 every consumer, preserve interfaces, and provide a rollback-sized diff.

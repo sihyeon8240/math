@@ -1,1 +1,326 @@
-%
+We examine gaps between primes and restrictions on their distribution.
+Unless otherwise specified, the variables are natural numbers, and the Lean
+namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
+
+\begin{theorem} \label{nt:thm:consecutive-composites}
+  For every positive integer $n$, there exist $n$ consecutive composite integers.
+
+  \begin{lean}
+    theorem exists_consecutive_composites (n : ℕ) (_hn : 0 < n) :
+        ∃ M : ℕ, ∀ i : ℕ, i < n → isComposite (M + i)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Let $F=(n+1)!$ and consider $F+2,F+3,\ldots,F+n+1$. For $0\le i<n$, the integer $i+2$ divides $F$, so it also divides $F+i+2$.
+
+  \begin{lean}
+    let F := (n + 1).factorial
+    refine ⟨F + 2, ?_⟩
+    intro i hi
+    obtain ⟨t, ht⟩ := factorial_multiple (n + 1) (i + 2) (by omega) (by omega)
+    have hF : 0 < F := Nat.factorial_pos (n + 1)
+    have hdiv : i + 2 ∣ F + 2 + i := by
+      refine ⟨t + 1, ?_⟩
+      dsimp [F]
+      rw [ht]
+      ring
+  \end{lean}
+
+  Each displayed integer exceeds one. Its divisor $i+2$ is greater than one and is strictly smaller than $F+i+2$, since $F>0$. Thus it cannot be prime.
+
+  \begin{lean}
+    refine ⟨by omega, ?_⟩
+    intro hp
+    rcases hp.2 (i + 2) hdiv with hone | heq
+
+    · omega
+    · omega
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:product-four-mul-add-one}
+  A product of two or more integers of the form $4k+1$, with $k\in\Z$, again has that form. More generally, this holds for any finite list, including the empty product.
+
+  \begin{lean}
+    theorem prod_four_mul_add_one (l : List ℤ)
+        (hl : ∀ a ∈ l, ∃ k : ℤ, a = 4 * k + 1) :
+        ∃ k : ℤ, l.prod = 4 * k + 1
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Induct on the number of factors. The empty product is $1=4\cdot0+1$. If the first factor is $4u+1$ and the remaining product is $4v+1$, then their product is $4(4uv+u+v)+1$.
+
+  \begin{lean}
+    induction l with
+    | nil => exact ⟨0, by simp⟩
+    | cons a l ih =>
+      obtain ⟨u, hu⟩ := hl a List.mem_cons_self
+      obtain ⟨v, hv⟩ := ih (fun b hb => hl b (List.mem_cons_of_mem a hb))
+      refine ⟨4 * u * v + u + v, ?_⟩
+      rw [List.prod_cons, hu, hv]
+      ring
+  \end{lean}
+
+\end{proof}
+
+The notation $a\bmod4$ below means the remainder upon division by $4$;
+in Lean it is written \texttt{a \% 4}. The division algorithm gives
+$a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
+
+\begin{lemma} \label{nt:lem:prime-remainders-four}
+  A prime $p$ is either $2$, or has remainder $1$ or $3$ upon division by $4$.
+
+  \begin{lean}
+    theorem prime_eq_two_or_mod_four (p : ℕ) (hp : isPrime p) :
+        p = 2 ∨ p % 4 = 1 ∨ p % 4 = 3
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  The remainder lies between zero and three. The desired conclusion already holds when it is one or three.
+
+  \begin{lean}
+    have hmod : p % 4 < 4 := Nat.mod_lt p (by omega)
+    by_cases hone : p % 4 = 1
+
+    · exact Or.inr (Or.inl hone)
+
+    · by_cases hthree : p % 4 = 3
+
+      · exact Or.inr (Or.inr hthree)
+  \end{lean}
+
+  For remainder zero, $p=2(2\lfloor p/4\rfloor)$; for remainder two, $p=2(2\lfloor p/4\rfloor+1)$. Thus $2\mid p$, and primality forces $p=2$.
+
+  \begin{lean}
+    · have hdiv : 2 ∣ p := by
+        rcases (show p % 4 = 0 ∨ p % 4 = 2 by omega) with hzero | htwo
+
+        · exact ⟨2 * (p / 4), by omega⟩
+        · exact ⟨2 * (p / 4) + 1, by omega⟩
+
+      rcases hp.2 2 hdiv with h | h
+
+      · omega
+      · exact Or.inl h.symm
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-divisor-four-mul-add-three}
+  If $n\bmod4=3$, then $n$ has a prime divisor whose remainder upon division by $4$ is also $3$.
+
+  \begin{lean}
+    theorem exists_prime_divisor_mod_four_three (n : ℕ) (hn : n % 4 = 3) :
+        ∃ p : ℕ, isPrime p ∧ p ∣ n ∧ p % 4 = 3
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Choose a prime factor list for $n$ and suppose that no prime divisor has remainder three. The factor $2$ is impossible, since $n$ has odd remainder. By the preceding lemma every prime factor must therefore have remainder one.
+
+  \begin{lean}
+    classical
+    obtain ⟨l, hl, hprod⟩ := exists_prime_factors n (by omega)
+    by_contra h
+    push Not at h
+    have hone : ∀ p ∈ l, p % 4 = 1 := by
+      intro p hp
+      have hdiv : p ∣ n := ⟨(l.erase p).prod, by rw [← hprod, List.prod_erase hp]⟩
+      rcases prime_eq_two_or_mod_four p (hl p hp) with htwo | hrest
+
+      · obtain ⟨k, hk⟩ := hdiv
+        rw [htwo] at hk
+        omega
+
+      · exact hrest.resolve_right (h p (hl p hp) hdiv)
+  \end{lean}
+
+  For each prime factor $p$, division by four gives $p=4\lfloor p/4\rfloor+1$. View these equalities as integer equalities to apply the product lemma.
+
+  \begin{lean}
+    have hform : ∀ a ∈ l.map (fun p : ℕ => (p : ℤ)), ∃ k : ℤ, a = 4 * k + 1 := by
+      intro a ha
+      obtain ⟨p, hp, rfl⟩ := List.mem_map.mp ha
+      refine ⟨(p / 4 : ℕ), ?_⟩
+      have heq : p = 4 * (p / 4) + 1 := by
+        have := hone p hp
+        omega
+      exact_mod_cast heq
+  \end{lean}
+
+  The product lemma makes the entire product equal to $4k+1$ for some integer $k$. Since that product is $n$, this contradicts $n\bmod4=3$.
+
+  \begin{lean}
+    obtain ⟨k, hk⟩ := prod_four_mul_add_one _ hform
+    have hcast : (l.map (fun p : ℕ => (p : ℤ))).prod = (n : ℤ) := by
+      rw [← Nat.cast_list_prod, hprod]
+
+    rw [hcast] at hk
+    omega
+  \end{lean}
+
+\end{proof}
+
+\begin{lemma} \label{nt:lem:prime-four-mul-add-three-above-bound}
+  For every natural number $m$, there is a prime $p>m$ of the form $p=4k+3$ with $k\in\N$.
+
+  \begin{lean}
+    theorem exists_prime_mod_four_three_gt (m : ℕ) :
+        ∃ p : ℕ, isPrime p ∧ m < p ∧ ∃ k : ℕ, p = 4 * k + 3
+  \end{lean}
+\end{lemma}
+
+\begin{proof}
+  Put $N=4m!-1$. Since $m!\ge1$, this is positive and has remainder three modulo four. Choose a prime divisor $p$ with that remainder, and write $p=4\lfloor p/4\rfloor+3$.
+
+  \begin{lean}
+    let N := 4 * m.factorial - 1
+    have hfac := Nat.factorial_pos m
+    have hN : N % 4 = 3 := by
+      dsimp [N]
+      omega
+    obtain ⟨p, hp, hdiv, hmod⟩ := exists_prime_divisor_mod_four_three N hN
+    refine ⟨p, hp, ?_, p / 4, by omega⟩
+  \end{lean}
+
+  If $p\le m$, write $m!=pt$. Then $N+1=4m!=p(4t)$, so $p$ divides $N+1$ as well as $N$.
+
+  \begin{lean}
+    by_contra h
+    obtain ⟨t, ht⟩ := factorial_multiple m p (lt_trans Nat.zero_lt_one hp.1) (by omega)
+    have hsucc : p ∣ N + 1 := by
+      refine ⟨4 * t, ?_⟩
+      have hNsucc : N + 1 = 4 * m.factorial := by
+        dsimp [N]
+        omega
+
+      rw [hNsucc, ht]
+      ring
+  \end{lean}
+
+  This contradicts the consecutive-number lemma. Hence $p>m$.
+
+  \begin{lean}
+    exact not_dvd_of_dvd_add_one p N hp hsucc hdiv
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:infinitely-many-primes-four-mul-add-three}
+  There are infinitely many primes of the form $4k+3$, with $k\in\N$.
+
+  \begin{lean}
+    theorem infinite_primes_four_mul_add_three :
+        Set.Infinite {p : ℕ | isPrime p ∧ ∃ k : ℕ, p = 4 * k + 3}
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  The preceding construction produces such a prime above every bound. A finite set of natural numbers is bounded, so this set of primes is infinite.
+
+  \begin{lean}
+    apply Set.infinite_of_forall_exists_gt
+    intro m
+    obtain ⟨p, hp, hgt, hform⟩ := exists_prime_mod_four_three_gt m
+    exact ⟨p, ⟨hp, hform⟩, hgt⟩
+  \end{lean}
+
+\end{proof}
+
+\begin{theorem} \label{nt:thm:prime-progression-common-difference}
+  Let $p,d\in\N$ and $n>2$. If every term of
+  \[
+    p,\ p+d,\ p+2d,\ \ldots,\ p+(n-1)d
+  \]
+  is prime, then every prime $q<n$ divides $d$. The statement includes the constant progression $d=0$.
+
+  \begin{lean}
+    theorem prime_dvd_common_difference (p d n : ℕ) (hn : 2 < n)
+        (hterms : ∀ i : ℕ, i < n → isPrime (p + i * d)) :
+        ∀ q : ℕ, isPrime q → q < n → q ∣ d
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  The first term $p$ is prime. Fix a prime $q<n$. If $d=0$, then $q\mid d$ immediately.
+
+  \begin{lean}
+    have hp : isPrime p := by
+      simpa only [zero_mul, add_zero] using hterms 0 (by omega)
+
+    intro q hq hqn
+    by_cases hd : d = 0
+
+    · exact ⟨0, by rw [hd, mul_zero]⟩
+  \end{lean}
+
+  Suppose $d>0$. We must have $n\le p$: otherwise the term with index $p$ occurs in the progression and equals $p+pd=p(1+d)$. Its divisor $p>1$ is smaller than the term, contradicting primality.
+
+  \begin{lean}
+    · have hnp : n ≤ p := by
+        by_contra h
+        have hterm := hterms p (by omega)
+        have hdiv : p ∣ p + p * d := ⟨1 + d, by ring⟩
+        rcases hterm.2 p hdiv with hone | heq
+
+        · have := hp.1
+          omega
+        · have hdpos : 0 < d := by omega
+          nlinarith [hp.1]
+  \end{lean}
+
+  Assume, seeking a contradiction, that $q$ does not divide $d$. The gcd of $q$ and $d$ divides the prime $q$, so it is $1$ or $q$. The latter would imply $q\mid d$; hence the gcd is $1$.
+
+  \begin{lean}
+    by_contra hqd
+    have hqpos : 0 < q := lt_trans Nat.zero_lt_one hq.1
+    have hqne : (q : ℤ) ≠ 0 := by
+      exact_mod_cast (Nat.ne_of_gt hqpos)
+    obtain ⟨_, hgq, hgd, _, _⟩ :=
+      Chapter01.gcd_spec (q : ℤ) (d : ℤ) (Or.inl hqne)
+    have hg : Chapter01.gcd (q : ℤ) (d : ℤ) = 1 := by
+      rcases hq.2 _ (Int.natCast_dvd_natCast.mp hgq) with hone | heq
+
+      · exact hone
+      · rw [heq] at hgd
+        exact (hqd (Int.natCast_dvd_natCast.mp hgd)).elim
+  \end{lean}
+
+  Choose integers $r,s$ with $1=qr+ds$. Divide $-ps$ by $q$, obtaining $-ps=aq+i$ with $0\le i<q$.
+
+  \begin{lean}
+    obtain ⟨r, s, hrs⟩ :=
+      (Chapter01.gcd_eq_one_iff_exists_mul_add_mul (q : ℤ) (d : ℤ) (Or.inl hqne)).mp hg
+    obtain ⟨⟨a, i⟩, ⟨hrem, hi⟩, _⟩ :=
+      Chapter01.existsUnique_quotient_remainder (-(p : ℤ) * s) ⟨q, hqpos⟩
+    change -(p : ℤ) * s = a * (q : ℤ) + (i : ℤ) at hrem
+    change i < q at hi
+  \end{lean}
+
+  These two equalities give $p+id=q(pr-da)$. Thus $q\mid p+id$.
+
+  \begin{lean}
+    have hdiv : q ∣ p + i * d := by
+      apply Int.natCast_dvd_natCast.mp
+      refine ⟨(p : ℤ) * r - (d : ℤ) * a, ?_⟩
+      push_cast
+      nlinarith [congrArg (fun z => (p : ℤ) * z) hrs,
+        congrArg (fun z => (d : ℤ) * z) hrem]
+  \end{lean}
+
+  Since $i<q<n$, this term is prime. Its prime divisor $q$ must equal the term. But $p+id\ge p\ge n>q$, a contradiction. Therefore $q\mid d$.
+
+  \begin{lean}
+    have hterm := hterms i (lt_trans hi hqn)
+    rcases hterm.2 q hdiv with hone | heq
+
+    · have := hq.1
+      omega
+    · omega
+  \end{lean}
+
+\end{proof}

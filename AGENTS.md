@@ -116,6 +116,10 @@ install and cache configuration pointed at that file.
 
 ## Lean source organization
 
+- Before writing Lean code, check the project-wide `leanOptions` in
+  `lean/lakefile.toml` and other applicable settings. Rely on those defaults
+  instead of repeating them in individual modules.
+
 - From the first result, put mathematical Lean sources in
   `lean/Textbooks/<Book>/ChapterNN/<Topic>.lean` (or `AppendixNN` for appendices),
   using descriptive `UpperCamelCase` topic names. Never use flat chapter files or a numbered
@@ -148,7 +152,7 @@ use its focused checks; shared style changes require the complete suites.
 For a single textbook, run:
 
 ```bash
-make books BOOK=<slug> check strict
+make book BOOK=<slug> check strict
 ```
 
 For the complete validation suites, run:
@@ -182,5 +186,5 @@ Prepare a concise summary containing:
 The repository owner performs final review and merge. GitHub Actions validate
 pull requests and `main`; merged release enablement or version increases for release-enabled books trigger automatic publication
 only after main CI validation gates pass. Prepare versions on development branches
-with `make release-prepare BOOK=<slug> VERSION=<version>`; do not create or push
+with `make book release BOOK=<slug> VERSION=<version>`; do not create or push
 release tags locally.
