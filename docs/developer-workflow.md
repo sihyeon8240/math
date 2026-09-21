@@ -16,6 +16,47 @@ The development container is the supported setup; for local requirements,
 inspect the canonical configuration and run `make doctor env`.
 After changing shared configuration, run `make config` and `make config check`.
 
+## Terminal containers
+
+Docker and GNU Make on the host are enough to use the toolchain without VS Code:
+
+```sh
+make image run
+make image run CMD='make book BOOK=linear-algebra check strict'
+make image build
+make image run IMAGE=math-toolchain:local CMD='make test'
+```
+
+`make image run` defaults to the reviewed image in `config/container-image.txt`.
+`make image build` builds the current Dockerfile for the host architecture and
+uses the local tag `math-toolchain:local`; set `IMAGE=<tag>` to choose another tag.
+Building does not change the reviewed pin. `make image pin DIGEST=<sha256>` is
+reserved for pinning a tested published image through the existing review flow.
+
+The run command mounts the repository at `/workspace`, sets the shared TeX search
+paths, and uses the host UID/GID so generated files retain the host user's
+ownership. It opens zsh by default or executes `CMD` with Bash and returns its exit
+status (Make reports command failures with its own nonzero status). A terminal
+is allocated only when both input and output are terminals; piped input is kept.
+`CMD` is passed as one string, so quote it to prevent host-shell expansion.
+
+The container gets a writable home under
+`${XDG_CACHE_HOME:-$HOME/.cache}/math-container/<repository-id>` on the host.
+Downloads cached there and Mathlib's `lean/.lake` directory survive subsequent
+runs; the home cache also survives `make clean build`. The numeric container user
+reuses the image's installed Lean toolchains and can download a newer pinned
+toolchain into its writable home. It starts a plain zsh session rather than
+root's personal shell configuration. Host Git/SSH credentials and the Docker
+socket are not mounted automatically. Docker must run locally with access to the
+checkout and cache paths. On Docker Desktop, allow sharing those directories.
+
+The scripts also work directly from any working directory, without Make:
+
+```sh
+./scripts/build-image.sh
+IMAGE=math-toolchain:local CMD='make check source' ./scripts/run-container.sh
+```
+
 ## Daily development workflow
 
 Keep local `main` synchronized with `origin/main` using fast-forward updates.
@@ -33,7 +74,7 @@ included in the merge or preserved elsewhere. Start with fresh branch history
 after a squash merge to avoid carrying already merged commits into the next PR.
 
 Run `make doctor env`, make focused changes, and build and check the affected
-book with `make books BOOK=<slug> check`. Select the required checks from
+book with `make book BOOK=<slug> check`. Select the required checks from
 [Contributing](CONTRIBUTING.md#validation-by-change-category) before review.
 
 Make-based build files stay under the ignored `build/` directory, while LaTeX
@@ -60,7 +101,7 @@ category.
 
 Use Make targets as the public interface. `make help` is the authoritative command
 and variable summary. Run `make report` for repository health and `make doctor
-books [BOOK=<slug>]` for advisory textbook inspections.
+book [BOOK=<slug>]` for advisory textbook inspections.
 
 Bulk builds use bounded concurrency; `BOOK_BUILD_JOBS` overrides the worker
 limit. Use Make targets as the supported interface and call implementation
@@ -172,7 +213,7 @@ order. Release targets must also have `build: true`. A version change while
 On `local-work` or another development branch, run:
 
 ```bash
-make release-prepare BOOK=mathematical-analysis-1 VERSION=0.1.0
+make book release BOOK=mathematical-analysis-1 VERSION=0.1.0
 ```
 
 This enables `release: true`, sets that book's version in `books.yml`, and

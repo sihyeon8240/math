@@ -69,7 +69,7 @@ jobs:
       - name: Pin the tested image in repository consumers
         env:
           DIGEST: ${{ needs.prepare-image.outputs.digest }}
-        run: make image-pin DIGEST="$DIGEST"
+        run: make image pin DIGEST="$DIGEST"
       - name: Commit the updated image pin
         id: pin
         run: |

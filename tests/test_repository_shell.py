@@ -236,7 +236,7 @@ class MakeBooksTests(unittest.TestCase):
         self, *goals: str, log_text: str = ""
     ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
-            ["make", "books", "BOOK=sample", *goals],
+            ["make", "book", "BOOK=sample", *goals],
             cwd=self.root,
             env={**os.environ, "PYTHON": sys.executable, "BUILD_LOG_TEXT": log_text},
             capture_output=True,
@@ -278,7 +278,7 @@ class MakeBooksTests(unittest.TestCase):
 
     def test_check_without_book_dispatches_to_bulk_validation(self) -> None:
         result = subprocess.run(
-            ["make", "books", "check", "strict"],
+            ["make", "book", "check", "strict"],
             cwd=self.root,
             env={**os.environ, "PYTHON": sys.executable},
             capture_output=True,
@@ -319,7 +319,7 @@ class MakeUsageTests(unittest.TestCase):
 
     def test_books_usage_matches_help_forms(self) -> None:
         result = subprocess.run(
-            ["make", "books", "strict"],
+            ["make", "book", "strict"],
             cwd=ROOT,
             capture_output=True,
             text=True,
@@ -331,8 +331,8 @@ class MakeUsageTests(unittest.TestCase):
             result.stderr.splitlines()[:3],
             [
                 "error: strict requires check for a book build",
-                "usage: make books [BOOK=<slug>]",
-                "usage: make books [BOOK=<slug>] check [strict]",
+                "usage: make book [BOOK=<slug>]",
+                "usage: make book [BOOK=<slug>] check [strict]",
             ],
         )
 
@@ -368,7 +368,7 @@ class MakeUsageTests(unittest.TestCase):
             result.stderr.splitlines()[:2],
             [
                 "usage: make doctor env",
-                "usage: make doctor books [BOOK=<slug>]",
+                "usage: make doctor book [BOOK=<slug>]",
             ],
         )
 

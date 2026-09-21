@@ -152,7 +152,7 @@ jobs:
       - name: Pin the tested image in repository consumers
         env:
           DIGEST: ${{ needs.prepare-image.outputs.digest }}
-        run: make image-pin DIGEST="$DIGEST"
+        run: make image pin DIGEST="$DIGEST"
       - name: Open an image pin pull request
         env:
           GH_TOKEN: ${{ github.token }}

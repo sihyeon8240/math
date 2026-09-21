@@ -138,7 +138,7 @@ it; the book policy does not change the repository's kernel trust boundary.
 
 Start new book policies from the
 [formalization boundary template](../common/templates/formalization.md), also
-copied by `make new-book`. Complete its prompts before formalization; the template
+copied by `make book new`. Complete its prompts before formalization; the template
 does not authorize any mathematical prerequisites.
 
 Current book policies are:
