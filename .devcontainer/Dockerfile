@@ -1,23 +1,4 @@
-FROM debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171 AS python-builder
-
-COPY config/toolchain.env /tmp/toolchain.env
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    build-essential ca-certificates curl libbz2-dev libffi-dev libgdbm-dev \
-    liblzma-dev libncursesw5-dev libreadline-dev libsqlite3-dev libssl-dev \
-    tk-dev uuid-dev xz-utils zlib1g-dev \
-  && set -a && . /tmp/toolchain.env && set +a \
-  && curl -fsSL -o /tmp/python.tar.xz \
-    "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz" \
-  && echo "${PYTHON_SHA256}  /tmp/python.tar.xz" | sha256sum --check - \
-  && mkdir /tmp/python \
-  && tar -xJf /tmp/python.tar.xz -C /tmp/python --strip-components=1 \
-  && cd /tmp/python \
-  && ./configure --prefix=/opt/python --enable-optimizations --with-lto --with-ensurepip=install \
-  && make -j2 && make install \
-  && /opt/python/bin/python3 -m pip install --disable-pip-version-check \
-    --no-cache-dir "PyYAML==${PYYAML_VERSION}"
-
-FROM debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171 AS tool-downloader
+FROM debian:bookworm-slim@sha256:3783cc01769c7b2b1b83a5c5ad96c815348e28ed7da68e2e3687004faa906251 AS tool-downloader
 
 COPY config/toolchain.env /tmp/toolchain.env
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -28,21 +9,17 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     amd64) elan_target=x86_64-unknown-linux-gnu; elan_sha256="$ELAN_SHA256_AMD64"; \
       ruff_target=x86_64-unknown-linux-gnu; ruff_sha256="$RUFF_SHA256_AMD64"; \
       shfmt_sha256="$SHFMT_SHA256_AMD64"; latexindent_asset=latexindent-linux; \
-      latexindent_sha256="$LATEXINDENT_SHA256_AMD64"; docker_target=x86_64; \
-      docker_sha256="$DOCKER_SHA256_AMD64"; buildx_target=amd64; \
-      buildx_sha256="$BUILDX_SHA256_AMD64"; compose_target=x86_64; \
-      compose_sha256="$COMPOSE_SHA256_AMD64"; gh_target=amd64; \
+      latexindent_sha256="$LATEXINDENT_SHA256_AMD64"; shellcheck_target=x86_64; \
+      shellcheck_sha256="$SHELLCHECK_SHA256_AMD64"; gh_target=amd64; \
       gh_sha256="$GH_SHA256_AMD64" ;; \
     arm64) elan_target=aarch64-unknown-linux-gnu; elan_sha256="$ELAN_SHA256_ARM64"; \
       ruff_target=aarch64-unknown-linux-gnu; ruff_sha256="$RUFF_SHA256_ARM64"; \
       shfmt_sha256="$SHFMT_SHA256_ARM64"; latexindent_asset=latexindent-linux-arm64; \
-      latexindent_sha256="$LATEXINDENT_SHA256_ARM64"; docker_target=aarch64; \
-      docker_sha256="$DOCKER_SHA256_ARM64"; buildx_target=arm64; \
-      buildx_sha256="$BUILDX_SHA256_ARM64"; compose_target=aarch64; \
-      compose_sha256="$COMPOSE_SHA256_ARM64"; gh_target=arm64; \
+      latexindent_sha256="$LATEXINDENT_SHA256_ARM64"; shellcheck_target=aarch64; \
+      shellcheck_sha256="$SHELLCHECK_SHA256_ARM64"; gh_target=arm64; \
       gh_sha256="$GH_SHA256_ARM64" ;; \
     *) echo "Unsupported architecture: $architecture" >&2; exit 1 ;; esac \
-  && mkdir -p /out/bin /out/lib/docker/cli-plugins /tmp/ruff /tmp/gh \
+  && mkdir -p /out/bin /tmp/ruff /tmp/gh /tmp/shellcheck \
   && curl -fsSL -o /tmp/elan.tgz "https://github.com/leanprover/elan/releases/download/v${ELAN_VERSION}/elan-${elan_target}.tar.gz" \
   && echo "${elan_sha256}  /tmp/elan.tgz" | sha256sum --check - \
   && tar -xzf /tmp/elan.tgz -C /out/bin elan-init \
@@ -56,34 +33,25 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
   && curl -fsSL -o /tmp/latexindent "https://github.com/cmhughes/latexindent.pl/releases/download/V${LATEXINDENT_VERSION}/${latexindent_asset}" \
   && echo "${latexindent_sha256}  /tmp/latexindent" | sha256sum --check - \
   && install /tmp/latexindent /out/bin/latexindent \
-  && curl -fsSL -o /tmp/docker.tgz "https://download.docker.com/linux/static/stable/${docker_target}/docker-${DOCKER_VERSION}.tgz" \
-  && echo "${docker_sha256}  /tmp/docker.tgz" | sha256sum --check - \
-  && tar -xzf /tmp/docker.tgz -C /tmp docker/docker --strip-components=1 \
-  && install /tmp/docker /out/bin/docker \
-  && curl -fsSL -o /tmp/buildx "https://github.com/docker/buildx/releases/download/v${BUILDX_VERSION}/buildx-v${BUILDX_VERSION}.linux-${buildx_target}" \
-  && echo "${buildx_sha256}  /tmp/buildx" | sha256sum --check - \
-  && install /tmp/buildx /out/lib/docker/cli-plugins/docker-buildx \
-  && curl -fsSL -o /tmp/compose "https://github.com/docker/compose/releases/download/v${COMPOSE_VERSION}/docker-compose-linux-${compose_target}" \
-  && echo "${compose_sha256}  /tmp/compose" | sha256sum --check - \
-  && install /tmp/compose /out/lib/docker/cli-plugins/docker-compose \
+  && curl -fsSL -o /tmp/shellcheck.tgz "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.${shellcheck_target}.tar.gz" \
+  && echo "${shellcheck_sha256}  /tmp/shellcheck.tgz" | sha256sum --check - \
+  && tar -xzf /tmp/shellcheck.tgz -C /tmp/shellcheck --strip-components=1 \
+  && install /tmp/shellcheck/shellcheck /out/bin/shellcheck \
   && curl -fsSL -o /tmp/gh.tgz "https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_${gh_target}.tar.gz" \
   && echo "${gh_sha256}  /tmp/gh.tgz" | sha256sum --check - \
   && tar -xzf /tmp/gh.tgz -C /tmp/gh --strip-components=1 \
   && install /tmp/gh/bin/gh /out/bin/gh
 
-FROM debian:bookworm-slim@sha256:88200866dfff7ea7f5cbcb6ec7c8a701889efe6fe859fe64d6990e4b07ea4171
+FROM python:3.12.14-slim-bookworm@sha256:392307d22300de8b5986851a12d9176dfc0fc073e65bf6523ebd7dcbeb23564e
 LABEL org.opencontainers.image.description="Mathematics textbook toolchain"
 ENV DEBIAN_FRONTEND=noninteractive
 ENV ELAN_HOME=/usr/local/elan
-ENV PATH="/opt/python/bin:/usr/local/elan/bin:/usr/local/bin:/usr/local/texlive/2026/bin/x86_64-linux:/usr/local/texlive/2026/bin/aarch64-linux:${PATH}"
+ENV PATH="/usr/local/elan/bin:/usr/local/bin:/usr/local/texlive/2026/bin/x86_64-linux:/usr/local/texlive/2026/bin/aarch64-linux:${PATH}"
 WORKDIR /workspace
 COPY config/toolchain.env /workspace/config/toolchain.env
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash build-essential ca-certificates curl ghostscript git git-man less libbz2-1.0 \
-    libffi8 libgdbm-compat4 libgdbm6 libgl1-mesa-glx liblzma5 libncursesw6 \
-    libreadline8 libsqlite3-0 libssl3 libtcl8.6 libtk8.6 libuuid1 locales \
-    man-db nano openssh-client patch perl ripgrep shellcheck tk tree tzdata \
-    xz-utils zlib1g zsh \
+    bash build-essential ca-certificates curl ghostscript git git-man less locales \
+    man-db nano openssh-client patch perl ripgrep tk tree tzdata xz-utils zsh \
   && echo 'en_US.UTF-8 UTF-8' > /etc/locale.gen \
   && locale-gen \
   && rm -rf /var/lib/apt/lists/*
@@ -115,9 +83,9 @@ RUN curl -fsSL -o /root/.zshrc \
   && rm -rf /root/.oh-my-zsh/.git \
       /root/.oh-my-zsh/custom/themes/powerlevel10k/.git \
   && usermod --shell /bin/zsh root
-COPY --from=python-builder /opt/python /opt/python
 COPY --from=tool-downloader /out/bin/ /usr/local/bin/
-COPY --from=tool-downloader /out/lib/docker/cli-plugins/ /usr/local/lib/docker/cli-plugins/
+RUN set -a && . /workspace/config/toolchain.env && set +a \
+  && python3 -m pip install --disable-pip-version-check --no-cache-dir "PyYAML==${PYYAML_VERSION}"
 RUN set -a && . /workspace/config/toolchain.env && set +a \
   && repository="https://texlive.info/tlnet-archive/${TEXLIVE_ARCHIVE_DATE}/tlnet" \
   && curl -fsSL -o /tmp/install-tl.tgz "$repository/install-tl-unx.tar.gz" \

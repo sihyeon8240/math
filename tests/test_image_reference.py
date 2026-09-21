@@ -83,8 +83,8 @@ class ConfigurationTests(unittest.TestCase):
             text = (ROOT / "config/toolchain.env").read_text(encoding="utf-8")
             path.write_text(
                 text.replace(
-                    "LEAN_TOOLCHAIN=leanprover/lean4:v4.33.1",
-                    "LEAN_TOOLCHAIN=leanprover/lean4:v4.32.0",
+                    f"LEAN_TOOLCHAIN={CONFIG.load_toolchain()['LEAN_TOOLCHAIN']}",
+                    "LEAN_TOOLCHAIN=leanprover/lean4:v0.0.0",
                 ),
                 encoding="utf-8",
             )
@@ -136,12 +136,15 @@ class ConfigurationTests(unittest.TestCase):
             self.make_repository(root)
             toolchain = root / "config/toolchain.env"
             toolchain.write_text(
-                toolchain.read_text().replace("4.33.1", "4.34.0"), encoding="utf-8"
+                toolchain.read_text().replace(
+                    CONFIG.load_toolchain()["LEAN_VERSION"], "99.0.0"
+                ),
+                encoding="utf-8",
             )
             lock = root / "lean/lake-manifest.json"
             manifest = json.loads(lock.read_text())
             mathlib = next(p for p in manifest["packages"] if p["name"] == "mathlib")
-            mathlib.update(inputRev="v4.34.0", rev="a" * 40)
+            mathlib.update(inputRev="v99.0.0", rev="a" * 40)
             lock.write_text(json.dumps(manifest), encoding="utf-8")
             versions = root / "common/templates/formalization-versions.tex"
             before = versions.read_text()
@@ -149,8 +152,8 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual(versions.read_text(), before)
             SYNC.synchronize(root=root)
             rendered = versions.read_text()
-            self.assertIn(r"\TextbookLeanVersion}{4.34.0}", rendered)
-            self.assertIn(r"\TextbookMathlibVersion}{v4.34.0}", rendered)
+            self.assertIn(r"\TextbookLeanVersion}{99.0.0}", rendered)
+            self.assertIn(r"\TextbookMathlibVersion}{v99.0.0}", rendered)
             self.assertIn(r"\TextbookMathlibRevision}{" + "a" * 40 + "}", rendered)
             self.assertEqual(SYNC.synchronize(root=root, check=True), [])
             versions.unlink()
