@@ -5,6 +5,11 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 PYTHON="${PYTHON:-python3}"
 
+if [[ $# -gt 1 || ($# -eq 1 && "$1" != --defer-proof-links) ]]; then
+  echo "usage: $0 [--defer-proof-links]" >&2
+  exit 2
+fi
+
 site_pages="$(mktemp -d)"
 trap 'rm -rf -- "$site_pages"' EXIT
 
@@ -29,7 +34,10 @@ shellcheck --severity=error scripts/*.sh
 "$PYTHON" scripts/generate-site-pages.py --output-dir "$site_pages"
 "$PYTHON" scripts/generate-site-pages.py --check --output-dir "$site_pages"
 "$PYTHON" scripts/check-image-reference.py
-"$PYTHON" scripts/check-proof-links.py
+# The full check validates these links together with their Lean declarations.
+if [[ "${1:-}" != --defer-proof-links ]]; then
+  "$PYTHON" scripts/check-proof-links.py
+fi
 
 required=(
   Makefile

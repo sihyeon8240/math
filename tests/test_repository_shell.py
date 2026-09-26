@@ -14,6 +14,60 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
+class FullCheckTests(unittest.TestCase):
+    def test_full_check_defers_links_and_stops_on_lean_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            shutil.copy2(ROOT / "scripts/check.sh", scripts)
+            names = [
+                "check-repository.sh",
+                "format-python.sh",
+                "format-shell.sh",
+                "format-tex.sh",
+                "normalize-eof.sh",
+                "check-lean.sh",
+                "build-all.sh",
+            ]
+            for name in names:
+                script = scripts / name
+                script.write_text(
+                    "#!/bin/sh\n"
+                    'printf "%s %s\\n" "${0##*/}" "$*" >> "$CAPTURE"\n'
+                    + (
+                        'exit "${LEAN_EXIT_CODE:-0}"\n'
+                        if name == "check-lean.sh"
+                        else ""
+                    )
+                )
+                script.chmod(0o755)
+
+            for status in (0, 7):
+                with self.subTest(status=status):
+                    capture = root / f"calls-{status}"
+                    result = subprocess.run(
+                        [str(scripts / "check.sh")],
+                        cwd=root,
+                        env={
+                            **os.environ,
+                            "CAPTURE": str(capture),
+                            "LEAN_EXIT_CODE": str(status),
+                        },
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, status, result.stderr)
+                    calls = capture.read_text().splitlines()
+                    self.assertEqual(
+                        calls[0], "check-repository.sh --defer-proof-links"
+                    )
+                    self.assertIn("normalize-eof.sh --check --exclude-formatted", calls)
+                    self.assertEqual(calls.count("check-lean.sh "), 1)
+                    self.assertEqual("build-all.sh check" in calls, status == 0)
+
+
 class RepositorySourceCheckTests(unittest.TestCase):
     def test_syntax_error_in_later_script_stops_source_checks(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -705,6 +759,49 @@ class NormalizeEofTests(unittest.TestCase):
             self.assertEqual(invalid_result.returncode, 1)
             self.assertIn(str(missing), invalid_result.stderr)
             self.assertIn(str(extra), invalid_result.stderr)
+
+    def test_full_check_excludes_only_paths_covered_by_formatters(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            covered = [
+                "scripts/helper.py",
+                "tests/test_sample.py",
+                "scripts/build.sh",
+                "books/sample/book.tex",
+                "common/styles/sample.sty",
+            ]
+            remaining = ["README.md", "lean/Sample.lean", "other/helper.py"]
+            for name in covered + remaining:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"missing newline")
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+
+            command = [str(ROOT / "scripts/normalize-eof.sh"), "--check"]
+            result = subprocess.run(
+                [*command, "--exclude-formatted"],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            for name in covered:
+                self.assertNotIn(name, result.stderr)
+            for name in remaining:
+                self.assertIn(name, result.stderr)
+
+            standalone = subprocess.run(
+                command,
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(standalone.returncode, 1)
+            for name in covered + remaining:
+                self.assertIn(name, standalone.stderr)
 
     def test_without_paths_processes_tracked_text_only(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

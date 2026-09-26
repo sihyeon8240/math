@@ -3,22 +3,34 @@ set -euo pipefail
 
 mode="format"
 collapse_blank_lines=0
+exclude_formatted=0
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
   --check) mode="check" ;;
+  --exclude-formatted) exclude_formatted=1 ;;
   --collapse-blank-lines) collapse_blank_lines=1 ;;
   *)
-    echo "usage: $0 [--check] [--collapse-blank-lines] [FILE...]" >&2
+    echo "usage: $0 [--check] [--collapse-blank-lines] [--exclude-formatted] [FILE...]" >&2
     exit 2
     ;;
   esac
   shift
 done
 
+if ((exclude_formatted)) && [[ "$mode" != check || $# -ne 0 ]]; then
+  echo "error: --exclude-formatted requires --check without file arguments" >&2
+  exit 2
+fi
+
 files=("$@")
 if [[ "${#files[@]}" -eq 0 ]]; then
   while IFS= read -r -d '' file; do
     [[ -f "$file" ]] || continue
+    if ((exclude_formatted)); then
+      case "$file" in
+      scripts/*.py | tests/*.py | scripts/*.sh | *.tex | *.sty) continue ;;
+      esac
+    fi
     grep -Iq '' "$file" || continue
     files+=("$file")
   done < <(git ls-files -z --cached)
