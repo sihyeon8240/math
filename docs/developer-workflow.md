@@ -107,6 +107,10 @@ Book builds retain successful PDFs so latexmk can skip unchanged inputs. A faile
 latexmk run removes its PDF; strict checks still inspect the resulting build log
 on every invocation.
 
+`make test` runs the isolated Lean audit scenarios with up to four workers. Each
+scenario has its own temporary module tree, and failures retain their scenario
+names in the test report.
+
 Bulk builds use bounded concurrency; `BOOK_BUILD_JOBS` overrides the worker
 limit. Use Make targets as the supported interface and call implementation
 scripts directly only when debugging their specific output.
