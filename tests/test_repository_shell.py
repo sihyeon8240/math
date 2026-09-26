@@ -767,6 +767,7 @@ class BuildBookTests(unittest.TestCase):
               touch "$LATEXMK_CAPTURE/stale-pdf-observed"
             fi
             touch "$LATEXMK_CAPTURE/book.pdf"
+            exit "${LATEXMK_EXIT_CODE:-0}"
             """),
             encoding="utf-8",
         )
@@ -799,7 +800,7 @@ class BuildBookTests(unittest.TestCase):
         )
         self.assertIn(f"-outdir={output}", (output / "arguments").read_text())
 
-    def test_removes_stale_pdf_before_latexmk(self) -> None:
+    def test_preserves_pdf_for_incremental_latexmk(self) -> None:
         output = self.root / "build/sample"
         output.mkdir(parents=True)
         (output / "book.pdf").write_text("stale", encoding="utf-8")
@@ -819,8 +820,32 @@ class BuildBookTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertFalse((output / "stale-pdf-observed").exists())
+        self.assertTrue((output / "stale-pdf-observed").exists())
         self.assertTrue((output / "book.pdf").exists())
+
+    def test_failed_latexmk_removes_pdf_and_preserves_exit_status(self) -> None:
+        output = self.root / "build/sample"
+        output.mkdir(parents=True)
+        (output / "book.pdf").write_text("stale", encoding="utf-8")
+
+        result = subprocess.run(
+            [str(self.root / "scripts/build-book.sh"), "sample"],
+            cwd=self.root,
+            env={
+                **os.environ,
+                "PATH": self.path,
+                "PYTHON": sys.executable,
+                "LATEXMK_CAPTURE": str(output),
+                "LATEXMK_EXIT_CODE": "17",
+            },
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 17, result.stderr)
+        self.assertFalse((output / "book.pdf").exists())
+        self.assertNotIn("==> Built", result.stdout)
 
     def test_missing_entry_point_is_rejected_before_latexmk(self) -> None:
         (self.root / "books/sample/book.tex").unlink()

@@ -103,6 +103,10 @@ Use Make targets as the public interface. `make help` is the authoritative comma
 and variable summary. Run `make report` for repository health and `make doctor
 book [BOOK=<slug>]` for advisory textbook inspections.
 
+Book builds retain successful PDFs so latexmk can skip unchanged inputs. A failed
+latexmk run removes its PDF; strict checks still inspect the resulting build log
+on every invocation.
+
 Bulk builds use bounded concurrency; `BOOK_BUILD_JOBS` overrides the worker
 limit. Use Make targets as the supported interface and call implementation
 scripts directly only when debugging their specific output.
