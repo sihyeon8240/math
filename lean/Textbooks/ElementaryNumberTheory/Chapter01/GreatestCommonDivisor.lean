@@ -89,7 +89,7 @@ theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
     0 < gcd a b ∧ (gcd a b : ℤ) ∣ a ∧ (gcd a b : ℤ) ∣ b ∧
       (∃ x y : ℤ, (gcd a b : ℤ) = a * x + b * y) ∧
       (∀ c : ℤ, c ∣ a → c ∣ b → c ∣ (gcd a b : ℤ)) := by
-  rw [gcd, dif_pos hab]
+  rw [gcd, dite_eq_left hab]
   exact Classical.choose_spec (exists_positive_common_divisor a b hab)
 
 /-- Theorem: every common divisor is at most the positive gcd.
@@ -117,7 +117,7 @@ theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
 /-- Theorem: the total definition assigns zero to the zero pair. -/
 theorem gcd_zero_zero : gcd 0 0 = 0 := by
   unfold gcd
-  rw [dif_neg (by
+  rw [dite_eq_right (by
     rintro (h | h)
     exact h rfl
     exact h rfl)]

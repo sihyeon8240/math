@@ -134,7 +134,7 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   The definition selects the number constructed above, together with its established properties.
 
   \begin{lean}
-    rw [gcd, dif_pos hab]
+    rw [gcd, dite_eq_left hab]
     exact Classical.choose_spec (exists_positive_common_divisor a b hab)
   \end{lean}
 \end{proof}
@@ -185,7 +185,7 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
   \begin{lean}
     unfold gcd
-    rw [dif_neg (by
+    rw [dite_eq_right (by
       rintro (h | h)
       exact h rfl
       exact h rfl)]

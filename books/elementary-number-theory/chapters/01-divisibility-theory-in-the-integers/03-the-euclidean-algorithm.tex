@@ -302,7 +302,7 @@ $a=qb+r$ with $0\le r<b$, and is followed by $(b,r)$.
   \begin{lean}
     classical
 
-    rw [lcm, dif_pos ⟨ha, hb⟩]
+    rw [lcm, dite_eq_left ⟨ha, hb⟩]
 
     obtain ⟨hp, hma, hmb⟩ := Nat.find_spec (exists_positive_common_multiple a b ha hb)
 

@@ -30,7 +30,7 @@ theorem lcm_spec (a b : ℤ) (ha : a ≠ 0) (hb : b ≠ 0) :
       (∀ c : ℤ, a ∣ c → b ∣ c → 0 < c → (lcm a b : ℤ) ≤ c) := by
   classical
 
-  rw [lcm, dif_pos ⟨ha, hb⟩]
+  rw [lcm, dite_eq_left ⟨ha, hb⟩]
 
   obtain ⟨hp, hma, hmb⟩ := Nat.find_spec (exists_positive_common_multiple a b ha hb)
 
