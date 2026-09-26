@@ -137,6 +137,19 @@ class LeanAuditTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("forbidden axiom externalFact", result.stdout)
 
+    def test_sorry_in_a_private_helper_is_rejected(self) -> None:
+        result = self.audit("private theorem unfinished : False := by sorry\n")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("forbidden axiom sorryAx", result.stdout)
+
+    def test_unused_external_axiom_is_not_a_repository_declaration(self) -> None:
+        result = self.audit(
+            "theorem result : True := True.intro\n",
+            "result",
+            external="axiom unusedExternalFact : False\n",
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
     def test_comment_and_string_mentions_are_not_escape_hatches(self) -> None:
         result = self.audit('-- sorry admit axiom\ndef note := "sorry admit axiom"\n')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

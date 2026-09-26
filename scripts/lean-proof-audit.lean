@@ -18,18 +18,16 @@ private def auditAxioms (name : Name) : CommandElabM Unit := do
 private def auditTextbookDeclarations : CommandElabM Unit := do
   let env ← getEnv
 
-  for (name, info) in env.constants.toList do
-    let some index := env.getModuleIdxFor? name | continue
-
-    let moduleName := env.header.moduleNames[index.toNat]!
-
+  -- Select modules before visiting declarations to avoid traversing all of Mathlib.
+  for moduleName in env.header.moduleNames, moduleData in env.header.moduleData do
     unless (`Textbooks).isPrefixOf moduleName do
       continue
 
-    if info matches .axiomInfo _ then
-      throwError "repository-defined axiom is forbidden: {name}"
+    for info in moduleData.constants do
+      if info matches .axiomInfo _ then
+        throwError "repository-defined axiom is forbidden: {info.name}"
 
-    auditAxioms name
+      auditAxioms info.name
 
 private def auditProof (name : Name) : CommandElabM Unit := do
   let some info := (← getEnv).find? name
