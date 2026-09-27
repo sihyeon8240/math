@@ -175,7 +175,9 @@ book-local file when an actual `frontmatter/title-and-copyright.tex` or
 | `site/books/*.md` | `make site`, from the registry and proof coverage | Ignored; regenerate before local site builds |
 | PDFs, LaTeX logs, proof-link probes, verified-build metadata | `build/` | Ignored; never commit |
 | LaTeX Workshop output | `vscode-build/` | Ignored; never commit |
-| Lake, Python, Ruff, and LaTeX formatter caches | Their configured ignored cache directories | Never commit |
+| Python, Ruff, LaTeX formatter, and Mathlib download caches | `.cache/{python,ruff,latexindent,mathlib}/` by default | Ignored; never commit |
+| Lake dependencies, configuration cache, and build results | `lean/.lake/` | Ignored; never commit |
+| Persistent container home | Host `${XDG_CACHE_HOME:-$HOME/.cache}/math-container/<repository-id>` | Outside the checkout; preserved by cache cleanup |
 | Release staging and source-check site rendering | Automatically cleaned temporary directories | Never commit |
 
 Intentionally absent local-only assets remain absent; preserve their fallback

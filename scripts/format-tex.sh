@@ -22,7 +22,7 @@ cruft_directory="$(mktemp -d)"
 trap 'rm -rf "$cruft_directory"' EXIT
 
 # Reuse checks only while the source, formatting rules, and tool version match.
-cache_root="${FORMAT_TEX_CACHE_DIR:-$repository_root/.latexindent_cache}"
+cache_root="${FORMAT_TEX_CACHE_DIR:-$repository_root/.cache/latexindent}"
 script_hash="$(sha256sum "$0" "$eof_formatter")"
 latexindent_version="$(latexindent --version | head -n 1)"
 cache_namespace="$(printf '%s\n%s\n' "$script_hash" "$latexindent_version" | sha256sum | cut -d ' ' -f 1)"

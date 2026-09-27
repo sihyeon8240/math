@@ -42,8 +42,9 @@ is allocated only when both input and output are terminals; piped input is kept.
 
 The container gets a writable home under
 `${XDG_CACHE_HOME:-$HOME/.cache}/math-container/<repository-id>` on the host.
-Downloads cached there and Mathlib's `lean/.lake` directory survive subsequent
-runs; the home cache also survives `make clean build`. The numeric container user
+This is persistent home state, including Elan settings and installed toolchains,
+not a disposable tool cache. It and Mathlib's `lean/.lake` directory survive
+subsequent runs and `make clean build`. The numeric container user
 reuses the image's installed Lean toolchains and can download a newer pinned
 toolchain into its writable home. It starts a plain zsh session rather than
 root's personal shell configuration. Host Git/SSH credentials and the Docker
@@ -92,16 +93,58 @@ artifact names are also excluded from Git and from `make tree` output.
 
 Use `make clean build` to remove generated Make and VS Code build output. Local
 tool caches are preserved unless explicitly selected with
-`make clean cache {lake|tex|ruff|py|all}`. The `lake`, `tex`, and `ruff` scopes
-remove their corresponding cache directories; `py` removes repository
-`__pycache__` directories and `.pyc` files. Use `all` to remove every cache
-category.
+`make clean cache {lake|mathlib|tex|ruff|py|all}`.
+
+| Scope | Default location | Contents |
+|---|---|---|
+| `tex` | `.cache/latexindent/` | Successful LaTeX formatting checks |
+| `ruff` | `.cache/ruff/` | Ruff formatter and lint caches |
+| `py` | `.cache/python/` | Python bytecode |
+| `mathlib` | `.cache/mathlib/` | Mathlib downloads |
+| `lake` | `lean/.lake/` | Lean dependencies, configuration cache, and build results |
+
+Make exports absolute `PYTHONPYCACHEPREFIX` and `MATHLIB_CACHE_DIR` defaults.
+The devcontainer and `make image run` set these variables inside the container
+as well, so direct Python and Lake commands there use the same locations.
+`scripts/check-lean.sh` also sets defaults when invoked directly. Ruff reads its
+cache path from `pyproject.toml`; the LaTeX formatter sets its own default.
+
+For direct Python or Lake commands in a host shell, set these variables from the
+repository root first (Python must see its setting before it starts):
+
+```bash
+export PYTHONPYCACHEPREFIX="$PWD/.cache/python"
+export MATHLIB_CACHE_DIR="$PWD/.cache/mathlib"
+```
+
+Explicit environment overrides are respected by Make; the container runner uses
+container paths rather than forwarding host paths. `FORMAT_TEX_CACHE_DIR` and
+`RUFF_CACHE_DIR` can also override the formatter defaults. Cleanup only targets
+the repository's default locations, never arbitrary override paths or shared
+user caches.
+
+The `tex` and `ruff` cleanup scopes also remove their old `.latexindent_cache/`
+and `.ruff_cache/` directories. The `py` scope additionally removes legacy
+repository `__pycache__` directories and `.pyc` files outside `.cache/`.
+Existing caches are not migrated automatically; they regenerate on demand.
+Use `all` to remove all listed categories, including these legacy locations.
+The persistent container home is excluded, and `mathlib` does not remove
+`lean/.lake/`. Lake retains its standard location for compatibility with its
+tools and Mathlib. Avoid cleaning caches while their tools are running.
 
 ## Make command interface
 
 Use Make targets as the public interface. `make help` is the authoritative command
 and variable summary. Run `make report` for repository health and `make doctor
 book [BOOK=<slug>]` for advisory textbook inspections.
+
+Book builds retain successful PDFs so latexmk can skip unchanged inputs. A failed
+latexmk run removes its PDF; strict checks still inspect the resulting build log
+on every invocation.
+
+`make test` runs the isolated Lean audit scenarios with up to four workers. Each
+scenario has its own temporary module tree, and failures retain their scenario
+names in the test report.
 
 Bulk builds use bounded concurrency; `BOOK_BUILD_JOBS` overrides the worker
 limit. Use Make targets as the supported interface and call implementation

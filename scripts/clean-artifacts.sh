@@ -14,6 +14,7 @@ while IFS= read -r -d '' artifact; do
   rm -f -- "$artifact"
 done < <(find "$repo_root" \
   -path "$repo_root/.git" -prune -o \
+  -path "$repo_root/.cache" -prune -o \
   -path "$repo_root/build" -prune -o \
   -path "$repo_root/vscode-build" -prune -o \
   -path "$repo_root/.latexindent_cache" -prune -o \

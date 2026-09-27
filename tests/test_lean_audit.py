@@ -7,6 +7,8 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from pathlib import Path
 
 from scripts.lean_source import escape_hatch_lines
@@ -30,6 +32,16 @@ class LeanSourceTests(unittest.TestCase):
         )
 
 
+@dataclass(frozen=True)
+class AuditCase:
+    name: str
+    body: str
+    proof: str | None = None
+    diagnostic: str | None = None
+    in_root: bool = False
+    external: str | None = None
+
+
 @unittest.skipUnless(shutil.which("lake"), "the pinned Lean toolchain is required")
 class LeanAuditTests(unittest.TestCase):
     @classmethod
@@ -44,26 +56,21 @@ class LeanAuditTests(unittest.TestCase):
         )
         cls.lean = str(Path(result.stdout.strip()) / "bin/lean")
 
-    def audit(
-        self,
-        body: str,
-        proof: str | None = None,
-        *,
-        in_root: bool = False,
-        external: str | None = None,
-    ) -> subprocess.CompletedProcess[str]:
+    def audit(self, case: AuditCase) -> subprocess.CompletedProcess[str]:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             environment = {**os.environ, "LEAN_PATH": str(root)}
             module = root / "Textbooks/Fixture.lean"
             module.parent.mkdir()
-            module.write_text("" if in_root else body)
+            module.write_text("" if case.in_root else case.body)
             entry = root / "Textbooks.lean"
-            entry.write_text("import Textbooks.Fixture\n" + (body if in_root else ""))
+            entry.write_text(
+                "import Textbooks.Fixture\n" + (case.body if case.in_root else "")
+            )
             sources = [module, entry]
-            if external is not None:
+            if case.external is not None:
                 dependency = root / "External.lean"
-                dependency.write_text(external)
+                dependency.write_text(case.external)
                 module.write_text("import External\n" + module.read_text())
                 sources.insert(0, dependency)
             for source in sources:
@@ -75,13 +82,12 @@ class LeanAuditTests(unittest.TestCase):
                     text=True,
                     timeout=60,
                 )
-                self.assertEqual(
-                    compiled.returncode, 0, compiled.stdout + compiled.stderr
-                )
+                if compiled.returncode != 0:
+                    raise AssertionError(compiled.stdout + compiled.stderr)
             probe = root / "Audit.lean"
             source = (ROOT / "scripts/lean-proof-audit.lean").read_text()
-            if proof:
-                source += f"\nrun_cmd auditProof `{proof}\n"
+            if case.proof:
+                source += f"\nrun_cmd auditProof `{case.proof}\n"
             probe.write_text(source)
             return subprocess.run(
                 [self.lean, str(probe)],
@@ -92,54 +98,79 @@ class LeanAuditTests(unittest.TestCase):
                 timeout=60,
             )
 
-    def test_checked_theorem_and_standard_classical_axioms_are_allowed(self) -> None:
-        result = self.audit(
-            "theorem result (p : Prop) : p ∨ ¬p := Classical.em p\n", "result"
-        )
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-
-    def test_registered_data_definition_is_not_a_proof(self) -> None:
-        result = self.audit("def result : Nat := 0\n", "result")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("not a proof of a proposition", result.stdout)
-
-    def test_missing_declaration_is_rejected(self) -> None:
-        result = self.audit("", "missing")
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("does not exist", result.stdout)
-
-    def test_private_and_unused_axioms_are_rejected_without_registered_proofs(
-        self,
-    ) -> None:
+    def test_isolated_audit_cases(self) -> None:
+        cases = [
+            AuditCase(
+                "standard classical axioms",
+                "theorem result (p : Prop) : p ∨ ¬p := Classical.em p\n",
+                proof="result",
+            ),
+            AuditCase(
+                "registered data definition",
+                "def result : Nat := 0\n",
+                proof="result",
+                diagnostic="not a proof of a proposition",
+            ),
+            AuditCase(
+                "missing declaration",
+                "",
+                proof="missing",
+                diagnostic="does not exist",
+            ),
+            AuditCase(
+                "transitive external axiom",
+                "theorem result : False := externalFact\n",
+                proof="result",
+                external="axiom externalFact : False\n",
+                diagnostic="forbidden axiom externalFact",
+            ),
+            AuditCase(
+                "private unfinished helper",
+                "private theorem unfinished : False := by sorry\n",
+                diagnostic="forbidden axiom sorryAx",
+            ),
+            AuditCase(
+                "unused external axiom",
+                "theorem result : True := True.intro\n",
+                proof="result",
+                external="axiom unusedExternalFact : False\n",
+            ),
+            AuditCase(
+                "comments and strings",
+                '-- sorry admit axiom\ndef note := "sorry admit axiom"\n',
+            ),
+        ]
         for in_root in (False, True):
-            with self.subTest(in_root=in_root):
-                result = self.audit(
-                    "private axiom fabricated : False\n", in_root=in_root
-                )
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn("repository-defined axiom", result.stdout)
+            cases.extend(
+                [
+                    AuditCase(
+                        "private unused axiom",
+                        "private axiom fabricated : False\n",
+                        diagnostic="repository-defined axiom",
+                        in_root=in_root,
+                    ),
+                    AuditCase(
+                        "unregistered unfinished helper",
+                        "theorem unfinished : False := by sorry\n",
+                        diagnostic="forbidden axiom sorryAx",
+                        in_root=in_root,
+                    ),
+                ]
+            )
 
-    def test_sorry_in_an_unregistered_helper_is_rejected(self) -> None:
-        for in_root in (False, True):
-            with self.subTest(in_root=in_root):
-                result = self.audit(
-                    "theorem unfinished : False := by sorry\n", in_root=in_root
-                )
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn("forbidden axiom sorryAx", result.stdout)
-
-    def test_transitive_external_axioms_are_rejected(self) -> None:
-        result = self.audit(
-            "theorem result : False := externalFact\n",
-            "result",
-            external="axiom externalFact : False\n",
-        )
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn("forbidden axiom externalFact", result.stdout)
-
-    def test_comment_and_string_mentions_are_not_escape_hatches(self) -> None:
-        result = self.audit('-- sorry admit axiom\ndef note := "sorry admit axiom"\n')
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        # Workers launch isolated Lean processes; assertions and reporting stay serial.
+        workers = min(4, os.cpu_count() or 1)
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            pending = [(case, executor.submit(self.audit, case)) for case in cases]
+            for case, future in pending:
+                with self.subTest(case=case.name, in_root=case.in_root):
+                    result = future.result()
+                    diagnostic = result.stdout + result.stderr
+                    if case.diagnostic is None:
+                        self.assertEqual(result.returncode, 0, diagnostic)
+                    else:
+                        self.assertNotEqual(result.returncode, 0, diagnostic)
+                        self.assertIn(case.diagnostic, diagnostic)
 
 
 if __name__ == "__main__":

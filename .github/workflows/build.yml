@@ -14,6 +14,9 @@ concurrency:
 jobs:
   source:
     name: Source and repository checks
+    env:
+      PYTHONPYCACHEPREFIX: ${{ github.workspace }}/.cache/python
+      MATHLIB_CACHE_DIR: ${{ github.workspace }}/.cache/mathlib
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -103,10 +106,10 @@ jobs:
       - name: Cache LaTeX formatting checks
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .latexindent_cache
-          key: latexindent-v1-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-${{ hashFiles('**/*.tex', '**/*.sty') }}
+          path: .cache/latexindent
+          key: latexindent-v2-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-${{ hashFiles('**/*.tex', '**/*.sty') }}
           restore-keys: |
-            latexindent-v1-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-
+            latexindent-v2-${{ runner.os }}-${{ runner.arch }}-${{ needs.prepare-image.outputs.digest }}-${{ hashFiles('scripts/format-tex.sh', 'scripts/normalize-eof.sh') }}-
       - uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
         with:
           docker_image: ${{ needs.prepare-image.outputs.image }}

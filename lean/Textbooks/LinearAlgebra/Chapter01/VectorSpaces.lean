@@ -1,5 +1,5 @@
 import Mathlib.Algebra.Field.Subfield.Defs
-import Mathlib.Data.Complex.Basic
+import Mathlib.Basic.Complex.Basic
 import Mathlib.LinearAlgebra.LinearIndependent.Defs
 import Mathlib.Algebra.BigOperators.Fin
 import Mathlib.Tactic.Abel

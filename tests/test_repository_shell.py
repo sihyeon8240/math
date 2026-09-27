@@ -14,6 +14,60 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 
+class FullCheckTests(unittest.TestCase):
+    def test_full_check_defers_links_and_stops_on_lean_failure(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            shutil.copy2(ROOT / "scripts/check.sh", scripts)
+            names = [
+                "check-repository.sh",
+                "format-python.sh",
+                "format-shell.sh",
+                "format-tex.sh",
+                "normalize-eof.sh",
+                "check-lean.sh",
+                "build-all.sh",
+            ]
+            for name in names:
+                script = scripts / name
+                script.write_text(
+                    "#!/bin/sh\n"
+                    'printf "%s %s\\n" "${0##*/}" "$*" >> "$CAPTURE"\n'
+                    + (
+                        'exit "${LEAN_EXIT_CODE:-0}"\n'
+                        if name == "check-lean.sh"
+                        else ""
+                    )
+                )
+                script.chmod(0o755)
+
+            for status in (0, 7):
+                with self.subTest(status=status):
+                    capture = root / f"calls-{status}"
+                    result = subprocess.run(
+                        [str(scripts / "check.sh")],
+                        cwd=root,
+                        env={
+                            **os.environ,
+                            "CAPTURE": str(capture),
+                            "LEAN_EXIT_CODE": str(status),
+                        },
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode, status, result.stderr)
+                    calls = capture.read_text().splitlines()
+                    self.assertEqual(
+                        calls[0], "check-repository.sh --defer-proof-links"
+                    )
+                    self.assertIn("normalize-eof.sh --check --exclude-formatted", calls)
+                    self.assertEqual(calls.count("check-lean.sh "), 1)
+                    self.assertEqual("build-all.sh check" in calls, status == 0)
+
+
 class RepositorySourceCheckTests(unittest.TestCase):
     def test_syntax_error_in_later_script_stops_source_checks(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -179,6 +233,8 @@ class CleanArtifactsTests(unittest.TestCase):
                 root / "keep.tex",
                 root / "build/book.log",
                 root / "vscode-build/book.aux",
+                root / ".cache/latexindent/indent.log",
+                root / ".cache/mathlib/download.log",
                 root / ".latexindent_cache/indent.log",
                 root / ".ruff_cache/state.log",
                 root / "lean/.lake/build.log",
@@ -301,7 +357,7 @@ class MakeUsageTests(unittest.TestCase):
     def test_usage_lists_clean_forms_on_separate_lines(self) -> None:
         expected = [
             "usage: make clean {build|source}",
-            "usage: make clean cache {lake|tex|ruff|py|all}",
+            "usage: make clean cache {lake|mathlib|tex|ruff|py|all}",
         ]
 
         for goals in (("clean",), ("clean", "cache")):
@@ -706,6 +762,49 @@ class NormalizeEofTests(unittest.TestCase):
             self.assertIn(str(missing), invalid_result.stderr)
             self.assertIn(str(extra), invalid_result.stderr)
 
+    def test_full_check_excludes_only_paths_covered_by_formatters(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            covered = [
+                "scripts/helper.py",
+                "tests/test_sample.py",
+                "scripts/build.sh",
+                "books/sample/book.tex",
+                "common/styles/sample.sty",
+            ]
+            remaining = ["README.md", "lean/Sample.lean", "other/helper.py"]
+            for name in covered + remaining:
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b"missing newline")
+            subprocess.run(["git", "add", "."], cwd=root, check=True)
+
+            command = [str(ROOT / "scripts/normalize-eof.sh"), "--check"]
+            result = subprocess.run(
+                [*command, "--exclude-formatted"],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 1)
+            for name in covered:
+                self.assertNotIn(name, result.stderr)
+            for name in remaining:
+                self.assertIn(name, result.stderr)
+
+            standalone = subprocess.run(
+                command,
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(standalone.returncode, 1)
+            for name in covered + remaining:
+                self.assertIn(name, standalone.stderr)
+
     def test_without_paths_processes_tracked_text_only(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -767,6 +866,7 @@ class BuildBookTests(unittest.TestCase):
               touch "$LATEXMK_CAPTURE/stale-pdf-observed"
             fi
             touch "$LATEXMK_CAPTURE/book.pdf"
+            exit "${LATEXMK_EXIT_CODE:-0}"
             """),
             encoding="utf-8",
         )
@@ -799,7 +899,7 @@ class BuildBookTests(unittest.TestCase):
         )
         self.assertIn(f"-outdir={output}", (output / "arguments").read_text())
 
-    def test_removes_stale_pdf_before_latexmk(self) -> None:
+    def test_preserves_pdf_for_incremental_latexmk(self) -> None:
         output = self.root / "build/sample"
         output.mkdir(parents=True)
         (output / "book.pdf").write_text("stale", encoding="utf-8")
@@ -819,8 +919,32 @@ class BuildBookTests(unittest.TestCase):
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertFalse((output / "stale-pdf-observed").exists())
+        self.assertTrue((output / "stale-pdf-observed").exists())
         self.assertTrue((output / "book.pdf").exists())
+
+    def test_failed_latexmk_removes_pdf_and_preserves_exit_status(self) -> None:
+        output = self.root / "build/sample"
+        output.mkdir(parents=True)
+        (output / "book.pdf").write_text("stale", encoding="utf-8")
+
+        result = subprocess.run(
+            [str(self.root / "scripts/build-book.sh"), "sample"],
+            cwd=self.root,
+            env={
+                **os.environ,
+                "PATH": self.path,
+                "PYTHON": sys.executable,
+                "LATEXMK_CAPTURE": str(output),
+                "LATEXMK_EXIT_CODE": "17",
+            },
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 17, result.stderr)
+        self.assertFalse((output / "book.pdf").exists())
+        self.assertNotIn("==> Built", result.stdout)
 
     def test_missing_entry_point_is_rejected_before_latexmk(self) -> None:
         (self.root / "books/sample/book.tex").unlink()

@@ -29,6 +29,8 @@ arguments=(
   --workdir /workspace
   --env HOME=/home/developer
   --env ELAN_HOME=/home/developer/.elan
+  --env PYTHONPYCACHEPREFIX=/workspace/.cache/python
+  --env MATHLIB_CACHE_DIR=/workspace/.cache/mathlib
   --entrypoint /workspace/scripts/container-entrypoint.sh
   --env "TERM=${TERM:-xterm-256color}"
   --env 'TEXINPUTS=.:/workspace/common/styles//:/workspace/common/templates//:'

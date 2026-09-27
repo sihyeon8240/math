@@ -3,6 +3,8 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PYTHON="${PYTHON:-python3}"
+export PYTHONPYCACHEPREFIX="${PYTHONPYCACHEPREFIX:-$repo_root/.cache/python}"
+export MATHLIB_CACHE_DIR="${MATHLIB_CACHE_DIR:-$repo_root/.cache/mathlib}"
 
 if ! command -v lake >/dev/null 2>&1; then
   echo "error: required command 'lake' was not found in PATH" >&2

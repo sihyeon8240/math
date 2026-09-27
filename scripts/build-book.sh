@@ -21,7 +21,6 @@ fi
 
 out_dir="$repo_root/build/$slug"
 mkdir -p "$out_dir"
-rm -f "$out_dir/book.pdf"
 
 while IFS= read -r source_dir; do
   [[ "$source_dir" == "$book_dir" ]] && continue
@@ -33,5 +32,13 @@ export TEXINPUTS=".:$repo_root/common/styles//:$repo_root/common/templates//:${T
 echo "==> Building $slug"
 cd "$book_dir"
 
-latexmk -r "$repo_root/latexmkrc" -lualatex -outdir="$out_dir" book.tex
+# Keep successful output for latexmk's dependency checks, but never retain a failed build.
+trap 'rm -f "$out_dir/book.pdf"; exit 130' HUP INT TERM
+if latexmk -r "$repo_root/latexmkrc" -lualatex -outdir="$out_dir" book.tex; then
+  trap - HUP INT TERM
+else
+  status=$?
+  rm -f "$out_dir/book.pdf"
+  exit "$status"
+fi
 echo "==> Built $out_dir/book.pdf"

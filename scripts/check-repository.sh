@@ -5,6 +5,11 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 PYTHON="${PYTHON:-python3}"
 
+if [[ $# -gt 1 || ($# -eq 1 && "$1" != --defer-proof-links) ]]; then
+  echo "usage: $0 [--defer-proof-links]" >&2
+  exit 2
+fi
+
 site_pages="$(mktemp -d)"
 trap 'rm -rf -- "$site_pages"' EXIT
 
@@ -29,7 +34,10 @@ shellcheck --severity=error scripts/*.sh
 "$PYTHON" scripts/generate-site-pages.py --output-dir "$site_pages"
 "$PYTHON" scripts/generate-site-pages.py --check --output-dir "$site_pages"
 "$PYTHON" scripts/check-image-reference.py
-"$PYTHON" scripts/check-proof-links.py
+# The full check validates these links together with their Lean declarations.
+if [[ "${1:-}" != --defer-proof-links ]]; then
+  "$PYTHON" scripts/check-proof-links.py
+fi
 
 required=(
   Makefile
@@ -81,7 +89,7 @@ mapfile -t tex_files < <(
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   generated_directories='(^|/)(__pycache__|vscode-build|build|dist|\.lake'
-  generated_directories+='|context.tex|tree.txt)/'
+  generated_directories+='|\.cache|context.tex|tree.txt)/'
   generated_extensions='\.(aux|bbl|bcf|blg|fdb_latexmk|fls|idx'
   generated_extensions+='|ilg|ind|lof|log|lot|out|pdf|pyc'
   generated_extensions+='|run\.xml|synctex\.gz|toc|xdv)$'
