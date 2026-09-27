@@ -1,4 +1,6 @@
 PYTHON ?= python3
+export PYTHONPYCACHEPREFIX ?= $(CURDIR)/.cache/python
+export MATHLIB_CACHE_DIR ?= $(CURDIR)/.cache/mathlib
 BOOK ?=
 SLUG ?=
 TITLE ?=
@@ -6,7 +8,7 @@ VERSION ?=
 empty :=
 space := $(empty) $(empty)
 TREE_IGNORE_PATTERNS ?= \
-	vscode-build build tree.txt .git .vscode .lake \
+	vscode-build build tree.txt .git .vscode .lake .cache \
 	.latexindent_cache .ruff_cache __pycache__ \
 	*.pdf *.run.xml *.synctex.gz *.toc *.xdv \
 	*.idx *.ilg *.ind *.lof *.log *.lot *.out \
@@ -22,7 +24,7 @@ CHECK_SCOPE := $(filter all source manifest proof-links docs,$(MAKECMDGOALS))
 FORMAT_SCOPE := $(filter tex py sh all,$(MAKECMDGOALS))
 DOCTOR_SCOPE := $(filter env book,$(MAKECMDGOALS))
 CLEAN_SCOPE := $(filter build source cache,$(MAKECMDGOALS))
-CACHE_SCOPE := $(filter lake tex ruff py all,$(MAKECMDGOALS))
+CACHE_SCOPE := $(filter lake mathlib tex ruff py all,$(MAKECMDGOALS))
 BOOK_ACTION := $(filter new release,$(MAKECMDGOALS))
 IMAGE_ACTION := $(filter pin build run,$(MAKECMDGOALS))
 override CMD := $(value CMD)
@@ -38,7 +40,7 @@ STRICT_REQUESTED := $(filter strict,$(MAKECMDGOALS))
 
 .PHONY: \
 	help report tree \
-	clean build source cache lake ruff all \
+	clean build source cache lake mathlib ruff all \
 	book new release \
 	contents chap sec \
 	image pin run \
@@ -58,7 +60,7 @@ help:
 		'  make report                                       Print an informational repository report' \
 		'  make tree                                         Write the local tree.txt listing' \
 		'  make clean {build|source}                         Remove build output or source artifacts' \
-		'  make clean cache {lake|tex|ruff|py|all}           Remove selected local caches' \
+		'  make clean cache {lake|mathlib|tex|ruff|py|all}    Remove selected local caches' \
 		'' \
 		'Books:' \
 		'  make book [BOOK=<slug>]                           Build all enabled books or one book' \
@@ -115,7 +117,7 @@ clean:
 	@if [ "$(words $(CLEAN_SCOPE))" -ne 1 ]; then \
 		printf '%s\n' \
 			"usage: make clean {build|source}" \
-			"usage: make clean cache {lake|tex|ruff|py|all}" >&2; \
+			"usage: make clean cache {lake|mathlib|tex|ruff|py|all}" >&2; \
 		exit 2; \
 	fi
 	@if [ -n "$(filter build,$(CLEAN_SCOPE))" ]; then \
@@ -125,13 +127,13 @@ clean:
 	elif [ "$(words $(CACHE_SCOPE))" -ne 1 ]; then \
 		printf '%s\n' \
 			"usage: make clean {build|source}" \
-			"usage: make clean cache {lake|tex|ruff|py|all}" >&2; \
+			"usage: make clean cache {lake|mathlib|tex|ruff|py|all}" >&2; \
 		exit 2; \
 	else \
 		./scripts/clean-cache.sh "$(CACHE_SCOPE)"; \
 	fi
 
-build source cache lake ruff all:
+build source cache lake mathlib ruff all:
 	@:
 
 book:

@@ -233,6 +233,8 @@ class CleanArtifactsTests(unittest.TestCase):
                 root / "keep.tex",
                 root / "build/book.log",
                 root / "vscode-build/book.aux",
+                root / ".cache/latexindent/indent.log",
+                root / ".cache/mathlib/download.log",
                 root / ".latexindent_cache/indent.log",
                 root / ".ruff_cache/state.log",
                 root / "lean/.lake/build.log",
@@ -355,7 +357,7 @@ class MakeUsageTests(unittest.TestCase):
     def test_usage_lists_clean_forms_on_separate_lines(self) -> None:
         expected = [
             "usage: make clean {build|source}",
-            "usage: make clean cache {lake|tex|ruff|py|all}",
+            "usage: make clean cache {lake|mathlib|tex|ruff|py|all}",
         ]
 
         for goals in (("clean",), ("clean", "cache")):

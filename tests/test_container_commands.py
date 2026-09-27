@@ -92,6 +92,8 @@ class ContainerCommandTests(unittest.TestCase):
         self.assertNotIn("--tty", arguments)
         self.assertIn("HOME=/home/developer", arguments)
         self.assertIn("ELAN_HOME=/home/developer/.elan", arguments)
+        self.assertIn("PYTHONPYCACHEPREFIX=/workspace/.cache/python", arguments)
+        self.assertIn("MATHLIB_CACHE_DIR=/workspace/.cache/mathlib", arguments)
         self.assertEqual(
             arguments[arguments.index("--entrypoint") + 1],
             "/workspace/scripts/container-entrypoint.sh",

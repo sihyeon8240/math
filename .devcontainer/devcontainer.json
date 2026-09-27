@@ -3,6 +3,8 @@
   "image": "ghcr.io/sihyeon8240/latex@sha256:9241a548b15d0b88386c69b5461c4f203e8e1bd8e705ea1641f5a3326bafbaa9",
 
   "containerEnv": {
+    "PYTHONPYCACHEPREFIX": "${containerWorkspaceFolder}/.cache/python",
+    "MATHLIB_CACHE_DIR": "${containerWorkspaceFolder}/.cache/mathlib",
     "TEXINPUTS": ".:${containerWorkspaceFolder}/common/styles//:${containerWorkspaceFolder}/common/templates//:"
   },
 

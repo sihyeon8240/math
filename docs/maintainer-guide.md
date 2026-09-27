@@ -109,6 +109,10 @@ every consumer, preserve interfaces, and provide a rollback-sized diff.
 
 ## CI caches and verified PDF reuse
 
+LaTeX formatting checks cache `.cache/latexindent/`. The source-check job sets
+Python bytecode and Mathlib downloads to `.cache/python/` and `.cache/mathlib/`;
+these directories are not separately restored by Actions.
+
 Lean caches `.lake` by OS, architecture, toolchain, dependency lock, Lake
 configuration, and Lean sources. LaTeX caches each book's `build/<slug>/` by OS,
 architecture, image digest, and source tree, with fallback only within the same

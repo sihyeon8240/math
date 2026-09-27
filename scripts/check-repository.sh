@@ -89,7 +89,7 @@ mapfile -t tex_files < <(
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   generated_directories='(^|/)(__pycache__|vscode-build|build|dist|\.lake'
-  generated_directories+='|context.tex|tree.txt)/'
+  generated_directories+='|\.cache|context.tex|tree.txt)/'
   generated_extensions='\.(aux|bbl|bcf|blg|fdb_latexmk|fls|idx'
   generated_extensions+='|ilg|ind|lof|log|lot|out|pdf|pyc'
   generated_extensions+='|run\.xml|synctex\.gz|toc|xdv)$'
