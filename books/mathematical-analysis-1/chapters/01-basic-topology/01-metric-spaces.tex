@@ -1,13 +1,17 @@
-\begin{definition} \label{an1:def:metric-space}
-  A \textbf{metric} on $X$ is a function $d:X\times X\to[0,\infty)$ such that, for all $p,q,z\in X$,
+\begin{definition}
+  \label{an1:def:metric-space}
+  A \textbf{metric} on $X$ is a function $d:X\times X\to[0,\infty)$ such that, for all $p,q,z\in
+    X$,
   \[
     d(p,q)=0\iff p=q,\qquad d(p,q)=d(q,p),\qquad d(p,z)\leq d(p,q)+d(q,z).
   \]
-  The last condition is the \textbf{triangle inequality}. The pair $(X,d)$ is a \textbf{metric space}.
+  The last condition is the \textbf{triangle inequality}.
+  The pair $(X,d)$ is a \textbf{metric space}.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_metric
-\begin{proposition} \label{an1:thm:standard-metric-on-Rn}
+\begin{proposition}
+  \label{an1:thm:standard-metric-on-Rn}
   For $n\in\N$, the function $d(x,y)=\|x-y\|$ is a metric on $\R^{n}$.
 
   \begin{lean}
@@ -21,7 +25,8 @@
 \end{proposition}
 
 \begin{proof}
-  The norm is nonnegative. It vanishes exactly at the zero vector, so $\|x-y\|=0$ precisely when $x=y$.
+  The norm is nonnegative.
+  It vanishes exactly at the zero vector, so $\|x-y\|=0$ precisely when $x=y$.
 
   \begin{lean}
     refine ⟨fun x y => norm_nonneg _, ?_, ?_, ?_⟩
@@ -51,20 +56,26 @@
 
 Euclidean spaces use this metric, including in dimension zero.
 
-\begin{definition} \label{an1:def:neighborhood-open-ball}
+\begin{definition}
+  \label{an1:def:neighborhood-open-ball}
   For $p\in X$ and $r>0$, the \textbf{open ball} is
   \[
     B(p,r)=\{q\in X:d(q,p)<r\}.
   \]
   The \textbf{punctured ball} is $B(p,r)\setminus\{p\}=\{q\in X:0<d(q,p)<r\}$.
-  A \textbf{neighborhood} of $p$ is any set containing an open ball $B(p,r)$ with $r>0$. A neighborhood need not itself be open or a ball.
+  A \textbf{neighborhood} of $p$ is any set containing an open ball $B(p,r)$ with $r>0$.
+  A neighborhood need not itself be open or a ball.
 \end{definition}
 
-\begin{definition} \label{an1:def:limit-interior-isolated-points}
-  A point $p$ is a \textbf{limit point} of $E$ if every positive-radius punctured ball about $p$ meets $E$.
+\begin{definition}
+  \label{an1:def:limit-interior-isolated-points}
+  A point $p$ is a \textbf{limit point} of $E$ if every positive-radius punctured ball about $p$
+  meets $E$.
   The set of limit points, or \textbf{derived set}, is denoted by $E'$.
-  A point is \textbf{interior} if some positive-radius ball about it lies in $E$; the set of interior points is denoted by $E^\circ$.
-  An \textbf{isolated point} of $E$ belongs to $E$ and is its only point in some ball. We write $\operatorname{Iso}(E)$ for the set of isolated points.
+  A point is \textbf{interior} if some positive-radius ball about it lies in $E$; the set of
+  interior points is denoted by $E^\circ$.
+  An \textbf{isolated point} of $E$ belongs to $E$ and is its only point in some ball.
+  We write $\operatorname{Iso}(E)$ for the set of isolated points.
   \begin{lean}
     def isolatedPoints (E : Set X) : Set X :=
       {p | ∃ r : ℝ, 0 < r ∧ E ∩ ball p r = {p}}
@@ -72,7 +83,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.mem_derivedSet_iff
-\begin{lemma} \label{an1:lem:mem-derivedSet-iff}
+\begin{lemma}
+  \label{an1:lem:mem-derivedSet-iff}
   $p\in E^{\prime}$ if and only if every $r>0$ admits $q\in E$ with $q\ne p$ and $d(q,p)<r$.
 
   \begin{lean}
@@ -82,7 +94,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Every positive-radius ball is a neighborhood, so the neighborhood condition supplies a distinct point in that ball.
+  Every positive-radius ball is a neighborhood, so the neighborhood condition supplies a distinct
+  point in that ball.
 
   \begin{lean}
     rw [mem_derivedSet, accPt_iff_nhds]
@@ -93,7 +106,8 @@ Euclidean spaces use this metric, including in dimension zero.
       exact ⟨q, hE, hne, hq⟩
   \end{lean}
 
-  Conversely, a neighborhood contains a positive-radius ball. A distinct point of the set in that ball also belongs to the neighborhood.
+  Conversely, a neighborhood contains a positive-radius ball.
+  A distinct point of the set in that ball also belongs to the neighborhood.
 
   \begin{lean}
     · intro h U hU
@@ -103,23 +117,30 @@ Euclidean spaces use this metric, including in dimension zero.
   \end{lean}
 \end{proof}
 
-\begin{definition} \label{an1:def:open-closed-sets}
-  A set $E$ is \textbf{open} if every point of $E$ is interior, and \textbf{closed} if its complement is open.
+\begin{definition}
+  \label{an1:def:open-closed-sets}
+  A set $E$ is \textbf{open} if every point of $E$ is interior, and \textbf{closed} if its
+  complement is open.
 \end{definition}
 
-\begin{definition} \label{an1:def:closure}
-  The \textbf{closure} $\overline E$ consists of points whose every positive-radius ball meets $E$.
+\begin{definition}
+  \label{an1:def:closure}
+  The \textbf{closure} $\overline E$ consists of points whose every positive-radius ball meets
+  $E$.
 \end{definition}
 
-\begin{definition} \label{an1:def:bounded-perfect-dense-sets}
+\begin{definition}
+  \label{an1:def:bounded-perfect-dense-sets}
   A set $E$ is \textbf{bounded} if there is a common upper bound for distances between its points.
-  Equivalently, when $X$ is nonempty, $E$ lies in a positive-radius ball, as proved below. Subsets of the empty space are bounded.
+  Equivalently, when $X$ is nonempty, $E$ lies in a positive-radius ball, as proved below.
+  Subsets of the empty space are bounded.
   A set is \textbf{perfect} if it is closed and each of its points is a limit point.
   A set is \textbf{dense} if $\overline E=X$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isBounded_iff
-\begin{lemma} \label{an1:lem:isBounded-iff}
+\begin{lemma}
+  \label{an1:lem:isBounded-iff}
   $E$ is bounded if and only if, whenever $X$ is nonempty, some $p\in X$ and $r>0$ satisfy $E\subseteq B(p,r)$.
 
   \begin{lean}
@@ -129,7 +150,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Suppose all pairwise distances in $E$ are at most $C$. If $E$ is empty, any center in $X$ and radius $1$ suffice. Otherwise choose $p\in E$ and radius $\max(C,0)+1$.
+  Suppose all pairwise distances in $E$ are at most $C$.
+  If $E$ is empty, any center in $X$ and radius $1$ suffice.
+  Otherwise choose $p\in E$ and radius $\max(C,0)+1$.
 
   \begin{lean}
     rw [Metric.isBounded_iff]
@@ -146,7 +169,9 @@ Euclidean spaces use this metric, including in dimension zero.
         exact (hC hq hp).trans_lt (by linarith [le_max_left C 0])
   \end{lean}
 
-  Conversely, two points of a ball of radius $r$ are at distance at most $2r$, by the triangle inequality. If $X$ is empty there are no points to check, and zero is a bound.
+  Conversely, two points of a ball of radius $r$ are at distance at most $2r$, by the triangle
+  inequality.
+  If $X$ is empty there are no points to check, and zero is a bound.
 
   \begin{lean}
     · intro h
@@ -166,8 +191,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.ball_open
-\begin{proposition} \label{an1:thm:neighborhood-is-open}
-  Every ball $B(p,r)$ is open. This also holds for nonpositive $r$, when the ball is empty.
+\begin{proposition}
+  \label{an1:thm:neighborhood-is-open}
+  Every ball $B(p,r)$ is open.
+  This also holds for nonpositive $r$, when the ball is empty.
 
   \begin{lean}
     theorem ball_open (p : X) (r : ℝ) : IsOpen (ball p r)
@@ -175,7 +202,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  Suppose $q\in B(p,r)$. The remaining distance $\delta=r-d(q,p)$ is positive.
+  Suppose $q\in B(p,r)$.
+  The remaining distance $\delta=r-d(q,p)$ is positive.
 
   \begin{lean}
     apply Metric.isOpen_iff.mpr
@@ -183,7 +211,8 @@ Euclidean spaces use this metric, including in dimension zero.
     refine ⟨r - dist q p, sub_pos.mpr hq, ?_⟩
   \end{lean}
 
-  If $d(s,q)<\delta$, the triangle inequality gives $d(s,p)\leq d(s,q)+d(q,p)<r$. Thus the ball of radius $\delta$ about $q$ stays inside $B(p,r)$.
+  If $d(s,q)<\delta$, the triangle inequality gives $d(s,p)\leq d(s,q)+d(q,p)<r$.
+  Thus the ball of radius $\delta$ about $q$ stays inside $B(p,r)$.
 
   \begin{lean}
     intro s hs
@@ -198,8 +227,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.finite_positive_lower_bound
-\begin{lemma} \label{an1:lem:finite-positive-lower-bound}
-  For a finite index set $S$ and positive numbers $r_i$ for $i\in S$, there is $\delta>0$ with $\delta\leq r_i$ for every $i\in S$.
+\begin{lemma}
+  \label{an1:lem:finite-positive-lower-bound}
+  For a finite index set $S$ and positive numbers $r_i$ for $i\in S$, there is $\delta>0$ with
+  $\delta\leq r_i$ for every $i\in S$.
 
   \begin{lean}
     theorem finite_positive_lower_bound {ι : Type*} (s : Finset ι)
@@ -209,7 +240,11 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Use induction on $S$. For the empty set, $\delta=1$ works. On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the remaining indices. It stays positive and is below every required radius.
+  Use induction on $S$.
+  For the empty set, $\delta=1$ works.
+  On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the
+  remaining indices.
+  It stays positive and is below every required radius.
 
   \begin{lean}
     classical
@@ -230,7 +265,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.limit_point_infinite
-\begin{proposition} \label{an1:thm:limit-point-neighborhood-contains-infinite-elements}
+\begin{proposition}
+  \label{an1:thm:limit-point-neighborhood-contains-infinite-elements}
   If $p\in E^{\prime}$ and $r>0$, then $E\cap B(p,r)$ is infinite.
 
   \begin{lean}
@@ -241,7 +277,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  Assume instead that this intersection is finite. After deleting $p$, its points still form a finite set, and all their distances from $p$ are positive.
+  Assume instead that this intersection is finite.
+  After deleting $p$, its points still form a finite set, and all their distances from $p$ are
+  positive.
 
   \begin{lean}
     classical
@@ -258,7 +296,9 @@ Euclidean spaces use this metric, including in dimension zero.
       exact dist_pos.mpr h.2
   \end{lean}
 
-  Choose a common positive lower bound $\delta$ for those distances. The limit-point condition supplies a distinct point of $E$ within $\min(r,\delta)$ of $p$. It belongs to the finite set but has distance less than its lower bound, a contradiction.
+  Choose a common positive lower bound $\delta$ for those distances.
+  The limit-point condition supplies a distinct point of $E$ within $\min(r,\delta)$ of $p$.
+  It belongs to the finite set but has distance less than its lower bound, a contradiction.
 
   \begin{lean}
     obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s (fun q => dist q p) hpos
@@ -273,7 +313,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_iff_compl_derivedSet
-\begin{proposition} \label{an1:thm:complement-of-open-set-is-closed}
+\begin{proposition}
+  \label{an1:thm:complement-of-open-set-is-closed}
   $E$ is open if and only if $E^{c}$ contains all its limit points, that is, $E^{c}$ is closed.
 
   \begin{lean}
@@ -283,7 +324,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  If $E$ is open, a point in $E$ has a ball contained in $E$. Such a ball prevents that point from being a limit point of the complement.
+  If $E$ is open, a point in $E$ has a ball contained in $E$.
+  Such a ball prevents that point from being a limit point of the complement.
 
   \begin{lean}
     classical
@@ -298,7 +340,10 @@ Euclidean spaces use this metric, including in dimension zero.
       exact hq (hball hd)
   \end{lean}
 
-  Conversely, suppose the complement contains its limit points. If $p\in E$ had no ball contained in $E$, each ball would contain a point outside $E$. That point differs from $p$, making $p$ a limit point of the complement and contradicting $p\in E$.
+  Conversely, suppose the complement contains its limit points.
+  If $p\in E$ had no ball contained in $E$, each ball would contain a point outside $E$.
+  That point differs from $p$, making $p$ a limit point of the complement and contradicting $p\in
+    E$.
 
   \begin{lean}
     · intro h
@@ -324,7 +369,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_iff_derivedSet
-\begin{lemma} \label{an1:lem:closed-iff-limitPoints}
+\begin{lemma}
+  \label{an1:lem:closed-iff-limitPoints}
   $E$ is closed if and only if $E^{\prime}\subseteq E$.
 
   \begin{lean}
@@ -334,7 +380,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  A set is closed precisely when its complement is open. Apply the preceding result to $E^{c}$ and take its complement twice.
+  A set is closed precisely when its complement is open.
+  Apply the preceding result to $E^{c}$ and take its complement twice.
 
   \begin{lean}
     have h := open_iff_compl_derivedSet Eᶜ
@@ -346,7 +393,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.perfect_iff
-\begin{lemma} \label{an1:lem:perfect-iff}
+\begin{lemma}
+  \label{an1:lem:perfect-iff}
   $E$ is perfect if and only if $E=E^{\prime}$.
 
   \begin{lean}
@@ -355,7 +403,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Closedness is equivalent to $E^{\prime}\subseteq E$, by the preceding result. Every point being a limit point says $E\subseteq E^{\prime}$. Together these are equality.
+  Closedness is equivalent to $E^{\prime}\subseteq E$, by the preceding result.
+  Every point being a limit point says $E\subseteq E^{\prime}$.
+  Together these are equality.
 
   \begin{lean}
     rw [perfect_def]
@@ -366,7 +416,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_union
-\begin{proposition} \label{an1:thm:arbitrary-union-of-open-sets-is-open}
+\begin{proposition}
+  \label{an1:thm:arbitrary-union-of-open-sets-is-open}
   For any indexed family of open sets $(E_i)$, the union $\bigcup_i E_i$ is open.
 
   \begin{lean}
@@ -376,7 +427,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  A point in the union belongs to one member $E_i$. Choose a ball contained in that member; the same ball is contained in the union. This argument also covers an empty family, since then there is no point to consider.
+  A point in the union belongs to one member $E_i$.
+  Choose a ball contained in that member; the same ball is contained in the union.
+  This argument also covers an empty family, since then there is no point to consider.
 
   \begin{lean}
     apply Metric.isOpen_iff.mpr
@@ -391,7 +444,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_intersection
-\begin{corollary} \label{an1:cor:arbitrary-intersection-of-closed-sets-is-closed}
+\begin{corollary}
+  \label{an1:cor:arbitrary-intersection-of-closed-sets-is-closed}
   For any indexed family of closed sets $(E_i)$, the intersection $\bigcap_i E_i$ is closed.
 
   \begin{lean}
@@ -401,7 +455,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{corollary}
 
 \begin{proof}
-  A limit point of the intersection is a limit point of each member: every nearby witness in the intersection belongs to that member. Each member is closed, so it contains the point; consequently the intersection contains it.
+  A limit point of the intersection is a limit point of each member: every nearby witness in the
+  intersection belongs to that member.
+  Each member is closed, so it contains the point; consequently the intersection contains it.
 
   \begin{lean}
     apply (closed_iff_derivedSet _).mpr
@@ -420,7 +476,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_intersection
-\begin{lemma} \label{an1:lem:open-intersection}
+\begin{lemma}
+  \label{an1:lem:open-intersection}
   The intersection of two open sets is open.
 
   \begin{lean}
@@ -430,7 +487,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  At a point of the intersection, choose one positive radius for each set. The smaller radius gives a ball lying in both sets.
+  At a point of the intersection, choose one positive radius for each set.
+  The smaller radius gives a ball lying in both sets.
 
   \begin{lean}
     apply Metric.isOpen_iff.mpr
@@ -448,8 +506,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.open_finite_intersection
-\begin{proposition} \label{an1:thm:finite-intersection-of-open-sets-is-open}
-  A finite intersection of open sets is open. In particular this applies to $\bigcap_{j=0}^{n-1}E_j$ for every $n\in\N$.
+\begin{proposition}
+  \label{an1:thm:finite-intersection-of-open-sets-is-open}
+  A finite intersection of open sets is open.
+  In particular this applies to $\bigcap_{j=0}^{n-1}E_j$ for every $n\in\N$.
 
   \begin{lean}
     theorem open_finite_intersection {ι : Type*} (s : Finset ι)
@@ -459,7 +519,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  For no indices the intersection is $X$, which contains a unit ball about each of its points. Adjoining one index replaces an already open finite intersection by its intersection with one more open set, so induction completes the proof.
+  For no indices the intersection is $X$, which contains a unit ball about each of its points.
+  Adjoining one index replaces an already open finite intersection by its intersection with one
+  more open set, so induction completes the proof.
 
   \begin{lean}
     classical
@@ -478,7 +540,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closed_finite_union
-\begin{corollary} \label{an1:cor:finite-union-of-closed-sets-is-closed}
+\begin{corollary}
+  \label{an1:cor:finite-union-of-closed-sets-is-closed}
   A finite union of closed sets is closed, including the union over no indices.
 
   \begin{lean}
@@ -489,7 +552,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{corollary}
 
 \begin{proof}
-  The complements are open, so their finite intersection is open. By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that union is closed.
+  The complements are open, so their finite intersection is open.
+  By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that
+  union is closed.
 
   \begin{lean}
     have ho := open_finite_intersection s (fun i => (E i)ᶜ)
@@ -505,7 +570,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_eq_union_derivedSet
-\begin{lemma} \label{an1:lem:closure-eq-union-limitPoints}
+\begin{lemma}
+  \label{an1:lem:closure-eq-union-limitPoints}
   $\overline E=E\cup E^{\prime}$, relating closure to the derived set.
 
   \begin{lean}
@@ -515,7 +581,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  If $p\in\overline E$, every ball about $p$ meets $E$. Either $p\in E$, or each such witness differs from $p$, making $p$ a limit point.
+  If $p\in\overline E$, every ball about $p$ meets $E$.
+  Either $p\in E$, or each such witness differs from $p$, making $p$ a limit point.
 
   \begin{lean}
     classical
@@ -536,7 +603,9 @@ Euclidean spaces use this metric, including in dimension zero.
         exact ⟨q, hq, fun h => he (h ▸ hq), by rwa [dist_comm]⟩
   \end{lean}
 
-  Conversely, a point of $E$ itself witnesses that every ball meets $E$. For a limit point, use the distinct witness in each deleted ball. Both cases give membership in the closure.
+  Conversely, a point of $E$ itself witnesses that every ball meets $E$.
+  For a limit point, use the distinct witness in each deleted ball.
+  Both cases give membership in the closure.
 
   \begin{lean}
     · intro hp
@@ -554,7 +623,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subset_closure
-\begin{lemma} \label{an1:lem:subset-closure}
+\begin{lemma}
+  \label{an1:lem:subset-closure}
   Every set is contained in its closure.
 
   \begin{lean}
@@ -563,7 +633,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  By the preceding characterization, every point of $E$ belongs to the left member of the union $E\cup E^{\prime}$.
+  By the preceding characterization, every point of $E$ belongs to the left member of the union
+  $E\cup E^{\prime}$.
 
   \begin{lean}
     rw [closure_eq_union_derivedSet]
@@ -573,7 +644,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_closed
-\begin{lemma} \label{an1:lem:closure-closed}
+\begin{lemma}
+  \label{an1:lem:closure-closed}
   The closure of any set is closed.
 
   \begin{lean}
@@ -582,7 +654,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Suppose $p$ is a limit point of $\overline E$ and $r>0$. Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$. The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.
+  Suppose $p$ is a limit point of $\overline E$ and $r>0$.
+  Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$.
+  The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.
 
   \begin{lean}
     apply (closed_iff_derivedSet _).mpr
@@ -604,8 +678,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.closure_properties
-\begin{proposition} \label{an1:thm:properties-of-closure}
-  For every $E\subseteq X$: $\overline E$ is closed; $E=\overline E$ if and only if $E$ is closed; and every closed set $F$ containing $E$ also contains $\overline E$.
+\begin{proposition}
+  \label{an1:thm:properties-of-closure}
+  For every $E\subseteq X$: $\overline E$ is closed; $E=\overline E$ if and only if $E$ is closed;
+  and every closed set $F$ containing $E$ also contains $\overline E$.
 
   \begin{lean}
     theorem closure_properties (E : Set X) :
@@ -615,7 +691,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  We have just proved that $\overline E$ is closed. Therefore $E=\overline E$ implies that $E$ is closed. Conversely, closedness gives $E^{\prime}\subseteq E$, so $E\cup E^{\prime}=E$.
+  We have just proved that $\overline E$ is closed.
+  Therefore $E=\overline E$ implies that $E$ is closed.
+  Conversely, closedness gives $E^{\prime}\subseteq E$, so $E\cup E^{\prime}=E$.
 
   \begin{lean}
     refine ⟨closure_closed E, ?_, ?_⟩
@@ -630,7 +708,10 @@ Euclidean spaces use this metric, including in dimension zero.
         exact (union_eq_left.mpr ((closed_iff_derivedSet E).mp h)).symm
   \end{lean}
 
-  Let $F$ be closed with $E\subseteq F$. A point of $\overline E$ either lies in $E$, hence in $F$, or is a limit point of $E$. In the latter case the same nearby witnesses make it a limit point of $F$, which belongs to $F$ by closedness.
+  Let $F$ be closed with $E\subseteq F$.
+  A point of $\overline E$ either lies in $E$, hence in $F$, or is a limit point of $E$.
+  In the latter case the same nearby witnesses make it a limit point of $F$, which belongs to $F$
+  by closedness.
 
   \begin{lean}
     · intro F hF hEF p hp
@@ -650,8 +731,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.supremum_in_closure
-\begin{proposition} \label{an1:thm:supremum-in-closure}
-  If $E\subseteq\R$ is nonempty and bounded above, then $\sup E\in\overline E$. If $E$ is also closed, then $\sup E\in E$.
+\begin{proposition}
+  \label{an1:thm:supremum-in-closure}
+  If $E\subseteq\R$ is nonempty and bounded above, then $\sup E\in\overline E$.
+  If $E$ is also closed, then $\sup E\in E$.
 
   \begin{lean}
     theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
@@ -660,7 +743,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  Write $c=\sup E$. For any $r>0$, the smaller number $c-r$ is not an upper bound, so choose $q\in E$ with $c-r<q\leq c$. Then $|c-q|<r$, proving that every ball about $c$ meets $E$.
+  Write $c=\sup E$.
+  For any $r>0$, the smaller number $c-r$ is not an upper bound, so choose $q\in E$ with $c-r<q\leq
+    c$.
+  Then $|c-q|<r$, proving that every ball about $c$ meets $E$.
 
   \begin{lean}
     have hc : sSup E ∈ closure E := by
@@ -674,7 +760,8 @@ Euclidean spaces use this metric, including in dimension zero.
       linarith
   \end{lean}
 
-  When $E$ is closed, its closure equals $E$, so the established closure membership is membership in $E$ itself.
+  When $E$ is closed, its closure equals $E$, so the established closure membership is membership
+  in $E$ itself.
 
   \begin{lean}
     exact ⟨hc, fun h => by
@@ -687,7 +774,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_eq_diff
-\begin{proposition} \label{an1:thm:isolated-points-are-self-minus-limit-points}
+\begin{proposition}
+  \label{an1:thm:isolated-points-are-self-minus-limit-points}
   $\operatorname{Iso}(E)=E\setminus E^{\prime}$.
 
   \begin{lean}
@@ -696,7 +784,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  If $E\cap B(p,r)=\{p\}$, then $p\in E$ and no distinct point of $E$ is in that ball. This contradicts the limit-point condition, so $p\notin E^{\prime}$.
+  If $E\cap B(p,r)=\{p\}$, then $p\in E$ and no distinct point of $E$ is in that ball.
+  This contradicts the limit-point condition, so $p\notin E^{\prime}$.
 
   \begin{lean}
     classical
@@ -719,7 +808,9 @@ Euclidean spaces use this metric, including in dimension zero.
       exact hn hmem
   \end{lean}
 
-  Conversely, if $p\in E$ but $p\notin E^{\prime}$, some positive-radius ball contains no distinct point of $E$. Its intersection with $E$ is therefore exactly $\{p\}$.
+  Conversely, if $p\in E$ but $p\notin E^{\prime}$, some positive-radius ball contains no distinct
+  point of $E$.
+  Its intersection with $E$ is therefore exactly $\{p\}$.
 
   \begin{lean}
     · rintro ⟨hp, hn⟩
@@ -753,7 +844,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.compl_interior_eq_closure_compl
-\begin{lemma} \label{an1:lem:complement-of-interior-is-closure-of-complement}
+\begin{lemma}
+  \label{an1:lem:complement-of-interior-is-closure-of-complement}
   $(E^{\circ})^{c}=\overline{E^{c}}$.
 
   \begin{lean}
@@ -763,7 +855,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Failure to be interior means that no positive-radius ball lies in $E$. Thus every such ball contains a point of $E^{c}$, giving membership in its closure. Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.
+  Failure to be interior means that no positive-radius ball lies in $E$.
+  Thus every such ball contains a point of $E^{c}$, giving membership in its closure.
+  Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.
 
   \begin{lean}
     classical
@@ -790,13 +884,15 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \end{proof}
 
-\begin{definition} \label{an1:def:boundary}
+\begin{definition}
+  \label{an1:def:boundary}
   The \textbf{boundary} is $\partial E=\overline E\setminus E^{\circ}$.
   The next lemma identifies it with $\overline E\cap\overline{E^{c}}$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.boundary_eq
-\begin{lemma} \label{an1:lem:boundary-eq}
+\begin{lemma}
+  \label{an1:lem:boundary-eq}
   $\partial E=\overline E\cap\overline{E^{c}}$.
 
   \begin{lean}
@@ -806,7 +902,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Write the difference as an intersection with the complement of the interior. The preceding lemma identifies this complement with the closure of the complement.
+  Write the difference as an intersection with the complement of the interior.
+  The preceding lemma identifies this complement with the closure of the complement.
 
   \begin{lean}
     rw [frontier, sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
@@ -815,7 +912,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.zero_dimensional
-\begin{lemma} \label{an1:lem:zero-dimensional}
+\begin{lemma}
+  \label{an1:lem:zero-dimensional}
   Any two points of $\R^{0}$ are equal, and every punctured ball in $\R^{0}$ is empty.
 
   \begin{lean}
@@ -825,7 +923,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  There are no coordinates on which two empty tuples can differ, so they are equal. Removing the center consequently removes every possible point of a ball.
+  There are no coordinates on which two empty tuples can differ, so they are equal.
+  Removing the center consequently removes every possible point of a ball.
 
   \begin{lean}
     have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by
@@ -842,8 +941,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_punctured_ball
-\begin{lemma} \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
-  For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the punctured ball $B(p,r)\setminus\{p\}$ is nonempty.
+\begin{lemma}
+  \label{an1:lem:deleted-neighborhood-in-Rn-is-non-empty}
+  For $n\in\N^{+}$, $p\in\R^{n}$, and $r>0$, the punctured ball $B(p,r)\setminus\{p\}$ is
+  nonempty.
 
   \begin{lean}
     theorem euclidean_punctured_ball (n : ℕ+)
@@ -853,7 +954,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  Since $n>0$, the coordinate vector $e_0$ exists. Put $v=(r/2)e_0$, so $\|v\|=r/2>0$. The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.
+  Since $n>0$, the coordinate vector $e_0$ exists.
+  Put $v=(r/2)e_0$, so $\|v\|=r/2>0$.
+  The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.
 
   \begin{lean}
     let v : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single ⟨0, n.pos⟩ (r / 2)
@@ -877,8 +980,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.isolated_limit_compl
-\begin{lemma} \label{an1:lem:isolated-limit-compl}
-  If every positive-radius deleted ball in $X$ is nonempty, then $\operatorname{Iso}(E)\subseteq(E^{c})^{\prime}$.
+\begin{lemma}
+  \label{an1:lem:isolated-limit-compl}
+  If every positive-radius deleted ball in $X$ is nonempty, then
+  $\operatorname{Iso}(E)\subseteq(E^{c})^{\prime}$.
 
   \begin{lean}
     theorem isolated_limit_compl (E : Set X)
@@ -888,7 +993,9 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{lemma}
 
 \begin{proof}
-  For an isolated point $p$, choose $r>0$ with $E\cap B(p,r)=\{p\}$. For any $s>0$, take a distinct point within $\min(r,s)$ of $p$. It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.
+  For an isolated point $p$, choose $r>0$ with $E\cap B(p,r)=\{p\}$.
+  For any $s>0$, take a distinct point within $\min(r,s)$ of $p$.
+  It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.
 
   \begin{lean}
     intro p hp
@@ -912,8 +1019,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.EuclideanSpaces.euclidean_boundary
-\begin{proposition} \label{an1:thm:properties-of-boundary-in-rn}
-  For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial E=\operatorname{Iso}(E)\cup\operatorname{Iso}(E^{c})\cup(E^{\prime}\cap(E^{c})^{\prime})$.
+\begin{proposition}
+  \label{an1:thm:properties-of-boundary-in-rn}
+  For $n\in\N^{+}$ and $E\subseteq\R^{n}$, $\partial
+    E=\operatorname{Iso}(E)\cup\operatorname{Iso}(E^{c})\cup(E^{\prime}\cap(E^{c})^{\prime})$.
 
   \begin{lean}
     theorem euclidean_boundary (n : ℕ+)
@@ -924,7 +1033,11 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  An isolated point of either side is a limit point of the other, by the preceding two results. Expand the two closures in $\partial E$ as the set together with its limit points. Separate points which fail one of the two limit-point conditions from those satisfying both. The former are exactly the isolated points of one side; the latter form $E^{\prime}\cap(E^{c})^{\prime}$.
+  An isolated point of either side is a limit point of the other, by the preceding two results.
+  Expand the two closures in $\partial E$ as the set together with its limit points.
+  Separate points which fail one of the two limit-point conditions from those satisfying both.
+  The former are exactly the isolated points of one side; the latter form
+  $E^{\prime}\cap(E^{c})^{\prime}$.
 
   \begin{lean}
     have hE := isolated_limit_compl E (euclidean_punctured_ball n)
@@ -949,8 +1062,10 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.subspace_metric
-\begin{proposition} \label{an1:lem:subspace-metric}
-  For $Y\subseteq X$, restricting $d$ to $Y\times Y$ gives a metric on $Y$, with the same distances.
+\begin{proposition}
+  \label{an1:lem:subspace-metric}
+  For $Y\subseteq X$, restricting $d$ to $Y\times Y$ gives a metric on $Y$, with the same
+  distances.
 
   \begin{lean}
     theorem subspace_metric (Y : Set X) (p q z : Y) :
@@ -961,7 +1076,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  Nonnegativity, symmetry, and the triangle inequality are inherited from $X$. Distance zero means equality of the underlying points, which is also equality as points of $Y$.
+  Nonnegativity, symmetry, and the triangle inequality are inherited from $X$.
+  Distance zero means equality of the underlying points, which is also equality as points of $Y$.
 
   \begin{lean}
     exact ⟨rfl, dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
@@ -969,15 +1085,21 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \end{proof}
 
-The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to write $d(p,q)$ for its distance.
+The resulting space is called the \textbf{subspace} $(Y,d)$.
+We continue to write $d(p,q)$ for its distance.
 
-\begin{definition} \label{an1:def:relative-open-closed-sets}
-  For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ when it is open as a subset of the subspace $Y$. Equivalently, each $p\in E$ has $r>0$ with $Y\cap B(p,r)\subseteq E$.
-  It is \textbf{closed relative to} $Y$ when it is closed in that subspace. The next lemma characterizes this by $E^{\prime}\cap Y\subseteq E$.
+\begin{definition}
+  \label{an1:def:relative-open-closed-sets}
+  For $E\subseteq Y\subseteq X$, $E$ is \textbf{open relative to} $Y$ when it is open as a subset
+  of the subspace $Y$.
+  Equivalently, each $p\in E$ has $r>0$ with $Y\cap B(p,r)\subseteq E$.
+  It is \textbf{closed relative to} $Y$ when it is closed in that subspace.
+  The next lemma characterizes this by $E^{\prime}\cap Y\subseteq E$.
 \end{definition}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_closed
-\begin{lemma} \label{an1:lem:relative-closed}
+\begin{lemma}
+  \label{an1:lem:relative-closed}
   For $E\subseteq Y$, $E$ is closed in $Y$ if and only if $E^{\prime}\cap Y\subseteq E$.
 
   \begin{lean}
@@ -987,14 +1109,18 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 \end{lemma}
 
 \begin{proof}
-  A point of $Y$ that is an ambient limit point of $E$ is a subspace limit point: every witness lies in $E\subseteq Y$, and its distance is unchanged.
+  A point of $Y$ that is an ambient limit point of $E$ is a subspace limit point: every witness
+  lies in $E\subseteq Y$, and its distance is unchanged.
 
   \begin{lean}
     rw [closed_iff_derivedSet]
     constructor
   \end{lean}
 
-  Conversely, each subspace witness has an underlying point in $E$ with the same positive distance. Thus a subspace limit point is an ambient limit point lying in $Y$, and the stated condition puts it in $E$.
+  Conversely, each subspace witness has an underlying point in $E$ with the same positive
+  distance.
+  Thus a subspace limit point is an ambient limit point lying in $Y$, and the stated condition puts
+  it in $E$.
 
   \begin{lean}
     · intro h p hp
@@ -1022,8 +1148,10 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces.relative_open
-\begin{proposition} \label{an1:thm:open-set-relative-to-subspace}
-  For $E\subseteq Y\subseteq X$, $E$ is open in $Y$ if and only if $E=V\cap Y$ for some open $V\subseteq X$.
+\begin{proposition}
+  \label{an1:thm:open-set-relative-to-subspace}
+  For $E\subseteq Y\subseteq X$, $E$ is open in $Y$ if and only if $E=V\cap Y$ for some open
+  $V\subseteq X$.
 
   \begin{lean}
     theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
@@ -1033,7 +1161,8 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
 \end{proposition}
 
 \begin{proof}
-  Suppose $E$ is open in $Y$. For each $p\in E$, choose $r_p>0$ with $Y\cap B(p,r_p)\subseteq E$.
+  Suppose $E$ is open in $Y$.
+  For each $p\in E$, choose $r_p>0$ with $Y\cap B(p,r_p)\subseteq E$.
 
   \begin{lean}
     classical
@@ -1051,7 +1180,11 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
           hs (show (⟨q, hq.1⟩ : Y) ∈ ball ⟨p.val, hEY p.property⟩ r from hq.2)⟩
   \end{lean}
 
-  Let $V$ be the union of these ambient balls. It is open. Each point of $E$ lies in its own ball and in $Y$; conversely, a point in $V\cap Y$ lies in one chosen ball, whose intersection with $Y$ lies in $E$. Hence $E=V\cap Y$.
+  Let $V$ be the union of these ambient balls.
+  It is open.
+  Each point of $E$ lies in its own ball and in $Y$; conversely, a point in $V\cap Y$ lies in one
+  chosen ball, whose intersection with $Y$ lies in $E$.
+  Hence $E=V\cap Y$.
 
   \begin{lean}
     choose r hr hs using hex
@@ -1070,7 +1203,8 @@ The resulting space is called the \textbf{subspace} $(Y,d)$. We continue to writ
       exact hs p ⟨hy, hp⟩
   \end{lean}
 
-  Conversely, choose an ambient ball inside $V$ about each point of $E=V\cap Y$. Restricting this ball to $Y$ produces a subspace ball inside $E$.
+  Conversely, choose an ambient ball inside $V$ about each point of $E=V\cap Y$.
+  Restricting this ball to $Y$ produces a subspace ball inside $E$.
 
   \begin{lean}
     · rintro ⟨V, hV, heq⟩

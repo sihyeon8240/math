@@ -7,9 +7,9 @@
 \RequirePackage{tcolorbox}
 \tcbuselibrary{breakable,skins}
 
-% Use only fonts shipped with the supported TeX Live environment. In
-% particular, DejaVu Sans Mono lacks indexed union/intersection glyphs.
-% The fallback supplies missing characters without rewriting checked Lean.
+% Use only fonts shipped with the supported TeX Live environment. In particular, DejaVu Sans Mono
+% lacks indexed union/intersection glyphs. The fallback supplies missing characters without
+% rewriting checked Lean.
 \directlua{
   luaotfload.add_fallback("textbookcode", {
     "file:texgyretermes-math.otf:mode=base;"

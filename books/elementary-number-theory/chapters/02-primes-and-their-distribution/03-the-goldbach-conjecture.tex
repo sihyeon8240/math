@@ -1,8 +1,9 @@
 We examine gaps between primes and restrictions on their distribution.
-Unless otherwise specified, the variables are natural numbers, and the Lean
-namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
+Unless otherwise specified, the variables are natural numbers, and the Lean namespace remains
+\texttt{ElementaryNumberTheory.Chapter02}.
 
-\begin{theorem} \label{nt:thm:consecutive-composites}
+\begin{theorem}
+  \label{nt:thm:consecutive-composites}
   For every positive integer $n$, there exist $n$ consecutive composite integers.
 
   \begin{lean}
@@ -12,7 +13,9 @@ namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
 \end{theorem}
 
 \begin{proof}
-  Let $F=(n+1)!$ and consider $F+2,F+3,\ldots,F+n+1$. For $0\le i<n$, the integer $i+2$ divides $F$, so it also divides $F+i+2$.
+  Let $F=(n+1)!
+  $ and consider $F+2,F+3,\ldots,F+n+1$.
+  For $0\le i<n$, the integer $i+2$ divides $F$, so it also divides $F+i+2$.
 
   \begin{lean}
     let F := (n + 1).factorial
@@ -27,7 +30,9 @@ namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
       ring
   \end{lean}
 
-  Each displayed integer exceeds one. Its divisor $i+2$ is greater than one and is strictly smaller than $F+i+2$, since $F>0$. Thus it cannot be prime.
+  Each displayed integer exceeds one.
+  Its divisor $i+2$ is greater than one and is strictly smaller than $F+i+2$, since $F>0$.
+  Thus it cannot be prime.
 
   \begin{lean}
     refine ⟨by omega, ?_⟩
@@ -40,8 +45,10 @@ namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:product-four-mul-add-one}
-  A product of two or more integers of the form $4k+1$, with $k\in\Z$, again has that form. More generally, this holds for any finite list, including the empty product.
+\begin{lemma}
+  \label{nt:lem:product-four-mul-add-one}
+  A product of two or more integers of the form $4k+1$, with $k\in\Z$, again has that form.
+  More generally, this holds for any finite list, including the empty product.
 
   \begin{lean}
     theorem prod_four_mul_add_one (l : List ℤ)
@@ -51,7 +58,10 @@ namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
 \end{lemma}
 
 \begin{proof}
-  Induct on the number of factors. The empty product is $1=4\cdot0+1$. If the first factor is $4u+1$ and the remaining product is $4v+1$, then their product is $4(4uv+u+v)+1$.
+  Induct on the number of factors.
+  The empty product is $1=4\cdot0+1$.
+  If the first factor is $4u+1$ and the remaining product is $4v+1$, then their product is
+  $4(4uv+u+v)+1$.
 
   \begin{lean}
     induction l with
@@ -66,11 +76,12 @@ namespace remains \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-The notation $a\bmod4$ below means the remainder upon division by $4$;
-in Lean it is written \texttt{a \% 4}. The division algorithm gives
-$a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
+The notation $a\bmod4$ below means the remainder upon division by $4$; in Lean it is written
+\texttt{a \% 4}.
+The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
-\begin{lemma} \label{nt:lem:prime-remainders-four}
+\begin{lemma}
+  \label{nt:lem:prime-remainders-four}
   A prime $p$ is either $2$, or has remainder $1$ or $3$ upon division by $4$.
 
   \begin{lean}
@@ -80,7 +91,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 \end{lemma}
 
 \begin{proof}
-  The remainder lies between zero and three. The desired conclusion already holds when it is one or three.
+  The remainder lies between zero and three.
+  The desired conclusion already holds when it is one or three.
 
   \begin{lean}
     have hmod : p % 4 < 4 := Nat.mod_lt p (by omega)
@@ -93,7 +105,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
       · exact Or.inr (Or.inr hthree)
   \end{lean}
 
-  For remainder zero, $p=2(2\lfloor p/4\rfloor)$; for remainder two, $p=2(2\lfloor p/4\rfloor+1)$. Thus $2\mid p$, and primality forces $p=2$.
+  For remainder zero, $p=2(2\lfloor p/4\rfloor)$; for remainder two, $p=2(2\lfloor p/4\rfloor+1)$.
+  Thus $2\mid p$, and primality forces $p=2$.
 
   \begin{lean}
     · have hdiv : 2 ∣ p := by
@@ -110,7 +123,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-divisor-four-mul-add-three}
+\begin{lemma}
+  \label{nt:lem:prime-divisor-four-mul-add-three}
   If $n\bmod4=3$, then $n$ has a prime divisor whose remainder upon division by $4$ is also $3$.
 
   \begin{lean}
@@ -120,7 +134,9 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 \end{lemma}
 
 \begin{proof}
-  Choose a prime factor list for $n$ and suppose that no prime divisor has remainder three. The factor $2$ is impossible, since $n$ has odd remainder. By the preceding lemma every prime factor must therefore have remainder one.
+  Choose a prime factor list for $n$ and suppose that no prime divisor has remainder three.
+  The factor $2$ is impossible, since $n$ has odd remainder.
+  By the preceding lemma every prime factor must therefore have remainder one.
 
   \begin{lean}
     classical
@@ -139,7 +155,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
       · exact hrest.resolve_right (h p (hl p hp) hdiv)
   \end{lean}
 
-  For each prime factor $p$, division by four gives $p=4\lfloor p/4\rfloor+1$. View these equalities as integer equalities to apply the product lemma.
+  For each prime factor $p$, division by four gives $p=4\lfloor p/4\rfloor+1$.
+  View these equalities as integer equalities to apply the product lemma.
 
   \begin{lean}
     have hform : ∀ a ∈ l.map (fun p : ℕ => (p : ℤ)), ∃ k : ℤ, a = 4 * k + 1 := by
@@ -152,7 +169,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
       exact_mod_cast heq
   \end{lean}
 
-  The product lemma makes the entire product equal to $4k+1$ for some integer $k$. Since that product is $n$, this contradicts $n\bmod4=3$.
+  The product lemma makes the entire product equal to $4k+1$ for some integer $k$.
+  Since that product is $n$, this contradicts $n\bmod4=3$.
 
   \begin{lean}
     obtain ⟨k, hk⟩ := prod_four_mul_add_one _ hform
@@ -165,7 +183,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-four-mul-add-three-above-bound}
+\begin{lemma}
+  \label{nt:lem:prime-four-mul-add-three-above-bound}
   For every natural number $m$, there is a prime $p>m$ of the form $p=4k+3$ with $k\in\N$.
 
   \begin{lean}
@@ -175,7 +194,11 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 \end{lemma}
 
 \begin{proof}
-  Put $N=4m!-1$. Since $m!\ge1$, this is positive and has remainder three modulo four. Choose a prime divisor $p$ with that remainder, and write $p=4\lfloor p/4\rfloor+3$.
+  Put $N=4m!
+    -1$.
+  Since $m!
+    \ge1$, this is positive and has remainder three modulo four.
+  Choose a prime divisor $p$ with that remainder, and write $p=4\lfloor p/4\rfloor+3$.
 
   \begin{lean}
     let N := 4 * m.factorial - 1
@@ -187,7 +210,10 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
     refine ⟨p, hp, ?_, p / 4, by omega⟩
   \end{lean}
 
-  If $p\le m$, write $m!=pt$. Then $N+1=4m!=p(4t)$, so $p$ divides $N+1$ as well as $N$.
+  If $p\le m$, write $m!
+    =pt$.
+  Then $N+1=4m!
+    =p(4t)$, so $p$ divides $N+1$ as well as $N$.
 
   \begin{lean}
     by_contra h
@@ -202,7 +228,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
       ring
   \end{lean}
 
-  This contradicts the consecutive-number lemma. Hence $p>m$.
+  This contradicts the consecutive-number lemma.
+  Hence $p>m$.
 
   \begin{lean}
     exact not_dvd_of_dvd_add_one p N hp hsucc hdiv
@@ -210,7 +237,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:infinitely-many-primes-four-mul-add-three}
+\begin{theorem}
+  \label{nt:thm:infinitely-many-primes-four-mul-add-three}
   There are infinitely many primes of the form $4k+3$, with $k\in\N$.
 
   \begin{lean}
@@ -220,7 +248,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 \end{theorem}
 
 \begin{proof}
-  The preceding construction produces such a prime above every bound. A finite set of natural numbers is bounded, so this set of primes is infinite.
+  The preceding construction produces such a prime above every bound.
+  A finite set of natural numbers is bounded, so this set of primes is infinite.
 
   \begin{lean}
     apply Set.infinite_of_forall_exists_gt
@@ -231,12 +260,15 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:prime-progression-common-difference}
-  Let $p,d\in\N$ and $n>2$. If every term of
+\begin{theorem}
+  \label{nt:thm:prime-progression-common-difference}
+  Let $p,d\in\N$ and $n>2$.
+  If every term of
   \[
     p,\ p+d,\ p+2d,\ \ldots,\ p+(n-1)d
   \]
-  is prime, then every prime $q<n$ divides $d$. The statement includes the constant progression $d=0$.
+  is prime, then every prime $q<n$ divides $d$.
+  The statement includes the constant progression $d=0$.
 
   \begin{lean}
     theorem prime_dvd_common_difference (p d n : ℕ) (hn : 2 < n)
@@ -246,7 +278,9 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 \end{theorem}
 
 \begin{proof}
-  The first term $p$ is prime. Fix a prime $q<n$. If $d=0$, then $q\mid d$ immediately.
+  The first term $p$ is prime.
+  Fix a prime $q<n$.
+  If $d=0$, then $q\mid d$ immediately.
 
   \begin{lean}
     have hp : isPrime p := by
@@ -258,7 +292,10 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
     · exact ⟨0, by rw [hd, mul_zero]⟩
   \end{lean}
 
-  Suppose $d>0$. We must have $n\le p$: otherwise the term with index $p$ occurs in the progression and equals $p+pd=p(1+d)$. Its divisor $p>1$ is smaller than the term, contradicting primality.
+  Suppose $d>0$.
+  We must have $n\le p$: otherwise the term with index $p$ occurs in the progression and equals
+  $p+pd=p(1+d)$.
+  Its divisor $p>1$ is smaller than the term, contradicting primality.
 
   \begin{lean}
     · have hnp : n ≤ p := by
@@ -273,7 +310,9 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
           nlinarith [hp.1]
   \end{lean}
 
-  Assume, seeking a contradiction, that $q$ does not divide $d$. The gcd of $q$ and $d$ divides the prime $q$, so it is $1$ or $q$. The latter would imply $q\mid d$; hence the gcd is $1$.
+  Assume, seeking a contradiction, that $q$ does not divide $d$.
+  The gcd of $q$ and $d$ divides the prime $q$, so it is $1$ or $q$.
+  The latter would imply $q\mid d$; hence the gcd is $1$.
 
   \begin{lean}
     by_contra hqd
@@ -290,7 +329,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
         exact (hqd (Int.natCast_dvd_natCast.mp hgd)).elim
   \end{lean}
 
-  Choose integers $r,s$ with $1=qr+ds$. Divide $-ps$ by $q$, obtaining $-ps=aq+i$ with $0\le i<q$.
+  Choose integers $r,s$ with $1=qr+ds$.
+  Divide $-ps$ by $q$, obtaining $-ps=aq+i$ with $0\le i<q$.
 
   \begin{lean}
     obtain ⟨r, s, hrs⟩ :=
@@ -301,7 +341,8 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
     change i < q at hi
   \end{lean}
 
-  These two equalities give $p+id=q(pr-da)$. Thus $q\mid p+id$.
+  These two equalities give $p+id=q(pr-da)$.
+  Thus $q\mid p+id$.
 
   \begin{lean}
     have hdiv : q ∣ p + i * d := by
@@ -312,7 +353,10 @@ $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
         congrArg (fun z => (d : ℤ) * z) hrem]
   \end{lean}
 
-  Since $i<q<n$, this term is prime. Its prime divisor $q$ must equal the term. But $p+id\ge p\ge n>q$, a contradiction. Therefore $q\mid d$.
+  Since $i<q<n$, this term is prime.
+  Its prime divisor $q$ must equal the term.
+  But $p+id\ge p\ge n>q$, a contradiction.
+  Therefore $q\mid d$.
 
   \begin{lean}
     have hterm := hterms i (lt_trans hi hqn)

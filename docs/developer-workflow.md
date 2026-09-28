@@ -180,10 +180,21 @@ All formatter targets require their text files to end with exactly one LF.
 Git-tracked text file; binary and untracked files are excluded. The complete
 check applies the same repository-wide validation.
 
-The LaTeX formatter is `latexindent`. It processes every Git-tracked `*.tex` and
-`*.sty` file, including book sources, shared styles, and templates, with a
-two-space default indentation setting and condenses consecutive blank lines to
-one. Untracked drafts and other extensions are not included. Temporary
+The LaTeX formatter is `latexindent`, configured in `config/latexindent.yaml`.
+It processes every Git-tracked `*.tex` and `*.sty` file, including book sources,
+shared styles, and templates, with two-space indentation. Sentences start on
+separate lines, prose and explanatory comments wrap to 100 columns after
+indentation, and environment beginnings, bodies, and endings start on separate
+lines. Consecutive blank lines are condensed to one. The formatter preserves
+sentence breaks during wrapping and does not join sentences across display math.
+A final indentation-only pass corrects extra indentation introduced by
+`latexindent` 4.0.2 when wrapping short sentences.
+
+The column width is a wrapping target, not a hard limit: verbatim code and
+unbreakable tokens can remain longer. Lean environments retain their relative
+code indentation. Generated boundary comments, Lean source references, editor
+directives, and empty `%` section markers are protected from comment wrapping.
+Untracked drafts and other extensions are not included. Temporary
 `latexindent` files are isolated and removed automatically. The command fails
 with a dependency error when `latexindent` is not available.
 

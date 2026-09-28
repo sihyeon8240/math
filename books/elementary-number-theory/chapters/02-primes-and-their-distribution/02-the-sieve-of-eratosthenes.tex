@@ -1,8 +1,8 @@
-We continue to represent positive integers by natural numbers with explicit
-positivity assumptions. The Lean namespace is
-\texttt{ElementaryNumberTheory.Chapter02}.
+We continue to represent positive integers by natural numbers with explicit positivity assumptions.
+The Lean namespace is \texttt{ElementaryNumberTheory.Chapter02}.
 
-\begin{lemma} \label{nt:lem:prime-divisor-exists}
+\begin{lemma}
+  \label{nt:lem:prime-divisor-exists}
   Every natural number $n>1$ has a prime divisor $p\le n$.
 
   \begin{lean}
@@ -12,7 +12,9 @@ positivity assumptions. The Lean namespace is
 \end{lemma}
 
 \begin{proof}
-  The fundamental theorem of arithmetic supplies a nonempty list of prime factors. Take its first entry $p$ and write $n=pM$, where $M$ is the product of the remaining entries. Since $n>0$, we have $M\ge1$, so $p\le n$.
+  The fundamental theorem of arithmetic supplies a nonempty list of prime factors.
+  Take its first entry $p$ and write $n=pM$, where $M$ is the product of the remaining entries.
+  Since $n>0$, we have $M\ge1$, so $p\le n$.
 
   \begin{lean}
     obtain ⟨l, hne, hl, hprod, _⟩ := fundamental_theorem_of_arithmetic n hn
@@ -28,9 +30,11 @@ positivity assumptions. The Lean namespace is
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:composite-prime-divisor-sqrt}
+\begin{theorem}
+  \label{nt:thm:composite-prime-divisor-sqrt}
   If $n>1$ is composite, it has a prime divisor $p$ satisfying $p\le\sqrt n$.
-  For integer $p$, this is equivalent to $p\le\lfloor\sqrt n\rfloor$; Lean uses the natural square root, characterized by $p\le\operatorname{sqrt}(n)$ if and only if $p^2\le n$.
+  For integer $p$, this is equivalent to $p\le\lfloor\sqrt n\rfloor$; Lean uses the natural square
+  root, characterized by $p\le\operatorname{sqrt}(n)$ if and only if $p^2\le n$.
 
   \begin{lean}
     theorem exists_prime_divisor_le_sqrt (n : ℕ) (hn : isComposite n) :
@@ -39,7 +43,8 @@ positivity assumptions. The Lean namespace is
 \end{theorem}
 
 \begin{proof}
-  Since $n$ is composite, choose a divisor $d$ other than $1$ and $n$, and write $n=dk$. Positivity and the proper-divisor condition give $d>1$ and $k>1$.
+  Since $n$ is composite, choose a divisor $d$ other than $1$ and $n$, and write $n=dk$.
+  Positivity and the proper-divisor condition give $d>1$ and $k>1$.
 
   \begin{lean}
     classical
@@ -59,7 +64,10 @@ positivity assumptions. The Lean namespace is
       exact hdn hk.symm
   \end{lean}
 
-  Choose a prime divisor $p$ of $\min(d,k)$. If $p$ divides $d$, write $d=pt$ and obtain $n=p(tk)$. If it divides $k$, write $k=pt$ and obtain $n=p(dt)$. Thus $p\mid n$ in either case.
+  Choose a prime divisor $p$ of $\min(d,k)$.
+  If $p$ divides $d$, write $d=pt$ and obtain $n=p(tk)$.
+  If it divides $k$, write $k=pt$ and obtain $n=p(dt)$.
+  Thus $p\mid n$ in either case.
 
   \begin{lean}
     obtain ⟨p, hp, ⟨t, ht⟩, hle⟩ := exists_prime_divisor (min d k) (by omega)
@@ -77,7 +85,8 @@ positivity assumptions. The Lean namespace is
         ring
   \end{lean}
 
-  The choice of $p$ gives $p\le d$ and $p\le k$. Therefore $p^2\le dk=n$, proving the square-root bound.
+  The choice of $p$ gives $p\le d$ and $p\le k$.
+  Therefore $p^2\le dk=n$, proving the square-root bound.
 
   \begin{lean}
     · have hpd : p ≤ d := le_trans hle (min_le_left _ _)
@@ -87,11 +96,13 @@ positivity assumptions. The Lean namespace is
 
 \end{proof}
 
-Consequently, a sieve need only test prime divisors up to the square root:
-a number greater than one with no such prime divisor cannot be composite.
+Consequently, a sieve need only test prime divisors up to the square root: a number greater than
+one with no such prime divisor cannot be composite.
 
-\begin{lemma} \label{nt:lem:factorial-multiple}
-  For natural numbers $k,n$ with $0<k\le n$, there is a natural number $t$ such that $n!=kt$.
+\begin{lemma}
+  \label{nt:lem:factorial-multiple}
+  For natural numbers $k,n$ with $0<k\le n$, there is a natural number $t$ such that $n!
+    =kt$.
 
   \begin{lean}
     theorem factorial_multiple (n k : ℕ) (hk : 0 < k) (hkn : k ≤ n) :
@@ -100,7 +111,13 @@ a number greater than one with no such prime divisor cannot be composite.
 \end{lemma}
 
 \begin{proof}
-  Induct on $n$. The case $n=0$ has no admissible $k$. At the next step, if $k=n+1$, use $(n+1)!=(n+1)n!$. Otherwise $k\le n$, and multiplying the inductive equality $n!=kt$ by $n+1$ gives the required witness.
+  Induct on $n$.
+  The case $n=0$ has no admissible $k$.
+  At the next step, if $k=n+1$, use $(n+1)!
+    =(n+1)n!$.
+  Otherwise $k\le n$, and multiplying the inductive equality $n!
+    =kt$ by $n+1$
+  gives the required witness.
 
   \begin{lean}
     induction n with
@@ -117,7 +134,8 @@ a number greater than one with no such prime divisor cannot be composite.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-not-divide-consecutive}
+\begin{lemma}
+  \label{nt:lem:prime-not-divide-consecutive}
   If a prime $p$ divides $M+1$, it does not divide $M$.
 
   \begin{lean}
@@ -127,7 +145,8 @@ a number greater than one with no such prime divisor cannot be composite.
 \end{lemma}
 
 \begin{proof}
-  If $M=pj$ and $M+1=pk$, then $j<k$. Hence $M+p=p(j+1)\le pk=M+1$, implying $p\le1$, a contradiction.
+  If $M=pj$ and $M+1=pk$, then $j<k$.
+  Hence $M+p=p(j+1)\le pk=M+1$, implying $p\le1$, a contradiction.
 
   \begin{lean}
     rintro ⟨j, hj⟩
@@ -139,7 +158,8 @@ a number greater than one with no such prime divisor cannot be composite.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-above-bound}
+\begin{lemma}
+  \label{nt:lem:prime-above-bound}
   For every natural number $m$, some prime exceeds $m$.
 
   \begin{lean}
@@ -148,7 +168,8 @@ a number greater than one with no such prime divisor cannot be composite.
 \end{lemma}
 
 \begin{proof}
-  The number $m!+1$ exceeds one, so it has a prime divisor $p$.
+  The number $m!
+    +1$ exceeds one, so it has a prime divisor $p$.
 
   \begin{lean}
     obtain ⟨p, hp, hdiv, _⟩ :=
@@ -157,7 +178,11 @@ a number greater than one with no such prime divisor cannot be composite.
         omega)
   \end{lean}
 
-  If $p\le m$, the factorial lemma gives $p\mid m!$. This contradicts the fact that a prime cannot divide both $m!$ and $m!+1$. Thus $p>m$.
+  If $p\le m$, the factorial lemma gives $p\mid m!
+  $.
+  This contradicts the fact that a prime cannot divide both $m!
+  $ and $m!+1$.
+  Thus $p>m$.
 
   \begin{lean}
     refine ⟨p, hp, ?_⟩
@@ -168,7 +193,8 @@ a number greater than one with no such prime divisor cannot be composite.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:infinitely-many-primes}
+\begin{theorem}
+  \label{nt:thm:infinitely-many-primes}
   There are infinitely many prime numbers.
 
   \begin{lean}
@@ -177,7 +203,8 @@ a number greater than one with no such prime divisor cannot be composite.
 \end{theorem}
 
 \begin{proof}
-  Every finite set of natural numbers is bounded. The preceding lemma produces a prime beyond any proposed bound, so the set of primes is infinite.
+  Every finite set of natural numbers is bounded.
+  The preceding lemma produces a prime beyond any proposed bound, so the set of primes is infinite.
 
   \begin{lean}
     apply Set.infinite_of_forall_exists_gt
@@ -189,12 +216,14 @@ a number greater than one with no such prime divisor cannot be composite.
 \end{proof}
 
 List the primes in increasing order as $p_1,p_2,\ldots$.
-The general enumeration \texttt{Nat.nth} starts at zero, so
-\texttt{Nat.nth isPrime i} denotes $p_{i+1}$. The infinitude just proved ensures
-that this enumeration always gives a prime, is increasing, and contains every
-prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
+The general enumeration \texttt{Nat.nth} starts at zero, so \texttt{Nat.nth isPrime i} denotes
+$p_{i+1}$.
+The infinitude just proved ensures that this enumeration always gives a prime, is increasing, and
+contains every prime.
+Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 
-\begin{lemma} \label{nt:lem:next-prime-product-bound}
+\begin{lemma}
+  \label{nt:lem:next-prime-product-bound}
   For every $n\ge0$, the next prime satisfies $p_{n+1}\le P_n+1$.
 
   \begin{lean}
@@ -204,7 +233,8 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 \end{lemma}
 
 \begin{proof}
-  All factors in $P_n$ are positive, and the empty product is also positive. Thus $P_n+1>1$.
+  All factors in $P_n$ are positive, and the empty product is also positive.
+  Thus $P_n+1>1$.
 
   \begin{lean}
     classical
@@ -215,7 +245,9 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
       exact lt_trans Nat.zero_lt_one (Nat.nth_mem_of_infinite infinite_primes i).1
   \end{lean}
 
-  Choose a prime divisor $q\le P_n+1$ and let its enumeration index be $k$, so $q=p_{k+1}$. If $k<n$, then $q$ is a factor of $P_n$, contradicting the consecutive-number lemma. Therefore $k\ge n$.
+  Choose a prime divisor $q\le P_n+1$ and let its enumeration index be $k$, so $q=p_{k+1}$.
+  If $k<n$, then $q$ is a factor of $P_n$, contradicting the consecutive-number lemma.
+  Therefore $k\ge n$.
 
   \begin{lean}
     obtain ⟨q, hq, hdiv, hqle⟩ := exists_prime_divisor (P + 1) (by omega)
@@ -243,7 +275,8 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-product-double-exponential}
+\begin{lemma}
+  \label{nt:lem:prime-product-double-exponential}
   For every $n\ge0$, we have $P_n<2^{2^n}$.
 
   \begin{lean}
@@ -253,7 +286,10 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 \end{lemma}
 
 \begin{proof}
-  Induct on $n$. For $n=0$, the assertion is $1<2$. If $P_n< B=2^{2^n}$, integrality gives $P_n+1\le B$, so the preceding bound yields $p_{n+1}\le B$.
+  Induct on $n$.
+  For $n=0$, the assertion is $1<2$.
+  If $P_n< B=2^{2^n}$, integrality gives $P_n+1\le B$, so the preceding bound yields $p_{n+1}\le
+    B$.
 
   \begin{lean}
     induction n with
@@ -280,7 +316,8 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:nth-prime-double-exponential}
+\begin{theorem}
+  \label{nt:thm:nth-prime-double-exponential}
   For the $n$th prime $p_n$, with $n\ge1$, we have $p_n\le2^{2^{n-1}}$.
 
   \begin{lean}
@@ -290,7 +327,9 @@ prime. Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 \end{theorem}
 
 \begin{proof}
-  Write $n=m+1$. The preceding lemmas give $p_n\le P_m+1$ and $P_m<2^{2^m}$. Since these are integers, $P_m+1\le2^{2^m}$, proving the assertion.
+  Write $n=m+1$.
+  The preceding lemmas give $p_n\le P_m+1$ and $P_m<2^{2^m}$.
+  Since these are integers, $P_m+1\le2^{2^m}$, proving the assertion.
 
   \begin{lean}
     obtain ⟨m, rfl⟩ := Nat.exists_eq_succ_of_ne_zero (Nat.ne_of_gt hn)

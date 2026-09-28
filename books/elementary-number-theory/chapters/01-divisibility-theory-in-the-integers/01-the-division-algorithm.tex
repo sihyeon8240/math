@@ -1,6 +1,7 @@
-\begin{theorem} \label{nt:thm:division-algorithm}
-  Let $a\in\Z$ and $b\in\N^+$. There is a unique pair
-  $(q,r)\in\Z\times\N$ such that
+\begin{theorem}
+  \label{nt:thm:division-algorithm}
+  Let $a\in\Z$ and $b\in\N^+$.
+  There is a unique pair $(q,r)\in\Z\times\N$ such that
   \[
     a=qb+r, \qquad r<b.
   \]
@@ -72,7 +73,8 @@
   \[
     0\le r-b=a-(q+1)b<r,
   \]
-  contradicting minimality. Hence $r<b$.
+  contradicting minimality.
+  Hence $r<b$.
 
   \begin{lean}
     have hrb_int : (r : ℤ) < b := by
@@ -101,8 +103,7 @@
     refine ⟨(q, r), ⟨ha, hrb⟩, ?_⟩
   \end{lean}
 
-  Suppose another pair $(q',r')\in\Z\times\N$ satisfies
-  $a=q'b+r'$ and $0\le r'<b$.
+  Suppose another pair $(q',r')\in\Z\times\N$ satisfies $a=q'b+r'$ and $0\le r'<b$.
 
   \begin{lean}
     rintro ⟨q', r'⟩ ⟨ha', hr'b⟩
