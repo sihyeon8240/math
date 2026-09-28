@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import shutil
 import subprocess
@@ -9,6 +10,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
@@ -59,6 +61,51 @@ class ContentsManifestTests(unittest.TestCase):
             self.assertEqual(index.count(r"\section{First}"), 1)
             self.assertEqual(index.count(r"\input{"), 1)
             self.assertIn("01-first.tex", index)
+
+    def test_generator_initializes_proof_indexes_without_overwriting(self) -> None:
+        repository = Path(__file__).resolve().parent.parent
+        spec = importlib.util.spec_from_file_location(
+            "generate_contents", repository / "scripts/generate-contents.py"
+        )
+        assert spec and spec.loader
+        generator = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(generator)
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            book = self.fixture(root)
+            (root / "books").mkdir()
+            book = book.rename(root / "books/sample")
+            manifest = book / "chapters.yml"
+            manifest.write_text(
+                manifest.read_text()
+                + "appendices:\n  - slug: tables\n    title: Tables\n"
+            )
+            appendix = book / "appendices/01-tables"
+            appendix.mkdir(parents=True)
+            (appendix / "sections.yml").write_text(
+                "schema_version: 1\nsections:\n  - slug: values\n    title: Values\n"
+            )
+            (appendix / "01-values.tex").write_text("body\n")
+            template = root / "common/templates/proofs.yml"
+            template.parent.mkdir(parents=True)
+            shutil.copyfile(repository / "common/templates/proofs.yml", template)
+            indexes = [book / "chapters/01-start/proofs.yml", appendix / "proofs.yml"]
+            with (
+                patch.object(generator, "ROOT", root),
+                patch.object(
+                    generator, "load_manifest", return_value={"books": [self.RECORD]}
+                ),
+            ):
+                self.assertEqual(generator.generate("all", check=True), 1)
+                self.assertTrue(all(not path.exists() for path in indexes))
+                self.assertEqual(generator.generate("all"), 0)
+                for path in indexes:
+                    self.assertEqual(path.read_text(), "proofs: []\n")
+                entries = "proofs:\n  - id: sa:thm:result\n    declaration: Sample.Chapter01.result\n"
+                indexes[0].write_text(entries)
+                self.assertEqual(generator.generate("all"), 0)
+                self.assertEqual(generator.generate("all", check=True), 0)
+                self.assertEqual(indexes[0].read_text(), entries)
 
     def test_metadata_is_rendered_from_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

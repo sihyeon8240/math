@@ -55,6 +55,12 @@ Edit the `chapters` and optional `appendices` lists in `chapters.yml` and
 their `sections.yml` files, then run `make contents all BOOK=<slug>`. Do not edit
 the generated `book.tex` or any chapter `index.tex`. Chapter and section titles
 may contain LaTeX, including `\texorpdfstring` where a PDF-safe form is required.
+
+The `sec` and `all` scopes also initialize missing chapter and appendix
+`proofs.yml` files from [the proof-index template](../common/templates/proofs.yml).
+Existing files are preserved; maintain their entries by hand. The `check` mode
+reports missing files without creating them. New books use this same initialization.
+
 Slugs remain meaningful ASCII descriptions: preserve mathematical identifiers
 and exponents (for example, `functions-of-class-l2` and `the-number-e`) instead
 of deriving a lossy slug from rendered title text.

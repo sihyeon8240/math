@@ -26,7 +26,7 @@ theorems in their owning namespace. See [Lean formalization](formalization.md).
 - `docs/` contains the documentation map plus contributor, maintainer, authoring, formalization, and site-operation guidance subordinate to this architecture contract.
 - `tests/` contains the Python unit-test suite for repository automation.
 - `lean/` is one pinned Lake project containing book-owned formalization namespaces.
-- `proof-index/<book>/<chapter>.yml` and `proof-index/<book>/appendices/<appendix>.yml` link labeled LaTeX results to checked Lean proofs.
+- `books/<book>/chapters/<chapter>/proofs.yml` and `books/<book>/appendices/<appendix>/proofs.yml` link labeled LaTeX results to checked Lean proofs.
 - `site/` contains website source and data.
 - `.devcontainer/` defines the supported development container, while `.github/` contains CI, release, issue, and pull-request configuration.
 - `build/` contains ignored, disposable Make-based output organized by book slug. The editor-only `vscode-build/` directory is also ignored and disposable.
@@ -193,6 +193,7 @@ its PDF snapshot separately from task branches and `main`.
 - `chapters.yml`: canonical ordered chapter slugs and titles plus optional ordered appendices.
 - `chapters/<NN-name>/sections.yml`: canonical ordered section slugs and titles.
 - `chapters/<NN-name>/index.tex`: generated chapter and section assembly; do not edit.
+- Chapter and appendix `proofs.yml`: hand-maintained theorem-to-proof links; contents generation initializes missing files from the empty template without overwriting entries.
 - `appendices/<NN-name>/sections.yml` and `index.tex`: appendix counterparts, generated after `\appendix` and before `\backmatter`.
 - `NN-section-name.tex`: the single source file for one logical section.
 - `references.bib`: predictable book-local bibliography.
@@ -233,8 +234,8 @@ Those guides own authoring order, displayed-source correspondence, prerequisite
 boundaries, and human review obligations.
 
 `make check all` validates publication sources and the pinned Lean project.
-Chapter-owned `proof-index/<book>/<chapter>.yml` and appendix-owned
-`proof-index/<book>/appendices/<appendix>.yml` shards own theorem-to-proof links.
+Chapter-owned `books/<book>/chapters/<chapter>/proofs.yml` and appendix-owned
+`books/<book>/appendices/<appendix>/proofs.yml` shards own theorem-to-proof links.
 The [formalization checks](formalization.md#validation-commands) reject unfinished
 proofs and repository-defined axioms and check registered proof types and axiom
 dependencies. Verification coverage is the set of registered results, not a claim

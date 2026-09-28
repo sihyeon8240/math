@@ -407,8 +407,14 @@ Each shard is owned by one registered book and one chapter or appendix:
 
 | LaTeX source directory | Proof-index shard | Lean namespace |
 |---|---|---|
-| `books/<book>/chapters/01-topic/` | `proof-index/<book>/01-topic.yml` | `<Book>.Chapter01` |
-| `books/<book>/appendices/01-topic/` | `proof-index/<book>/appendices/01-topic.yml` | `<Book>.Appendix01` |
+| `books/<book>/chapters/01-topic/` | `books/<book>/chapters/01-topic/proofs.yml` | `<Book>.Chapter01` |
+| `books/<book>/appendices/01-topic/` | `books/<book>/appendices/01-topic/proofs.yml` | `<Book>.Appendix01` |
+
+Every registered chapter and appendix owns a `proofs.yml`, including `proofs: []`
+when no results are registered. The loader follows `books.yml` and `chapters.yml`
+order and rejects missing files or indexes outside registered directories.
+Run `make contents all BOOK=<slug>` to initialize missing files without replacing
+existing entries.
 
 Both shard kinds use the same entry schema:
 
@@ -489,7 +495,8 @@ together. Ordinary checks must not run `lake update`.
 
 Do not claim that an entire textbook is formally verified merely because the
 Lean project builds. Coverage counts textbook theorem, lemma, proposition, and
-corollary environments linked through `proof-index/`, once per environment,
-relative to all such environments in the book. Lean-only results are excluded.
+corollary environments linked through chapter and appendix `proofs.yml` files,
+once per environment, relative to all such environments in the book. Lean-only
+results are excluded.
 Material omitted pedagogically may be supplied by Mathlib and should be described
 as a prerequisite at chapter or book level.

@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-CHAPTER_RE = re.compile(r"^[0-9]{2}-[a-z0-9]+(?:-[a-z0-9]+)*$")
-PROOF_INDEX_DIR = "proof-index"
+try:
+    from scripts.book_manifest import load_manifest
+    from scripts.contents_manifest import proof_index_paths
+except ModuleNotFoundError:
+    from book_manifest import load_manifest
+    from contents_manifest import proof_index_paths
+
 SHARD_FIELDS = {"proofs"}
 
 
@@ -28,24 +32,27 @@ def load_yaml(path: Path) -> dict[str, Any]:
 def load_proof_index(root: Path) -> tuple[list[str], list[dict[str, Any]]]:
     """Load proof shards in deterministic book/chapter order."""
     errors: list[str] = []
-    shard_root = root / PROOF_INDEX_DIR
-    if not shard_root.is_dir():
-        return errors + [f"proof index directory does not exist: {PROOF_INDEX_DIR}"], []
+    try:
+        books = load_manifest(root / "books.yml", root)["books"]
+    except ValueError as error:
+        return [str(error)], []
+
+    paths: list[Path] = []
+    for book in books:
+        try:
+            paths.extend(proof_index_paths(root / "books" / book["slug"]))
+        except ValueError as error:
+            errors.append(str(error))
+
+    for path in sorted(set((root / "books").rglob("proofs.yml")) - set(paths)):
+        errors.append(f"{path.relative_to(root)}: unregistered proof index")
 
     proofs: list[dict[str, Any]] = []
-    for path in sorted(shard_root.rglob("*.yml")):
-        relative = path.relative_to(shard_root)
-        is_appendix = len(relative.parts) == 3 and relative.parts[1] == "appendices"
-        if len(relative.parts) != 2 and not is_appendix:
-            errors.append(
-                f"proof index shard must be <book>/<chapter>.yml or "
-                f"<book>/appendices/<appendix>.yml: {relative}"
-            )
-            continue
-        expected_book = relative.parts[0]
-        expected_chapter = path.stem
-        if not CHAPTER_RE.fullmatch(expected_chapter):
-            errors.append(f"proof index shard has invalid chapter name: {relative}")
+    for path in paths:
+        relative = path.relative_to(root)
+        expected_book = relative.parts[1]
+        expected_chapter = path.parent.name
+        is_appendix = path.parent.parent.name == "appendices"
         try:
             shard = load_yaml(path)
         except ValueError as error:
