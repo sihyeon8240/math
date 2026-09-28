@@ -16,6 +16,13 @@ The development container is the supported setup; for local requirements,
 inspect the canonical configuration and run `make doctor env`.
 After changing shared configuration, run `make config` and `make config check`.
 
+Keep the Python version and base-image digest pinned. Dependabot ignores the
+`python` Docker image; update it manually only when needed for a security fix,
+end of support, or a dependency requirement. Update `config/toolchain.env` and
+the Python image pin in `.devcontainer/Dockerfile` together, then run
+`make config`, `make config check`, `make test`, and `make check all strict`
+using the rebuilt development image.
+
 ## Terminal containers
 
 Docker and GNU Make on the host are enough to use the toolchain without VS Code:
