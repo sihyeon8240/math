@@ -128,7 +128,11 @@ install and cache configuration pointed at that file.
 - Use `<Book>.ChapterNN` or `<Book>.AppendixNN` declaration namespaces without a
   `Textbooks` prefix.
   Keep `Textbooks` in module paths and imports. Book-level `All.lean` files are
-  aggregation entry points, not mathematical sources.
+  generated aggregation entry points, not mathematical sources. Register topic
+  names and reading order in each chapter or appendix `modules.yml`
+  (`schema_version: 1`, `modules` list without filename extensions), then run
+  `make generated BOOK=<slug>`. Do not edit `All.lean` or `Textbooks.lean`
+  directly; keep actual dependencies in topic-level imports.
 - Format Lean proofs by reasoning unit: separate setup, local claims, case
   branches, and conclusions with single blank lines; indent nested proofs by
   two spaces and wrap long signatures and expressions. Keep short related tactics

@@ -121,6 +121,19 @@ def appendix_directory(book_dir: Path, number: int, appendix: dict) -> Path:
     return book_dir / "appendices" / f"{number:02d}-{appendix['slug']}"
 
 
+def proof_index_paths(book_dir: Path) -> list[Path]:
+    """Return chapter and appendix proof indexes in contents order."""
+    chapters, appendices = load_book_contents(book_dir)
+    return [
+        directory_for(book_dir, number, entry) / "proofs.yml"
+        for entries, directory_for in (
+            (chapters, chapter_directory),
+            (appendices, appendix_directory),
+        )
+        for number, entry in enumerate(entries, 1)
+    ]
+
+
 def section_filenames(number: int, section: dict) -> list[str]:
     return [f"{number:02d}-{section['slug']}.tex"]
 

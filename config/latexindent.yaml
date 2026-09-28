@@ -1,0 +1,25 @@
+defaultIndent: '  '
+verbatimEnvironments:
+  lean: 1
+# Preserve machine-readable comments and intentionally empty sections.
+noIndentBlock:
+  metadataComments:
+    begin: '(?m)^\h*%(?=\h*(?:!|(?:BEGIN|END)\h+GENERATED\b|Generated\h+from\b|Lean\h+source:|$))'
+    body: '[^\r\n]*'
+    end: '(?m)(?=\r?$)'
+modifyLineBreaks:
+  oneSentencePerLine:
+    manipulateSentences: 1
+    textWrapSentences: 1
+    sentencesDoNOTcontain:
+      other: '\\begin|\\\[|\\\]'
+  environments:
+    BeginStartsOnOwnLine: 1
+    BodyStartsOnOwnLine: 1
+    EndStartsOnOwnLine: 1
+  textWrapOptions:
+    columns: 100
+    when: after
+    comments:
+      wrap: 1
+      inheritLeadingSpace: 1

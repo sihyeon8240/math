@@ -26,7 +26,7 @@ theorems in their owning namespace. See [Lean formalization](formalization.md).
 - `docs/` contains the documentation map plus contributor, maintainer, authoring, formalization, and site-operation guidance subordinate to this architecture contract.
 - `tests/` contains the Python unit-test suite for repository automation.
 - `lean/` is one pinned Lake project containing book-owned formalization namespaces.
-- `proof-index/<book>/<chapter>.yml` and `proof-index/<book>/appendices/<appendix>.yml` link labeled LaTeX results to checked Lean proofs.
+- `books/<book>/chapters/<chapter>/proofs.yml` and `books/<book>/appendices/<appendix>/proofs.yml` link labeled LaTeX results to checked Lean proofs.
 - `site/` contains website source and data.
 - `.devcontainer/` defines the supported development container, while `.github/` contains CI, release, issue, and pull-request configuration.
 - `build/` contains ignored, disposable Make-based output organized by book slug. The editor-only `vscode-build/` directory is also ignored and disposable.
@@ -59,7 +59,7 @@ chapter numbers and independent section/theorem numbering.
 
 `make contents all` runs both operations; `BOOK=<slug>` limits any form to one
 registered book, and `check` validates without writing. `make generated` runs
-contents generation before site generation.
+Lean aggregation, contents generation, and then site generation.
 
 Generated assembly is committed so ordinary LaTeX tools can build directly, but
 it must never be edited by hand.
@@ -171,6 +171,7 @@ book-local file when an actual `frontmatter/title-and-copyright.tex` or
 | Files | Owner and location | Git policy |
 |---|---|---|
 | Complete `books/<slug>/book.tex` and chapter/appendix `index.tex` | Contents generator, from manifests and shared templates | Commit; never edit by hand |
+| Lean root and book aggregation modules | Lean generator, from the book registry, contents, and topic manifests | Commit; never edit by hand |
 | Synchronized toolchain and image consumers | `make config`, from `config/` | Commit with the canonical configuration |
 | `site/books/*.md` | `make site`, from the registry and proof coverage | Ignored; regenerate before local site builds |
 | PDFs, LaTeX logs, proof-link probes, verified-build metadata | `build/` | Ignored; never commit |
@@ -192,6 +193,7 @@ its PDF snapshot separately from task branches and `main`.
 - `chapters.yml`: canonical ordered chapter slugs and titles plus optional ordered appendices.
 - `chapters/<NN-name>/sections.yml`: canonical ordered section slugs and titles.
 - `chapters/<NN-name>/index.tex`: generated chapter and section assembly; do not edit.
+- Chapter and appendix `proofs.yml`: hand-maintained theorem-to-proof links; contents generation initializes missing files from the empty template without overwriting entries.
 - `appendices/<NN-name>/sections.yml` and `index.tex`: appendix counterparts, generated after `\appendix` and before `\backmatter`.
 - `NN-section-name.tex`: the single source file for one logical section.
 - `references.bib`: predictable book-local bibliography.
@@ -232,8 +234,8 @@ Those guides own authoring order, displayed-source correspondence, prerequisite
 boundaries, and human review obligations.
 
 `make check all` validates publication sources and the pinned Lean project.
-Chapter-owned `proof-index/<book>/<chapter>.yml` and appendix-owned
-`proof-index/<book>/appendices/<appendix>.yml` shards own theorem-to-proof links.
+Chapter-owned `books/<book>/chapters/<chapter>/proofs.yml` and appendix-owned
+`books/<book>/appendices/<appendix>/proofs.yml` shards own theorem-to-proof links.
 The [formalization checks](formalization.md#validation-commands) reject unfinished
 proofs and repository-defined axioms and check registered proof types and axiom
 dependencies. Verification coverage is the set of registered results, not a claim
@@ -243,7 +245,21 @@ The Lean project is rooted at `lean/Textbooks.lean`. Mathematical sources use
 `lean/Textbooks/<Book>/ChapterNN/<Topic>.lean` or
 `lean/Textbooks/<Book>/AppendixNN/<Topic>.lean`, with declarations in the matching
 `<Book>.ChapterNN` or `<Book>.AppendixNN` namespace. `Textbooks` is a module-path
-prefix only. Book-level `All.lean` files aggregate imports. A book may import
+prefix only. Each existing chapter or appendix directory owns a
+`modules.yml` with `schema_version: 1` and an ordered `modules` list of topic
+names without extensions. The book's `chapters.yml` supplies chapter and
+appendix order; no Lean directory or manifest is required for unformalized
+chapters. An existing directory may declare `modules: []` only when it has no
+Lean sources.
+
+`make generated` generates book-level `All.lean` files and the root
+`Textbooks.lean`; `make generated check` checks them without writing.
+`BOOK=<slug>` limits book aggregation but always includes the complete root
+aggregation from `books.yml`. Missing, duplicate, invalid, or unregistered
+topics and manifests outside registered chapters are errors. Source and Lean
+checks also reject stale aggregation. These manifests own reading order and
+membership; individual topic imports still own the actual dependency graph.
+A book may import
 Mathlib and its own modules, preserving independent publication and prerequisite
 boundaries. See [source layout](formalization.md#source-layout) for details.
 

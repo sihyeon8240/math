@@ -48,7 +48,7 @@ content, focused checks, CI, and release commands.
 - `books/<slug>/`: independently assembled textbooks, each entered through `book.tex`
 - `common/`: shared LaTeX styles, assets, and book templates
 - `config/`: canonical container image and development toolchain versions
-- `lean/` and `proof-index/`: formalizations and links to textbook statements
+- `lean/`: formalizations; chapter and appendix `proofs.yml` files link them to textbook statements
 - `scripts/` and `tests/`: repository automation and its tests
 - `site/`: website source; generated book pages are ignored
 - `docs/`: architecture, contribution, authoring, and maintenance guides

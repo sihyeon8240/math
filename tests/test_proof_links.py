@@ -66,6 +66,11 @@ class ProofLinkTests(unittest.TestCase):
                 {"slug": "sample", "label_prefix": "sa", "lean_module": "Sample"}
             ),
         )
+        self.write_yaml(
+            "books/sample/chapters.yml",
+            {"schema_version": 1, "chapters": [{"slug": "start", "title": "Start"}]},
+        )
+        self.write_yaml("books/sample/chapters/01-start/proofs.yml", {"proofs": []})
         self.entry = {
             "id": "sa:thm:result",
             "declaration": "Sample.Chapter01.result",
@@ -81,7 +86,7 @@ class ProofLinkTests(unittest.TestCase):
 
     def errors(self, entries: list[object]) -> list[str]:
         self.write_yaml(
-            "proof-index/sample/01-start.yml",
+            "books/sample/chapters/01-start/proofs.yml",
             {"proofs": entries},
         )
         return MODULE.validate_index(self.root)[0]
@@ -91,7 +96,7 @@ class ProofLinkTests(unittest.TestCase):
 
     def test_shard_identity_is_derived_from_path(self) -> None:
         self.write_yaml(
-            "proof-index/sample/01-start.yml",
+            "books/sample/chapters/01-start/proofs.yml",
             {
                 "book": "sample",
                 "chapter": "01-start",
@@ -102,6 +107,71 @@ class ProofLinkTests(unittest.TestCase):
         self.assertTrue(
             any("unknown fields: book, chapter" in error for error in errors)
         )
+
+    def test_missing_index_is_rejected(self) -> None:
+        path = self.root / "books/sample/chapters/01-start/proofs.yml"
+        path.unlink()
+        errors, proofs = MODULE.load_proof_index(self.root)
+        self.assertEqual(proofs, [])
+        self.assertTrue(any("YAML file not found" in error for error in errors))
+
+    def test_unregistered_index_is_rejected(self) -> None:
+        for path in (
+            "books/unknown/chapters/01-start/proofs.yml",
+            "books/sample/chapters/02-other/proofs.yml",
+            "books/sample/appendices/01-tables/proofs.yml",
+            "books/sample/proofs.yml",
+            "books/sample/chapters/01-start/nested/proofs.yml",
+        ):
+            with self.subTest(path=path):
+                self.write_yaml(path, {"proofs": []})
+                errors, _ = MODULE.load_proof_index(self.root)
+                self.assertIn(f"{path}: unregistered proof index", errors)
+                (self.root / path).unlink()
+
+    def test_invalid_index_schema_is_rejected(self) -> None:
+        for data, message in (
+            ([], "root must be a mapping"),
+            ({}, "'proofs' must be a list"),
+            ({"proofs": {}}, "'proofs' must be a list"),
+            ({"proofs": [None]}, "must be a mapping"),
+        ):
+            with self.subTest(data=data):
+                self.write_yaml("books/sample/chapters/01-start/proofs.yml", data)
+                errors, _ = MODULE.load_proof_index(self.root)
+                self.assertTrue(any(message in error for error in errors))
+
+    def test_indexes_follow_book_and_contents_order(self) -> None:
+        self.write_yaml(
+            "books.yml",
+            self.books({"slug": "zulu"}, {"slug": "alpha"}),
+        )
+        (self.root / "books/sample/chapters/01-start/proofs.yml").unlink()
+        expected = []
+        for slug in ("zulu", "alpha"):
+            self.write_yaml(
+                f"books/{slug}/chapters.yml",
+                {
+                    "schema_version": 1,
+                    "chapters": [
+                        {"slug": "start", "title": "Start"},
+                        {"slug": "next", "title": "Next"},
+                    ],
+                    "appendices": [{"slug": "tables", "title": "Tables"}],
+                },
+            )
+            for directory in (
+                "chapters/01-start",
+                "chapters/02-next",
+                "appendices/01-tables",
+            ):
+                path = f"books/{slug}/{directory}/proofs.yml"
+                self.write_yaml(path, {"proofs": [self.entry]})
+                expected.append(path)
+        errors, proofs = MODULE.load_proof_index(self.root)
+        self.assertEqual(errors, [])
+        self.assertEqual([entry["source"] for entry in proofs], expected)
+        self.assertEqual(proofs[-1]["kind"], "appendices")
 
     def test_duplicate_latex_label_is_rejected(self) -> None:
         duplicate = self.root / "books/sample/chapters/01-start/02-duplicate.tex"
@@ -151,7 +221,15 @@ class ProofLinkTests(unittest.TestCase):
         source.parent.mkdir(parents=True)
         source.write_text(r"\begin{lemma}\label{sa:lem:extra}Extra.\end{lemma}" + "\n")
         entry = {"id": "sa:lem:extra", "declaration": "Sample.Appendix01.extra"}
-        shard = "proof-index/sample/appendices/01-tables.yml"
+        self.write_yaml(
+            "books/sample/chapters.yml",
+            {
+                "schema_version": 1,
+                "chapters": [{"slug": "start", "title": "Start"}],
+                "appendices": [{"slug": "tables", "title": "Tables"}],
+            },
+        )
+        shard = "books/sample/appendices/01-tables/proofs.yml"
         self.write_yaml(shard, {"proofs": [entry]})
         self.assertEqual(MODULE.validate_index(self.root)[0], [])
         self.write_yaml(

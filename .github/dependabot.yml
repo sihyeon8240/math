@@ -21,6 +21,10 @@ updates:
     schedule:
       interval: "weekly"
 
+    # Python image updates require a coordinated manual toolchain update.
+    ignore:
+      - dependency-name: "python"
+
     open-pull-requests-limit: 1
 
     labels:

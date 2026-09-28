@@ -1,0 +1,9 @@
+schema_version: 1
+
+modules:
+  - VectorSpaces
+  - Bases
+  - Exchange
+  - Dimension
+  - DirectSums
+  - Products

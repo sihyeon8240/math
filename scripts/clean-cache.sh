@@ -9,33 +9,22 @@ clean_directory() {
   case "$directory" in
   "$repo_root/.cache/latexindent" | "$repo_root/.cache/ruff" | \
     "$repo_root/.cache/python" | "$repo_root/.cache/mathlib" | \
-    "$repo_root/lean/.lake" | "$repo_root/.latexindent_cache" | "$repo_root/.ruff_cache") ;;
+    "$repo_root/lean/.lake") ;;
   *)
     echo "error: refusing unsafe cache path" >&2
     exit 1
     ;;
   esac
+  # Reject links at either level before traversing a default cache directory.
+  if [[ -L "${directory%/*}" || -L "$directory" ]]; then
+    echo "error: refusing symlinked cache path: $directory" >&2
+    exit 1
+  fi
+
   if [[ -d "$directory" ]]; then
     find "$directory" -mindepth 1 -delete
     rmdir "$directory"
   fi
-}
-
-clean_python() {
-  clean_directory "$repo_root/.cache/python"
-  while IFS= read -r -d '' bytecode; do
-    rm -f -- "$bytecode"
-  done < <(find "$repo_root" \
-    -path "$repo_root/.git" -prune -o \
-    -path "$repo_root/.cache" -prune -o \
-    -type f -name '*.pyc' -print0)
-  while IFS= read -r -d '' cache; do
-    find "$cache" -mindepth 1 -delete
-    rmdir "$cache"
-  done < <(find "$repo_root" \
-    -path "$repo_root/.git" -prune -o \
-    -path "$repo_root/.cache" -prune -o \
-    -type d -name '__pycache__' -print0)
 }
 
 case "$scope" in
@@ -47,23 +36,19 @@ mathlib)
   ;;
 tex)
   clean_directory "$repo_root/.cache/latexindent"
-  clean_directory "$repo_root/.latexindent_cache"
   ;;
 ruff)
   clean_directory "$repo_root/.cache/ruff"
-  clean_directory "$repo_root/.ruff_cache"
   ;;
 py)
-  clean_python
+  clean_directory "$repo_root/.cache/python"
   ;;
 all)
   clean_directory "$repo_root/.cache/mathlib"
   clean_directory "$repo_root/lean/.lake"
   clean_directory "$repo_root/.cache/latexindent"
-  clean_directory "$repo_root/.latexindent_cache"
   clean_directory "$repo_root/.cache/ruff"
-  clean_directory "$repo_root/.ruff_cache"
-  clean_python
+  clean_directory "$repo_root/.cache/python"
   ;;
 *)
   echo "usage: clean-cache.sh {lake|mathlib|tex|ruff|py|all}" >&2

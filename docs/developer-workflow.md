@@ -16,6 +16,13 @@ The development container is the supported setup; for local requirements,
 inspect the canonical configuration and run `make doctor env`.
 After changing shared configuration, run `make config` and `make config check`.
 
+Keep the Python version and base-image digest pinned. Dependabot ignores the
+`python` Docker image; update it manually only when needed for a security fix,
+end of support, or a dependency requirement. Update `config/toolchain.env` and
+the Python image pin in `.devcontainer/Dockerfile` together, then run
+`make config`, `make config check`, `make test`, and `make check all strict`
+using the rebuilt development image.
+
 ## Terminal containers
 
 Docker and GNU Make on the host are enough to use the toolchain without VS Code:
@@ -123,11 +130,9 @@ container paths rather than forwarding host paths. `FORMAT_TEX_CACHE_DIR` and
 the repository's default locations, never arbitrary override paths or shared
 user caches.
 
-The `tex` and `ruff` cleanup scopes also remove their old `.latexindent_cache/`
-and `.ruff_cache/` directories. The `py` scope additionally removes legacy
-repository `__pycache__` directories and `.pyc` files outside `.cache/`.
-Existing caches are not migrated automatically; they regenerate on demand.
-Use `all` to remove all listed categories, including these legacy locations.
+Cleanup rejects symbolic links at the cache directory or its immediate parent
+so it cannot traverse a redirected cache root. Use `all` to remove all listed
+categories; unknown directories under `.cache/` are preserved.
 The persistent container home is excluded, and `mathlib` does not remove
 `lean/.lake/`. Lake retains its standard location for compatibility with its
 tools and Mathlib. Avoid cleaning caches while their tools are running.
@@ -175,10 +180,21 @@ All formatter targets require their text files to end with exactly one LF.
 Git-tracked text file; binary and untracked files are excluded. The complete
 check applies the same repository-wide validation.
 
-The LaTeX formatter is `latexindent`. It processes every Git-tracked `*.tex` and
-`*.sty` file, including book sources, shared styles, and templates, with a
-two-space default indentation setting and condenses consecutive blank lines to
-one. Untracked drafts and other extensions are not included. Temporary
+The LaTeX formatter is `latexindent`, configured in `config/latexindent.yaml`.
+It processes every Git-tracked `*.tex` and `*.sty` file, including book sources,
+shared styles, and templates, with two-space indentation. Sentences start on
+separate lines, prose and explanatory comments wrap to 100 columns after
+indentation, and environment beginnings, bodies, and endings start on separate
+lines. Consecutive blank lines are condensed to one. The formatter preserves
+sentence breaks during wrapping and does not join sentences across display math.
+A final indentation-only pass corrects extra indentation introduced by
+`latexindent` 4.0.2 when wrapping short sentences.
+
+The column width is a wrapping target, not a hard limit: verbatim code and
+unbreakable tokens can remain longer. Lean environments retain their relative
+code indentation. Generated boundary comments, Lean source references, editor
+directives, and empty `%` section markers are protected from comment wrapping.
+Untracked drafts and other extensions are not included. Temporary
 `latexindent` files are isolated and removed automatically. The command fails
 with a dependency error when `latexindent` is not available.
 

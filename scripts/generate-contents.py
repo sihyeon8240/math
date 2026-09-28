@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from book_manifest import load_manifest
-from contents_manifest import expected_files
+from contents_manifest import expected_files, proof_index_paths
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -24,7 +24,15 @@ def generate(scope: str, *, book: str | None = None, check: bool = False) -> int
     stale: list[Path] = []
     updates: dict[Path, str] = {}
     for item in selected:
-        updates.update(expected_files(ROOT / "books" / item["slug"], scope, book=item))
+        book_dir = ROOT / "books" / item["slug"]
+        updates.update(expected_files(book_dir, scope, book=item))
+        if scope in {"sec", "all"}:
+            template = (ROOT / "common/templates/proofs.yml").read_text(
+                encoding="utf-8"
+            )
+            for path in proof_index_paths(book_dir):
+                if not path.exists():
+                    updates[path] = template
     for path, expected in updates.items():
         current = path.read_text(encoding="utf-8") if path.is_file() else ""
         if current != expected:

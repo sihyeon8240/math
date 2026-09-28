@@ -1,9 +1,10 @@
-Positive integers are represented by natural numbers with explicit positivity
-hypotheses. Integer factors may still be negative or zero. The Lean declarations
-in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
+Positive integers are represented by natural numbers with explicit positivity hypotheses.
+Integer factors may still be negative or zero.
+The Lean declarations in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \begin{definition}
-  A natural number $p>1$ is \emph{prime} when every natural divisor is $1$ or $p$. Since $p>0$, zero cannot divide $p$; thus this is precisely the condition on positive divisors.
+  A natural number $p>1$ is \emph{prime} when every natural divisor is $1$ or $p$.
+  Since $p>0$, zero cannot divide $p$; thus this is precisely the condition on positive divisors.
 
   \begin{lean}
     def isPrime (p : ℕ) : Prop :=
@@ -12,7 +13,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{definition}
 
 \begin{definition}
-  A natural number $n>1$ which is not prime is \emph{composite}. In particular, neither zero nor one is prime or composite.
+  A natural number $n>1$ which is not prime is \emph{composite}.
+  In particular, neither zero nor one is prime or composite.
 
   \begin{lean}
     def isComposite (n : ℕ) : Prop :=
@@ -20,7 +22,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
   \end{lean}
 \end{definition}
 
-\begin{lemma} \label{nt:lem:prime-interface}
+\begin{lemma}
+  \label{nt:lem:prime-interface}
   The divisor definition of primality agrees with the standard predicate \texttt{Nat.Prime}.
 
   \begin{lean}
@@ -29,7 +32,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{lemma}
 
 \begin{proof}
-  The standard divisor characterization requires $2\le p$ and that every divisor be $1$ or $p$. For natural numbers $2\le p$ is the same condition as $1<p$.
+  The standard divisor characterization requires $2\le p$ and that every divisor be $1$ or $p$.
+  For natural numbers $2\le p$ is the same condition as $1<p$.
 
   \begin{lean}
     rw [Nat.prime_def]
@@ -38,8 +42,10 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:prime-divides-product}
-  Let $p$ be prime and let $a,b\in\Z$. If $p\mid ab$, then $p\mid a$ or $p\mid b$.
+\begin{theorem}
+  \label{nt:thm:prime-divides-product}
+  Let $p$ be prime and let $a,b\in\Z$.
+  If $p\mid ab$, then $p\mid a$ or $p\mid b$.
 
   \begin{lean}
     theorem prime_dvd_mul (p : ℕ) (hp : isPrime p) (a b : ℤ)
@@ -48,7 +54,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{theorem}
 
 \begin{proof}
-  If $p\mid a$, the assertion is immediate. Otherwise, $p$ is nonzero because $p>1$.
+  If $p\mid a$, the assertion is immediate.
+  Otherwise, $p$ is nonzero because $p>1$.
 
   \begin{lean}
     classical
@@ -61,7 +68,9 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
         omega
   \end{lean}
 
-  The positive integer $d=\gcd(p,a)$ divides $p$, so it is $1$ or $p$. The second possibility would imply $p\mid a$, contrary to the assumption. Thus $\gcd(p,a)=1$.
+  The positive integer $d=\gcd(p,a)$ divides $p$, so it is $1$ or $p$.
+  The second possibility would imply $p\mid a$, contrary to the assumption.
+  Thus $\gcd(p,a)=1$.
 
   \begin{lean}
     obtain ⟨_, hdp, hda, _, _⟩ := Chapter01.gcd_spec (p : ℤ) a (Or.inl hnz)
@@ -82,8 +91,10 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-\begin{corollary} \label{nt:cor:prime-divides-finite-product}
-  If a prime $p$ divides the product of a finite list of integers, then it divides at least one member of that list.
+\begin{corollary}
+  \label{nt:cor:prime-divides-finite-product}
+  If a prime $p$ divides the product of a finite list of integers, then it divides at least one
+  member of that list.
 
   \begin{lean}
     theorem prime_dvd_list_prod (p : ℕ) (hp : isPrime p) (l : List ℤ)
@@ -92,7 +103,9 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{corollary}
 
 \begin{proof}
-  Induct on the list. The empty product is $1$. If $1=pk$, then $p>1$ forces $k>0$, whence $pk\ge p>1$, a contradiction.
+  Induct on the list.
+  The empty product is $1$.
+  If $1=pk$, then $p>1$ forces $k>0$, whence $pk\ge p>1$, a contradiction.
 
   \begin{lean}
     induction l with
@@ -104,7 +117,9 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
       nlinarith
   \end{lean}
 
-  For a nonempty list with first entry $a$, the preceding theorem says that $p$ divides $a$ or the product of the remaining entries. In the latter case apply the induction hypothesis.
+  For a nonempty list with first entry $a$, the preceding theorem says that $p$ divides $a$ or the
+  product of the remaining entries.
+  In the latter case apply the induction hypothesis.
 
   \begin{lean}
     | cons a l ih =>
@@ -117,7 +132,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-divides-natural-product}
+\begin{lemma}
+  \label{nt:lem:prime-divides-natural-product}
   If $p$ is prime and $a,b\in\N$, then $p\mid ab$ implies $p\mid a$ or $p\mid b$.
 
   \begin{lean}
@@ -127,7 +143,9 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{lemma}
 
 \begin{proof}
-  View the natural numbers as integers and apply the product theorem. Divisibility of natural numbers is unchanged by this inclusion, so the conclusion returns to $\N$.
+  View the natural numbers as integers and apply the product theorem.
+  Divisibility of natural numbers is unchanged by this inclusion, so the conclusion returns to
+  $\N$.
 
   \begin{lean}
     have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by exact_mod_cast h
@@ -139,8 +157,11 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-\begin{corollary} \label{nt:cor:prime-in-prime-product}
-  If $p$ and all members of a finite list $q_1,\ldots,q_n$ are prime, and $p\mid q_1\cdots q_n$, then $p=q_k$ for some $1\le k\le n$. List membership expresses this conclusion without choosing an indexing convention.
+\begin{corollary}
+  \label{nt:cor:prime-in-prime-product}
+  If $p$ and all members of a finite list $q_1,\ldots,q_n$ are prime, and $p\mid q_1\cdots q_n$,
+  then $p=q_k$ for some $1\le k\le n$.
+  List membership expresses this conclusion without choosing an indexing convention.
 
   \begin{lean}
     theorem prime_eq_of_dvd_prod (p : ℕ) (hp : isPrime p) (l : List ℕ)
@@ -149,7 +170,8 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 \end{corollary}
 
 \begin{proof}
-  Induct on the list. As before, a prime cannot divide the empty product $1$.
+  Induct on the list.
+  As before, a prime cannot divide the empty product $1$.
 
   \begin{lean}
     induction l with
@@ -160,7 +182,9 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
       nlinarith [hp.1]
   \end{lean}
 
-  For a list beginning with $q$, either $p\mid q$ or $p$ divides the remaining product. In the first case the divisors of the prime $q$ give $p=1$ or $p=q$. Since $p>1$, only $p=q$ is possible.
+  For a list beginning with $q$, either $p\mid q$ or $p$ divides the remaining product.
+  In the first case the divisors of the prime $q$ give $p=1$ or $p=q$.
+  Since $p>1$, only $p=q$ is possible.
 
   \begin{lean}
     | cons q l ih =>
@@ -182,13 +206,15 @@ in this section belong to \texttt{ElementaryNumberTheory.Chapter02}.
 
 \end{proof}
 
-A list records factors with their multiplicities. Its product is denoted by
-\texttt{List.prod}; the empty product is $1$. Two lists are permutations of each
-other when they have the same entries with the same multiplicities, possibly
-in different orders.
+A list records factors with their multiplicities.
+Its product is denoted by \texttt{List.prod}; the empty product is $1$.
+Two lists are permutations of each other when they have the same entries with the same
+multiplicities, possibly in different orders.
 
-\begin{lemma} \label{nt:lem:prime-factor-existence}
-  Every natural number $n>0$ is the product of a finite list of primes; for $n=1$ the list may be empty.
+\begin{lemma}
+  \label{nt:lem:prime-factor-existence}
+  Every natural number $n>0$ is the product of a finite list of primes; for $n=1$ the list may be
+  empty.
 
   \begin{lean}
     theorem exists_prime_factors (n : ℕ) (hn : 0 < n) :
@@ -197,7 +223,9 @@ in different orders.
 \end{lemma}
 
 \begin{proof}
-  Use strong induction on $n$. The empty list has product $1$. If $n>1$ is prime, the one-element list containing $n$ has the required product.
+  Use strong induction on $n$.
+  The empty list has product $1$.
+  If $n>1$ is prime, the one-element list containing $n$ has the required product.
 
   \begin{lean}
     classical
@@ -213,7 +241,11 @@ in different orders.
         · exact ⟨[n], by simpa, by simp⟩
   \end{lean}
 
-  If $n>1$ is not prime, it has a divisor $d$ different from $1$ and $n$. Write $n=dk$. Positivity gives $d,k>0$. If $d\ge n$, then $k=1$, contradicting $d\ne n$; hence $d<n$. Also $d\ge2$, so $k<n$.
+  If $n>1$ is not prime, it has a divisor $d$ different from $1$ and $n$.
+  Write $n=dk$.
+  Positivity gives $d,k>0$.
+  If $d\ge n$, then $k=1$, contradicting $d\ne n$; hence $d<n$.
+  Also $d\ge2$, so $k<n$.
 
   \begin{lean}
     · have hdiv : ∃ d : ℕ, d ∣ n ∧ d ≠ 1 ∧ d ≠ n := by
@@ -233,7 +265,8 @@ in different orders.
         nlinarith
   \end{lean}
 
-  By the induction hypothesis, $d$ and $k$ have prime factor lists. Concatenating them preserves primality of every entry, and its product is $dk=n$.
+  By the induction hypothesis, $d$ and $k$ have prime factor lists.
+  Concatenating them preserves primality of every entry, and its product is $dk=n$.
 
   \begin{lean}
     obtain ⟨l, hl, heql⟩ := ih d hdlt hdpos
@@ -251,7 +284,8 @@ in different orders.
 
 \end{proof}
 
-\begin{lemma} \label{nt:lem:prime-factor-permutation}
+\begin{lemma}
+  \label{nt:lem:prime-factor-permutation}
   Two finite lists of primes with the same product are permutations of one another.
 
   \begin{lean}
@@ -261,7 +295,10 @@ in different orders.
 \end{lemma}
 
 \begin{proof}
-  Induct on the first list. If it is empty, its product is $1$. The second list cannot begin with a prime $q>1$, since $1=qM$ would imply $M>0$ and hence $qM>1$. Thus both lists are empty.
+  Induct on the first list.
+  If it is empty, its product is $1$.
+  The second list cannot begin with a prime $q>1$, since $1=qM$ would imply $M>0$ and hence $qM>1$.
+  Thus both lists are empty.
 
   \begin{lean}
     classical
@@ -276,7 +313,8 @@ in different orders.
         nlinarith
   \end{lean}
 
-  If the first list begins with $p$, then $p$ divides the second product. The preceding corollary ensures that $p$ occurs in the second list.
+  If the first list begins with $p$, then $p$ divides the second product.
+  The preceding corollary ensures that $p$ occurs in the second list.
 
   \begin{lean}
     | cons p l ih =>
@@ -286,7 +324,8 @@ in different orders.
         exact ⟨l.prod, hprod.symm⟩
   \end{lean}
 
-  Move one occurrence of $p$ to the front of the second list and remove it. Since $p>0$, cancellation shows that the two remaining products are equal.
+  Move one occurrence of $p$ to the front of the second list and remove it.
+  Since $p>0$, cancellation shows that the two remaining products are equal.
 
   \begin{lean}
     have hperm : m.Perm (p :: m.erase p) := List.perm_cons_erase hpm
@@ -296,7 +335,9 @@ in different orders.
       exact Nat.eq_of_mul_eq_mul_left hp.1.le (hprod.trans heq)
   \end{lean}
 
-  The remaining lists still consist of primes, so the induction hypothesis makes them permutations. Restoring the removed occurrence of $p$ gives the desired permutation of the original lists.
+  The remaining lists still consist of primes, so the induction hypothesis makes them
+  permutations.
+  Restoring the removed occurrence of $p$ gives the desired permutation of the original lists.
 
   \begin{lean}
     have htailperm : l.Perm (m.erase p) := ih (m.erase p)
@@ -308,8 +349,11 @@ in different orders.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:fundamental-theorem-arithmetic}
-  Every natural number $n>1$ is a prime or a product of primes. Its prime factor list is nonempty and is unique up to permutation; a list with one entry represents the prime case.
+\begin{theorem}
+  \label{nt:thm:fundamental-theorem-arithmetic}
+  Every natural number $n>1$ is a prime or a product of primes.
+  Its prime factor list is nonempty and is unique up to permutation; a list with one entry
+  represents the prime case.
 
   \begin{lean}
     theorem fundamental_theorem_of_arithmetic (n : ℕ) (hn : 1 < n) :
@@ -319,7 +363,8 @@ in different orders.
 \end{theorem}
 
 \begin{proof}
-  The existence lemma gives a prime factor list for $n$. It cannot be empty, since the empty product is $1$ and $n>1$.
+  The existence lemma gives a prime factor list for $n$.
+  It cannot be empty, since the empty product is $1$ and $n>1$.
 
   \begin{lean}
     obtain ⟨l, hl, hprod⟩ := exists_prime_factors n (by omega)
@@ -331,7 +376,8 @@ in different orders.
       omega
   \end{lean}
 
-  Any other prime factor list for $n$ has the same product, so the uniqueness lemma makes it a permutation of this list.
+  Any other prime factor list for $n$ has the same product, so the uniqueness lemma makes it a
+  permutation of this list.
 
   \begin{lean}
     · intro m hm hmn
@@ -340,17 +386,19 @@ in different orders.
 
 \end{proof}
 
-To group equal prime factors, use a finitely supported function
-$e\colon\N\to\N$. Its support is the finite set of $p$ with $e(p)\ne0$;
-these and only these indices have positive exponents. In Lean this type is
-\texttt{Finsupp}, and its product means
-$\prod_{p\in\operatorname{supp}(e)}p^{e(p)}$. A multiset forgets the order of a
-list while retaining its multiplicities. Passing between multisets and exponent
-functions only groups or repeats entries; it does not invoke a factorization
-result.
+To group equal prime factors, use a finitely supported function $e\colon\N\to\N$.
+Its support is the finite set of $p$ with $e(p)\ne0$; these and only these indices have positive
+exponents.
+In Lean this type is \texttt{Finsupp}, and its product means
+$\prod_{p\in\operatorname{supp}(e)}p^{e(p)}$.
+A multiset forgets the order of a list while retaining its multiplicities.
+Passing between multisets and exponent functions only groups or repeats entries; it does not invoke
+a factorization result.
 
-\begin{lemma} \label{nt:lem:unique-prime-exponents}
-  For every $n>0$ there is a unique finitely supported function $e\colon\N\to\N$ whose support consists of primes and for which $\prod_{p\in\operatorname{supp}(e)}p^{e(p)}=n$.
+\begin{lemma}
+  \label{nt:lem:unique-prime-exponents}
+  For every $n>0$ there is a unique finitely supported function $e\colon\N\to\N$ whose support
+  consists of primes and for which $\prod_{p\in\operatorname{supp}(e)}p^{e(p)}=n$.
 
   \begin{lean}
     theorem existsUnique_prime_exponents (n : ℕ) (hn : 0 < n) :
@@ -360,7 +408,10 @@ result.
 \end{lemma}
 
 \begin{proof}
-  Choose a prime factor list and let $e(p)$ count its occurrences of $p$. Every member of the support is prime. Grouping repeated factors replaces their product by the product of prime powers, still equal to $n$.
+  Choose a prime factor list and let $e(p)$ count its occurrences of $p$.
+  Every member of the support is prime.
+  Grouping repeated factors replaces their product by the product of prime powers, still equal to
+  $n$.
 
   \begin{lean}
     classical
@@ -376,7 +427,9 @@ result.
         exact hprod
   \end{lean}
 
-  For any other exponent function $f$, repeat each supported prime $p$ exactly $f(p)$ times to form a list. All its entries are prime, and its product is the specified power product $n$.
+  For any other exponent function $f$, repeat each supported prime $p$ exactly $f(p)$ times to
+  form a list.
+  All its entries are prime, and its product is the specified power product $n$.
 
   \begin{lean}
     refine ⟨e, he, ?_⟩
@@ -391,7 +444,9 @@ result.
       exact hfn
   \end{lean}
 
-  The uniqueness lemma makes the two expanded lists permutations. Their multisets, and hence all their multiplicities, agree. Thus $f=e$.
+  The uniqueness lemma makes the two expanded lists permutations.
+  Their multisets, and hence all their multiplicities, agree.
+  Thus $f=e$.
 
   \begin{lean}
     have hperm := prime_factors_perm m l hm hl (hmprod.trans hprod.symm)
@@ -405,7 +460,11 @@ result.
 \end{proof}
 
 \begin{definition}
-  A \emph{canonical factorization} of $n$ is a pair $(L,e)$: the list $L$ is strictly increasing, its entries are exactly the support of the finitely supported exponent function $e$, every supported entry is prime, and the product of the corresponding prime powers is $n$. The notation \texttt{Pairwise} with $<$ requires every earlier entry to be less than every later entry.
+  A \emph{canonical factorization} of $n$ is a pair $(L,e)$: the list $L$ is strictly increasing,
+  its entries are exactly the support of the finitely supported exponent function $e$, every
+  supported entry is prime, and the product of the corresponding prime powers is $n$.
+  The notation \texttt{Pairwise} with $<$ requires every earlier entry to be less than every later
+  entry.
 
   \begin{lean}
     def isCanonicalFactorization (n : ℕ) (r : List ℕ × (ℕ →₀ ℕ)) : Prop :=
@@ -414,7 +473,8 @@ result.
   \end{lean}
 \end{definition}
 
-\begin{corollary} \label{nt:cor:unique-canonical-factorization}
+\begin{corollary}
+  \label{nt:cor:unique-canonical-factorization}
   Every natural number $n>1$ has exactly one canonical factorization $(L,e)$.
 
   \begin{lean}
@@ -424,7 +484,8 @@ result.
 \end{corollary}
 
 \begin{proof}
-  Take the unique exponent function and arrange its finite support in increasing order. The support has no repeated elements, so the resulting list is strictly increasing.
+  Take the unique exponent function and arrange its finite support in increasing order.
+  The support has no repeated elements, so the resulting list is strictly increasing.
 
   \begin{lean}
     classical
@@ -434,7 +495,8 @@ result.
       List.sortedLT_iff_pairwise.mp (Finset.sortedLT_sort e.support)
   \end{lean}
 
-  This pair is a canonical factorization. For any other pair $(M,f)$, uniqueness of prime exponents gives $f=e$.
+  This pair is a canonical factorization.
+  For any other pair $(M,f)$, uniqueness of prime exponents gives $f=e$.
 
   \begin{lean}
     refine ⟨(l, e), ⟨hl, Finset.sort_toFinset _ _, he⟩, ?_⟩
@@ -443,7 +505,9 @@ result.
     subst f
   \end{lean}
 
-  The list $M$ is strictly increasing and has the same underlying finite set as $L$. Sorting this finite set therefore returns $M$ as well as $L$, so the lists agree and the pairs are equal.
+  The list $M$ is strictly increasing and has the same underlying finite set as $L$.
+  Sorting this finite set therefore returns $M$ as well as $L$, so the lists agree and the pairs
+  are equal.
 
   \begin{lean}
     have hsorted : e.support.sort (· ≤ ·) = m := by
@@ -456,13 +520,17 @@ result.
 
 \end{proof}
 
-\begin{corollary} \label{nt:cor:canonical-factorization-product}
-  If $(L,e)$ is the canonical factorization of $n>1$, then $L$ is nonempty. Writing $L=(p_1,\ldots,p_r)$ and $k_i=e(p_i)$, we have
+\begin{corollary}
+  \label{nt:cor:canonical-factorization-product}
+  If $(L,e)$ is the canonical factorization of $n>1$, then $L$ is nonempty.
+  Writing
+  $L=(p_1,\ldots,p_r)$ and $k_i=e(p_i)$, we have
   \[
     n=p_1^{k_1}\cdots p_r^{k_r},\qquad
     p_1<\cdots<p_r,\qquad k_i>0,
   \]
-  and each $p_i$ is prime. Together with the preceding uniqueness result, this is the canonical prime-power form.
+  and each $p_i$ is prime.
+  Together with the preceding uniqueness result, this is the canonical prime-power form.
 
   \begin{lean}
     theorem canonical_factorization_spec (n : ℕ) (hn : 1 < n)
@@ -474,7 +542,8 @@ result.
 \end{corollary}
 
 \begin{proof}
-  The list has distinct entries and its underlying set is the support. Thus the product along the list equals the product over the support, which is $n$.
+  The list has distinct entries and its underlying set is the support.
+  Thus the product along the list equals the product over the support, which is $n$.
 
   \begin{lean}
     obtain ⟨hsorted, hsupport, hprime, hprod⟩ := hr
@@ -494,7 +563,9 @@ result.
       omega
   \end{lean}
 
-  Every listed prime belongs to the support. By definition of the support its exponent is nonzero, hence positive; primality is part of the canonical factorization condition.
+  Every listed prime belongs to the support.
+  By definition of the support its exponent is nonzero, hence positive; primality is part of the
+  canonical factorization condition.
 
   \begin{lean}
     · intro p hp

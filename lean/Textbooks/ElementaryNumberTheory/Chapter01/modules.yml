@@ -1,0 +1,8 @@
+schema_version: 1
+
+modules:
+  - DivisionAlgorithm
+  - GreatestCommonDivisor
+  - EuclideanAlgorithm
+  - LeastCommonMultiple
+  - DiophantineEquations

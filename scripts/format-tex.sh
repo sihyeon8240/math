@@ -17,13 +17,14 @@ fi
 repository_root="$(git rev-parse --show-toplevel)"
 cd "$repository_root"
 eof_formatter="$repository_root/scripts/normalize-eof.sh"
+format_settings="$repository_root/config/latexindent.yaml"
 
 cruft_directory="$(mktemp -d)"
 trap 'rm -rf "$cruft_directory"' EXIT
 
 # Reuse checks only while the source, formatting rules, and tool version match.
 cache_root="${FORMAT_TEX_CACHE_DIR:-$repository_root/.cache/latexindent}"
-script_hash="$(sha256sum "$0" "$eof_formatter")"
+script_hash="$(sha256sum "$0" "$eof_formatter" "$format_settings")"
 latexindent_version="$(latexindent --version | head -n 1)"
 cache_namespace="$(printf '%s\n%s\n' "$script_hash" "$latexindent_version" | sha256sum | cut -d ' ' -f 1)"
 cache_directory="$cache_root/$cache_namespace"
@@ -49,11 +50,6 @@ normalize_lean_indentation() {
        $indent . $opening . $body . $indent . $closing;
      }gmse;
   ' "$1" >"$cruft_directory/lean-normalized.tex"
-  if [[ "$mode" == "check" ]]; then
-    cmp -s "$1" "$cruft_directory/lean-normalized.tex"
-  elif ! cmp -s "$1" "$cruft_directory/lean-normalized.tex"; then
-    cat "$cruft_directory/lean-normalized.tex" >"$1"
-  fi
 }
 
 status=0
@@ -76,37 +72,32 @@ while IFS= read -r -d '' file; do
     continue
   fi
 
-  if [[ "$mode" == "check" ]]; then
-    if ! latexindent \
-      --check \
-      --silent \
-      --yaml="defaultIndent:'  ',verbatimEnvironments:lean:1" \
-      --cruft="$cruft_directory" \
-      "$file"; then
+  wrapped_file="$cruft_directory/wrapped.${file##*.}"
+  formatted_file="$cruft_directory/formatted.${file##*.}"
+  latexindent \
+    --modifylinebreaks \
+    --local="$format_settings" \
+    --cruft="$cruft_directory" \
+    "$file" >"$wrapped_file"
+
+  # latexindent 4.0.2 adds extra indentation to short wrapped sentences.
+  # An indentation-only pass keeps the final result at the configured depth.
+  latexindent \
+    --local="$format_settings" \
+    --cruft="$cruft_directory" \
+    "$wrapped_file" >"$formatted_file"
+  normalize_lean_indentation "$formatted_file"
+  "$eof_formatter" --collapse-blank-lines "$cruft_directory/lean-normalized.tex"
+
+  if ! cmp -s "$file" "$cruft_directory/lean-normalized.tex"; then
+    if [[ "$mode" == "check" ]]; then
       echo "[tex] needs formatting: $file" >&2
       status=1
       continue
     fi
-    if ! normalize_lean_indentation "$file" ||
-      ! "$eof_formatter" --check --collapse-blank-lines "$file"; then
-      echo "[tex] needs formatting: $file" >&2
-      status=1
-      continue
-    fi
-  else
-    latexindent \
-      --overwriteIfDifferent \
-      --silent \
-      --yaml="defaultIndent:'  ',verbatimEnvironments:lean:1" \
-      --cruft="$cruft_directory" \
-      "$file"
-    normalize_lean_indentation "$file"
-    "$eof_formatter" --collapse-blank-lines "$file"
-    formatted_hash="$(sha256sum "$file" | cut -d ' ' -f 1)"
-    if [[ "$formatted_hash" != "$content_hash" ]]; then
-      changed_count=$((changed_count + 1))
-      echo "[tex] reformatted: $file"
-    fi
+    cat "$cruft_directory/lean-normalized.tex" >"$file"
+    changed_count=$((changed_count + 1))
+    echo "[tex] reformatted: $file"
   fi
   sha256sum "$file" | cut -d ' ' -f 1 >"$cache_entry"
 done < <(git ls-files -z --cached -- '*.tex' '*.sty')

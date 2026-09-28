@@ -1,10 +1,12 @@
-All coefficients and unknowns are integers. We use the nonnegative gcd
-constructed above.
+All coefficients and unknowns are integers.
+We use the nonnegative gcd constructed above.
 
 The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
 
-\begin{theorem} \label{nt:thm:diophantine-solvability}
-  The equation $ax+by=c$ has an integer solution if and only if $\gcd(a,b)\mid c$. This includes $a=b=0$, when both conditions mean $c=0$.
+\begin{theorem}
+  \label{nt:thm:diophantine-solvability}
+  The equation $ax+by=c$ has an integer solution if and only if $\gcd(a,b)\mid c$.
+  This includes $a=b=0$, when both conditions mean $c=0$.
 
   \begin{lean}
     theorem exists_mul_add_mul_eq_iff (a b c : ℤ) :
@@ -13,7 +15,8 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
 \end{theorem}
 
 \begin{proof}
-  First suppose that the coefficients are not both zero. Write $a=du$, $b=dv$, and $d=ar+bs$, where $d=\gcd(a,b)>0$.
+  First suppose that the coefficients are not both zero.
+  Write $a=du$, $b=dv$, and $d=ar+bs$, where $d=\gcd(a,b)>0$.
 
   \begin{lean}
     by_cases hab : a ≠ 0 ∨ b ≠ 0
@@ -41,7 +44,8 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
       ring
   \end{lean}
 
-  If both coefficients vanish, their gcd is zero. The equation is solvable exactly when $c=0$, which is also the meaning of $0\mid c$.
+  If both coefficients vanish, their gcd is zero.
+  The equation is solvable exactly when $c=0$, which is also the meaning of $0\mid c$.
 
   \begin{lean}
     · have ha : a = 0 := Classical.byContradiction (fun h => hab (Or.inl h))
@@ -51,8 +55,10 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
 
 \end{proof}
 
-\begin{theorem} \label{nt:thm:diophantine-general-solution}
-  Suppose $a,b$ are not both zero, put $d=\gcd(a,b)$, and fix a solution $(x_0,y_0)$ of $ax+by=c$. An integer pair $(x,y)$ is a solution if and only if, for some $t\in\Z$,
+\begin{theorem}
+  \label{nt:thm:diophantine-general-solution}
+  Suppose $a,b$ are not both zero, put $d=\gcd(a,b)$, and fix a solution $(x_0,y_0)$ of $ax+by=c$.
+  An integer pair $(x,y)$ is a solution if and only if, for some $t\in\Z$,
   \[
     x=x_0+\frac{b}{d}t,\qquad y=y_0-\frac{a}{d}t.
   \]
@@ -68,7 +74,8 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
 \end{theorem}
 
 \begin{proof}
-  Choose $u,v,r,s$ with $a=du$, $b=dv$, and $d=ar+bs$. Since $d>0$, the exact quotients $a/d$ and $b/d$ are $u$ and $v$.
+  Choose $u,v,r,s$ with $a=du$, $b=dv$, and $d=ar+bs$.
+  Since $d>0$, the exact quotients $a/d$ and $b/d$ are $u$ and $v$.
 
   \begin{lean}
     obtain ⟨hd, ⟨u, hu⟩, ⟨v, hv⟩, ⟨r, s, hrs⟩, _⟩ := gcd_spec a b hab
@@ -101,7 +108,8 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
     constructor
   \end{lean}
 
-  For another solution, subtract the two equations and cancel $d$. With $X=x-x_0$ and $Y=y-y_0$, this gives $uX+vY=0$.
+  For another solution, subtract the two equations and cancel $d$.
+  With $X=x-x_0$ and $Y=y-y_0$, this gives $uX+vY=0$.
 
   \begin{lean}
     · intro h
@@ -117,7 +125,9 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
             ring
   \end{lean}
 
-  Put $t=sX-rY$. Then $(ur+vs)X-r(uX+vY)=vt$ and $(ur+vs)Y-s(uX+vY)=-ut$. Hence $X=vt$ and $Y=-ut$, as required.
+  Put $t=sX-rY$.
+  Then $(ur+vs)X-r(uX+vY)=vt$ and $(ur+vs)Y-s(uX+vY)=-ut$.
+  Hence $X=vt$ and $Y=-ut$, as required.
 
   \begin{lean}
     refine ⟨s * (x - x₀) - r * (y - y₀), ?_, ?_⟩
@@ -128,7 +138,9 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
         congrArg (fun z => z * s) hdiff]
   \end{lean}
 
-  Conversely, substitution of $x=x_0+vt$ and $y=y_0-ut$ cancels the terms involving $t$, because $av=bu$. The result is $ax_0+by_0=c$.
+  Conversely, substitution of $x=x_0+vt$ and $y=y_0-ut$ cancels the terms involving $t$, because
+  $av=bu$.
+  The result is $ax_0+by_0=c$.
 
   \begin{lean}
     · rintro ⟨t, rfl, rfl⟩
@@ -141,8 +153,10 @@ The Lean namespace is \texttt{ElementaryNumberTheory.Chapter01}.
 
 \end{proof}
 
-\begin{corollary} \label{nt:cor:diophantine-coprime}
-  If $\gcd(a,b)=1$ and $ax_0+by_0=c$, then the integer solutions are exactly $x=x_0+bt$, $y=y_0-at$ for $t\in\Z$.
+\begin{corollary}
+  \label{nt:cor:diophantine-coprime}
+  If $\gcd(a,b)=1$ and $ax_0+by_0=c$, then the integer solutions are exactly $x=x_0+bt$,
+  $y=y_0-at$ for $t\in\Z$.
 
   \begin{lean}
     theorem mul_add_mul_eq_iff_of_coprime (a b c x₀ y₀ x y : ℤ)

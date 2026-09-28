@@ -9,7 +9,6 @@ empty :=
 space := $(empty) $(empty)
 TREE_IGNORE_PATTERNS ?= \
 	vscode-build build tree.txt .git .vscode .lake .cache \
-	.latexindent_cache .ruff_cache __pycache__ \
 	*.pdf *.run.xml *.synctex.gz *.toc *.xdv \
 	*.idx *.ilg *.ind *.lof *.log *.lot *.out \
 	*.aux *.bbl *.bcf *.blg *.fdb_latexmk *.fls \
@@ -255,7 +254,8 @@ lean:
 	@if [ -n "$(CHECK_REQUESTED)" ]; then \
 		./scripts/check-lean.sh; \
 	else \
-		cd lean && lake build; \
+		$(PYTHON) scripts/generate-lean.py --check && \
+		(cd lean && lake build); \
 	fi
 
 format:
@@ -313,6 +313,9 @@ site:
 		$(if $(CHECK_REQUESTED),--check)
 
 generated:
+	@$(PYTHON) scripts/generate-lean.py \
+		$(if $(strip $(BOOK)),--book "$(BOOK)") \
+		$(if $(CHECK_REQUESTED),--check)
 	@$(PYTHON) scripts/generate-contents.py all \
 		$(if $(strip $(BOOK)),--book "$(BOOK)") \
 		$(if $(CHECK_REQUESTED),--check)

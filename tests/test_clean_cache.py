@@ -60,32 +60,66 @@ class CleanCacheTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertTrue(all(not path.exists() for path in caches.values()))
 
-    def test_legacy_cleanup_preserves_unselected_and_unknown_caches(self) -> None:
-        legacy_paths = {
-            "tex": ".latexindent_cache/cache",
-            "ruff": ".ruff_cache/cache",
-            "py": "package/__pycache__/module.pyc",
-        }
-        for scope, relative in legacy_paths.items():
-            with self.subTest(scope=scope), tempfile.TemporaryDirectory() as directory:
-                root = Path(directory)
-                caches = self.populate_caches(root)
-                legacy = root / relative
-                legacy.parent.mkdir(parents=True)
-                legacy.write_text("old cache")
-                unknown = root / ".cache/custom/keep.pyc"
-                unknown.parent.mkdir(parents=True)
-                unknown.write_text("keep")
+    def test_cleanup_preserves_unknown_caches_and_unrelated_bytecode(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.populate_caches(root)
+            preserved = (root / ".cache/custom/keep.pyc", root / "package/keep.pyc")
+            for path in preserved:
+                path.parent.mkdir(parents=True)
+                path.write_text("keep")
 
-                result = self.run_clean(root, scope)
+            result = self.run_clean(root, "all")
 
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertFalse(legacy.exists())
-                self.assertFalse(caches[scope].exists())
-                self.assertTrue(unknown.exists())
-                self.assertTrue(
-                    all(path.exists() for name, path in caches.items() if name != scope)
-                )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue(all(path.read_text() == "keep" for path in preserved))
+
+    def test_rejects_symlinked_cache_directories_and_parents(self) -> None:
+        for relative, scope in ((".cache/ruff", "ruff"), ("lean/.lake", "lake")):
+            for parent_link in (False, True):
+                with (
+                    self.subTest(relative=relative, parent_link=parent_link),
+                    tempfile.TemporaryDirectory() as directory,
+                ):
+                    root = Path(directory) / "repo"
+                    root.mkdir()
+                    external = Path(directory) / "external"
+                    external.mkdir()
+                    cache = root / relative
+                    if parent_link:
+                        cache.parent.symlink_to(external, target_is_directory=True)
+                        external_cache = external / cache.name
+                        external_cache.mkdir()
+                    else:
+                        cache.parent.mkdir()
+                        cache.symlink_to(external, target_is_directory=True)
+                        external_cache = external
+                    sentinel = external_cache / "keep"
+                    sentinel.write_text("keep")
+
+                    result = self.run_clean(root, scope)
+
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("refusing symlinked cache path", result.stderr)
+                    self.assertEqual(sentinel.read_text(), "keep")
+                    self.assertTrue(cache.exists())
+
+    def test_cleanup_does_not_follow_links_inside_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "repo"
+            cache = root / ".cache/ruff"
+            cache.mkdir(parents=True)
+            external = Path(directory) / "external"
+            external.mkdir()
+            sentinel = external / "keep"
+            sentinel.write_text("keep")
+            (cache / "link").symlink_to(external, target_is_directory=True)
+
+            result = self.run_clean(root, "ruff")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(cache.exists())
+            self.assertEqual(sentinel.read_text(), "keep")
 
     def test_make_exports_absolute_defaults_and_respects_overrides(self) -> None:
         with tempfile.TemporaryDirectory(prefix="cache paths ") as directory:

@@ -1,8 +1,11 @@
-For integers $c,z$, define $c\mid z$ to mean that $z=ck$ for some
-$k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
+For integers $c,z$, define $c\mid z$ to mean that $z=ck$ for some $k\in\Z$.
+In particular, $0\mid z$ if and only if $z=0$.
 
-\begin{theorem} \label{nt:thm:positive-common-divisor}
-  Suppose $a,b\in\Z$ are not both zero. There is a positive natural number $d$ which divides both $a$ and $b$, is an integer linear combination of them, and is divisible by every common divisor.
+\begin{theorem}
+  \label{nt:thm:positive-common-divisor}
+  Suppose $a,b\in\Z$ are not both zero.
+  There is a positive natural number $d$ which divides both $a$ and $b$, is an integer linear
+  combination of them, and is divisible by every common divisor.
 
   \begin{lean}
     theorem exists_positive_common_divisor (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -13,7 +16,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  Since $a,b$ are not both zero, $a^{2}+b^{2}>0$. Thus the set of positive natural numbers of the form $ax+by$, with $x,y\in\Z$, is nonempty.
+  Since $a,b$ are not both zero, $a^{2}+b^{2}>0$.
+  Thus the set of positive natural numbers of the form $ax+by$, with $x,y\in\Z$, is nonempty.
 
   \begin{lean}
     classical
@@ -31,7 +35,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
       · exact (Int.toNat_of_nonneg (le_of_lt hpos)).symm
   \end{lean}
 
-  Let $d$ be its least element and choose $x,y\in\Z$ with $ax+by=d$. Every positive natural number represented by such a combination is at least $d$.
+  Let $d$ be its least element and choose $x,y\in\Z$ with $ax+by=d$.
+  Every positive natural number represented by such a combination is at least $d$.
 
   \begin{lean}
     let d : ℕ := Nat.find hS
@@ -43,7 +48,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
       Nat.find_min' hS ⟨hn, hlinear⟩
   \end{lean}
 
-  Suppose $u,v\in\Z$. Apply the division algorithm to $au+bv$ and the positive divisor $d$, obtaining $au+bv=qd+r$ with $0\le r<d$.
+  Suppose $u,v\in\Z$.
+  Apply the division algorithm to $au+bv$ and the positive divisor $d$, obtaining $au+bv=qd+r$ with
+  $0\le r<d$.
 
   \begin{lean}
     have hddiv (u v : ℤ) : (d : ℤ) ∣ a * u + b * v := by
@@ -67,7 +74,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
           linarith [heq]
   \end{lean}
 
-  If $r\ne0$, then $r>0$ and minimality gives $d\le r$, contradicting $r<d$. Hence $r=0$.
+  If $r\ne0$, then $r>0$ and minimality gives $d\le r$, contradicting $r<d$.
+  Hence $r=0$.
 
   \begin{lean}
     have hrzero : r = 0 := by
@@ -79,7 +87,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
       omega
   \end{lean}
 
-  Therefore $d\mid au+bv$. Taking $(u,v)=(1,0)$ and $(0,1)$ gives $d\mid a$ and $d\mid b$.
+  Therefore $d\mid au+bv$.
+  Taking $(u,v)=(1,0)$ and $(0,1)$ gives $d\mid a$ and $d\mid b$.
 
   \begin{lean}
       refine ⟨q, ?_⟩
@@ -93,7 +102,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
       simpa only [mul_one, mul_zero, zero_add] using hddiv 0 1
   \end{lean}
 
-  Suppose $c\mid a$ and $c\mid b$. Choose $u,v\in\Z$ with $a=cu$ and $b=cv$. Then $d=ax+by=c(ux+vy)$, so $c\mid d$. This proves all the asserted properties.
+  Suppose $c\mid a$ and $c\mid b$.
+  Choose $u,v\in\Z$ with $a=cu$ and $b=cv$.
+  Then $d=ax+by=c(ux+vy)$, so $c\mid d$.
+  This proves all the asserted properties.
 
   \begin{lean}
     have hcommon (c : ℤ) (hca : c ∣ a) (hcb : c ∣ b) : c ∣ (d : ℤ) := by
@@ -109,7 +121,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{definition}
-  For $a,b\in\Z$ not both zero, define $\gcd(a,b)$ to be the positive common divisor constructed above from the least positive linear combination. Define $\gcd(0,0)=0$.
+  For $a,b\in\Z$ not both zero, define $\gcd(a,b)$ to be the positive common divisor constructed
+  above from the least positive linear combination.
+  Define $\gcd(0,0)=0$.
 
   \begin{lean}
     noncomputable def gcd (a b : ℤ) : ℕ :=
@@ -119,8 +133,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{definition}
 
-\begin{theorem} \label{nt:thm:gcd-spec}
-  For integers $a,b$ not both zero, $\gcd(a,b)$ is positive, divides both inputs, is an integer linear combination of them, and is divisible by every common divisor.
+\begin{theorem}
+  \label{nt:thm:gcd-spec}
+  For integers $a,b$ not both zero, $\gcd(a,b)$ is positive, divides both inputs, is an integer
+  linear combination of them, and is divisible by every common divisor.
 
   \begin{lean}
     theorem gcd_spec (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -139,8 +155,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:common-divisor-le-gcd}
-  Suppose $a,b\in\Z$ are not both zero and $c\in\Z$ divides both. Then $c\le\gcd(a,b)$.
+\begin{theorem}
+  \label{nt:thm:common-divisor-le-gcd}
+  Suppose $a,b\in\Z$ are not both zero and $c\in\Z$ divides both.
+  Then $c\le\gcd(a,b)$.
 
   \begin{lean}
     theorem common_divisor_le_gcd (a b c : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
@@ -149,7 +167,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  Write $d=\gcd(a,b)>0$. Since $c\mid d$, there is $k\in\Z$ with $d=ck$. If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$. If $c\le0$, then $c<d$ immediately.
+  Write $d=\gcd(a,b)>0$.
+  Since $c\mid d$, there is $k\in\Z$ with $d=ck$.
+  If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$.
+  If $c\le0$, then $c<d$ immediately.
 
   \begin{lean}
     obtain ⟨hpos, _, _, _, hcommon⟩ := gcd_spec a b hab
@@ -172,7 +193,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:gcd-zero-zero}
+\begin{theorem}
+  \label{nt:thm:gcd-zero-zero}
   The zero-pair convention is $\gcd(0,0)=0$.
 
   \begin{lean}
@@ -181,7 +203,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  Neither input is nonzero, so the definition assigns the value zero. This is a convention; the common divisors of zero and zero have no greatest integer.
+  Neither input is nonzero, so the definition assigns the value zero.
+  This is a convention; the common divisors of zero and zero have no greatest integer.
 
   \begin{lean}
     unfold gcd
@@ -192,8 +215,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:gcd-eq-of-greatest}
-  Suppose $a,b\in\Z$ are not both zero and $d\in\N$ divides both. If every integer common divisor is at most $d$, then $\gcd(a,b)=d$.
+\begin{theorem}
+  \label{nt:thm:gcd-eq-of-greatest}
+  Suppose $a,b\in\Z$ are not both zero and $d\in\N$ divides both.
+  If every integer common divisor is at most $d$, then $\gcd(a,b)=d$.
 
   \begin{lean}
     theorem gcd_eq_of_greatest (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) (d : ℕ)
@@ -203,7 +228,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  Since $\gcd(a,b)$ is a common divisor, the hypothesis gives $\gcd(a,b)\le d$. The preceding bound applied to $d$ gives $d\le\gcd(a,b)$. Antisymmetry proves equality.
+  Since $\gcd(a,b)$ is a common divisor, the hypothesis gives $\gcd(a,b)\le d$.
+  The preceding bound applied to $d$ gives $d\le\gcd(a,b)$.
+  Antisymmetry proves equality.
 
   \begin{lean}
     have hspec := gcd_spec a b hab
@@ -216,8 +243,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:bezout}
-  Suppose $a,b\in\Z$ are not both zero. There are integers $x,y$ such that $\gcd(a,b)=ax+by$.
+\begin{theorem}
+  \label{nt:thm:bezout}
+  Suppose $a,b\in\Z$ are not both zero.
+  There are integers $x,y$ such that $\gcd(a,b)=ax+by$.
 
   \begin{lean}
     theorem exists_gcd_eq_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -226,15 +255,19 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  The linear-combination representation is one of the properties established when constructing the gcd.
+  The linear-combination representation is one of the properties established when constructing the
+  gcd.
 
   \begin{lean}
     exact (gcd_spec a b hab).2.2.2.1
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:gcd-linear-combinations}
-  Suppose $a,b\in\Z$ are not both zero. The set of integer linear combinations $ax+by$ is exactly the set of integer multiples of $\gcd(a,b)$.
+\begin{theorem}
+  \label{nt:thm:gcd-linear-combinations}
+  Suppose $a,b\in\Z$ are not both zero.
+  The set of integer linear combinations $ax+by$ is exactly the set of integer multiples of
+  $\gcd(a,b)$.
 
   \begin{lean}
     theorem linear_combinations_eq_gcd_multiples (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -244,7 +277,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{theorem}
 
 \begin{proof}
-  Write $d=\gcd(a,b)=ax_{0}+by_{0}$. Since $d$ divides both inputs, choose $u,v\in\Z$ with $a=du$ and $b=dv$. We prove both set inclusions.
+  Write $d=\gcd(a,b)=ax_{0}+by_{0}$.
+  Since $d$ divides both inputs, choose $u,v\in\Z$ with $a=du$ and $b=dv$.
+  We prove both set inclusions.
 
   \begin{lean}
     obtain ⟨x₀, y₀, hbezout⟩ := exists_gcd_eq_mul_add_mul a b hab
@@ -284,8 +319,11 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:gcd-one-bezout}
-  Let $a,b\in\Z$ be not both zero. They are relatively prime, meaning $\gcd(a,b)=1$, if and only if there are integers $x,y$ with $1=ax+by$.
+\begin{theorem}
+  \label{nt:thm:gcd-one-bezout}
+  Let $a,b\in\Z$ be not both zero.
+  They are relatively prime, meaning $\gcd(a,b)=1$, if and only if there are integers $x,y$ with
+  $1=ax+by$.
 
   \begin{lean}
     theorem gcd_eq_one_iff_exists_mul_add_mul (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -305,7 +343,12 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
       exact ⟨x, y, by simpa only [h, Nat.cast_one] using hxy⟩
   \end{lean}
-  Conversely, $1$ divides both inputs. If $c$ is a common divisor, write $a=cu$ and $b=cv$. Then $1=c(ux+vy)$. For $c>0$ the second factor is a positive integer, hence at least one, so $c\le1$; for $c\le0$ the same bound is immediate. The order characterization of the gcd gives the result.
+  Conversely, $1$ divides both inputs.
+  If $c$ is a common divisor, write $a=cu$ and $b=cv$.
+  Then $1=c(ux+vy)$.
+  For $c>0$ the second factor is a positive integer, hence at least one, so $c\le1$; for $c\le0$
+  the same bound is immediate.
+  The order characterization of the gcd gives the result.
 
   \begin{lean}
     · rintro ⟨x, y, hxy⟩
@@ -340,8 +383,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{corollary} \label{nt:thm:gcd-div-gcd}
-  For integers $a,b$ not both zero, set $d=\gcd(a,b)$. Then $\gcd(a/d,b/d)=1$, where the quotients are integers.
+\begin{corollary}
+  \label{nt:thm:gcd-div-gcd}
+  For integers $a,b$ not both zero, set $d=\gcd(a,b)$.
+  Then $\gcd(a/d,b/d)=1$, where the quotients are integers.
 
   \begin{lean}
     theorem gcd_div_gcd_eq_one (a b : ℤ) (hab : a ≠ 0 ∨ b ≠ 0) :
@@ -350,7 +395,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{corollary}
 
 \begin{proof}
-  Since the positive gcd divides both inputs, write $a=du$ and $b=dv$. The integer quotients are exactly $u$ and $v$, since $d\ne0$.
+  Since the positive gcd divides both inputs, write $a=du$ and $b=dv$.
+  The integer quotients are exactly $u$ and $v$, since $d\ne0$.
 
   \begin{lean}
     obtain ⟨hdpos, ⟨u, hu⟩, ⟨v, hv⟩, ⟨x, y, hxy⟩, _⟩ := gcd_spec a b hab
@@ -368,7 +414,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
       rw [hv]
       exact Int.mul_ediv_cancel_left v hdne
   \end{lean}
-  Choose Bezout coefficients with $d=ax+by$. Substitution gives $d=d(ux+vy)$, and cancellation of the nonzero integer $d$ yields $1=ux+vy$.
+  Choose Bezout coefficients with $d=ax+by$.
+  Substitution gives $d=d(ux+vy)$, and cancellation of the nonzero integer $d$ yields $1=ux+vy$.
 
   \begin{lean}
     have hone : (1 : ℤ) = u * x + v * y := by
@@ -380,7 +427,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
           rw [hu, hv]
           ring
   \end{lean}
-  The identity rules out $u=v=0$. Apply the preceding characterization to conclude that the two quotients are relatively prime.
+  The identity rules out $u=v=0$.
+  Apply the preceding characterization to conclude that the two quotients are relatively prime.
 
   \begin{lean}
     have huv : u ≠ 0 ∨ v ≠ 0 := by
@@ -396,8 +444,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{corollary} \label{nt:thm:coprime-product-divides}
-  Let $a,b,c\in\Z$. If $\gcd(a,b)=1$, $a\mid c$, and $b\mid c$, then $ab\mid c$.
+\begin{corollary}
+  \label{nt:thm:coprime-product-divides}
+  Let $a,b,c\in\Z$.
+  If $\gcd(a,b)=1$, $a\mid c$, and $b\mid c$, then $ab\mid c$.
 
   \begin{lean}
     theorem mul_dvd_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
@@ -406,7 +456,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{corollary}
 
 \begin{proof}
-  The inputs cannot both be zero because $\gcd(0,0)=0$. Thus the coprimality characterization supplies integers $x,y$ with $1=ax+by$.
+  The inputs cannot both be zero because $\gcd(0,0)=0$.
+  Thus the coprimality characterization supplies integers $x,y$ with $1=ax+by$.
 
   \begin{lean}
     have hnz : a ≠ 0 ∨ b ≠ 0 := by
@@ -420,7 +471,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
     obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
   \end{lean}
-  Write $c=ar=bs$. Multiplying the Bezout identity by $c$ and using these two expressions gives $c=acx+bcy=ab(sx+ry)$. The integer $sx+ry$ is the required divisibility witness.
+  Write $c=ar=bs$.
+  Multiplying the Bezout identity by $c$ and using these two expressions gives
+  $c=acx+bcy=ab(sx+ry)$.
+  The integer $sx+ry$ is the required divisibility witness.
 
   \begin{lean}
     obtain ⟨r, hr⟩ := hac
@@ -442,8 +496,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:euclid-lemma}
-  Let $a,b,c\in\Z$ with $\gcd(a,b)=1$. If $a\mid bc$, then $a\mid c$ (Euclid\textquotesingle s lemma).
+\begin{theorem}
+  \label{nt:thm:euclid-lemma}
+  Let $a,b,c\in\Z$ with $\gcd(a,b)=1$.
+  If $a\mid bc$, then $a\mid c$ (Euclid\textquotesingle s lemma).
 
   \begin{lean}
     theorem dvd_of_dvd_mul_of_coprime (a b c : ℤ) (hab : gcd a b = 1)
@@ -466,7 +522,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
     obtain ⟨x, y, hxy⟩ := (gcd_eq_one_iff_exists_mul_add_mul a b hnz).1 hab
   \end{lean}
-  Write $bc=ak$. Multiplication by $c$ gives $c=acx+bcy=a(cx+ky)$, which exhibits an integer witness for $a\mid c$.
+  Write $bc=ak$.
+  Multiplication by $c$ gives $c=acx+bcy=a(cx+ky)$, which exhibits an integer witness for $a\mid
+    c$.
 
   \begin{lean}
     obtain ⟨k, hk⟩ := hdiv
@@ -484,8 +542,11 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
   \end{lean}
 \end{proof}
 
-\begin{theorem} \label{nt:thm:gcd-divisibility-characterization}
-  Let $a,b\in\Z$ be not both zero and let $d\in\Z$ be positive. Then $d=\gcd(a,b)$ if and only if $d$ divides both inputs and every integer common divisor of $a,b$ divides $d$.
+\begin{theorem}
+  \label{nt:thm:gcd-divisibility-characterization}
+  Let $a,b\in\Z$ be not both zero and let $d\in\Z$ be positive.
+  Then $d=\gcd(a,b)$ if and only if $d$ divides both inputs and every integer common divisor of
+  $a,b$ divides $d$.
 
   \begin{lean}
     theorem eq_gcd_iff_common_divisor (a b d : ℤ) (hab : a ≠ 0 ∨ b ≠ 0)
@@ -508,7 +569,11 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 
       exact ⟨hda, hdb, hcommon⟩
   \end{lean}
-  Conversely, let $g=\gcd(a,b)>0$. Because $d$ is a common divisor, $d\le g$. Since $g$ divides both inputs, the last hypothesis gives $d=gk$. Positivity forces the integer $k$ to be at least one, so $g\le d$. The two bounds imply $d=g$.
+  Conversely, let $g=\gcd(a,b)>0$.
+  Because $d$ is a common divisor, $d\le g$.
+  Since $g$ divides both inputs, the last hypothesis gives $d=gk$.
+  Positivity forces the integer $k$ to be at least one, so $g\le d$.
+  The two bounds imply $d=g$.
 
   \begin{lean}
     · rintro ⟨hda, hdb, hcommon⟩
@@ -534,8 +599,10 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 % Lean source: Textbooks.ElementaryNumberTheory.Chapter01.GreatestCommonDivisor.gcd_eq_int_gcd
-\begin{lemma} \label{nt:lem:gcd-eq-int-gcd}
-  For all integers $a,b$, the nonnegative gcd constructed above agrees with Mathlib\textquotesingle s standard integer gcd, including $(a,b)=(0,0)$.
+\begin{lemma}
+  \label{nt:lem:gcd-eq-int-gcd}
+  For all integers $a,b$, the nonnegative gcd constructed above agrees with
+  Mathlib\textquotesingle s standard integer gcd, including $(a,b)=(0,0)$.
 
   \begin{lean}
     theorem gcd_eq_int_gcd (a b : ℤ) : gcd a b = Int.gcd a b
@@ -543,7 +610,8 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
 \end{lemma}
 
 \begin{proof}
-  If the inputs are not both zero, each gcd divides the other by the common-divisor property. Since both are natural numbers, they are equal.
+  If the inputs are not both zero, each gcd divides the other by the common-divisor property.
+  Since both are natural numbers, they are equal.
 
   \begin{lean}
     by_cases hab : a ≠ 0 ∨ b ≠ 0
@@ -556,7 +624,9 @@ $k\in\Z$. In particular, $0\mid z$ if and only if $z=0$.
           (hgreatest (Int.gcd a b) (Int.gcd_dvd_left a b) (Int.gcd_dvd_right a b))
   \end{lean}
 
-  For the zero pair, both definitions give zero. This comparison identifies the representations after the local gcd properties have been established; none of those proofs uses the comparison.
+  For the zero pair, both definitions give zero.
+  This comparison identifies the representations after the local gcd properties have been
+  established; none of those proofs uses the comparison.
 
   \begin{lean}
     · have ha : a = 0 := Classical.byContradiction (fun h => hab (Or.inl h))
