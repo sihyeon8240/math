@@ -333,6 +333,7 @@ lean/
     ElementaryNumberTheory/
       All.lean
       Chapter01/
+        modules.yml
         DivisionAlgorithm.lean
 ```
 
@@ -350,9 +351,26 @@ dependencies become distinct, not at an arbitrary line count.
 The root `Textbooks.lean` and each book's `All.lean` are aggregation entry points,
 not homes for mathematical declarations. The book-level `All.lean` is the only
 exception to the chapter/topic or appendix/topic layout under a book directory.
-Import topic
-modules there and import earlier results as needed within the same book;
-imports must remain acyclic. Do not create empty topic placeholders.
+Both aggregation entry points are generated; do not edit them by hand.
+Register topic filenames without extensions in the chapter or appendix
+`modules.yml`, in reading order:
+
+```yaml
+schema_version: 1
+
+modules:
+  - DivisionAlgorithm
+  - GreatestCommonDivisor
+```
+
+Run `make generated BOOK=<slug>` after adding, removing, or reordering topics.
+Chapter and appendix order comes from the book's `chapters.yml`. Keep filenames
+stable when changing reading order. No manifest is needed for a chapter without
+a Lean directory; an existing empty directory may use `modules: []`.
+Import required results explicitly inside topic sources; these imports determine
+dependencies and must remain acyclic. Do not create empty topic placeholders.
+See the [architecture contract](ARCHITECTURE.md) for
+manifest validation and generated-file ownership.
 
 Module paths and declaration namespaces are separate. For example,
 `import Textbooks.ElementaryNumberTheory.Chapter01.DivisionAlgorithm` loads

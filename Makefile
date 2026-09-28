@@ -254,7 +254,8 @@ lean:
 	@if [ -n "$(CHECK_REQUESTED)" ]; then \
 		./scripts/check-lean.sh; \
 	else \
-		cd lean && lake build; \
+		$(PYTHON) scripts/generate-lean.py --check && \
+		(cd lean && lake build); \
 	fi
 
 format:
@@ -312,6 +313,9 @@ site:
 		$(if $(CHECK_REQUESTED),--check)
 
 generated:
+	@$(PYTHON) scripts/generate-lean.py \
+		$(if $(strip $(BOOK)),--book "$(BOOK)") \
+		$(if $(CHECK_REQUESTED),--check)
 	@$(PYTHON) scripts/generate-contents.py all \
 		$(if $(strip $(BOOK)),--book "$(BOOK)") \
 		$(if $(CHECK_REQUESTED),--check)

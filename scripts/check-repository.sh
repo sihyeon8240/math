@@ -29,6 +29,7 @@ shellcheck --severity=error scripts/*.sh
 
 "$PYTHON" scripts/books.py validate
 "$PYTHON" scripts/generate-contents.py all --check
+"$PYTHON" scripts/generate-lean.py --check
 "$PYTHON" scripts/check-architecture.py
 "$PYTHON" scripts/check-docs.py
 "$PYTHON" scripts/generate-site-pages.py --output-dir "$site_pages"

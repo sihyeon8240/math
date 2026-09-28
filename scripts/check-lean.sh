@@ -12,6 +12,7 @@ if ! command -v lake >/dev/null 2>&1; then
   exit 127
 fi
 
+"$PYTHON" "$repo_root/scripts/generate-lean.py" --check
 cd "$repo_root/lean"
 lake build
 cd "$repo_root"

@@ -59,7 +59,7 @@ chapter numbers and independent section/theorem numbering.
 
 `make contents all` runs both operations; `BOOK=<slug>` limits any form to one
 registered book, and `check` validates without writing. `make generated` runs
-contents generation before site generation.
+Lean aggregation, contents generation, and then site generation.
 
 Generated assembly is committed so ordinary LaTeX tools can build directly, but
 it must never be edited by hand.
@@ -171,6 +171,7 @@ book-local file when an actual `frontmatter/title-and-copyright.tex` or
 | Files | Owner and location | Git policy |
 |---|---|---|
 | Complete `books/<slug>/book.tex` and chapter/appendix `index.tex` | Contents generator, from manifests and shared templates | Commit; never edit by hand |
+| Lean root and book aggregation modules | Lean generator, from the book registry, contents, and topic manifests | Commit; never edit by hand |
 | Synchronized toolchain and image consumers | `make config`, from `config/` | Commit with the canonical configuration |
 | `site/books/*.md` | `make site`, from the registry and proof coverage | Ignored; regenerate before local site builds |
 | PDFs, LaTeX logs, proof-link probes, verified-build metadata | `build/` | Ignored; never commit |
@@ -243,7 +244,21 @@ The Lean project is rooted at `lean/Textbooks.lean`. Mathematical sources use
 `lean/Textbooks/<Book>/ChapterNN/<Topic>.lean` or
 `lean/Textbooks/<Book>/AppendixNN/<Topic>.lean`, with declarations in the matching
 `<Book>.ChapterNN` or `<Book>.AppendixNN` namespace. `Textbooks` is a module-path
-prefix only. Book-level `All.lean` files aggregate imports. A book may import
+prefix only. Each existing chapter or appendix directory owns a
+`modules.yml` with `schema_version: 1` and an ordered `modules` list of topic
+names without extensions. The book's `chapters.yml` supplies chapter and
+appendix order; no Lean directory or manifest is required for unformalized
+chapters. An existing directory may declare `modules: []` only when it has no
+Lean sources.
+
+`make generated` generates book-level `All.lean` files and the root
+`Textbooks.lean`; `make generated check` checks them without writing.
+`BOOK=<slug>` limits book aggregation but always includes the complete root
+aggregation from `books.yml`. Missing, duplicate, invalid, or unregistered
+topics and manifests outside registered chapters are errors. Source and Lean
+checks also reject stale aggregation. These manifests own reading order and
+membership; individual topic imports still own the actual dependency graph.
+A book may import
 Mathlib and its own modules, preserving independent publication and prerequisite
 boundaries. See [source layout](formalization.md#source-layout) for details.
 
