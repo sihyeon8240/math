@@ -123,11 +123,9 @@ container paths rather than forwarding host paths. `FORMAT_TEX_CACHE_DIR` and
 the repository's default locations, never arbitrary override paths or shared
 user caches.
 
-The `tex` and `ruff` cleanup scopes also remove their old `.latexindent_cache/`
-and `.ruff_cache/` directories. The `py` scope additionally removes legacy
-repository `__pycache__` directories and `.pyc` files outside `.cache/`.
-Existing caches are not migrated automatically; they regenerate on demand.
-Use `all` to remove all listed categories, including these legacy locations.
+Cleanup rejects symbolic links at the cache directory or its immediate parent
+so it cannot traverse a redirected cache root. Use `all` to remove all listed
+categories; unknown directories under `.cache/` are preserved.
 The persistent container home is excluded, and `mathlib` does not remove
 `lean/.lake/`. Lake retains its standard location for compatibility with its
 tools and Mathlib. Avoid cleaning caches while their tools are running.

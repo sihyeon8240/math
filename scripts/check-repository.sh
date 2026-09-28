@@ -88,7 +88,7 @@ mapfile -t tex_files < <(
 "$PYTHON" scripts/check-labels.py "${tex_files[@]}"
 
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  generated_directories='(^|/)(__pycache__|vscode-build|build|dist|\.lake'
+  generated_directories='(^|/)(vscode-build|build|dist|\.lake'
   generated_directories+='|\.cache|context.tex|tree.txt)/'
   generated_extensions='\.(aux|bbl|bcf|blg|fdb_latexmk|fls|idx'
   generated_extensions+='|ilg|ind|lof|log|lot|out|pdf|pyc'

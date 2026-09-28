@@ -235,8 +235,6 @@ class CleanArtifactsTests(unittest.TestCase):
                 root / "vscode-build/book.aux",
                 root / ".cache/latexindent/indent.log",
                 root / ".cache/mathlib/download.log",
-                root / ".latexindent_cache/indent.log",
-                root / ".ruff_cache/state.log",
                 root / "lean/.lake/build.log",
             )
             for path in preserved:

@@ -9,7 +9,6 @@ empty :=
 space := $(empty) $(empty)
 TREE_IGNORE_PATTERNS ?= \
 	vscode-build build tree.txt .git .vscode .lake .cache \
-	.latexindent_cache .ruff_cache __pycache__ \
 	*.pdf *.run.xml *.synctex.gz *.toc *.xdv \
 	*.idx *.ilg *.ind *.lof *.log *.lot *.out \
 	*.aux *.bbl *.bcf *.blg *.fdb_latexmk *.fls \

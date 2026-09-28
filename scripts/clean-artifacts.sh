@@ -17,8 +17,6 @@ done < <(find "$repo_root" \
   -path "$repo_root/.cache" -prune -o \
   -path "$repo_root/build" -prune -o \
   -path "$repo_root/vscode-build" -prune -o \
-  -path "$repo_root/.latexindent_cache" -prune -o \
-  -path "$repo_root/.ruff_cache" -prune -o \
   -path "$repo_root/lean/.lake" -prune -o \
   -type f \( \
   -name '*.aux' -o \
