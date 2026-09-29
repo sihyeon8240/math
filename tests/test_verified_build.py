@@ -309,13 +309,50 @@ class VerifiedBuildTests(unittest.TestCase):
         jobs = yaml.safe_load((ROOT / ".github/workflows/build.yml").read_text())[
             "jobs"
         ]
-        lean_cache = next(
-            step
-            for step in jobs["source"]["steps"]
-            if step.get("name") == "Cache Lean dependencies and build outputs"
-        )
+        source_steps = jobs["source"]["steps"]
+        restores = {
+            step["id"]: step
+            for step in source_steps
+            if step.get("uses", "").startswith("actions/cache/restore@")
+        }
+        dependencies = restores["lean-dependencies"]["with"]
+        build_cache = restores["lean-build"]["with"]
+        self.assertEqual(dependencies["path"], "lean/.lake/packages")
+        self.assertEqual(build_cache["path"], "lean/.lake/build")
+        self.assertNotIn("restore-keys", dependencies)
+        self.assertNotIn(".lean'", dependencies["key"])
+        self.assertIn("lean/Textbooks/**/*.lean", build_cache["key"])
+        self.assertNotIn("lean/**/*.lean", build_cache["key"])
         for filename in ("lean-toolchain", "lake-manifest.json", "lakefile.toml"):
-            self.assertIn(filename, lean_cache["with"]["restore-keys"])
+            self.assertIn(filename, dependencies["key"])
+            self.assertIn(filename, build_cache["restore-keys"])
+        saves = [
+            step
+            for step in source_steps
+            if step.get("uses", "").startswith("actions/cache/save@")
+        ]
+        self.assertEqual(len(saves), len(restores))
+        for cache_id, restore in restores.items():
+            save = next(
+                step
+                for step in saves
+                if step["with"]["path"] == restore["with"]["path"]
+            )
+            self.assertIn("github.event_name == 'push'", save["if"])
+            self.assertIn("github.ref == 'refs/heads/main'", save["if"])
+            self.assertIn(f"steps.{cache_id}.outputs.cache-hit != 'true'", save["if"])
+            self.assertEqual(
+                save["with"]["key"],
+                "${{ steps." + cache_id + ".outputs.cache-primary-key }}",
+            )
+            self.assertGreater(
+                source_steps.index(save),
+                next(
+                    index
+                    for index, step in enumerate(source_steps)
+                    if step.get("run") == "make lean check"
+                ),
+            )
         steps = jobs["book"]["steps"]
         cache = next(
             step for step in steps if step.get("name") == "Cache LaTeX build outputs"
