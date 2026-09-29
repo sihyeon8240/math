@@ -18,3 +18,7 @@ import Textbooks.LinearAlgebra.Chapter03.RankNullity
 import Textbooks.LinearAlgebra.Chapter03.Composition
 import Textbooks.LinearAlgebra.Chapter03.Geometry
 import Textbooks.LinearAlgebra.Chapter03.Isomorphisms
+
+import Textbooks.LinearAlgebra.Chapter04.MatrixMaps
+import Textbooks.LinearAlgebra.Chapter04.Representation
+import Textbooks.LinearAlgebra.Chapter04.ChangeOfBasis
