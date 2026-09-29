@@ -2,7 +2,7 @@ import Textbooks.LinearAlgebra.Chapter03.Composition
 import Textbooks.LinearAlgebra.Chapter03.RankNullity
 
 /-!
-Isomorphic vector spaces: mathematical results from the Chapter III supplement.
+Isomorphic vector spaces and their invariants.
 Isomorphisms use `LinearEquiv`, and isomorphic spaces use `Nonempty (U ≃ₗ[K] V)`.
 Dimension results use the book's finite basis and rank-nullity proofs, without
 assuming arbitrary-dimensional basis existence.
