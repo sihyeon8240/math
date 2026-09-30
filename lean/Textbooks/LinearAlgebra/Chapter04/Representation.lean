@@ -128,21 +128,6 @@ noncomputable def matrixEquiv (b : Module.Basis (Fin n) K V)
   map_add' := toMatrix_add b c
   map_smul' := toMatrix_smul b c
 
-/-- Proposition: the independently verified isomorphism agrees with Mathlib's interface. -/
-theorem matrixEquiv_eq_toMatrix (b : Module.Basis (Fin n) K V)
-    (c : Module.Basis (Fin m) K W) : matrixEquiv b c = LinearMap.toMatrix b c := by
-  apply LinearEquiv.ext
-  intro f
-  rfl
-
-/-- Proposition: coordinate reconstruction agrees with Mathlib's matrix-to-map interface. -/
-theorem mapOfMatrix_eq_toLin (b : Module.Basis (Fin n) K V)
-    (c : Module.Basis (Fin m) K W) (A : Matrix (Fin m) (Fin n) K) :
-    mapOfMatrix b c A = Matrix.toLin b c A := by
-  have h := congrArg (fun e : (V →ₗ[K] W) ≃ₗ[K] Matrix (Fin m) (Fin n) K => e.symm A)
-    (matrixEquiv_eq_toMatrix b c)
-  exact h
-
 /-- Corollary: the space of linear maps has dimension the product of the dimensions. -/
 theorem finrank_linearMap (b : Module.Basis (Fin n) K V)
     (c : Module.Basis (Fin m) K W) : Module.finrank K (V →ₗ[K] W) = m * n := by

@@ -16,14 +16,6 @@ open Chapter01
 
 variable {K : Type*} [Field K] {m n p : ℕ}
 
-/-- Proposition: the matrix map from Chapter III agrees with Mathlib's interface. -/
-theorem matrixMap_eq_mulVecLin (A : Matrix (Fin m) (Fin n) K) :
-    Chapter03.matrixMap A = A.mulVecLin := by
-  apply LinearMap.ext
-  intro x
-  funext i
-  rfl
-
 /-- Lemma: applying a matrix map to a standard vector extracts a column. -/
 theorem mulVecLin_single (A : Matrix (Fin m) (Fin n) K) (j : Fin n) :
     A.mulVecLin (Pi.single j 1) = fun i => A i j := by
@@ -142,21 +134,5 @@ theorem isNonsingular_iff_linearIndependent (A : Matrix (Fin n) (Fin n) K) :
       dsimp only
       rw [mulVecLin_mul, mulVecLin_toMatrix', mulVecLin_one]
       exact LinearMap.ext hgf
-
-/-- Proposition: the earlier two-sided-inverse convention agrees with `IsUnit`. -/
-theorem isNonsingular_iff_isUnit (A : Matrix (Fin n) (Fin n) K) :
-    Chapter02.IsNonsingular A ↔ IsUnit A := by
-  constructor
-
-  · rintro ⟨B, hAB, hBA⟩
-    exact ⟨⟨A, B, hAB, hBA⟩, rfl⟩
-
-  · rintro ⟨u, rfl⟩
-    exact ⟨↑u⁻¹, u.val_inv, u.inv_val⟩
-
-/-- Theorem: the independent-column criterion in Mathlib's unit terminology. -/
-theorem isUnit_iff_linearIndependent (A : Matrix (Fin n) (Fin n) K) :
-    IsUnit A ↔ LinearIndependent K (Chapter02.column A) := by
-  rw [← isNonsingular_iff_isUnit, isNonsingular_iff_linearIndependent]
 
 end LinearAlgebra.Chapter04

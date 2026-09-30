@@ -579,8 +579,7 @@ theorem pi_cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b 
 
 /-- Lemma: the coordinate identity is continuous by an explicit
 estimate, including dimension zero. `PiLp.dist_sq_eq_of_L2` is the accepted
-Euclidean distance formula; `dist_le_pi_dist` is the finite maximum bound.
-Mathlib counterpart: `PiLp.continuous_toLp` specialized to real Euclidean space. -/
+Euclidean distance formula; `dist_le_pi_dist` is the finite maximum bound. -/
 theorem continuous_to_euclidean (n : ℕ) :
     Continuous (fun x : Fin n → ℝ => (WithLp.toLp 2 x : EuclideanSpace ℝ (Fin n))) := by
   apply Metric.continuous_iff.mpr

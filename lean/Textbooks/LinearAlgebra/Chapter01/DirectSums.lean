@@ -224,7 +224,7 @@ theorem finrank_directSum [Module.Finite K V] {U W : Submodule K V}
 
   have hd : Disjoint s t := disjoint_basis_sets hs ht hz
 
-  rw [← dimension_eq_finrank ⟨s ∪ t, hu⟩, dimension_eq_card ⟨s ∪ t, hu⟩ hu,
+  rw [finrank_eq_card_of_basis hu,
     finrank_eq_card_of_basisOf hs, finrank_eq_card_of_basisOf ht, Finset.card_union_of_disjoint hd]
 
 /-- Definition: the direct product of two vector spaces, with pointwise operations. -/

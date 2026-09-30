@@ -22,26 +22,6 @@ The Lean declarations in this section belong to \texttt{ElementaryNumberTheory.C
   \end{lean}
 \end{definition}
 
-\begin{lemma}
-  \label{nt:lem:prime-interface}
-  The divisor definition of primality agrees with the standard predicate \texttt{Nat.Prime}.
-
-  \begin{lean}
-    theorem isPrime_iff_nat_prime (p : ℕ) : isPrime p ↔ Nat.Prime p
-  \end{lean}
-\end{lemma}
-
-\begin{proof}
-  The standard divisor characterization requires $2\le p$ and that every divisor be $1$ or $p$.
-  For natural numbers $2\le p$ is the same condition as $1<p$.
-
-  \begin{lean}
-    rw [Nat.prime_def]
-    rfl
-  \end{lean}
-
-\end{proof}
-
 \begin{theorem}
   \label{nt:thm:prime-divides-product}
   Let $p$ be prime and let $a,b\in\Z$.

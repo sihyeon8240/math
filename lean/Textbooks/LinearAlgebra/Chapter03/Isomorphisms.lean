@@ -47,7 +47,7 @@ theorem nonempty_coordinate_equiv [Module.Finite K V] :
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
 
   have hc : Fintype.card s = Module.finrank K V := by
-    rw [Fintype.card_coe, ← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs]
+    rw [Fintype.card_coe, finrank_eq_card_of_basis hs]
 
   let b := (basisOfSet hs).reindex (Fintype.equivFinOfCardEq hc)
 

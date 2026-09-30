@@ -54,8 +54,8 @@ theorem finrank_product [Module.Finite K U] [Module.Finite K W] :
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (product_is_basis hu hw)
 
   rw [Module.finrank_eq_card_basis b, Fintype.card_sum, Fintype.card_coe, Fintype.card_coe,
-    ← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs,
-    ← dimension_eq_finrank ⟨t, ht⟩, dimension_eq_card ⟨t, ht⟩ ht]
+    finrank_eq_card_of_basis hs,
+    finrank_eq_card_of_basis ht]
 
 /-- Definition: split a coordinate tuple into two consecutive blocks. -/
 def coordinateProductEquiv (r s : ℕ) :

@@ -45,10 +45,6 @@ proofs:
     declaration: ElementaryNumberTheory.Chapter01.lcm_spec
   - id: nt:thm:gcd-lcm-product
     declaration: ElementaryNumberTheory.Chapter01.gcd_mul_lcm
-  - id: nt:lem:gcd-eq-int-gcd
-    declaration: ElementaryNumberTheory.Chapter01.gcd_eq_int_gcd
-  - id: nt:lem:lcm-eq-int-lcm
-    declaration: ElementaryNumberTheory.Chapter01.lcm_eq_int_lcm
   - id: nt:thm:diophantine-solvability
     declaration: ElementaryNumberTheory.Chapter01.exists_mul_add_mul_eq_iff
   - id: nt:thm:diophantine-general-solution
