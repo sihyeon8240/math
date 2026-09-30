@@ -1,1 +1,377 @@
-%
+The results in this section follow the corresponding topics in \cite{burton}.
+The checked declarations belong to \texttt{ElementaryNumberTheory.Chapter04}.
+The finite products in the proofs use only permutation, inverse pairs, and cancellation; no
+group-order theorem is assumed.
+
+\begin{theorem}
+  \label{nt:thm:fermat}
+  If $p$ is prime and $p\nmid a$, then $a^{p-1}\equiv1\pmod p$.
+
+  \begin{lean}
+    theorem fermat (p : ℕ) (hp : Chapter02.isPrime p) (a : ℤ) (ha : ¬(p : ℤ) ∣ a) :
+        a ^ (p - 1) ≡ 1 [ZMOD (p : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Multiplication by the nonzero class of $a$ permutes the nonzero residue classes.
+  Multiplying all these equalities yields $a^{p-1}P=P$, where $P$ is the product of all nonzero
+  classes.
+  Each factor is invertible, so cancellation gives the result.
+  The auxiliary permutation-product lemma implements this finite argument directly.
+
+  \begin{lean}
+    let : Fact p.Prime := ⟨Nat.prime_def.mpr hp⟩
+
+    have hne : (a : ZMod p) ≠ 0 := by
+      intro h
+      exact ha ((ZMod.intCast_zmod_eq_zero_iff_dvd a p).1 h)
+
+    have h := pow_card_by_permutation (Units.mk0 (a : ZMod p) hne)
+
+    have hv := congrArg (fun u : (ZMod p)ˣ => (u : ZMod p)) h
+    simp only [Units.val_pow_eq_pow_val, Units.val_mk0, Units.val_one,
+      Fintype.card_units, ZMod.card] at hv
+
+    apply (ZMod.intCast_eq_intCast_iff _ _ p).1
+    simpa only [Int.cast_pow, Int.cast_one] using hv
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:fermat-all}
+  For every prime $p$ and integer $a$, one has $a^p\equiv a\pmod p$.
+
+  \begin{lean}
+    theorem fermat_all (p : ℕ) (hp : Chapter02.isPrime p) (a : ℤ) :
+        a ^ p ≡ a [ZMOD (p : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  If $p\mid a$, both sides are zero modulo $p$.
+  Otherwise multiply Fermat\textquotesingle s congruence by $a$.
+
+  \begin{lean}
+    have hpos : 0 < p := by
+      have := hp.1
+      omega
+    by_cases hpa : (p : ℤ) ∣ a
+
+    · have hz := Chapter03.modEq_pow ((Chapter03.modEq_zero_iff _ _).2 hpa) p
+      rw [zero_pow (ne_of_gt hpos)] at hz
+      exact Chapter03.modEq_trans hz
+        (Chapter03.modEq_symm ((Chapter03.modEq_zero_iff _ _).2 hpa))
+
+    · have h := Chapter03.modEq_mul (fermat p hp a hpa) (Chapter03.modEq_refl (p : ℤ) a)
+      simpa only [← pow_succ, Nat.sub_add_cancel hpos, one_mul] using h
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:composite-of-not-fermat}
+  If $n>1$ and $a^n\not\equiv a\pmod n$ for some integer $a$, then $n$ is composite.
+
+  \begin{lean}
+    theorem composite_of_not_fermat (n : ℕ) (hn : 1 < n) (a : ℤ)
+        (h : ¬a ^ n ≡ a [ZMOD (n : ℤ)]) : Chapter02.isComposite n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  If $n$ were prime, the unrestricted Fermat congruence would contradict the hypothesis.
+
+  \begin{lean}
+    ⟨hn, fun hp => h (fermat_all n hp a)⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:fermat-two-primes}
+  Let $p\ne q$ be primes.
+  If $a^p\equiv a\pmod q$ and $a^q\equiv a\pmod p$, then $a^{pq}\equiv a\pmod{pq}$.
+
+  \begin{lean}
+    theorem fermat_two_primes (p q : ℕ) (hp : Chapter02.isPrime p)
+        (hq : Chapter02.isPrime q) (hne : p ≠ q) (a : ℤ)
+        (hpq : a ^ p ≡ a [ZMOD (q : ℤ)]) (hqp : a ^ q ≡ a [ZMOD (p : ℤ)]) :
+        a ^ (p * q) ≡ a [ZMOD ((p * q : ℕ) : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Raise the congruence modulo $p$ to the $p$th power, and the one modulo $q$ to the $q$th power.
+  Fermat\textquotesingle s theorem reduces their right-hand sides to $a$.
+  The two distinct primes are coprime, so their product divides $a^{pq}-a$.
+
+  \begin{lean}
+    have h₁ := Chapter03.modEq_trans (Chapter03.modEq_pow hqp p) (fermat_all p hp a)
+
+    have h₂ := Chapter03.modEq_trans (Chapter03.modEq_pow hpq q) (fermat_all q hq a)
+    rw [← pow_mul, Nat.mul_comm q p] at h₁
+    rw [← pow_mul] at h₂
+    apply (Chapter03.modEq_iff_dvd_sub _ _ _).2
+    rw [Nat.cast_mul]
+    exact Chapter01.mul_dvd_of_coprime p q _ (gcd_distinct_primes p q hp hq hne)
+      ((Chapter03.modEq_iff_dvd_sub _ _ _).1 h₁) ((Chapter03.modEq_iff_dvd_sub _ _ _).1 h₂)
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  A composite natural number $n$ is a \emph{pseudoprime to base $a$} if $a^n\equiv a\pmod n$.
+  The term pseudoprime without a specified base refers to base two.
+
+  \begin{lean}
+    def IsPseudoprime (a : ℤ) (n : ℕ) : Prop :=
+      Chapter02.isComposite n ∧ a ^ n ≡ a [ZMOD (n : ℤ)]
+  \end{lean}
+\end{definition}
+
+\begin{definition}
+  An \emph{absolute pseudoprime}, or Carmichael number, is a composite $n$ satisfying $a^n\equiv
+    a\pmod n$ for every integer $a$.
+
+  \begin{lean}
+    def IsAbsolutePseudoprime (n : ℕ) : Prop :=
+      Chapter02.isComposite n ∧ ∀ a : ℤ, a ^ n ≡ a [ZMOD (n : ℤ)]
+  \end{lean}
+\end{definition}
+
+\begin{definition}
+  A positive integer is \emph{square-free} when no square of a prime divides it.
+  In particular, one is square-free.
+
+  \begin{lean}
+    def IsSquareFree (n : ℕ) : Prop :=
+      0 < n ∧ ∀ p : ℕ, Chapter02.isPrime p → ¬p ^ 2 ∣ n
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:pseudoprime-two-iff}
+  For an odd composite $n$, the base-two pseudoprime condition is equivalent to
+  $2^{n-1}\equiv1\pmod n$.
+
+  \begin{lean}
+    theorem pseudoprime_two_iff (n : ℕ) (hn : Odd n) (hc : Chapter02.isComposite n) :
+        IsPseudoprime 2 n ↔ (2 : ℤ) ^ (n - 1) ≡ 1 [ZMOD (n : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  An odd integer is coprime to two: writing $n=2k+1$ gives the Bezout identity $1=n-2k$.
+  Cancel two in one direction and multiply by two in the other.
+
+  \begin{lean}
+    have hpos : 0 < n := by
+      have := hc.1
+      omega
+
+    constructor
+
+    · intro h
+      apply Chapter03.modEq_cancel (gcd_odd_two n hn)
+      simpa only [← pow_succ', Nat.sub_add_cancel hpos, mul_one] using h.2
+
+    · intro h
+      refine ⟨hc, ?_⟩
+
+      have hh := Chapter03.modEq_mul h (Chapter03.modEq_refl (n : ℤ) 2)
+      simpa only [← pow_succ, Nat.sub_add_cancel hpos, one_mul] using hh
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  The Mersenne number with exponent $n$ is $M_n=2^n-1$.
+
+  \begin{lean}
+    def mersenne (n : ℕ) : ℕ := 2 ^ n - 1
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:mersenne-pseudoprime}
+  If $n$ is a base-two pseudoprime, then $M_n$ is a larger base-two pseudoprime.
+  In particular, this holds for every odd pseudoprime.
+
+  \begin{lean}
+    theorem mersenne_pseudoprime (n : ℕ) (h : IsPseudoprime 2 n) :
+        IsPseudoprime 2 (mersenne n) ∧ n < mersenne n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Since $n$ is composite, it has a proper divisor $d>1$.
+  The identity $d\mid n$ gives $2^d-1\mid2^n-1$, and this is a nontrivial proper divisor.
+  Thus $M_n$ is composite.
+  Induction also gives $2^n-1>n$ for $n\ge2$.
+
+  \begin{lean}
+    have hn : 2 ≤ n := h.1.1
+
+    have hlarge := lt_mersenne n hn
+
+    have hpow : 2 ≤ 2 ^ n := by
+      have hh : 1 ≤ 2 ^ (n - 1) := by
+        have := pow_pos (by decide : 0 < (2 : ℕ)) (n - 1)
+        omega
+
+      have he : 2 ^ n = 2 ^ (n - 1) * 2 := by
+        rw [← pow_succ, Nat.sub_add_cancel (by omega : 1 ≤ n)]
+      omega
+  \end{lean}
+
+  The pseudoprime congruence gives $n\mid2^n-2=M_n-1$.
+  Write $M_n-1=nk$.
+  Since $2^n\equiv1\pmod{M_n}$, raising to the $k$th power and then multiplying by two proves
+  $2^{M_n}\equiv2\pmod{M_n}$.
+
+  \begin{lean}
+    have hdiv : n ∣ mersenne n - 1 := by
+      apply Int.natCast_dvd_natCast.mp
+
+      have hh := (Chapter03.modEq_iff_dvd_sub _ _ _).1 h.2
+
+      have he : ((mersenne n - 1 : ℕ) : ℤ) = (2 : ℤ) ^ n - 2 := by
+        rw [mersenne, Nat.sub_sub, Nat.cast_sub hpow, Nat.cast_pow, Nat.cast_ofNat]
+      rwa [he]
+
+    obtain ⟨k, hk⟩ := hdiv
+
+    have hbase : (2 : ℤ) ^ n ≡ 1 [ZMOD ((mersenne n : ℕ) : ℤ)] := by
+      apply (Chapter03.modEq_iff_dvd_sub _ _ _).2
+      refine ⟨1, ?_⟩
+      simp only [mersenne, Nat.cast_sub (by omega : 1 ≤ 2 ^ n),
+        Nat.cast_pow, Nat.cast_ofNat, Nat.cast_one, mul_one]
+
+    have hpower := Chapter03.modEq_pow hbase k
+    rw [← pow_mul, ← hk, one_pow] at hpower
+
+    have hfinal := Chapter03.modEq_mul hpower
+      (Chapter03.modEq_refl ((mersenne n : ℕ) : ℤ) 2)
+    rw [← pow_succ, Nat.sub_add_cancel (by omega : 1 ≤ mersenne n), one_mul] at hfinal
+
+    exact ⟨⟨mersenne_composite n h.1, hfinal⟩, hlarge⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:infinite-odd-pseudoprimes}
+  There are infinitely many odd base-two pseudoprimes.
+
+  \begin{lean}
+    theorem infinite_odd_pseudoprimes : {n : ℕ | Odd n ∧ IsPseudoprime 2 n}.Infinite
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Start from $341$ and repeatedly apply the Mersenne construction.
+  Every new value is odd and strictly larger, so an odd pseudoprime exists above every natural
+  bound.
+  An unbounded subset of the natural numbers is infinite.
+
+  \begin{lean}
+    apply Set.infinite_of_forall_exists_gt
+    intro B
+
+    obtain ⟨n, hB, hodd, hn⟩ := exists_odd_pseudoprime_gt B
+
+    exact ⟨n, ⟨hodd, hn⟩, hB⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:absolutepseudoprime-of-prime-product}
+  Let $n$ be a composite product of distinct primes.
+  If $p-1\mid n-1$ for every prime in the product, then $n$ is an absolute pseudoprime.
+
+  \begin{lean}
+    theorem absolutePseudoprime_of_prime_product (s : Finset ℕ)
+        (hp : ∀ p ∈ s, Chapter02.isPrime p)
+        (hc : Chapter02.isComposite (∏ p ∈ s, p))
+        (hdiv : ∀ p ∈ s, p - 1 ∣ (∏ q ∈ s, q) - 1) :
+        IsAbsolutePseudoprime (∏ p ∈ s, p)
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Fix $a$.
+  For each prime factor $p$, either $p\mid a$, or Fermat\textquotesingle s theorem and $p-1\mid
+    n-1$ give $a^{n-1}\equiv1\pmod p$.
+  In either case $a^n\equiv a\pmod p$.
+  Pairwise coprimality combines these congruences modulo their product.
+
+  \begin{lean}
+    refine ⟨hc, ?_⟩
+    intro a
+    apply (Chapter03.modEq_iff_dvd_sub _ _ _).2
+    rw [Nat.cast_prod]
+    apply Chapter03.prod_dvd_of_pairwise s (fun p => (p : ℤ))
+
+    · intro p hps
+
+      have := (hp p hps).1
+      omega
+
+    · intro p hps q hqs hne
+      exact gcd_distinct_primes p q (hp p hps) (hp q hqs) hne
+
+    · intro p hps
+      exact (Chapter03.modEq_iff_dvd_sub _ _ _).1
+        (fermat_of_sub_one_dvd p _ (hp p hps) (by
+            have := hc.1
+            omega) (hdiv p hps) a)
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:absolutepseudoprime-squarefree}
+  Every absolute pseudoprime is square-free.
+
+  \begin{lean}
+    theorem absolutePseudoprime_squareFree (n : ℕ) (h : IsAbsolutePseudoprime n) :
+        IsSquareFree n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  If $p^2\mid n$, use the defining congruence with base $p$.
+  Since $n\ge2$, both $p^n$ and $n$ are divisible by $p^2$, so $p^2\mid p$.
+  Cancelling $p$ would make a prime divide one, a contradiction.
+
+  \begin{lean}
+    refine ⟨by
+        have := h.1.1
+        omega, ?_⟩
+    intro p hp hpn
+
+    have hn : 2 ≤ n := h.1.1
+
+    obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 (h.2 p)
+    obtain ⟨t, ht⟩ := hpn
+
+    have ht' : (n : ℤ) = (p : ℤ) ^ 2 * t := by exact_mod_cast ht
+
+    have hpow : (p : ℤ) ^ n = (p : ℤ) ^ 2 * (p : ℤ) ^ (n - 2) := by
+      rw [← pow_add, Nat.add_sub_cancel' hn]
+
+    have hcancel : (p : ℤ) * ((p : ℤ) ^ (n - 2) - (t : ℤ) * k) = 1 := by
+      have hpne : (p : ℤ) ≠ 0 := by
+        have := hp.1
+        omega
+
+      apply mul_left_cancel₀ hpne
+      rw [ht', hpow] at hk
+      nlinarith [hk]
+
+    have hd : p ∣ 1 := Int.natCast_dvd_natCast.mp
+      ⟨(p : ℤ) ^ (n - 2) - (t : ℤ) * k, hcancel.symm⟩
+
+    obtain ⟨u, hu⟩ := hd
+
+    have := hp.1
+
+    have hu' : 0 < u := by nlinarith
+    nlinarith
+  \end{lean}
+\end{proof}

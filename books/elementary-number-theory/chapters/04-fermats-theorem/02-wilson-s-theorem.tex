@@ -1,1 +1,343 @@
-%
+The results in this section follow the corresponding topics in \cite{burton}.
+The checked declarations belong to \texttt{ElementaryNumberTheory.Chapter04}.
+
+\begin{theorem}
+  \label{nt:thm:wilson}
+  If $p$ is prime, then $(p-1)!
+    \equiv-1\pmod p$.
+
+  \begin{lean}
+    theorem wilson (p : ℕ) (hp : Chapter02.isPrime p) :
+        ((p - 1).factorial : ℤ) ≡ -1 [ZMOD (p : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Pair every nonzero residue with its inverse.
+  A fixed point satisfies $x^2=1$, hence is one or minus one.
+  After removing minus one, all inverse pairs multiply to one, and the possible fixed point one
+  does too.
+  The remaining factor is minus one.
+  The code identifies the product of the nonzero residues with the factorial, using the
+  inverse-pair lemma proved in the module.
+
+  \begin{lean}
+    classical
+
+    have : Fact p.Prime := ⟨Nat.prime_def.mpr hp⟩
+
+    have hpos : 0 < p := by
+      have := hp.1
+      omega
+
+    have hprod : (∏ u : (ZMod p)ˣ, (u : ZMod p)) =
+        ∏ k ∈ Finset.Ico 1 p, (k : ZMod p) := by
+
+      apply Finset.prod_bij (fun (u : (ZMod p)ˣ) _ => (u : ZMod p).val)
+
+      · intro u hu
+        apply Finset.mem_Ico.mpr
+        refine ⟨?_, ZMod.val_lt _⟩
+
+        have hne : (u : ZMod p).val ≠ 0 := by
+          intro hz
+          apply Units.ne_zero u
+          apply ZMod.val_injective p
+          simpa only [ZMod.val_zero] using hz
+        omega
+
+      · intro u hu v hv h
+        exact Units.ext (ZMod.val_injective p h)
+
+      · intro k hk
+
+        have hk' := Finset.mem_Ico.mp hk
+
+        have hne : (k : ZMod p) ≠ 0 := by
+          intro hz
+
+          have hh := congrArg ZMod.val hz
+          rw [ZMod.val_natCast_of_lt hk'.2, ZMod.val_zero] at hh
+          omega
+
+        exact ⟨Units.mk0 (k : ZMod p) hne, Finset.mem_univ _,
+          ZMod.val_natCast_of_lt hk'.2⟩
+
+      · intro u hu
+        exact (ZMod.natCast_zmod_val _).symm
+
+    have hf : (∏ k ∈ Finset.Ico 1 p, (k : ZMod p)) = ((p - 1).factorial : ZMod p) := by
+      rw [← Nat.cast_prod, ← Finset.prod_Ico_id_eq_factorial]
+      rw [Nat.sub_add_cancel hpos]
+
+    apply (ZMod.intCast_eq_intCast_iff _ _ p).1
+    simpa only [Int.cast_natCast, Int.cast_neg, Int.cast_one] using
+      (hf.symm.trans (hprod.symm.trans (prod_units_eq_neg_one p)))
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:prime-of-wilson}
+  If $n>1$ and $(n-1)!
+    \equiv-1\pmod n$, then $n$ is prime.
+
+  \begin{lean}
+    theorem prime_of_wilson (n : ℕ) (hn : 1 < n)
+        (h : ((n - 1).factorial : ℤ) ≡ -1 [ZMOD (n : ℤ)]) : Chapter02.isPrime n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Let $d$ divide $n$.
+  If $d\ne n$, then $1\le d\le n-1$, so $d$ divides $(n-1)!
+  $.
+  It also divides $(n-1)!
+    +1$ by the congruence, and therefore divides one.
+  Thus every divisor is one or $n$.
+
+  \begin{lean}
+    refine ⟨hn, ?_⟩
+    intro d hd
+    by_cases he : d = n
+
+    · exact Or.inr he
+
+    · have hdpos : 0 < d := by
+        obtain ⟨k, hk⟩ := hd
+        by_contra hh
+
+        have hz : d = 0 := by omega
+        rw [hz, zero_mul] at hk
+        omega
+
+      have hdle : d ≤ n := by
+        obtain ⟨k, hk⟩ := hd
+
+        have hkpos : 0 < k := by nlinarith
+        nlinarith
+
+      have hdf : (d : ℤ) ∣ (n - 1).factorial :=
+        Int.natCast_dvd_natCast.mpr (dvd_factorial d (n - 1) hdpos (by omega))
+
+      obtain ⟨u, hu⟩ := hdf
+      obtain ⟨v, hv⟩ := Int.natCast_dvd_natCast.mpr hd
+      obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 h
+
+      have hone : (1 : ℤ) = d * (v * k - u) := by
+        rw [hu, hv] at hk
+        nlinarith
+
+      have hdz : (0 : ℤ) < d := by exact_mod_cast hdpos
+
+      have hkp : 0 < v * k - u := by nlinarith
+      left
+
+      have : (d : ℤ) = 1 := by nlinarith
+      exact_mod_cast this
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:prime-iff-wilson}
+  For $n>1$, primality is equivalent to $(n-1)!
+    \equiv-1\pmod n$.
+
+  \begin{lean}
+    theorem prime_iff_wilson (n : ℕ) (hn : 1 < n) :
+        Chapter02.isPrime n ↔ ((n - 1).factorial : ℤ) ≡ -1 [ZMOD (n : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Combine Wilson\textquotesingle s theorem with its converse.
+
+  \begin{lean}
+    ⟨wilson n, prime_of_wilson n hn⟩
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  A quadratic congruence modulo $n$ has coefficients $a,b,c\in\mathbb Z$ and the form
+  $ax^2+bx+c\equiv0\pmod n$, with $a\not\equiv0\pmod n$.
+
+  \begin{lean}
+    structure QuadraticCongruence (n : ℤ) where
+      a : ℤ
+      b : ℤ
+      c : ℤ
+      leading_ne_zero : ¬a ≡ 0 [ZMOD n]
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:half-factorial}
+  If $p=2m+1$, then in the residue ring modulo $p$, \[ (p-1)!=(-1)^m(m!)^2. \]
+
+  \begin{lean}
+    theorem half_factorial (p m : ℕ) (hp : p = 2 * m + 1) :
+        ((p - 1).factorial : ZMod p) = (-1 : ZMod p) ^ m * (m.factorial : ZMod p) ^ 2
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Split the factorial into the factors $1,\ldots,m$ and $m+1,\ldots,2m$.
+  Reflection $k\mapsto p-k$ carries the second interval to the first, and each reflected residue is
+  $-k$.
+
+  \begin{lean}
+    have hprefix : (∏ k ∈ Finset.Ico 1 (m + 1), (k : ZMod p)) = (m.factorial : ZMod p) := by
+      rw [← Nat.cast_prod, Finset.prod_Ico_id_eq_factorial]
+
+    have hreflect : (∏ k ∈ Finset.Ico (m + 1) p, (k : ZMod p)) =
+        ∏ k ∈ Finset.Ico 1 (m + 1), ((p - k : ℕ) : ZMod p) := by
+      rw [Finset.prod_Ico_reflect _ 1 (by omega : m + 1 ≤ p + 1)]
+      rw [show p + 1 - (m + 1) = m + 1 by omega, Nat.add_sub_cancel]
+
+    have hnegative : (∏ k ∈ Finset.Ico 1 (m + 1), ((p - k : ℕ) : ZMod p)) =
+        (-1 : ZMod p) ^ m * (m.factorial : ZMod p) := by
+      have hterm : ∀ k ∈ Finset.Ico 1 (m + 1), ((p - k : ℕ) : ZMod p) = -1 * (k : ZMod p) := by
+        intro k hk
+
+        have hkp : k ≤ p := by
+          have := Finset.mem_Ico.mp hk
+          omega
+
+        rw [Nat.cast_sub hkp, ZMod.natCast_self, zero_sub, neg_one_mul]
+
+      rw [Finset.prod_congr rfl hterm, Finset.prod_mul_distrib, Finset.prod_const,
+        Nat.card_Ico, Nat.add_sub_cancel, hprefix]
+  \end{lean}
+
+  The first product is $m!
+  $ and the second is $(-1)^m m!$.
+  Multiplying the two pieces gives the identity.
+
+  \begin{lean}
+    have hfull : ((p - 1).factorial : ZMod p) = ∏ k ∈ Finset.Ico 1 p, (k : ZMod p) := by
+      rw [← Nat.cast_prod, ← Finset.prod_Ico_id_eq_factorial]
+      rw [Nat.sub_add_cancel (by omega : 1 ≤ p)]
+
+    rw [hfull, ← Finset.prod_Ico_consecutive (fun k => (k : ZMod p))
+      (by omega : 1 ≤ m + 1) (by omega : m + 1 ≤ p), hprefix, hreflect, hnegative]
+    ring
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:exists-square-eq-neg-one-iff}
+  For an odd prime $p$, the congruence $x^2\equiv-1\pmod p$ has an integer solution exactly when
+  $p\equiv1\pmod4$.
+
+  \begin{lean}
+    theorem exists_square_eq_neg_one_iff (p : ℕ) (hp : Chapter02.isPrime p) (hodd : Odd p) :
+        (∃ x : ℤ, x ^ 2 ≡ -1 [ZMOD (p : ℤ)]) ↔ p % 4 = 1
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Write $p=2m+1$.
+  If $x^2\equiv-1$, then $p\nmid x$.
+  Raising the square congruence to the $m$th power and using Fermat gives $(-1)^m\equiv1$.
+  If $p\equiv3\pmod4$, then $m$ is odd, forcing $p\mid2$, contrary to $p>2$.
+
+  \begin{lean}
+    have hp2 : 2 < p := by
+      have hmod := Nat.odd_iff.mp hodd
+
+      have := hp.1
+      omega
+
+    let m := (p - 1) / 2
+
+    have hpm : p = 2 * m + 1 := by
+      have hmod := Nat.odd_iff.mp hodd
+      dsimp [m]
+      omega
+
+    constructor
+
+    · rintro ⟨x, hx⟩
+
+      have hnot : ¬(p : ℤ) ∣ x := by
+        intro hd
+
+        have hz := Chapter03.modEq_pow ((Chapter03.modEq_zero_iff _ _).2 hd) 2
+        rw [zero_pow (by decide : 2 ≠ 0)] at hz
+
+        have hh := (Chapter03.modEq_iff_dvd_sub _ _ _).1
+          (Chapter03.modEq_trans (Chapter03.modEq_symm hz) hx)
+
+        obtain ⟨k, hk⟩ := hh
+
+        have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+
+        have hkpos : 0 < k := by nlinarith
+        nlinarith
+
+      have hpow := Chapter03.modEq_pow hx m
+      rw [← pow_mul, show 2 * m = p - 1 by omega] at hpow
+
+      have hh := Chapter03.modEq_trans (Chapter03.modEq_symm hpow) (fermat p hp x hnot)
+      by_contra hne
+
+      have hm : Odd m := Nat.odd_iff.mpr (by omega)
+      rw [hm.neg_one_pow] at hh
+
+      obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 hh
+
+      have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+
+      have hkneg : k < 0 := by nlinarith
+      nlinarith
+  \end{lean}
+
+  If $p\equiv1\pmod4$, then $m$ is even.
+  The half-factorial identity and Wilson\textquotesingle s theorem give $(m!
+    )^2\equiv-1$, which supplies the required solution.
+
+  \begin{lean}
+    · intro hpmod
+
+      have hm : Even m := Nat.even_iff.mpr (by omega)
+
+      have hhalf := half_factorial p m hpm
+      rw [hm.neg_one_pow, one_mul] at hhalf
+
+      have hw := (ZMod.intCast_eq_intCast_iff _ _ p).2 (wilson p hp)
+      simp only [Int.cast_natCast, Int.cast_neg, Int.cast_one] at hw
+
+      refine ⟨m.factorial, ?_⟩
+      apply (ZMod.intCast_eq_intCast_iff _ _ p).1
+      simpa only [Int.cast_pow, Int.cast_natCast, Int.cast_neg, Int.cast_one] using
+        hhalf.symm.trans hw
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:infinite-factorial-composites}
+  Infinitely many composite integers have the form $n!
+    +1$.
+
+  \begin{lean}
+    theorem infinite_factorial_composites :
+        {k : ℕ | (∃ n : ℕ, k = n.factorial + 1) ∧ Chapter02.isComposite k}.Infinite
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Choose primes $p$ arbitrarily large and put $n=p-1$.
+  Wilson gives $p\mid n!
+    +1$.
+  For $n\ge3$, the elementary bound $n!
+    \ge2n$ makes this divisor proper.
+  These composite values exceed every bound.
+
+  \begin{lean}
+    apply Set.infinite_of_forall_exists_gt
+    intro B
+
+    obtain ⟨n, hB, hn⟩ := exists_composite_factorial_add_one_gt B
+
+    exact ⟨n.factorial + 1, ⟨⟨n, rfl⟩, hn⟩, hB⟩
+  \end{lean}
+\end{proof}

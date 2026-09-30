@@ -1,1 +1,334 @@
-%
+The results in this section follow the corresponding topics in \cite{burton}.
+The checked declarations belong to \texttt{ElementaryNumberTheory.Chapter03}.
+
+\begin{definition}
+  For a list of natural digits written with the units digit first, define its base-$b$ value
+  recursively by $V_b([])=0$ and $V_b(d::D)=d+bV_b(D)$.
+
+  \begin{lean}
+    def digitValue (b : ℕ) : List ℕ → ℕ
+
+      | [] => 0
+
+      | d :: ds => d + b * digitValue b ds
+  \end{lean}
+\end{definition}
+
+\begin{definition}
+  A digit list is \emph{canonical} when every digit is less than $b$ and its last, most
+  significant digit is nonzero.
+  The empty list is the canonical representation of zero.
+
+  \begin{lean}
+    def CanonicalDigits (b : ℕ) : List ℕ → Prop
+
+      | [] => True
+
+      | d :: ds => d < b ∧ (ds = [] → d ≠ 0) ∧ CanonicalDigits b ds
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:existsunique-digits}
+  For each natural number $n$ and base $b>1$, there is exactly one canonical digit list with value
+  $n$.
+  For positive $n$, this list is nonempty.
+
+  \begin{lean}
+    theorem existsUnique_digits (b : ℕ) (hb : 1 < b) (n : ℕ) :
+        ∃! ds : List ℕ, CanonicalDigits b ds ∧ digitValue b ds = n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Use strong induction on $n$.
+  Zero has the empty expansion.
+  For positive $n$, division by $b$ gives $n=bq+r$, where $0\le r<b$ and $0\le q<n$.
+  Expand $q$ by induction and prepend $r$; if the tail is empty, positivity of $n$ ensures $r\ne0$.
+
+  \begin{lean}
+    have hex : ∀ n : ℕ, ∃ ds : List ℕ, CanonicalDigits b ds ∧ digitValue b ds = n := by
+      intro n
+      induction n using Nat.strong_induction_on with
+      | h n ih =>
+        by_cases hn : n = 0
+
+        · exact ⟨[], trivial, by exact hn.symm⟩
+
+        · obtain ⟨⟨q, r⟩, ⟨heq, hr⟩, _⟩ :=
+            Chapter01.existsUnique_quotient_remainder n ⟨b, by omega⟩
+          change (n : ℤ) = q * b + r at heq
+          change r < b at hr
+
+          have hb' : (1 : ℤ) < b := by exact_mod_cast hb
+
+          have hr' : (r : ℤ) < b := by exact_mod_cast hr
+
+          have hq : 0 ≤ q := by nlinarith
+
+          have hnpos : (0 : ℤ) < n := by omega
+
+          have hqn : q < n := by nlinarith
+
+          have hlt : q.toNat < n := by omega
+
+          obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
+
+          refine ⟨r :: ds, ⟨hr, ?_, hds⟩, ?_⟩
+
+          · intro hnil hrzero
+            rw [hnil] at hval
+            change 0 = q.toNat at hval
+
+            have : q = 0 := by omega
+            rw [this, hrzero] at heq
+            simp only [zero_mul, Nat.cast_zero, add_zero] at heq
+            exact hn (by exact_mod_cast heq)
+
+          · change r + b * digitValue b ds = n
+            rw [hval]
+
+            have hc : (q.toNat : ℤ) = q := Int.toNat_of_nonneg hq
+            exact_mod_cast (show (r : ℤ) + (b : ℤ) * q.toNat = n by
+                rw [hc]
+                nlinarith)
+  \end{lean}
+
+  The construction gives existence.
+  For uniqueness, equality of two positional values gives equal quotient--remainder pairs on
+  division by $b$: the first digits agree and the tails have equal values.
+  Repeating this argument proves equality of the complete lists.
+
+  \begin{lean}
+    obtain ⟨ds, hd, hv⟩ := hex n
+
+    exact ⟨ds, ⟨hd, hv⟩, fun es he => digitValue_injective b hb es ds he.1 hd (he.2.trans hv.symm)⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:existsunique-binary-digits}
+  Every natural number has a unique canonical base-two expansion.
+  Since each digit is less than two, the digits are zero and one.
+
+  \begin{lean}
+    theorem existsUnique_binary_digits (n : ℕ) :
+        ∃! ds : List ℕ, CanonicalDigits 2 ds ∧ digitValue 2 ds = n
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Specialize the positional representation theorem to base two.
+
+  \begin{lean}
+    existsUnique_digits 2 (by decide) n
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  For integer coefficients written in increasing order of degree, define $P_b([])=0$ and
+  $P_b(d::D)=d+bP_b(D)$.
+  Thus the same notation evaluates polynomials and positional digit lists.
+
+  \begin{lean}
+    def positionalValue (b : ℤ) : List ℤ → ℤ
+
+      | [] => 0
+
+      | d :: ds => d + b * positionalValue b ds
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:positionalvalue-modeq}
+  An integer polynomial takes congruent values at congruent arguments: if $a\equiv b\pmod n$, then
+  $P(a)\equiv P(b)\pmod n$.
+
+  \begin{lean}
+    theorem positionalValue_modEq (n a b : ℤ) (h : a ≡ b [ZMOD n]) (ds : List ℤ) :
+        positionalValue a ds ≡ positionalValue b ds [ZMOD n]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Induct on the coefficient list.
+  The zero polynomial gives the base case.
+  The recursive step adds a common constant coefficient to congruent products.
+
+  \begin{lean}
+    induction ds with
+    | nil => exact modEq_refl n 0
+
+    | cons d ds ih => exact modEq_add (modEq_refl n d) (modEq_mul h ih)
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  The alternating sum starts with the units digit: $A([])=0$ and $A(d::D)=d-A(D)$.
+
+  \begin{lean}
+    def alternatingSum : List ℤ → ℤ
+
+      | [] => 0
+
+      | d :: ds => d - alternatingSum ds
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:nine-dvd-iff-digit-sum}
+  A decimal positional value is divisible by $9$ precisely when the sum of its digits is divisible
+  by $9$.
+  The identity also holds for arbitrary integer coefficients.
+
+  \begin{lean}
+    theorem nine_dvd_iff_digit_sum (ds : List ℤ) :
+        9 ∣ positionalValue 10 ds ↔ 9 ∣ ds.sum
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Since $10\equiv1\pmod9$, substitute one for ten in the positional polynomial.
+  Its value at one is the digit sum.
+
+  \begin{lean}
+    have h := positionalValue_modEq 9 10 1 (by decide) ds
+    rw [positionalValue_one] at h
+    exact dvd_iff_of_modEq h
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:three-dvd-iff-digit-sum}
+  A decimal positional value is divisible by $3$ precisely when the sum of its digits is divisible
+  by $3$.
+  The identity also holds for arbitrary integer coefficients.
+
+  \begin{lean}
+    theorem three_dvd_iff_digit_sum (ds : List ℤ) :
+        3 ∣ positionalValue 10 ds ↔ 3 ∣ ds.sum
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  The same argument uses $10\equiv1\pmod3$.
+
+  \begin{lean}
+    have h := positionalValue_modEq 3 10 1 (by decide) ds
+    rw [positionalValue_one] at h
+    exact dvd_iff_of_modEq h
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:eleven-dvd-iff-alternating-sum}
+  A decimal positional value is divisible by $11$ precisely when the alternating sum of its
+  digits, starting with the units digit is divisible by $11$.
+  The identity also holds for arbitrary integer coefficients.
+
+  \begin{lean}
+    theorem eleven_dvd_iff_alternating_sum (ds : List ℤ) :
+        11 ∣ positionalValue 10 ds ↔ 11 ∣ alternatingSum ds
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Use $10\equiv-1\pmod{11}$.
+  Evaluation at minus one is the alternating sum.
+
+  \begin{lean}
+    have h := positionalValue_modEq 11 10 (-1) (by decide) ds
+    rw [positionalValue_neg_one] at h
+    exact dvd_iff_of_modEq h
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:two-dvd-iff-last-digit}
+  A nonempty decimal expansion is divisible by two exactly when its units digit is even.
+
+  \begin{lean}
+    theorem two_dvd_iff_last_digit (d : ℤ) (ds : List ℤ) :
+        2 ∣ positionalValue 10 (d :: ds) ↔ 2 ∣ d
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  All other terms contain a factor of ten, which is divisible by two.
+
+  \begin{lean}
+    dvd_positionalValue_cons_iff 2 10 d ds (by decide)
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:five-dvd-iff-last-digit}
+  For a units digit $0\le d<10$, a decimal expansion is divisible by five exactly when $d=0$ or
+  $d=5$.
+
+  \begin{lean}
+    theorem five_dvd_iff_last_digit (d : ℤ) (ds : List ℤ) (hd : 0 ≤ d ∧ d < 10) :
+        5 ∣ positionalValue 10 (d :: ds) ↔ d = 0 ∨ d = 5
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Remove the terms divisible by ten.
+  A multiple of five in the interval from zero to nine is zero or five.
+
+  \begin{lean}
+    rw [dvd_positionalValue_cons_iff 5 10 d ds (by decide)]
+    constructor
+
+    · rintro ⟨k, hk⟩
+      omega
+
+    · rintro (rfl | rfl) <;> decide
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:four-dvd-iff-last-two-digits}
+  A decimal positional value with units digit $d$ and tens digit $e$ is divisible by four exactly
+  when $d+10e$ is divisible by four.
+
+  \begin{lean}
+    theorem four_dvd_iff_last_two_digits (d e : ℤ) (ds : List ℤ) :
+        4 ∣ positionalValue 10 (d :: e :: ds) ↔ 4 ∣ d + 10 * e
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  The remaining contribution is one hundred times the tail value, hence is divisible by four.
+
+  \begin{lean}
+    apply dvd_iff_of_modEq
+    exact (modEq_iff_dvd_sub _ _ _).2
+      ⟨25 * positionalValue 10 ds, by
+          simp only [positionalValue]
+          ring⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:detects-single-digit-error}
+  If $\gcd(10,w)=1$ and $d,e$ are distinct decimal digits, then $wd\not\equiv we\pmod{10}$.
+
+  \begin{lean}
+    theorem detects_single_digit_error (w d e : ℤ) (hw : Chapter01.gcd 10 w = 1)
+        (hd : 0 ≤ d ∧ d < 10) (he : 0 ≤ e ∧ e < 10) (hne : d ≠ e) :
+        ¬w * d ≡ w * e [ZMOD 10]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Otherwise coprime cancellation would give $10\mid d-e$.
+  Since $-10<d-e<10$, this forces equality of the digits.
+
+  \begin{lean}
+    intro h
+
+    obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 (modEq_cancel hw h)
+    omega
+  \end{lean}
+\end{proof}

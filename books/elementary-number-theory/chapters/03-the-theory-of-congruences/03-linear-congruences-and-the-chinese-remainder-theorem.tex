@@ -1,1 +1,470 @@
-%
+The results in this section follow the corresponding topics in \cite{burton}.
+The checked declarations belong to \texttt{ElementaryNumberTheory.Chapter03}.
+
+\begin{theorem}
+  \label{nt:thm:linear-modeq-iff}
+  For integers $n,a,b,x$, the congruence $ax\equiv b\pmod n$ is equivalent to the existence of an
+  integer $y$ with $ax+ny=b$.
+
+  \begin{lean}
+    theorem linear_modEq_iff (n a b x : ℤ) :
+        a * x ≡ b [ZMOD n] ↔ ∃ y : ℤ, a * x + n * y = b
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Negate the witness for $n\mid ax-b$ to obtain $y$, and reverse this construction in the other
+  direction.
+
+  \begin{lean}
+    rw [modEq_iff_dvd_sub]
+    constructor
+
+    · rintro ⟨k, hk⟩
+      exact ⟨-k, by nlinarith⟩
+
+    · rintro ⟨y, hy⟩
+      exact ⟨-y, by nlinarith⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:exists-linear-modeq-iff}
+  The congruence $ax\equiv b\pmod n$ is solvable exactly when $\gcd(a,n)\mid b$.
+
+  \begin{lean}
+    theorem exists_linear_modEq_iff (n a b : ℤ) :
+        (∃ x : ℤ, a * x ≡ b [ZMOD n]) ↔ (Chapter01.gcd a n : ℤ) ∣ b
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Use the preceding translation and the solvability criterion for linear Diophantine equations.
+
+  \begin{lean}
+    simp only [linear_modEq_iff]
+    exact Chapter01.exists_mul_add_mul_eq_iff a n b
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:linear-modeq-iff-eq-add}
+  Let $n\ne0$, $g=\gcd(a,n)$, and let $x_0$ solve $ax\equiv b\pmod n$.
+  The solutions are precisely $x=x_0+(n/g)t$ with $t\in\mathbb Z$.
+
+  \begin{lean}
+    theorem linear_modEq_iff_eq_add (n a b x₀ x : ℤ) (hn : n ≠ 0)
+        (h₀ : a * x₀ ≡ b [ZMOD n]) :
+        a * x ≡ b [ZMOD n] ↔ ∃ t : ℤ,
+          x = x₀ + (n / (Chapter01.gcd a n : ℤ)) * t
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Choose a companion $y_0$ with $ax_0+ny_0=b$.
+  The previously proved parametrization of all Diophantine solutions gives the displayed first
+  coordinate.
+  Conversely, accompany any such $x$ by $y_0-(a/g)t$.
+
+  \begin{lean}
+    obtain ⟨y₀, hy₀⟩ := (linear_modEq_iff n a b x₀).1 h₀
+    rw [linear_modEq_iff]
+    constructor
+
+    · rintro ⟨y, hy⟩
+
+      obtain ⟨t, ht, _⟩ :=
+        (Chapter01.mul_add_mul_eq_iff a n b x₀ y₀ x y (Or.inr hn) hy₀).1 hy
+
+      exact ⟨t, ht⟩
+
+    · rintro ⟨t, ht⟩
+      refine ⟨y₀ - (a / (Chapter01.gcd a n : ℤ)) * t, ?_⟩
+      exact (Chapter01.mul_add_mul_eq_iff a n b x₀ y₀ x _ (Or.inr hn) hy₀).2
+        ⟨t, ht, rfl⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:linear-solution-classes}
+  For $n>0$, a solvable linear congruence has exactly $g=\gcd(a,n)$ incongruent solutions.
+  They are represented by $x_0+(n/g)t$ for $0\le t<g$, and each solution belongs to exactly one of
+  these classes.
+
+  \begin{lean}
+    theorem linear_solution_classes (n a b x₀ : ℤ) (hn : 0 < n)
+        (h₀ : a * x₀ ≡ b [ZMOD n]) :
+        (∀ t : Fin (Chapter01.gcd a n),
+          a * (x₀ + (n / (Chapter01.gcd a n : ℤ)) * t.val) ≡ b [ZMOD n]) ∧
+        (∀ x : ℤ, a * x ≡ b [ZMOD n] →
+          ∃! t : Fin (Chapter01.gcd a n),
+            x ≡ x₀ + (n / (Chapter01.gcd a n : ℤ)) * t.val [ZMOD n])
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Write $n=gu$ with $u>0$.
+  Every proposed representative is a solution by the parametrization.
+
+  \begin{lean}
+    have hnne := ne_of_gt hn
+
+    obtain ⟨hg, _, ⟨u, hu⟩, _, _⟩ := Chapter01.gcd_spec a n (Or.inr hnne)
+
+    have hgne : (Chapter01.gcd a n : ℤ) ≠ 0 := by exact_mod_cast ne_of_gt hg
+
+    have hquot : n / (Chapter01.gcd a n : ℤ) = u := by
+      calc
+        n / (Chapter01.gcd a n : ℤ) =
+            ((Chapter01.gcd a n : ℤ) * u) / (Chapter01.gcd a n : ℤ) :=
+          congrArg (fun z => z / (Chapter01.gcd a n : ℤ)) hu
+        _ = u := Int.mul_ediv_cancel_left u hgne
+
+    have hupos : 0 < u := by
+      have hgz : (0 : ℤ) < Chapter01.gcd a n := by exact_mod_cast hg
+      nlinarith
+
+    constructor
+
+    · intro t
+      exact (linear_modEq_iff_eq_add n a b x₀ _ hnne h₀).2 ⟨t.val, rfl⟩
+  \end{lean}
+
+  For an arbitrary solution, divide its integer parameter by $g$ and retain the remainder $r$.
+  The discarded multiple of $g$ changes $x$ by a multiple of $n$.
+  If two remainders gave the same class, cancellation of $u$ would make their difference a multiple
+  of $g$; their bounds force this difference to vanish.
+
+  \begin{lean}
+    · intro x hx
+
+      obtain ⟨t, ht⟩ := (linear_modEq_iff_eq_add n a b x₀ x hnne h₀).1 hx
+      obtain ⟨⟨q, r⟩, ⟨htr, hr⟩, _⟩ :=
+        Chapter01.existsUnique_quotient_remainder t ⟨Chapter01.gcd a n, hg⟩
+
+      change t = q * (Chapter01.gcd a n : ℤ) + r at htr
+      change r < Chapter01.gcd a n at hr
+
+      have hrep : x ≡ x₀ + (n / (Chapter01.gcd a n : ℤ)) * r [ZMOD n] := by
+        apply (modEq_iff_dvd_sub _ _ _).2
+        refine ⟨q, ?_⟩
+        rw [hquot] at ht ⊢
+        rw [ht]
+        nlinarith [congrArg (fun z => z * q) hu, congrArg (fun z => u * z) htr]
+
+      refine ⟨⟨r, hr⟩, hrep, ?_⟩
+      intro s hs
+
+      have hdiff := modEq_trans (modEq_symm hs) hrep
+
+      obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 hdiff
+      rw [hquot] at hk
+
+      have he : (s.val : ℤ) - r = (Chapter01.gcd a n : ℤ) * k := by
+        apply mul_left_cancel₀ (ne_of_gt hupos)
+        calc
+          u * ((s.val : ℤ) - r) = (x₀ + u * s.val) - (x₀ + u * r) := by ring
+          _ = u * ((Chapter01.gcd a n : ℤ) * k) := by
+            rw [hk]
+            nlinarith [congrArg (fun z => z * k) hu]
+
+      have hsbound : (s.val : ℤ) < Chapter01.gcd a n := by exact_mod_cast s.isLt
+
+      have hrbound : (r : ℤ) < Chapter01.gcd a n := by exact_mod_cast hr
+
+      have hgz : (0 : ℤ) < Chapter01.gcd a n := by exact_mod_cast hg
+
+      have hkzero : k = 0 := by
+        rcases lt_trichotomy k 0 with hneg | hzero | hpos
+
+        · have : k ≤ -1 := by omega
+          nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
+
+        · exact hzero
+
+        · have : 1 ≤ k := hpos
+          nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
+
+      apply Fin.ext
+
+      have hval : (s.val : ℤ) = r := by
+        rw [hkzero, mul_zero] at he
+        linarith
+      exact_mod_cast hval
+  \end{lean}
+\end{proof}
+
+\begin{definition}
+  An integer $u$ is a multiplicative inverse of $a$ modulo $n$ when $au\equiv1\pmod n$.
+
+  \begin{lean}
+    def IsModularInverse (n a u : ℤ) : Prop := a * u ≡ 1 [ZMOD n]
+  \end{lean}
+\end{definition}
+
+\begin{theorem}
+  \label{nt:thm:exists-modularinverse}
+  If $\gcd(a,n)=1$, an inverse of $a$ modulo $n$ exists.
+
+  \begin{lean}
+    theorem exists_modularInverse (n a : ℤ) (ha : Chapter01.gcd a n = 1) :
+        ∃ u : ℤ, IsModularInverse n a u
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Apply the linear congruence existence criterion with right-hand side one.
+
+  \begin{lean}
+    apply (exists_linear_modEq_iff n a 1).2
+    rw [ha, Nat.cast_one]
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:exists-unique-linear-modeq}
+  For $n\ne0$ and $\gcd(a,n)=1$, every linear congruence $ax\equiv b\pmod n$ has one solution
+  class modulo $n$.
+
+  \begin{lean}
+    theorem exists_unique_linear_modEq (n a b : ℤ) (hn : n ≠ 0)
+        (ha : Chapter01.gcd a n = 1) :
+        ∃ x₀ : ℤ, a * x₀ ≡ b [ZMOD n] ∧
+          ∀ x : ℤ, a * x ≡ b [ZMOD n] ↔ x ≡ x₀ [ZMOD n]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Existence follows because one divides every integer.
+  The solution step $n/\gcd(a,n)$ is now $n$, so the parametrization is exactly one congruence
+  class.
+
+  \begin{lean}
+    obtain ⟨x₀, hx₀⟩ := (exists_linear_modEq_iff n a b).2 (by
+      rw [ha, Nat.cast_one]
+      exact ⟨b, by ring⟩)
+
+    refine ⟨x₀, hx₀, ?_⟩
+    intro x
+    rw [linear_modEq_iff_eq_add n a b x₀ x hn hx₀, ha, Nat.cast_one, Int.ediv_one,
+      modEq_iff_dvd_sub]
+
+    constructor
+
+    · rintro ⟨t, ht⟩
+      exact ⟨t, by linarith⟩
+
+    · rintro ⟨t, ht⟩
+      exact ⟨t, by linarith⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:linear-modeq-iff-inverse}
+  If $au\equiv1\pmod n$, then $ax\equiv b\pmod n$ is equivalent to $x\equiv ub\pmod n$.
+
+  \begin{lean}
+    theorem linear_modEq_iff_inverse (n a b u x : ℤ) (hu : IsModularInverse n a u) :
+        a * x ≡ b [ZMOD n] ↔ x ≡ u * b [ZMOD n]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Multiply the original congruence by $u$ and replace $au$ by one.
+  In the reverse direction multiply by $a$ and again use the inverse relation.
+
+  \begin{lean}
+    constructor
+
+    · intro hx
+
+      have h₁ := modEq_mul (modEq_refl n u) hx
+
+      have h₂ := modEq_mul hu (modEq_refl n x)
+
+      have heq : u * (a * x) = (a * u) * x := by ring
+      rw [heq] at h₁
+      exact modEq_trans (modEq_symm (by simpa only [one_mul] using h₂)) h₁
+
+    · intro hx
+
+      have h₁ := modEq_mul (modEq_refl n a) hx
+
+      have h₂ := modEq_mul hu (modEq_refl n b)
+
+      have heq : a * (u * b) = (a * u) * b := by ring
+      rw [heq] at h₁
+      exact modEq_trans h₁ (by simpa only [one_mul] using h₂)
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:chinese-remainder}
+  Let $(n_i)_{i\in S}$ be a finite family of nonzero, pairwise coprime integer moduli.
+  For any integers $a_i$, the system $x\equiv a_i\pmod{n_i}$ has a solution, and all solutions form
+  one class modulo $\prod_{i\in S}n_i$.
+  The empty system gives the unique class modulo one.
+
+  \begin{lean}
+    theorem chinese_remainder {ι : Type*} (s : Finset ι) (n a : ι → ℤ)
+        (hn : ∀ i ∈ s, n i ≠ 0)
+        (hpair : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → Chapter01.gcd (n i) (n j) = 1) :
+        ∃ x : ℤ, (∀ i ∈ s, x ≡ a i [ZMOD n i]) ∧
+          ∀ y : ℤ, (∀ i ∈ s, y ≡ a i [ZMOD n i]) ↔ y ≡ x [ZMOD ∏ i ∈ s, n i]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  For each $i$, form the complementary product $N_i=\prod_{j\ne i}n_j$.
+  Pairwise coprimality and the product form of Bezout\textquotesingle s identity give an inverse
+  $u_i$ of $N_i$ modulo $n_i$.
+  Set $x=\sum_i a_iN_i u_i$.
+
+  \begin{lean}
+    classical
+
+    let N (i : ι) := ∏ j ∈ s.erase i, n j
+
+    have hcop (i : ι) (hi : i ∈ s) : Chapter01.gcd (N i) (n i) = 1 := by
+      apply gcd_prod_eq_one _ _ _ (hn i hi)
+      intro j hj
+      exact hpair j (Finset.mem_of_mem_erase hj) i hi (Finset.ne_of_mem_erase hj)
+
+    have hinv (i : ι) (hi : i ∈ s) : ∃ u : ℤ, IsModularInverse (n i) (N i) u :=
+      exists_modularInverse _ _ (hcop i hi)
+    choose u hu using hinv
+
+    let x := ∑ i ∈ s.attach, a i * N i * u i i.property
+  \end{lean}
+
+  Modulo $n_i$, the $i$th summand is $a_i$, while every other summand contains the factor $n_i$.
+  Hence the constructed sum solves every congruence.
+
+  \begin{lean}
+    have hx (i : ι) (hi : i ∈ s) : x ≡ a i [ZMOD n i] := by
+      have hsum : x - a i =
+          ∑ j ∈ s.attach, (a j * N j * u j j.property - if j.val = i then a i else 0) := by
+        simp only [Finset.sum_sub_distrib]
+
+        have he : (∑ j ∈ s.attach, if j.val = i then a i else 0) = a i := by
+          rw [Finset.sum_eq_single ⟨i, hi⟩]
+
+          · simp only [↓reduceIte]
+
+          · intro j hj hji
+
+            have hne : j.val ≠ i := by
+              intro heq
+              apply hji
+              exact Subtype.ext heq
+            simp only [hne, ↓reduceIte]
+
+          · simp
+        rw [he]
+
+      apply (modEq_iff_dvd_sub _ _ _).2
+      rw [hsum]
+      apply Finset.dvd_sum
+      intro j hj
+      by_cases he : j.val = i
+
+      · subst i
+        simp only [↓reduceIte]
+
+        obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 (hu j.val j.property)
+
+        exact ⟨a j * k, by nlinarith [congrArg (fun z => a j * z) hk]⟩
+
+      · simp only [he, ↓reduceIte, sub_zero]
+
+        have hmem : i ∈ s.erase j.val := Finset.mem_erase.mpr ⟨Ne.symm he, hi⟩
+
+        obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem n hmem
+
+        exact ⟨a j * k * u j j.property, by
+            change N j = n i * k at hk
+            rw [hk]
+            ring⟩
+  \end{lean}
+
+  Two simultaneous solutions have a difference divisible by every $n_i$.
+  Repeated use of the coprime product-divisibility lemma makes the difference divisible by their
+  product.
+  Conversely, a multiple of that product is a multiple of each modulus.
+
+  \begin{lean}
+    refine ⟨x, hx, ?_⟩
+    intro y
+    constructor
+
+    · intro hy
+      apply (modEq_iff_dvd_sub _ _ _).2
+      apply prod_dvd_of_pairwise s n hn hpair
+      intro i hi
+      exact (modEq_iff_dvd_sub _ _ _).1 (modEq_trans (hy i hi) (modEq_symm (hx i hi)))
+
+    · intro hy i hi
+
+      obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 hy
+      obtain ⟨t, ht⟩ := Finset.dvd_prod_of_mem n hi
+      apply modEq_trans _ (hx i hi)
+      exact (modEq_iff_dvd_sub _ _ _).2 ⟨t * k, by
+          rw [hk, ht]
+          ring⟩
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:linear-system-iff}
+  Let $\Delta=ad-bc$ and suppose $\Delta t\equiv1\pmod n$.
+  The system $ax+by\equiv r$, $cx+dy\equiv s\pmod n$ is equivalent to $x\equiv t(dr-bs)$ and
+  $y\equiv t(as-cr)\pmod n$.
+
+  \begin{lean}
+    theorem linear_system_iff (n : ℕ) (a b c d r s t x y : ℤ)
+        (ht : (a * d - b * c) * t ≡ 1 [ZMOD (n : ℤ)]) :
+        (a * x + b * y ≡ r [ZMOD (n : ℤ)] ∧ c * x + d * y ≡ s [ZMOD (n : ℤ)]) ↔
+          x ≡ t * (d * r - b * s) [ZMOD (n : ℤ)] ∧
+          y ≡ t * (a * s - c * r) [ZMOD (n : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Work in the residue ring.
+  Subtract $b$ times the second equation from $d$ times the first, and subtract $c$ times the first
+  from $a$ times the second.
+  These give $\Delta x=dr-bs$ and $\Delta y=as-cr$.
+  Multiplication by $t$ gives the formulas; direct substitution verifies their converse.
+  The auxiliary ring calculation is proved in the same checked module.
+
+  \begin{lean}
+    simp only [← ZMod.intCast_eq_intCast_iff, Int.cast_add, Int.cast_mul,
+      Int.cast_sub, Int.cast_one] at ht ⊢
+
+    exact two_equations (a : ZMod n) b c d r s t x y ht
+  \end{lean}
+\end{proof}
+
+\begin{theorem}
+  \label{nt:thm:exists-unique-linear-system}
+  If $\gcd(ad-bc,n)=1$, the two-variable system has a unique solution pair modulo $n$.
+
+  \begin{lean}
+    theorem exists_unique_linear_system (n : ℕ) (a b c d r s : ℤ)
+        (hdet : Chapter01.gcd (a * d - b * c) n = 1) :
+        ∃ x₀ y₀ : ℤ, ∀ x y : ℤ,
+          (a * x + b * y ≡ r [ZMOD (n : ℤ)] ∧ c * x + d * y ≡ s [ZMOD (n : ℤ)]) ↔
+            x ≡ x₀ [ZMOD (n : ℤ)] ∧ y ≡ y₀ [ZMOD (n : ℤ)]
+  \end{lean}
+\end{theorem}
+
+\begin{proof}
+  Choose an inverse of the determinant and apply the explicit solution formulas.
+
+  \begin{lean}
+    obtain ⟨t, ht⟩ := exists_modularInverse n (a * d - b * c) hdet
+
+    exact ⟨t * (d * r - b * s), t * (a * s - c * r),
+      fun x y => linear_system_iff n a b c d r s t x y ht⟩
+  \end{lean}
+\end{proof}

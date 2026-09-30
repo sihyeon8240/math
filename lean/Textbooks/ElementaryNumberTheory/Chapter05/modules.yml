@@ -1,0 +1,11 @@
+schema_version: 1
+
+modules:
+  - Divisors
+  - PrimeExponents
+  - DivisorFormulas
+  - DivisorProperties
+  - Mobius
+  - MobiusInversion
+  - SummatoryFunctions
+  - FactorialExponents
