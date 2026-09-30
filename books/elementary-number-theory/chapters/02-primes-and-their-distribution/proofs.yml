@@ -1,6 +1,4 @@
 proofs:
-  - id: nt:lem:prime-interface
-    declaration: ElementaryNumberTheory.Chapter02.isPrime_iff_nat_prime
   - id: nt:thm:prime-divides-product
     declaration: ElementaryNumberTheory.Chapter02.prime_dvd_mul
   - id: nt:cor:prime-divides-finite-product

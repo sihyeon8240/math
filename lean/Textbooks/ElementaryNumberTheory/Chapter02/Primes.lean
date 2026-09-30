@@ -13,12 +13,6 @@ def isPrime (p : ℕ) : Prop :=
 def isComposite (n : ℕ) : Prop :=
   1 < n ∧ ¬isPrime n
 
-/-- Lemma: the divisor definition agrees with the standard prime predicate.
-This bridge only compares definitions; it supplies no factorization theorem. -/
-theorem isPrime_iff_nat_prime (p : ℕ) : isPrime p ↔ Nat.Prime p := by
-  rw [Nat.prime_def]
-  rfl
-
 /-- Theorem: a prime dividing a product of integers divides one factor. -/
 theorem prime_dvd_mul (p : ℕ) (hp : isPrime p) (a b : ℤ)
     (h : (p : ℤ) ∣ a * b) : (p : ℤ) ∣ a ∨ (p : ℤ) ∣ b := by

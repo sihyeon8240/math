@@ -331,7 +331,7 @@ printf '%s\\n' "$MANIFEST"
         self.assertEqual(workflow["jobs"]["check"]["needs"], ["source", "latex"])
 
     def test_external_actions_are_pinned_to_full_commit_shas(self):
-        reference = re.compile(r"^[^/]+/[^/@]+@[0-9a-f]{40}$")
+        reference = re.compile(r"^[^/@]+/[^/@]+(?:/[^/@]+)*@[0-9a-f]{40}$")
         for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
             workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
             pending = [workflow]

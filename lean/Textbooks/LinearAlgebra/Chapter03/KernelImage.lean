@@ -103,7 +103,7 @@ theorem finrank_eq_of_bijective [Module.Finite K V] (f : V →ₗ[K] W)
 
   obtain ⟨b, _⟩ := (finiteBasis_iff _).mp (basis_map f hf hb)
 
-  rw [← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs,
+  rw [finrank_eq_card_of_basis hs,
     Module.finrank_eq_card_basis b, Fintype.card_coe]
 
 /-- Lemma: a subspace has a finite generating structure from its constructed basis. -/

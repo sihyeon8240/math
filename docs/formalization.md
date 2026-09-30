@@ -252,9 +252,9 @@ and generality as an existing Mathlib theorem, prefer its statement shape;
 identical syntax or proof implementation is not required. Do not generalize a
 textbook theorem merely to match Mathlib, or silently strengthen assumptions
 through typeclasses. Use a book-local specialization or wrapper when appropriate.
-If definitions or formulations differ, prove the required bridge rather than
-claiming correspondence from similar theorem names. Different proofs of the same
-proposition do not require a separate proof-equality theorem.
+Do not add declarations solely to compare local constructions or proofs with
+Mathlib equivalents. Use the independently developed declarations in subsequent
+core proofs.
 
 Within a book, subsequent core developments cite its earlier independently proved
 core declarations. For accepted external prerequisites, including results taught
@@ -262,20 +262,11 @@ in another book, cite Mathlib directly or through a thin book-local wrapper when
 needed for the printed statement or proof index. The cross-book import prohibition
 continues to apply.
 
-If an independently developed result is later found in Mathlib, retain the local
-core proof and record the corresponding Mathlib declaration. Its presence in
-Mathlib is not grounds for replacing the pedagogical proof with a direct call.
-Record important Mathlib correspondences in short Lean declaration docstrings
-(`/-- ... -/`) beside the relevant result. Include exact declaration names and
-any specialization or differences in definitions, assumptions, or conclusions.
-Record principal prerequisite declarations at their use sites, including scoped
-external exceptions, and identify their role as accepted prerequisites. Use a
-module comment (`/-! ... -/`) once when the information applies to several
-related declarations. Keep these details in Lean rather than duplicating a
-correspondence inventory in the book policy; that policy owns the mathematical
-permission and scope of external results. Verify declaration names against the
-pinned Mathlib revision rather than guessing them. Exhaustive inventories of
-elementary helper lemmas are unnecessary.
+Retain independently developed proofs even when Mathlib contains the same result.
+Do not add counterpart inventories or comparison comments. Keep declaration
+comments concise: identify the mathematical role and essential hypotheses.
+Document accepted external prerequisites and scoped exceptions at their use sites
+when needed to explain the dependency boundary.
 
 ## Mathematical language and standard interfaces
 
@@ -293,9 +284,9 @@ such as `{U : Set X | IsOpen U}` only when the collection itself is needed.
 Keep ball notation distinct from general neighborhood notation.
 
 A local construction is justified when its construction is part of the lesson
-or the textbook convention differs. Prove its agreement with the standard
-interface, preserving empty cases and explicit hypotheses, and use that
-interface in later developments. Adopting a standard definition does not permit
+or the textbook convention differs. Preserve empty cases and explicit
+hypotheses, and use the local construction and its proved properties in later
+developments. Adopting a standard definition does not permit
 replacing a core proof by its Mathlib counterpart. Establish substantive
 characterizations locally when they are part of the book's mathematical content.
 

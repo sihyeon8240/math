@@ -1,1 +1,79 @@
-proofs: []
+proofs:
+  - id: nt:thm:dvd-iff-primeexponents-le
+    declaration: ElementaryNumberTheory.Chapter05.dvd_iff_primeExponents_le
+  - id: nt:thm:divisor-exponents
+    declaration: ElementaryNumberTheory.Chapter05.divisor_exponents
+  - id: nt:thm:tau-eq-prod
+    declaration: ElementaryNumberTheory.Chapter05.tau_eq_prod
+  - id: nt:thm:multiplicative-one
+    declaration: ElementaryNumberTheory.Chapter05.multiplicative_one
+  - id: nt:thm:existsunique-divisor-split
+    declaration: ElementaryNumberTheory.Chapter05.existsUnique_divisor_split
+  - id: nt:thm:divisorsum-multiplicative
+    declaration: ElementaryNumberTheory.Chapter05.divisorSum_multiplicative
+  - id: nt:thm:tau-multiplicative
+    declaration: ElementaryNumberTheory.Chapter05.tau_multiplicative
+  - id: nt:thm:sigma-multiplicative
+    declaration: ElementaryNumberTheory.Chapter05.sigma_multiplicative
+  - id: nt:thm:multiplicative-prime-powers
+    declaration: ElementaryNumberTheory.Chapter05.multiplicative_prime_powers
+  - id: nt:thm:tau-prime-pow
+    declaration: ElementaryNumberTheory.Chapter05.tau_prime_pow
+  - id: nt:thm:sigma-prime-pow
+    declaration: ElementaryNumberTheory.Chapter05.sigma_prime_pow
+  - id: nt:thm:sigma-eq-prod
+    declaration: ElementaryNumberTheory.Chapter05.sigma_eq_prod
+  - id: nt:thm:sigma-eq-prod-quotients
+    declaration: ElementaryNumberTheory.Chapter05.sigma_eq_prod_quotients
+  - id: nt:thm:tau-sigma-one
+    declaration: ElementaryNumberTheory.Chapter05.tau_sigma_one
+  - id: nt:thm:tau-eq-two-iff
+    declaration: ElementaryNumberTheory.Chapter05.tau_eq_two_iff
+  - id: nt:thm:sigma-eq-succ-iff
+    declaration: ElementaryNumberTheory.Chapter05.sigma_eq_succ_iff
+  - id: nt:thm:prod-divisors-sq
+    declaration: ElementaryNumberTheory.Chapter05.prod_divisors_sq
+  - id: nt:thm:mobius-one
+    declaration: ElementaryNumberTheory.Chapter05.mobius_one
+  - id: nt:thm:mobius-prime-pow
+    declaration: ElementaryNumberTheory.Chapter05.mobius_prime_pow
+  - id: nt:thm:mobius-eq-zero-of-prime-sq-dvd
+    declaration: ElementaryNumberTheory.Chapter05.mobius_eq_zero_of_prime_sq_dvd
+  - id: nt:thm:mobius-eq-sign
+    declaration: ElementaryNumberTheory.Chapter05.mobius_eq_sign
+  - id: nt:thm:mobius-multiplicative
+    declaration: ElementaryNumberTheory.Chapter05.mobius_multiplicative
+  - id: nt:thm:sum-mobius
+    declaration: ElementaryNumberTheory.Chapter05.sum_mobius
+  - id: nt:thm:mobius-inversion
+    declaration: ElementaryNumberTheory.Chapter05.mobius_inversion
+  - id: nt:thm:mobius-inversion-complement
+    declaration: ElementaryNumberTheory.Chapter05.mobius_inversion'
+  - id: nt:thm:multiplicative-of-divisorsum
+    declaration: ElementaryNumberTheory.Chapter05.multiplicative_of_divisorSum
+  - id: nt:thm:multiplicative-iff-divisorsum
+    declaration: ElementaryNumberTheory.Chapter05.multiplicative_iff_divisorSum
+  - id: nt:thm:floor-spec
+    declaration: ElementaryNumberTheory.Chapter05.floor_spec
+  - id: nt:thm:floor-eq-self-iff
+    declaration: ElementaryNumberTheory.Chapter05.floor_eq_self_iff
+  - id: nt:thm:floor-nat-div
+    declaration: ElementaryNumberTheory.Chapter05.floor_nat_div
+  - id: nt:thm:card-multiples
+    declaration: ElementaryNumberTheory.Chapter05.card_multiples
+  - id: nt:thm:legendre
+    declaration: ElementaryNumberTheory.Chapter05.legendre
+  - id: nt:thm:floor-add-carry
+    declaration: ElementaryNumberTheory.Chapter05.floor_add_carry
+  - id: nt:thm:floor-add-ge
+    declaration: ElementaryNumberTheory.Chapter05.floor_add_ge
+  - id: nt:thm:factorials-dvd-factorial
+    declaration: ElementaryNumberTheory.Chapter05.factorials_dvd_factorial
+  - id: nt:thm:factorial-dvd-consecutive-product
+    declaration: ElementaryNumberTheory.Chapter05.factorial_dvd_consecutive_product
+  - id: nt:thm:sum-divisorsum
+    declaration: ElementaryNumberTheory.Chapter05.sum_divisorSum
+  - id: nt:thm:sum-tau
+    declaration: ElementaryNumberTheory.Chapter05.sum_tau
+  - id: nt:thm:sum-sigma
+    declaration: ElementaryNumberTheory.Chapter05.sum_sigma

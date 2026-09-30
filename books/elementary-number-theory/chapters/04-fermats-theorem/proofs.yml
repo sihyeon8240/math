@@ -1,1 +1,31 @@
-proofs: []
+proofs:
+  - id: nt:thm:fermat
+    declaration: ElementaryNumberTheory.Chapter04.fermat
+  - id: nt:thm:fermat-all
+    declaration: ElementaryNumberTheory.Chapter04.fermat_all
+  - id: nt:thm:composite-of-not-fermat
+    declaration: ElementaryNumberTheory.Chapter04.composite_of_not_fermat
+  - id: nt:thm:fermat-two-primes
+    declaration: ElementaryNumberTheory.Chapter04.fermat_two_primes
+  - id: nt:thm:pseudoprime-two-iff
+    declaration: ElementaryNumberTheory.Chapter04.pseudoprime_two_iff
+  - id: nt:thm:mersenne-pseudoprime
+    declaration: ElementaryNumberTheory.Chapter04.mersenne_pseudoprime
+  - id: nt:thm:infinite-odd-pseudoprimes
+    declaration: ElementaryNumberTheory.Chapter04.infinite_odd_pseudoprimes
+  - id: nt:thm:absolutepseudoprime-of-prime-product
+    declaration: ElementaryNumberTheory.Chapter04.absolutePseudoprime_of_prime_product
+  - id: nt:thm:absolutepseudoprime-squarefree
+    declaration: ElementaryNumberTheory.Chapter04.absolutePseudoprime_squareFree
+  - id: nt:thm:wilson
+    declaration: ElementaryNumberTheory.Chapter04.wilson
+  - id: nt:thm:prime-of-wilson
+    declaration: ElementaryNumberTheory.Chapter04.prime_of_wilson
+  - id: nt:thm:prime-iff-wilson
+    declaration: ElementaryNumberTheory.Chapter04.prime_iff_wilson
+  - id: nt:thm:half-factorial
+    declaration: ElementaryNumberTheory.Chapter04.half_factorial
+  - id: nt:thm:exists-square-eq-neg-one-iff
+    declaration: ElementaryNumberTheory.Chapter04.exists_square_eq_neg_one_iff
+  - id: nt:thm:infinite-factorial-composites
+    declaration: ElementaryNumberTheory.Chapter04.infinite_factorial_composites

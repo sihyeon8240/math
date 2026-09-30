@@ -60,7 +60,7 @@ theorem finrank_top [Module.Finite K V] :
     Module.finrank K (⊤ : Submodule K V) = Module.finrank K V := by
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
 
-  rw [finrank_eq_card_of_basisOf hs, ← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs]
+  rw [finrank_eq_card_of_basisOf hs, finrank_eq_card_of_basis hs]
 
 /-- Lemma: every vector in a finite-dimensional space of dimension zero is zero. -/
 theorem eq_zero_of_finrank_zero [Module.Finite K V]
@@ -68,7 +68,7 @@ theorem eq_zero_of_finrank_zero [Module.Finite K V]
   obtain ⟨s, hs⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
 
   have hc : s.card = 0 := by
-    exact (dimension_eq_card ⟨s, hs⟩ hs).symm.trans ((dimension_eq_finrank ⟨s, hs⟩).trans h)
+    exact (finrank_eq_card_of_basis hs).symm.trans h
 
   have he : s = ∅ := Finset.card_eq_zero.mp hc
 
@@ -82,7 +82,7 @@ theorem eq_zero_of_finrank_zero [Module.Finite K V]
 theorem finrank_bot : Module.finrank K (⊥ : Submodule K V) = 0 := by
   obtain ⟨s, hs, hc⟩ := zero_space_dimension (K := K) (V := (⊥ : Submodule K V))
 
-  rw [← dimension_eq_finrank ⟨s, hs⟩, dimension_eq_card ⟨s, hs⟩ hs, hc]
+  rw [finrank_eq_card_of_basis hs, hc]
 
 /-- Theorem: between spaces of equal finite dimension, injectivity implies bijectivity. -/
 theorem bijective_of_injective_of_finrank_eq [Module.Finite K V] [Module.Finite K W]

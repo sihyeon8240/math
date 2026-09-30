@@ -181,13 +181,10 @@ theorem isFiniteBasis_coe_of_isBasisOf {s : Finset V}
     IsFiniteBasis (K := K) (fun x : s => (x : V)) := by
   exact (finiteBasis_iff _).mpr ⟨basisOfSet hs, Module.Basis.coe_mk _ _⟩
 
-/-- Proposition: the locally determined finite dimension agrees
-with `Module.finrank`. -/
-theorem dimension_eq_finrank (h : HasFiniteBasis K V) : dimension h = Module.finrank K V := by
-  obtain ⟨s, hs⟩ := h
-
-  rw [dimension_eq_card ⟨s, hs⟩ hs]
-  simpa only [Fintype.card_coe] using (Module.finrank_eq_card_basis (basisOfSet hs)).symm
+/-- Proposition: the dimension is the cardinality of a finite basis. -/
+theorem finrank_eq_card_of_basis {s : Finset V}
+    (hs : IsBasisOf s (⊤ : Submodule K V)) : Module.finrank K V = s.card := by
+  simpa only [Fintype.card_coe] using Module.finrank_eq_card_basis (basisOfSet hs)
 
 /-- Definition: a basis of a subspace with vectors regarded as elements of that subspace. -/
 noncomputable def subspaceBasis {s : Finset V} {W : Submodule K V} (hs : IsBasisOf s W) :
@@ -247,8 +244,7 @@ theorem subspace_finrank_le [Module.Finite K V] (W : Submodule K V) :
   obtain ⟨t, ht⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
   obtain ⟨s, hs, hc⟩ := subspace_has_basis t ht.2 W
 
-  rw [finrank_eq_card_of_basisOf hs, ← dimension_eq_finrank ⟨t, ht⟩,
-    dimension_eq_card ⟨t, ht⟩ ht]
+  rw [finrank_eq_card_of_basisOf hs, finrank_eq_card_of_basis ht]
   exact hc
 
 /-- Theorem: a subspace of full finite dimension is the whole space. -/
@@ -258,8 +254,7 @@ theorem subspace_eq_top_of_finrank_eq [Module.Finite K V] (W : Submodule K V)
   obtain ⟨s, hs, _⟩ := subspace_has_basis t ht.2 W
 
   have hc : s.card = t.card := by
-    rw [← finrank_eq_card_of_basisOf hs, h, ← dimension_eq_finrank ⟨t, ht⟩,
-      dimension_eq_card ⟨t, ht⟩ ht]
+    rw [← finrank_eq_card_of_basisOf hs, h, finrank_eq_card_of_basis ht]
 
   exact hs.2.symm.trans (independent_full_card_is_basis ht hs.1 hc).2
 
@@ -272,7 +267,7 @@ theorem extend_to_basis [Module.Finite K V] (s : Finset V)
   obtain ⟨u, hu⟩ := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
   obtain ⟨t, hst, ht, _⟩ := extend_in_subspace u ⊤ (by rw [hu.2]) s hs (by simp)
 
-  exact ⟨t, hst, ht, (dimension_eq_card ⟨t, ht⟩ ht).symm.trans (dimension_eq_finrank ⟨t, ht⟩)⟩
+  exact ⟨t, hst, ht, (finrank_eq_card_of_basis ht).symm⟩
 
 /-- Theorem: an independent finite family is no larger than a generating family. -/
 theorem independent_le_generating {ι κ : Type*} [Fintype ι] [Fintype κ]
@@ -320,7 +315,7 @@ theorem independent_card_finrank_is_basis [Module.Finite K V]
   have hsc : s.card = t.card := by
     rw [show s.card = Fintype.card ι from
       (Finset.card_image_of_injective _ hv.injective).trans Finset.card_univ,
-      hc, ← dimension_eq_finrank ⟨t, ht⟩, dimension_eq_card ⟨t, ht⟩ ht]
+      hc, finrank_eq_card_of_basis ht]
 
   have hb := independent_full_card_is_basis ht hs hsc
 

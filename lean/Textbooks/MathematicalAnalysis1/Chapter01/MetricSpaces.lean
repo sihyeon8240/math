@@ -272,8 +272,7 @@ theorem closure_eq_union_derivedSet (E : Set X) :
 
       exact ⟨q, hq, by rwa [dist_comm]⟩
 
-/-- Lemma: a set is contained in its closure by the proved union characterization.
-Mathlib counterpart: `subset_closure`. -/
+/-- Lemma: a set is contained in its closure by the proved union characterization. -/
 theorem subset_closure (E : Set X) : E ⊆ closure E := by
   rw [closure_eq_union_derivedSet]
   exact fun _ hp => Or.inl hp

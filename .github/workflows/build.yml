@@ -58,13 +58,21 @@ jobs:
       - run: >-
           python3 -m pip install --disable-pip-version-check
           --requirement .github/requirements-ci.txt
-      - name: Cache Lean dependencies and build outputs
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      # Dependency archives are large; source edits must not duplicate them.
+      - name: Restore Lean dependencies
+        id: lean-dependencies
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: lean/.lake
-          key: lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-${{ hashFiles('lean/**/*.lean') }}
+          path: lean/.lake/packages
+          key: lean-dependencies-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}
+      - name: Restore Lean build outputs
+        id: lean-build
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: lean/.lake/build
+          key: lean-build-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-${{ hashFiles('lean/Textbooks.lean', 'lean/Textbooks/**/*.lean') }}
           restore-keys: |
-            lean-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-
+            lean-build-v2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('lean/lean-toolchain', 'lean/lake-manifest.json', 'lean/lakefile.toml') }}-
       - name: Set up the pinned Lean toolchain
         uses: leanprover/lean-action@50fcf42d2e460296f1a34b402e990d1b24f8b596 # v1
         with:
@@ -96,6 +104,23 @@ jobs:
       - name: GitHub Actions semantics
         if: steps.changes.outputs.structured == 'true'
         run: ./scripts/check-actions.sh
+      # PRs can restore main's caches without creating PR-scoped copies.
+      - name: Save Lean dependencies
+        if: >-
+          github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+          steps.lean-dependencies.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: lean/.lake/packages
+          key: ${{ steps.lean-dependencies.outputs.cache-primary-key }}
+      - name: Save Lean build outputs
+        if: >-
+          github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+          steps.lean-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: lean/.lake/build
+          key: ${{ steps.lean-build.outputs.cache-primary-key }}
   latex:
     name: Source formatting
     needs: prepare-image
