@@ -2,13 +2,6 @@ import Textbooks.LinearAlgebra.Chapter02.Multiplication
 import Textbooks.LinearAlgebra.Chapter03.Isomorphisms
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
-/-!
-Matrix maps and their unique matrices.
-Use Mathlib's `Matrix`, `mulVecLin`, and `LinearMap.toMatrix'` interfaces.
-The proofs below recover matrices from standard vectors and extend by finite
-linear combinations; they do not use Mathlib's matrix/map equivalence theorems.
--/
-
 namespace LinearAlgebra.Chapter04
 
 open scoped BigOperators Matrix

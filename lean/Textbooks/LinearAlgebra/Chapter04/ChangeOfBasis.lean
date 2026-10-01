@@ -1,12 +1,5 @@
 import Textbooks.LinearAlgebra.Chapter04.Representation
 
-/-!
-Change of coordinates and conjugacy.
-The transition from `c` to `b` is `toMatrix c b id`.
-Inverse notation uses the existing Chapter II inverse with its two-sided
-inverse witness, so no determinant theory is needed.
--/
-
 namespace LinearAlgebra.Chapter04
 
 open scoped Matrix

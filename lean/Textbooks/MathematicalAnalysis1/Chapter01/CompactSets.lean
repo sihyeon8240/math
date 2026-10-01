@@ -4,10 +4,6 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.Positivity
 
-/-! Core compactness results from the finite-open-subcover definition.
-No compactness, sequential compactness, or completeness theorem is used as a
-substitute for the arguments below. -/
-
 set_option autoImplicit false
 
 namespace MathematicalAnalysis1.Chapter01

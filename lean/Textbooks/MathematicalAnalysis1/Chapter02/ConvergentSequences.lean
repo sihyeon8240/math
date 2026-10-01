@@ -2,9 +2,6 @@ import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Tactic.Positivity
 
-/-! Core sequence results from the epsilon definition, with indices in ℕ
-starting at zero. -/
-
 set_option autoImplicit false
 
 namespace MathematicalAnalysis1.Chapter02

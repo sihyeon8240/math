@@ -2,9 +2,6 @@ import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Tactic.Tauto
 
-/-! Euclidean metric and boundary results. Euclidean norm identities are accepted
-finite-dimensional prerequisites; general metric topology lives in `MetricSpaces`. -/
-
 set_option autoImplicit false
 
 namespace MathematicalAnalysis1.Chapter01

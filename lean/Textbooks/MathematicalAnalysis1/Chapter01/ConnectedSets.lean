@@ -2,10 +2,6 @@ import Textbooks.MathematicalAnalysis1.Chapter01.MetricSpaces
 import Mathlib.Tactic.Ring
 import Mathlib.Topology.Connected.Basic
 
-/-! Core connectedness on the real line from the least-upper-bound property.
-The book permits the empty set to be connected, represented by `IsPreconnected`.
-The closure-based separation criterion is proved before the interval theorem. -/
-
 set_option autoImplicit false
 
 namespace MathematicalAnalysis1.Chapter01

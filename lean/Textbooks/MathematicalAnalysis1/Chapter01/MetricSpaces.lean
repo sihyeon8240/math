@@ -5,10 +5,6 @@ import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Push
 
-/-! Metric topology developed from balls and the metric axioms.
-Use Mathlib's metric interfaces directly; the core results use explicit metric arguments.
-The owning book policy specifies this boundary. -/
-
 set_option autoImplicit false
 
 namespace MathematicalAnalysis1.Chapter01
