@@ -22,3 +22,16 @@ import Textbooks.LinearAlgebra.Chapter03.Isomorphisms
 import Textbooks.LinearAlgebra.Chapter04.MatrixMaps
 import Textbooks.LinearAlgebra.Chapter04.Representation
 import Textbooks.LinearAlgebra.Chapter04.ChangeOfBasis
+
+import Textbooks.LinearAlgebra.Chapter05.ScalarProducts
+import Textbooks.LinearAlgebra.Chapter05.BilinearMatrices
+import Textbooks.LinearAlgebra.Chapter05.PositiveDefinite
+import Textbooks.LinearAlgebra.Chapter05.HermitianProducts
+import Textbooks.LinearAlgebra.Chapter05.CoordinateProducts
+import Textbooks.LinearAlgebra.Chapter05.IntegralProducts
+import Textbooks.LinearAlgebra.Chapter05.FourierCoefficients
+import Textbooks.LinearAlgebra.Chapter05.GramSchmidt
+import Textbooks.LinearAlgebra.Chapter05.OrthogonalComplements
+import Textbooks.LinearAlgebra.Chapter05.OrthogonalBases
+import Textbooks.LinearAlgebra.Chapter05.QuadraticForms
+import Textbooks.LinearAlgebra.Chapter05.Sylvester
