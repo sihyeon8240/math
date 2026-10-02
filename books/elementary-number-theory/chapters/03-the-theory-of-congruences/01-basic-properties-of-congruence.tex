@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:modeq-iff-dvd-sub}
+  \label{ent:thm:modeq-iff-dvd-sub}
   For integers $n,a,b$, congruence $a\equiv b\pmod n$ is equivalent to $n\mid a-b$.
 
   \begin{lean}
@@ -24,7 +24,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-iff-emod-eq}
+  \label{ent:thm:modeq-iff-emod-eq}
   Integers are congruent modulo $n$ exactly when their remainders on division by $n$ agree.
 
   \begin{lean}
@@ -41,7 +41,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-refl}
+  \label{ent:thm:modeq-refl}
   For all integers $n,a$, one has $a\equiv a\pmod n$.
 
   \begin{lean}
@@ -58,7 +58,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-symm}
+  \label{ent:thm:modeq-symm}
   If $a\equiv b\pmod n$, then $b\equiv a\pmod n$.
 
   \begin{lean}
@@ -75,7 +75,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-trans}
+  \label{ent:thm:modeq-trans}
   If $a\equiv b\pmod n$ and $b\equiv c\pmod n$, then $a\equiv c\pmod n$.
 
   \begin{lean}
@@ -93,7 +93,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-add}
+  \label{ent:thm:modeq-add}
   If $a\equiv b\pmod n$ and $c\equiv d\pmod n$, then $a+c\equiv b+d\pmod n$.
 
   \begin{lean}
@@ -115,7 +115,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-mul}
+  \label{ent:thm:modeq-mul}
   Under the same hypotheses, $ac\equiv bd\pmod n$.
 
   \begin{lean}
@@ -137,7 +137,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-pow}
+  \label{ent:thm:modeq-pow}
   If $a\equiv b\pmod n$, then $a^k\equiv b^k\pmod n$ for every natural number $k$, including zero.
 
   \begin{lean}
@@ -161,7 +161,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-zero-iff}
+  \label{ent:thm:modeq-zero-iff}
   For integers $n,a$, one has $a\equiv0\pmod n$ if and only if $n\mid a$.
 
   \begin{lean}
@@ -178,7 +178,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:existsunique-residue}
+  \label{ent:thm:existsunique-residue}
   For every positive modulus $n$ and integer $a$, there is exactly one natural number $r<n$ with
   $a\equiv r\pmod n$.
 
@@ -227,7 +227,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:complete-residue-system-iff}
+  \label{ent:thm:complete-residue-system-iff}
   For $n>0$, a family $(a_i)_{i\in\{0,\ldots,n-1\}}$ is a complete residue system precisely when
   congruent members have equal indices.
 
@@ -275,7 +275,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-cancel}
+  \label{ent:thm:modeq-cancel}
   If $\gcd(n,c)=1$ and $ca\equiv cb\pmod n$, then $a\equiv b\pmod n$.
 
   \begin{lean}
@@ -296,7 +296,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-cancel-gcd}
+  \label{ent:thm:modeq-cancel-gcd}
   Let $n\ne0$ and $g=\gcd(n,c)$.
   If $ca\equiv cb\pmod n$, then $a\equiv b\pmod{n/g}$.
 
@@ -352,7 +352,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:modeq-mul-zero-prime}
+  \label{ent:thm:modeq-mul-zero-prime}
   For a prime $p$, the congruence $ab\equiv0\pmod p$ implies $a\equiv0\pmod p$ or $b\equiv0\pmod
     p$.
 

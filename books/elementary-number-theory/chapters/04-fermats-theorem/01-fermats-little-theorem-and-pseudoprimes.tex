@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:fermat}
+  \label{ent:thm:fermat}
   If $p$ is prime and $p\nmid a$, then $a^{p-1}\equiv1\pmod p$.
 
   \begin{lean}
@@ -34,7 +34,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:fermat-all}
+  \label{ent:thm:fermat-all}
   For every prime $p$ and integer $a$, one has $a^p\equiv a\pmod p$.
 
   \begin{lean}
@@ -64,7 +64,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:composite-of-not-fermat}
+  \label{ent:thm:composite-of-not-fermat}
   If $n>1$ and $a^n\not\equiv a\pmod n$ for some integer $a$, then $n$ is composite.
 
   \begin{lean}
@@ -82,7 +82,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:fermat-two-primes}
+  \label{ent:thm:fermat-two-primes}
   Let $p\ne q$ be primes.
   If $a^p\equiv a\pmod q$ and $a^q\equiv a\pmod p$, then $a^{pq}\equiv a\pmod{pq}$.
 
@@ -143,7 +143,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:pseudoprime-two-iff}
+  \label{ent:thm:pseudoprime-two-iff}
   For an odd composite $n$, the base-two pseudoprime condition is equivalent to
   $2^{n-1}\equiv1\pmod n$.
 
@@ -185,7 +185,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:mersenne-pseudoprime}
+  \label{ent:thm:mersenne-pseudoprime}
   If $n$ is a base-two pseudoprime, then $M_n$ is a larger base-two pseudoprime.
   In particular, this holds for every odd pseudoprime.
 
@@ -251,7 +251,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:infinite-odd-pseudoprimes}
+  \label{ent:thm:infinite-odd-pseudoprimes}
   There are infinitely many odd base-two pseudoprimes.
 
   \begin{lean}
@@ -276,7 +276,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:absolutepseudoprime-of-prime-product}
+  \label{ent:thm:absolutepseudoprime-of-prime-product}
   Let $n$ be a composite product of distinct primes.
   If $p-1\mid n-1$ for every prime in the product, then $n$ is an absolute pseudoprime.
 
@@ -320,7 +320,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:absolutepseudoprime-squarefree}
+  \label{ent:thm:absolutepseudoprime-squarefree}
   Every absolute pseudoprime is square-free.
 
   \begin{lean}

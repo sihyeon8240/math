@@ -1,5 +1,5 @@
 \begin{lemma}
-  \label{nt:lem:prime-divisor-exists}
+  \label{ent:lem:prime-divisor-exists}
   Every natural number $n>1$ has a prime divisor $p\le n$.
 
   \begin{lean}
@@ -28,7 +28,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:composite-prime-divisor-sqrt}
+  \label{ent:thm:composite-prime-divisor-sqrt}
   If $n>1$ is composite, it has a prime divisor $p$ satisfying $p\le\sqrt n$.
   For integer $p$, this is equivalent to $p\le\lfloor\sqrt n\rfloor$; Lean uses the natural square
   root, characterized by $p\le\operatorname{sqrt}(n)$ if and only if $p^2\le n$.
@@ -97,7 +97,7 @@ Consequently, a sieve need only test prime divisors up to the square root: a num
 one with no such prime divisor cannot be composite.
 
 \begin{lemma}
-  \label{nt:lem:factorial-multiple}
+  \label{ent:lem:factorial-multiple}
   For natural numbers $k,n$ with $0<k\le n$, there is a natural number $t$ such that $n!
     =kt$.
 
@@ -132,7 +132,7 @@ one with no such prime divisor cannot be composite.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-not-divide-consecutive}
+  \label{ent:lem:prime-not-divide-consecutive}
   If a prime $p$ divides $M+1$, it does not divide $M$.
 
   \begin{lean}
@@ -156,7 +156,7 @@ one with no such prime divisor cannot be composite.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-above-bound}
+  \label{ent:lem:prime-above-bound}
   For every natural number $m$, some prime exceeds $m$.
 
   \begin{lean}
@@ -191,7 +191,7 @@ one with no such prime divisor cannot be composite.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:infinitely-many-primes}
+  \label{ent:thm:infinitely-many-primes}
   There are infinitely many prime numbers.
 
   \begin{lean}
@@ -220,7 +220,7 @@ contains every prime.
 Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 
 \begin{lemma}
-  \label{nt:lem:next-prime-product-bound}
+  \label{ent:lem:next-prime-product-bound}
   For every $n\ge0$, the next prime satisfies $p_{n+1}\le P_n+1$.
 
   \begin{lean}
@@ -273,7 +273,7 @@ Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-product-double-exponential}
+  \label{ent:lem:prime-product-double-exponential}
   For every $n\ge0$, we have $P_n<2^{2^n}$.
 
   \begin{lean}
@@ -314,7 +314,7 @@ Put $P_0=1$ and $P_n=p_1\cdots p_n$ for $n>0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:nth-prime-double-exponential}
+  \label{ent:thm:nth-prime-double-exponential}
   For the $n$th prime $p_n$, with $n\ge1$, we have $p_n\le2^{2^{n-1}}$.
 
   \begin{lean}

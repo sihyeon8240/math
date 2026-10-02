@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:floor-spec}
+  \label{ent:thm:floor-spec}
   For every real $x$, its greatest integer satisfies $\lfloor x\rfloor\le x<\lfloor x\rfloor+1$.
   In particular, $x=\lfloor x\rfloor+\theta$ for a real $0\le\theta<1$.
 
@@ -24,7 +24,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-eq-self-iff}
+  \label{ent:thm:floor-eq-self-iff}
   A real number equals its floor exactly when it is an integer.
 
   \begin{lean}
@@ -48,7 +48,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-nat-div}
+  \label{ent:thm:floor-nat-div}
   For natural $N$ and positive $k$, the integer quotient is $N/k=\lfloor N/k\rfloor$, where the
   quotient inside the floor is taken in the real numbers.
 
@@ -83,7 +83,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:card-multiples}
+  \label{ent:thm:card-multiples}
   The number of multiples of positive $k$ in $\{1,\ldots,N\}$ is $\lfloor N/k\rfloor$.
 
   \begin{lean}
@@ -141,7 +141,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:legendre}
+  \label{ent:thm:legendre}
   For a prime $p$ and natural $n$, the exponent of $p$ in $n!
   $ is \[ v_p(n!)=\sum_{j=1}^{n}\left\lfloor\frac{n}{p^j}\right\rfloor. \] Larger indices contribute zero, so this is also the usual finite sum over $j\ge1$.
 
@@ -165,7 +165,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-add-carry}
+  \label{ent:thm:floor-add-carry}
   For real $a,b$, the difference $\lfloor a+b\rfloor-\lfloor a\rfloor-\lfloor b\rfloor$ is either
   zero or one.
 
@@ -200,7 +200,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-add-ge}
+  \label{ent:thm:floor-add-ge}
   For all real $a,b$, $\lfloor a+b\rfloor\ge\lfloor a\rfloor+\lfloor b\rfloor$.
 
   \begin{lean}
@@ -217,7 +217,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:factorials-dvd-factorial}
+  \label{ent:thm:factorials-dvd-factorial}
   For natural $r\le n$, the factorial quotient $n!
     /(r!(n-r)!)$ is an integer.
   This includes the endpoint cases $r=0,n$, when the quotient is one.
@@ -272,7 +272,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:factorial-dvd-consecutive-product}
+  \label{ent:thm:factorial-dvd-consecutive-product}
   The product of any $r$ consecutive positive integers is divisible by $r!
   $.
   More precisely, $r!
@@ -316,7 +316,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-divisorsum}
+  \label{ent:thm:sum-divisorsum}
   For $F(n)=\sum_{d\mid n}f(d)$ and every natural $N$, \[ \sum_{n=1}^N F(n)=\sum_{k=1}^N f(k)\left\lfloor\frac Nk\right\rfloor. \] No multiplicativity assumption is needed.
 
   \begin{lean}
@@ -368,7 +368,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-tau}
+  \label{ent:thm:sum-tau}
   For natural $N$, \[ \sum_{n=1}^N\tau(n)=\sum_{k=1}^N\left\lfloor\frac Nk\right\rfloor. \]
 
   \begin{lean}
@@ -388,7 +388,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-sigma}
+  \label{ent:thm:sum-sigma}
   For natural $N$, \[ \sum_{n=1}^N\sigma(n)=\sum_{k=1}^N k\left\lfloor\frac Nk\right\rfloor. \]
 
   \begin{lean}

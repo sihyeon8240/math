@@ -3,7 +3,7 @@ Pairs with the same common divisors have equal gcds: for nonzero pairs, each gcd
 other; a zero pair is characterized by having zero as a common divisor.
 
 \begin{lemma}
-  \label{nt:thm:gcd-remainder}
+  \label{ent:thm:gcd-remainder}
   If $a,b,q,r\in\Z$ and $a=qb+r$, then $\gcd(a,b)=\gcd(b,r)$.
   No sign or size condition on the remainder is needed for this identity.
 
@@ -47,7 +47,7 @@ other; a zero pair is characterized by having zero as a common divisor.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:thm:gcd-abs}
+  \label{ent:thm:gcd-abs}
   For all integers $a,b$, taking absolute values leaves the gcd unchanged:
   $\gcd(|a|,|b|)=\gcd(a,b)$.
 
@@ -96,7 +96,7 @@ is followed by $(b,r)$.
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:euclidean-termination}
+  \label{ent:thm:euclidean-termination}
   For every $a,b\in\N$, a finite Euclidean division trace starts at $(a,b)$ and ends at some
   $(g,0)$.
 
@@ -135,7 +135,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:euclidean-correctness}
+  \label{ent:thm:euclidean-correctness}
   If a Euclidean trace starts at $(a,b)$ and ends at $(g,0)$, then $\gcd(a,b)=g$.
 
   \begin{lean}
@@ -161,7 +161,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:euclidean-positive}
+  \label{ent:thm:euclidean-positive}
   If the initial second input $b$ is positive, then the terminal entry $g$ of a Euclidean trace is
   positive.
   Hence it is the last nonzero remainder, or the initial divisor if the first remainder is zero.
@@ -186,7 +186,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-positive-factor}
+  \label{ent:thm:gcd-positive-factor}
   For integers $a,b,k$ with $k>0$, we have $\gcd(ka,kb)=k\gcd(a,b)$.
 
   \begin{lean}
@@ -253,7 +253,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:gcd-nonzero-factor}
+  \label{ent:thm:gcd-nonzero-factor}
   For integers $a,b$ and any nonzero integer $k$, we have $\gcd(ka,kb)=|k|\gcd(a,b)$.
 
   \begin{lean}
@@ -280,7 +280,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:thm:positive-common-multiple}
+  \label{ent:thm:positive-common-multiple}
   Any two nonzero integers $a,b$ have a positive natural number that is divisible by both.
 
   \begin{lean}
@@ -324,7 +324,7 @@ is followed by $(b,r)$.
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:lcm-spec}
+  \label{ent:thm:lcm-spec}
   For nonzero integers $a,b$, the number $m=\operatorname{lcm}(a,b)$ is positive, satisfies $a\mid
     m$ and $b\mid m$, and obeys $m\le c$ for every positive integer common multiple $c$.
 
@@ -368,7 +368,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-lcm-product}
+  \label{ent:thm:gcd-lcm-product}
   For positive integers $a,b$, we have $\gcd(a,b)\operatorname{lcm}(a,b)=ab$.
 
   \begin{lean}

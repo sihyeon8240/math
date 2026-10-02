@@ -1,31 +1,31 @@
 proofs:
-  - id: nt:thm:fermat
+  - id: ent:thm:fermat
     declaration: ElementaryNumberTheory.Chapter04.fermat
-  - id: nt:thm:fermat-all
+  - id: ent:thm:fermat-all
     declaration: ElementaryNumberTheory.Chapter04.fermat_all
-  - id: nt:thm:composite-of-not-fermat
+  - id: ent:thm:composite-of-not-fermat
     declaration: ElementaryNumberTheory.Chapter04.composite_of_not_fermat
-  - id: nt:thm:fermat-two-primes
+  - id: ent:thm:fermat-two-primes
     declaration: ElementaryNumberTheory.Chapter04.fermat_two_primes
-  - id: nt:thm:pseudoprime-two-iff
+  - id: ent:thm:pseudoprime-two-iff
     declaration: ElementaryNumberTheory.Chapter04.pseudoprime_two_iff
-  - id: nt:thm:mersenne-pseudoprime
+  - id: ent:thm:mersenne-pseudoprime
     declaration: ElementaryNumberTheory.Chapter04.mersenne_pseudoprime
-  - id: nt:thm:infinite-odd-pseudoprimes
+  - id: ent:thm:infinite-odd-pseudoprimes
     declaration: ElementaryNumberTheory.Chapter04.infinite_odd_pseudoprimes
-  - id: nt:thm:absolutepseudoprime-of-prime-product
+  - id: ent:thm:absolutepseudoprime-of-prime-product
     declaration: ElementaryNumberTheory.Chapter04.absolutePseudoprime_of_prime_product
-  - id: nt:thm:absolutepseudoprime-squarefree
+  - id: ent:thm:absolutepseudoprime-squarefree
     declaration: ElementaryNumberTheory.Chapter04.absolutePseudoprime_squareFree
-  - id: nt:thm:wilson
+  - id: ent:thm:wilson
     declaration: ElementaryNumberTheory.Chapter04.wilson
-  - id: nt:thm:prime-of-wilson
+  - id: ent:thm:prime-of-wilson
     declaration: ElementaryNumberTheory.Chapter04.prime_of_wilson
-  - id: nt:thm:prime-iff-wilson
+  - id: ent:thm:prime-iff-wilson
     declaration: ElementaryNumberTheory.Chapter04.prime_iff_wilson
-  - id: nt:thm:half-factorial
+  - id: ent:thm:half-factorial
     declaration: ElementaryNumberTheory.Chapter04.half_factorial
-  - id: nt:thm:exists-square-eq-neg-one-iff
+  - id: ent:thm:exists-square-eq-neg-one-iff
     declaration: ElementaryNumberTheory.Chapter04.exists_square_eq_neg_one_iff
-  - id: nt:thm:infinite-factorial-composites
+  - id: ent:thm:infinite-factorial-composites
     declaration: ElementaryNumberTheory.Chapter04.infinite_factorial_composites

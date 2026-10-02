@@ -36,7 +36,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:dvd-iff-primeexponents-le}
+  \label{ent:thm:dvd-iff-primeexponents-le}
   For positive $d,n$, one has $d\mid n$ precisely when $e_d(p)\le e_n(p)$ for every prime $p$.
 
   \begin{lean}
@@ -73,7 +73,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:divisor-exponents}
+  \label{ent:thm:divisor-exponents}
   Every exponent vector $0\le e\le e_n$ gives a positive divisor $V(e)$ of $n$, whose prime
   multiplicities are exactly $e$.
   Consequently these choices describe the divisors uniquely.
@@ -112,7 +112,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:tau-eq-prod}
+  \label{ent:thm:tau-eq-prod}
   For positive $n=\prod_p p^{e_n(p)}$, \[ \tau(n)=\prod_{p\mid n}(e_n(p)+1). \] The product is one when $n=1$.
 
   \begin{lean}
@@ -164,7 +164,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-one}
+  \label{ent:thm:multiplicative-one}
   If a multiplicative function is nonzero at some positive argument, then $f(1)=1$.
 
   \begin{lean}
@@ -191,7 +191,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:existsunique-divisor-split}
+  \label{ent:thm:existsunique-divisor-split}
   For positive coprime $m,n$, each divisor $d\mid mn$ has a unique expression $d=ab$ with $a\mid
     m$ and $b\mid n$.
 
@@ -232,7 +232,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:divisorsum-multiplicative}
+  \label{ent:thm:divisorsum-multiplicative}
   If $f$ is multiplicative, then its divisor sum is multiplicative.
 
   \begin{lean}
@@ -259,7 +259,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:tau-multiplicative}
+  \label{ent:thm:tau-multiplicative}
   The function $\tau$ is multiplicative.
 
   \begin{lean}
@@ -279,7 +279,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sigma-multiplicative}
+  \label{ent:thm:sigma-multiplicative}
   The function $\sigma$ is multiplicative.
 
   \begin{lean}
@@ -299,7 +299,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-prime-powers}
+  \label{ent:thm:multiplicative-prime-powers}
   For $n>1$, a multiplicative function satisfies $f(n)=\prod_{p\mid n}f(p^{e_n(p)})$.
   This also holds for the zero function.
 
@@ -340,7 +340,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:tau-prime-pow}
+  \label{ent:thm:tau-prime-pow}
   If $p$ is prime and $k\ge0$, then $\tau(p^k)=k+1$.
 
   \begin{lean}
@@ -361,7 +361,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sigma-prime-pow}
+  \label{ent:thm:sigma-prime-pow}
   If $p$ is prime and $k\ge0$, then $\sigma(p^k)=1+p+\cdots+p^k$.
 
   \begin{lean}
@@ -382,7 +382,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sigma-eq-prod}
+  \label{ent:thm:sigma-eq-prod}
   For $n>1$, \[ \sigma(n)=\prod_{p\mid n}\bigl(1+p+\cdots+p^{e_n(p)}\bigr). \]
 
   \begin{lean}
@@ -405,7 +405,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sigma-eq-prod-quotients}
+  \label{ent:thm:sigma-eq-prod-quotients}
   For $n>1$, \[ \sigma(n)=\prod_{p\mid n}\frac{p^{e_n(p)+1}-1}{p-1}. \] Each quotient is an integer.
 
   \begin{lean}
@@ -429,7 +429,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:tau-sigma-one}
+  \label{ent:thm:tau-sigma-one}
   One has $\tau(1)=\sigma(1)=1$.
 
   \begin{lean}
@@ -446,7 +446,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:tau-eq-two-iff}
+  \label{ent:thm:tau-eq-two-iff}
   For $n>1$, one has $\tau(n)=2$ exactly when $n$ is prime.
 
   \begin{lean}
@@ -508,7 +508,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sigma-eq-succ-iff}
+  \label{ent:thm:sigma-eq-succ-iff}
   For $n>1$, one has $\sigma(n)=n+1$ exactly when $n$ is prime.
 
   \begin{lean}
@@ -590,7 +590,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:prod-divisors-sq}
+  \label{ent:thm:prod-divisors-sq}
   For positive $n$, the product of its divisors satisfies \[ \left(\prod_{d\mid n}d\right)^2=n^{\tau(n)}. \] Equivalently, as positive real numbers, the product is $n^{\tau(n)/2}$; the squared form avoids truncating the half-exponent.
 
   \begin{lean}

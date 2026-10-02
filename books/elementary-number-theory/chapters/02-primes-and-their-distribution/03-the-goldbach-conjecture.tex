@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:consecutive-composites}
+  \label{ent:thm:consecutive-composites}
   For every positive integer $n$, there exist $n$ consecutive composite integers.
 
   \begin{lean}
@@ -42,7 +42,7 @@
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:product-four-mul-add-one}
+  \label{ent:lem:product-four-mul-add-one}
   A product of two or more integers of the form $4k+1$, with $k\in\Z$, again has that form.
   More generally, this holds for any finite list, including the empty product.
 
@@ -77,7 +77,7 @@ The notation $a\bmod4$ below means the remainder upon division by $4$; in Lean i
 The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in $\{0,1,2,3\}$.
 
 \begin{lemma}
-  \label{nt:lem:prime-remainders-four}
+  \label{ent:lem:prime-remainders-four}
   A prime $p$ is either $2$, or has remainder $1$ or $3$ upon division by $4$.
 
   \begin{lean}
@@ -120,7 +120,7 @@ The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-divisor-four-mul-add-three}
+  \label{ent:lem:prime-divisor-four-mul-add-three}
   If $n\bmod4=3$, then $n$ has a prime divisor whose remainder upon division by $4$ is also $3$.
 
   \begin{lean}
@@ -180,7 +180,7 @@ The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-four-mul-add-three-above-bound}
+  \label{ent:lem:prime-four-mul-add-three-above-bound}
   For every natural number $m$, there is a prime $p>m$ of the form $p=4k+3$ with $k\in\N$.
 
   \begin{lean}
@@ -234,7 +234,7 @@ The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:infinitely-many-primes-four-mul-add-three}
+  \label{ent:thm:infinitely-many-primes-four-mul-add-three}
   There are infinitely many primes of the form $4k+3$, with $k\in\N$.
 
   \begin{lean}
@@ -257,7 +257,7 @@ The division algorithm gives $a=4\lfloor a/4\rfloor+(a\bmod4)$ with remainder in
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:prime-progression-common-difference}
+  \label{ent:thm:prime-progression-common-difference}
   Let $p,d\in\N$ and $n>2$.
   If every term of
   \[

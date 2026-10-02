@@ -1,69 +1,69 @@
 proofs:
-  - id: nt:thm:modeq-iff-dvd-sub
+  - id: ent:thm:modeq-iff-dvd-sub
     declaration: ElementaryNumberTheory.Chapter03.modEq_iff_dvd_sub
-  - id: nt:thm:modeq-iff-emod-eq
+  - id: ent:thm:modeq-iff-emod-eq
     declaration: ElementaryNumberTheory.Chapter03.modEq_iff_emod_eq
-  - id: nt:thm:modeq-refl
+  - id: ent:thm:modeq-refl
     declaration: ElementaryNumberTheory.Chapter03.modEq_refl
-  - id: nt:thm:modeq-symm
+  - id: ent:thm:modeq-symm
     declaration: ElementaryNumberTheory.Chapter03.modEq_symm
-  - id: nt:thm:modeq-trans
+  - id: ent:thm:modeq-trans
     declaration: ElementaryNumberTheory.Chapter03.modEq_trans
-  - id: nt:thm:modeq-add
+  - id: ent:thm:modeq-add
     declaration: ElementaryNumberTheory.Chapter03.modEq_add
-  - id: nt:thm:modeq-mul
+  - id: ent:thm:modeq-mul
     declaration: ElementaryNumberTheory.Chapter03.modEq_mul
-  - id: nt:thm:modeq-pow
+  - id: ent:thm:modeq-pow
     declaration: ElementaryNumberTheory.Chapter03.modEq_pow
-  - id: nt:thm:modeq-zero-iff
+  - id: ent:thm:modeq-zero-iff
     declaration: ElementaryNumberTheory.Chapter03.modEq_zero_iff
-  - id: nt:thm:existsunique-residue
+  - id: ent:thm:existsunique-residue
     declaration: ElementaryNumberTheory.Chapter03.existsUnique_residue
-  - id: nt:thm:complete-residue-system-iff
+  - id: ent:thm:complete-residue-system-iff
     declaration: ElementaryNumberTheory.Chapter03.complete_residue_system_iff
-  - id: nt:thm:modeq-cancel
+  - id: ent:thm:modeq-cancel
     declaration: ElementaryNumberTheory.Chapter03.modEq_cancel
-  - id: nt:thm:modeq-cancel-gcd
+  - id: ent:thm:modeq-cancel-gcd
     declaration: ElementaryNumberTheory.Chapter03.modEq_cancel_gcd
-  - id: nt:thm:modeq-mul-zero-prime
+  - id: ent:thm:modeq-mul-zero-prime
     declaration: ElementaryNumberTheory.Chapter03.modEq_mul_zero_prime
-  - id: nt:thm:existsunique-digits
+  - id: ent:thm:existsunique-digits
     declaration: ElementaryNumberTheory.Chapter03.existsUnique_digits
-  - id: nt:thm:existsunique-binary-digits
+  - id: ent:thm:existsunique-binary-digits
     declaration: ElementaryNumberTheory.Chapter03.existsUnique_binary_digits
-  - id: nt:thm:positionalvalue-modeq
+  - id: ent:thm:positionalvalue-modeq
     declaration: ElementaryNumberTheory.Chapter03.positionalValue_modEq
-  - id: nt:thm:nine-dvd-iff-digit-sum
+  - id: ent:thm:nine-dvd-iff-digit-sum
     declaration: ElementaryNumberTheory.Chapter03.nine_dvd_iff_digit_sum
-  - id: nt:thm:three-dvd-iff-digit-sum
+  - id: ent:thm:three-dvd-iff-digit-sum
     declaration: ElementaryNumberTheory.Chapter03.three_dvd_iff_digit_sum
-  - id: nt:thm:eleven-dvd-iff-alternating-sum
+  - id: ent:thm:eleven-dvd-iff-alternating-sum
     declaration: ElementaryNumberTheory.Chapter03.eleven_dvd_iff_alternating_sum
-  - id: nt:thm:two-dvd-iff-last-digit
+  - id: ent:thm:two-dvd-iff-last-digit
     declaration: ElementaryNumberTheory.Chapter03.two_dvd_iff_last_digit
-  - id: nt:thm:five-dvd-iff-last-digit
+  - id: ent:thm:five-dvd-iff-last-digit
     declaration: ElementaryNumberTheory.Chapter03.five_dvd_iff_last_digit
-  - id: nt:thm:four-dvd-iff-last-two-digits
+  - id: ent:thm:four-dvd-iff-last-two-digits
     declaration: ElementaryNumberTheory.Chapter03.four_dvd_iff_last_two_digits
-  - id: nt:thm:detects-single-digit-error
+  - id: ent:thm:detects-single-digit-error
     declaration: ElementaryNumberTheory.Chapter03.detects_single_digit_error
-  - id: nt:thm:linear-modeq-iff
+  - id: ent:thm:linear-modeq-iff
     declaration: ElementaryNumberTheory.Chapter03.linear_modEq_iff
-  - id: nt:thm:exists-linear-modeq-iff
+  - id: ent:thm:exists-linear-modeq-iff
     declaration: ElementaryNumberTheory.Chapter03.exists_linear_modEq_iff
-  - id: nt:thm:linear-modeq-iff-eq-add
+  - id: ent:thm:linear-modeq-iff-eq-add
     declaration: ElementaryNumberTheory.Chapter03.linear_modEq_iff_eq_add
-  - id: nt:thm:linear-solution-classes
+  - id: ent:thm:linear-solution-classes
     declaration: ElementaryNumberTheory.Chapter03.linear_solution_classes
-  - id: nt:thm:exists-modularinverse
+  - id: ent:thm:exists-modularinverse
     declaration: ElementaryNumberTheory.Chapter03.exists_modularInverse
-  - id: nt:thm:exists-unique-linear-modeq
+  - id: ent:thm:exists-unique-linear-modeq
     declaration: ElementaryNumberTheory.Chapter03.exists_unique_linear_modEq
-  - id: nt:thm:linear-modeq-iff-inverse
+  - id: ent:thm:linear-modeq-iff-inverse
     declaration: ElementaryNumberTheory.Chapter03.linear_modEq_iff_inverse
-  - id: nt:thm:chinese-remainder
+  - id: ent:thm:chinese-remainder
     declaration: ElementaryNumberTheory.Chapter03.chinese_remainder
-  - id: nt:thm:linear-system-iff
+  - id: ent:thm:linear-system-iff
     declaration: ElementaryNumberTheory.Chapter03.linear_system_iff
-  - id: nt:thm:exists-unique-linear-system
+  - id: ent:thm:exists-unique-linear-system
     declaration: ElementaryNumberTheory.Chapter03.exists_unique_linear_system

@@ -19,7 +19,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:prime-divides-product}
+  \label{ent:thm:prime-divides-product}
   Let $p$ be prime and let $a,b\in\Z$.
   If $p\mid ab$, then $p\mid a$ or $p\mid b$.
 
@@ -68,7 +68,7 @@
 \end{proof}
 
 \begin{corollary}
-  \label{nt:cor:prime-divides-finite-product}
+  \label{ent:cor:prime-divides-finite-product}
   If a prime $p$ divides the product of a finite list of integers, then it divides at least one
   member of that list.
 
@@ -109,7 +109,7 @@
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-divides-natural-product}
+  \label{ent:lem:prime-divides-natural-product}
   If $p$ is prime and $a,b\in\N$, then $p\mid ab$ implies $p\mid a$ or $p\mid b$.
 
   \begin{lean}
@@ -134,7 +134,7 @@
 \end{proof}
 
 \begin{corollary}
-  \label{nt:cor:prime-in-prime-product}
+  \label{ent:cor:prime-in-prime-product}
   If $p$ and all members of a finite list $q_1,\ldots,q_n$ are prime, and $p\mid q_1\cdots q_n$,
   then $p=q_k$ for some $1\le k\le n$.
   List membership expresses this conclusion without choosing an indexing convention.
@@ -188,7 +188,7 @@ Two lists are permutations of each other when they have the same entries with th
 multiplicities, possibly in different orders.
 
 \begin{lemma}
-  \label{nt:lem:prime-factor-existence}
+  \label{ent:lem:prime-factor-existence}
   Every natural number $n>0$ is the product of a finite list of primes; for $n=1$ the list may be
   empty.
 
@@ -261,7 +261,7 @@ multiplicities, possibly in different orders.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:lem:prime-factor-permutation}
+  \label{ent:lem:prime-factor-permutation}
   Two finite lists of primes with the same product are permutations of one another.
 
   \begin{lean}
@@ -326,7 +326,7 @@ multiplicities, possibly in different orders.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:fundamental-theorem-arithmetic}
+  \label{ent:thm:fundamental-theorem-arithmetic}
   Every natural number $n>1$ is a prime or a product of primes.
   Its prime factor list is nonempty and is unique up to permutation; a list with one entry
   represents the prime case.
@@ -372,7 +372,7 @@ Passing between multisets and exponent functions only groups or repeats entries;
 a factorization result.
 
 \begin{lemma}
-  \label{nt:lem:unique-prime-exponents}
+  \label{ent:lem:unique-prime-exponents}
   For every $n>0$ there is a unique finitely supported function $e\colon\N\to\N$ whose support
   consists of primes and for which $\prod_{p\in\operatorname{supp}(e)}p^{e(p)}=n$.
 
@@ -450,7 +450,7 @@ a factorization result.
 \end{definition}
 
 \begin{corollary}
-  \label{nt:cor:unique-canonical-factorization}
+  \label{ent:cor:unique-canonical-factorization}
   Every natural number $n>1$ has exactly one canonical factorization $(L,e)$.
 
   \begin{lean}
@@ -497,7 +497,7 @@ a factorization result.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:cor:canonical-factorization-product}
+  \label{ent:cor:canonical-factorization-product}
   If $(L,e)$ is the canonical factorization of $n>1$, then $L$ is nonempty.
   Writing
   $L=(p_1,\ldots,p_r)$ and $k_i=e(p_i)$, we have

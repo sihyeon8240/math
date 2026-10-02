@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:linear-modeq-iff}
+  \label{ent:thm:linear-modeq-iff}
   For integers $n,a,b,x$, the congruence $ax\equiv b\pmod n$ is equivalent to the existence of an
   integer $y$ with $ax+ny=b$.
 
@@ -26,7 +26,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:exists-linear-modeq-iff}
+  \label{ent:thm:exists-linear-modeq-iff}
   The congruence $ax\equiv b\pmod n$ is solvable exactly when $\gcd(a,n)\mid b$.
 
   \begin{lean}
@@ -45,7 +45,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:linear-modeq-iff-eq-add}
+  \label{ent:thm:linear-modeq-iff-eq-add}
   Let $n\ne0$, $g=\gcd(a,n)$, and let $x_0$ solve $ax\equiv b\pmod n$.
   The solutions are precisely $x=x_0+(n/g)t$ with $t\in\mathbb Z$.
 
@@ -83,7 +83,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:linear-solution-classes}
+  \label{ent:thm:linear-solution-classes}
   For $n>0$, a solvable linear congruence has exactly $g=\gcd(a,n)$ incongruent solutions.
   They are represented by $x_0+(n/g)t$ for $0\le t<g$, and each solution belongs to exactly one of
   these classes.
@@ -200,7 +200,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:exists-modularinverse}
+  \label{ent:thm:exists-modularinverse}
   If $\gcd(a,n)=1$, an inverse of $a$ modulo $n$ exists.
 
   \begin{lean}
@@ -219,7 +219,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:exists-unique-linear-modeq}
+  \label{ent:thm:exists-unique-linear-modeq}
   For $n\ne0$ and $\gcd(a,n)=1$, every linear congruence $ax\equiv b\pmod n$ has one solution
   class modulo $n$.
 
@@ -257,7 +257,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:linear-modeq-iff-inverse}
+  \label{ent:thm:linear-modeq-iff-inverse}
   If $au\equiv1\pmod n$, then $ax\equiv b\pmod n$ is equivalent to $x\equiv ub\pmod n$.
 
   \begin{lean}
@@ -296,7 +296,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:chinese-remainder}
+  \label{ent:thm:chinese-remainder}
   Let $(n_i)_{i\in S}$ be a finite family of nonzero, pairwise coprime integer moduli.
   For any integers $a_i$, the system $x\equiv a_i\pmod{n_i}$ has a solution, and all solutions form
   one class modulo $\prod_{i\in S}n_i$.
@@ -412,7 +412,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:linear-system-iff}
+  \label{ent:thm:linear-system-iff}
   Let $\Delta=ad-bc$ and suppose $\Delta t\equiv1\pmod n$.
   The system $ax+by\equiv r$, $cx+dy\equiv s\pmod n$ is equivalent to $x\equiv t(dr-bs)$ and
   $y\equiv t(as-cr)\pmod n$.
@@ -443,7 +443,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:exists-unique-linear-system}
+  \label{ent:thm:exists-unique-linear-system}
   If $\gcd(ad-bc,n)=1$, the two-variable system has a unique solution pair modulo $n$.
 
   \begin{lean}

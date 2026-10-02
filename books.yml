@@ -21,8 +21,7 @@ books:
   - slug: elementary-number-theory
     title: Elementary Number Theory
     version: 0.1.0
-    short_title: Number Theory
-    label_prefix: nt
+    label_prefix: ent
     lean_module: ElementaryNumberTheory
     status: draft
     order: 30

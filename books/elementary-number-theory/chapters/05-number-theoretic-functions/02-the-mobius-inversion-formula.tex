@@ -19,7 +19,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:mobius-one}
+  \label{ent:thm:mobius-one}
   The M\"obius function has $\mu(1)=1$.
 
   \begin{lean}
@@ -36,7 +36,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-prime-pow}
+  \label{ent:thm:mobius-prime-pow}
   For a prime $p$, $\mu(p^k)=w(k)$: the values are one for $k=0$, minus one for $k=1$, and zero
   thereafter.
 
@@ -60,7 +60,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-eq-zero-of-prime-sq-dvd}
+  \label{ent:thm:mobius-eq-zero-of-prime-sq-dvd}
   If $n>0$ and $p^2\mid n$ for a prime $p$, then $\mu(n)=0$.
 
   \begin{lean}
@@ -91,7 +91,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-eq-sign}
+  \label{ent:thm:mobius-eq-sign}
   If positive $n$ has no prime-square divisor and has $r$ distinct prime factors, then
   $\mu(n)=(-1)^r$.
 
@@ -132,7 +132,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-multiplicative}
+  \label{ent:thm:mobius-multiplicative}
   The M\"obius function is multiplicative.
 
   \begin{lean}
@@ -155,7 +155,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-mobius}
+  \label{ent:thm:sum-mobius}
   For positive $n$, \[ \sum_{d\mid n}\mu(d)=
     \begin{cases}
       1 & n=1, \\0&n>1.
@@ -198,7 +198,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-inversion}
+  \label{ent:thm:mobius-inversion}
   Let $F(n)=\sum_{d\mid n}f(d)$ for every positive $n$.
   Then \[ f(n)=\sum_{d\mid n}\mu(d)F(n/d). \]
 
@@ -244,7 +244,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-inversion-complement}
+  \label{ent:thm:mobius-inversion-complement}
   Under the same hypotheses, \[ f(n)=\sum_{d\mid n}\mu(n/d)F(d). \]
 
   \begin{lean}
@@ -269,7 +269,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-of-divisorsum}
+  \label{ent:thm:multiplicative-of-divisorsum}
   If the divisor sum of $f$ is multiplicative, then $f$ is multiplicative.
 
   \begin{lean}
@@ -300,7 +300,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-iff-divisorsum}
+  \label{ent:thm:multiplicative-iff-divisorsum}
   An arithmetic function is multiplicative if and only if its divisor sum is multiplicative.
 
   \begin{lean}
