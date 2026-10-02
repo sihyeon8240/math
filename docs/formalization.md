@@ -76,6 +76,22 @@ witness selection, local claims, case analysis, and the final conclusion.
 Separate these units with one blank line. Keep consecutive tactics that perform
 one short calculation together; do not insert a blank line after every tactic.
 
+Place a blank line where the subgoal or the purpose of the argument changes.
+Keep introductions, representation conversions, and short calculations for the
+same local goal together. Related `have` claims or `obtain` steps may form one
+unit; do not separate every declaration mechanically. For example, the interval
+compactness proof first establishes the prerequisites for the supremum, then
+locates it in the interval:
+
+```lean
+  have hne : T.Nonempty := ⟨a, ha⟩
+  have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
+
+  let c := sSup T
+  have hac : a ≤ c := le_csSup hb ha
+  have hcb : c ≤ b := csSup_le hne (fun x hx => hx.1.2)
+```
+
 Indent each nested `by` proof and branch body by two spaces. Align sibling
 `·` branches and named cases, and distinguish substantial branches with blank
 lines. Wrap long declaration hypotheses and conclusions with four-space

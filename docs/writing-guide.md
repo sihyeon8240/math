@@ -262,8 +262,8 @@ The two remainders are equal: $r'=r$.
 
 Group displayed proofs by mathematical reasoning unit using the
 [Lean readability conventions](formalization.md#lean-readability), matching the
-checked source. Use blank lines between local claims and substantial branches,
-and indent nested proofs consistently.
+checked source. Use blank lines between groups of related local claims and
+substantial branches, and indent nested proofs consistently.
 
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment
