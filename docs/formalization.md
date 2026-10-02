@@ -145,8 +145,7 @@ Current book policies are:
 
 - [Elementary Number Theory](../books/elementary-number-theory/formalization.md).
 - [Linear Algebra](../books/linear-algebra/formalization.md).
-- [Mathematical Analysis I](../books/mathematical-analysis-1/formalization.md).
-- [Mathematical Analysis II](../books/mathematical-analysis-2/formalization.md).
+- [Mathematical Analysis](../books/mathematical-analysis/formalization.md).
 
 Each policy records starting structures, accepted results, results developed in
 the book, and scoped external exceptions. Keep it concise and organize accepted
@@ -390,7 +389,7 @@ sources.
 
 A verified LaTeX theorem needs two parts:
 
-1. A repository-global theorem label such as `an1:thm:compactness`.
+1. A repository-global theorem label such as `ma:thm:compactness`.
 2. An entry in the matching chapter or appendix shard below naming its Lean
    proof declaration.
 
@@ -411,8 +410,8 @@ Both shard kinds use the same entry schema:
 
 ```yaml
 proofs:
-  - id: an1:thm:compactness
-    declaration: MathematicalAnalysis1.Chapter01.compactness
+  - id: ma:thm:compactness
+    declaration: MathematicalAnalysis.Chapter01.compactness
 ```
 
 This is a schema example; use the actual checked declaration and label. The

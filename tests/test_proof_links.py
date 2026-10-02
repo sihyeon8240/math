@@ -369,7 +369,7 @@ class ProofLinkTests(unittest.TestCase):
                 {
                     "slug": "analysis",
                     "label_prefix": "an",
-                    "lean_module": "MathematicalAnalysis1",
+                    "lean_module": "MathematicalAnalysis",
                 },
                 {
                     "slug": "algebra",
@@ -379,9 +379,9 @@ class ProofLinkTests(unittest.TestCase):
             ),
         )
         textbooks = self.root / "lean/Textbooks"
-        for module in ("MathematicalAnalysis1", "LinearAlgebra"):
+        for module in ("MathematicalAnalysis", "LinearAlgebra"):
             (textbooks / module).mkdir(parents=True)
-        source = textbooks / "MathematicalAnalysis1/Chapter01/WellOrdering.lean"
+        source = textbooks / "MathematicalAnalysis/Chapter01/WellOrdering.lean"
         source.parent.mkdir(parents=True)
         source.write_text("import Textbooks.LinearAlgebra.All\n", encoding="utf-8")
         errors = MODULE.validate_import_boundaries(self.root)

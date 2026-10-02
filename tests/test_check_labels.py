@@ -61,7 +61,7 @@ class CheckLabelsTests(unittest.TestCase):
                 "books/linear-algebra/b.tex": (
                     "\\label{la:thm:one}\n"
                     "\\label{la:thm:bad label}\n"
-                    "\\label{an1:thm:collision}\n"
+                    "\\label{ma:thm:collision}\n"
                 ),
             }
         )

@@ -272,7 +272,7 @@ order. Release targets must also have `build: true`. A version change while
 On `local-work` or another development branch, run:
 
 ```bash
-make book release BOOK=mathematical-analysis-1 VERSION=0.1.0
+make book release BOOK=mathematical-analysis VERSION=0.1.0
 ```
 
 This enables `release: true`, sets that book's version in `books.yml`, and

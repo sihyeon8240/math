@@ -8,23 +8,13 @@ defaults:
   site: false
 
 books:
-  - slug: mathematical-analysis-1
-    title: Mathematical Analysis I
+  - slug: mathematical-analysis
+    title: Mathematical Analysis
     version: 0.1.0
-    label_prefix: an1
-    lean_module: MathematicalAnalysis1
-    status: review
-    order: 10
-    release: false
-    site: true
-
-  - slug: mathematical-analysis-2
-    title: Mathematical Analysis II
-    version: 0.1.0
-    label_prefix: an2
-    lean_module: MathematicalAnalysis2
+    label_prefix: ma
+    lean_module: MathematicalAnalysis
     status: draft
-    order: 20
+    order: 10
     release: false
     site: true
 
