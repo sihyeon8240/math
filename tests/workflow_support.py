@@ -4,6 +4,16 @@ from __future__ import annotations
 
 import ast
 import re
+from pathlib import Path
+
+import yaml
+
+
+def build_workflow() -> dict:
+    root = Path(__file__).resolve().parent.parent
+    return yaml.safe_load(
+        (root / ".github/workflows/build.yml").read_text(encoding="utf-8")
+    )
 
 
 def condition_allows(condition: str, context: dict[str, str | bool]) -> bool:
