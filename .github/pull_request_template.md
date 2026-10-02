@@ -4,7 +4,7 @@
 
 ## Validation checklist
 
-- [ ] I ran the checks required by [Contributing](../docs/CONTRIBUTING.md#validation-by-change-category) and listed results or unavailable checks below.
+- [ ] I ran the checks required by [Contributing](https://github.com/sihyeon8240/math/blob/main/docs/CONTRIBUTING.md#validation-by-change-category) and listed results or unavailable checks below.
 - [ ] When PDF output was affected, I reviewed build logs and any relevant visual changes.
 - [ ] I did not commit PDFs, `build/`, or generated files that are not explicitly tracked by repository policy.
 - [ ] I kept commits focused, independently revertible, and consistent with the commit-message convention.
