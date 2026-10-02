@@ -181,8 +181,11 @@ def replace_generated_block(
     return text[:start] + rendered + text[finish:]
 
 
-def render_contents_index(book_dir: Path, directory: Path, entry: dict) -> str:
-    sections = load_sections(directory)
+def render_contents_index(
+    book_dir: Path, directory: Path, entry: dict, sections: list[dict] | None = None
+) -> str:
+    if sections is None:
+        sections = load_sections(directory)
     lines = [GENERATED_NOTICE, "", f"\\chapter{{{entry['title']}}}"]
     relative = directory.relative_to(book_dir).as_posix()
     for section_number, section in enumerate(sections, 1):
@@ -239,10 +242,10 @@ def expected_files(
         for entries, directory_for in groups:
             for number, entry in enumerate(entries, 1):
                 directory = directory_for(book_dir, number, entry)
-                expected[directory / "index.tex"] = render_contents_index(
-                    book_dir, directory, entry
-                )
                 sections = load_sections(directory)
+                expected[directory / "index.tex"] = render_contents_index(
+                    book_dir, directory, entry, sections
+                )
                 expected_sources = {
                     directory / filename
                     for section_number, section in enumerate(sections, 1)

@@ -48,6 +48,24 @@ class ContentsManifestTests(unittest.TestCase):
         (chapter / "01-first.tex").write_text("body\n", encoding="utf-8")
         return book
 
+    def test_render_and_validation_share_section_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            book = self.fixture(Path(temporary))
+            reads = []
+            original = Path.read_text
+
+            def tracked(path, *args, **kwargs):
+                if path.name == "sections.yml":
+                    reads.append(path)
+                return original(path, *args, **kwargs)
+
+            with patch.object(Path, "read_text", tracked):
+                rendered = expected_files(book, book=self.RECORD)
+            self.assertEqual(reads, [book / "chapters/01-start/sections.yml"])
+            self.assertIn(
+                "\\section{First}", rendered[book / "chapters/01-start/index.tex"]
+            )
+
     def test_render_uses_manifest_titles_and_single_source(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             book = self.fixture(Path(temporary))
