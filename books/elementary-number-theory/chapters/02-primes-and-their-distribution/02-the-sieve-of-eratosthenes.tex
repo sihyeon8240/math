@@ -11,7 +11,6 @@
 \begin{proof}
   The fundamental theorem of arithmetic supplies a nonempty list of prime factors.
   Take its first entry $p$ and write $n=pM$, where $M$ is the product of the remaining entries.
-  Since $n>0$, we have $M\ge1$, so $p\le n$.
 
   \begin{lean}
     obtain ⟨l, hne, hl, hprod, _⟩ := fundamental_theorem_of_arithmetic n hn
@@ -20,11 +19,16 @@
     | cons p l =>
       have hp := hl p List.mem_cons_self
       have heq : n = p * l.prod := hprod.symm
-      have hpos : 0 < l.prod := by
-        nlinarith
-      exact ⟨p, hp, ⟨l.prod, heq⟩, by nlinarith⟩
   \end{lean}
 
+  Since $n>0$, the natural number $M$ is positive and hence at least one.
+  Thus $p\le n$, and $p$ is the required prime divisor.
+
+  \begin{lean}
+    have hpos : 0 < l.prod := by
+      nlinarith
+    exact ⟨p, hp, ⟨l.prod, heq⟩, by nlinarith⟩
+  \end{lean}
 \end{proof}
 
 \begin{theorem}
@@ -112,9 +116,6 @@ one with no such prime divisor cannot be composite.
   The case $n=0$ has no admissible $k$.
   At the next step, if $k=n+1$, use $(n+1)!
     =(n+1)n!$.
-  Otherwise $k\le n$, and multiplying the inductive equality $n!
-    =kt$ by $n+1$
-  gives the required witness.
 
   \begin{lean}
     induction n with
@@ -123,12 +124,18 @@ one with no such prime divisor cannot be composite.
       by_cases heq : k = n + 1
 
       · exact ⟨n.factorial, by rw [heq, Nat.factorial_succ]⟩
-      · obtain ⟨t, ht⟩ := ih (by omega)
-        refine ⟨(n + 1) * t, ?_⟩
-        rw [Nat.factorial_succ, ht]
-        ring
   \end{lean}
 
+  Otherwise $k\le n$.
+  Multiply the inductive equality $n!
+    =kt$ by $n+1$ to obtain the required witness.
+
+  \begin{lean}
+    · obtain ⟨t, ht⟩ := ih (by omega)
+      refine ⟨(n + 1) * t, ?_⟩
+      rw [Nat.factorial_succ, ht]
+      ring
+  \end{lean}
 \end{proof}
 
 \begin{lemma}

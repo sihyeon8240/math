@@ -59,9 +59,8 @@
 
 \begin{proof}
   Choose a companion $y_0$ with $ax_0+ny_0=b$.
-  The previously proved parametrization of all Diophantine solutions gives the displayed first
-  coordinate.
-  Conversely, accompany any such $x$ by $y_0-(a/g)t$.
+  For any other solution, the previously proved parametrization of Diophantine solutions gives the
+  displayed first coordinate.
 
   \begin{lean}
     obtain ⟨y₀, hy₀⟩ := (linear_modEq_iff n a b x₀).1 h₀
@@ -74,7 +73,12 @@
         (Chapter01.mul_add_mul_eq_iff a n b x₀ y₀ x y (Or.inr hn) hy₀).1 hy
 
       exact ⟨t, ht⟩
+  \end{lean}
 
+  Conversely, accompany any such $x$ by $y_0-(a/g)t$, where $g=\gcd(a,n)$.
+  The parametrization then verifies the original equation.
+
+  \begin{lean}
     · rintro ⟨t, ht⟩
       refine ⟨y₀ - (a / (Chapter01.gcd a n : ℤ)) * t, ?_⟩
       exact (Chapter01.mul_add_mul_eq_iff a n b x₀ y₀ x _ (Or.inr hn) hy₀).2
@@ -129,10 +133,9 @@
       exact (linear_modEq_iff_eq_add n a b x₀ _ hnne h₀).2 ⟨t.val, rfl⟩
   \end{lean}
 
-  For an arbitrary solution, divide its integer parameter by $g$ and retain the remainder $r$.
-  The discarded multiple of $g$ changes $x$ by a multiple of $n$.
-  If two remainders gave the same class, cancellation of $u$ would make their difference a multiple
-  of $g$; their bounds force this difference to vanish.
+  For an arbitrary solution, divide its integer parameter by $g=\gcd(a,n)$ and retain the
+  remainder $r$.
+  The discarded multiple of $g$ changes $x$ by a multiple of $n$, so $r$ supplies a representative.
 
   \begin{lean}
     · intro x hx
@@ -150,50 +153,64 @@
         rw [hquot] at ht ⊢
         rw [ht]
         nlinarith [congrArg (fun z => z * q) hu, congrArg (fun z => u * z) htr]
+  \end{lean}
 
-      refine ⟨⟨r, hr⟩, hrep, ?_⟩
-      intro s hs
+  If another remainder $s$ represents the same class, subtracting the two congruences and
+  cancelling $u>0$ makes $s-r$ a multiple of $g$.
 
-      have hdiff := modEq_trans (modEq_symm hs) hrep
+  \begin{lean}
+    refine ⟨⟨r, hr⟩, hrep, ?_⟩
+    intro s hs
 
-      obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 hdiff
-      rw [hquot] at hk
+    have hdiff := modEq_trans (modEq_symm hs) hrep
 
-      have he : (s.val : ℤ) - r = (Chapter01.gcd a n : ℤ) * k := by
-        apply mul_left_cancel₀ (ne_of_gt hupos)
-        calc
-          u * ((s.val : ℤ) - r) = (x₀ + u * s.val) - (x₀ + u * r) := by ring
-          _ = u * ((Chapter01.gcd a n : ℤ) * k) := by
-            rw [hk]
-            nlinarith [congrArg (fun z => z * k) hu]
+    obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 hdiff
+    rw [hquot] at hk
 
-      have hsbound : (s.val : ℤ) < Chapter01.gcd a n := by
-        exact_mod_cast s.isLt
+    have he : (s.val : ℤ) - r = (Chapter01.gcd a n : ℤ) * k := by
+      apply mul_left_cancel₀ (ne_of_gt hupos)
+      calc
+        u * ((s.val : ℤ) - r) = (x₀ + u * s.val) - (x₀ + u * r) := by ring
+        _ = u * ((Chapter01.gcd a n : ℤ) * k) := by
+          rw [hk]
+          nlinarith [congrArg (fun z => z * k) hu]
+  \end{lean}
 
-      have hrbound : (r : ℤ) < Chapter01.gcd a n := by
-        exact_mod_cast hr
+  Both remainders lie between zero and $g-1$.
+  Their difference is therefore strictly between $-g$ and $g$, forcing that multiple to be zero.
 
-      have hgz : (0 : ℤ) < Chapter01.gcd a n := by
-        exact_mod_cast hg
+  \begin{lean}
+    have hsbound : (s.val : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast s.isLt
 
-      have hkzero : k = 0 := by
-        rcases lt_trichotomy k 0 with hneg | hzero | hpos
+    have hrbound : (r : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast hr
 
-        · have : k ≤ -1 := by
-            omega
-          nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
+    have hgz : (0 : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast hg
 
-        · exact hzero
+    have hkzero : k = 0 := by
+      rcases lt_trichotomy k 0 with hneg | hzero | hpos
 
-        · have : 1 ≤ k := hpos
-          nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
+      · have : k ≤ -1 := by
+          omega
+        nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
 
-      apply Fin.ext
+      · exact hzero
 
-      have hval : (s.val : ℤ) = r := by
-        rw [hkzero, mul_zero] at he
-        linarith
-      exact_mod_cast hval
+      · have : 1 ≤ k := hpos
+        nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
+  \end{lean}
+
+  Thus $s=r$, proving uniqueness of the representative.
+
+  \begin{lean}
+    apply Fin.ext
+
+    have hval : (s.val : ℤ) = r := by
+      rw [hkzero, mul_zero] at he
+      linarith
+    exact_mod_cast hval
   \end{lean}
 \end{proof}
 
@@ -239,14 +256,17 @@
 
 \begin{proof}
   Existence follows because one divides every integer.
-  The solution step $n/\gcd(a,n)$ is now $n$, so the parametrization is exactly one congruence
-  class.
 
   \begin{lean}
     obtain ⟨x₀, hx₀⟩ := (exists_linear_modEq_iff n a b).2 (by
       rw [ha, Nat.cast_one]
       exact ⟨b, by ring⟩)
+  \end{lean}
 
+  The solution step $n/\gcd(a,n)$ is now $n$, so the parametrization is exactly one congruence
+  class.
+
+  \begin{lean}
     refine ⟨x₀, hx₀, ?_⟩
     intro x
     rw [linear_modEq_iff_eq_add n a b x₀ x hn hx₀, ha, Nat.cast_one, Int.ediv_one,
@@ -273,8 +293,8 @@
 \end{theorem}
 
 \begin{proof}
-  Multiply the original congruence by $u$ and replace $au$ by one.
-  In the reverse direction multiply by $a$ and again use the inverse relation.
+  Suppose $ax\equiv b\pmod n$.
+  Multiplication by $u$ gives $u(ax)\equiv ub$, while the inverse relation gives $(au)x\equiv x$.
 
   \begin{lean}
     constructor
@@ -283,23 +303,36 @@
 
       have h₁ := modEq_mul (modEq_refl n u) hx
       have h₂ := modEq_mul hu (modEq_refl n x)
+  \end{lean}
 
-      have heq : u * (a * x) = (a * u) * x := by
-        ring
-      rw [heq] at h₁
+  Since $u(ax)=(au)x$, these congruences imply $x\equiv ub\pmod n$.
 
-      exact modEq_trans (modEq_symm (by simpa only [one_mul] using h₂)) h₁
+  \begin{lean}
+    have heq : u * (a * x) = (a * u) * x := by
+      ring
+    rw [heq] at h₁
 
+    exact modEq_trans (modEq_symm (by simpa only [one_mul] using h₂)) h₁
+  \end{lean}
+
+  Conversely, suppose $x\equiv ub\pmod n$.
+  Multiplication by $a$ gives $ax\equiv a(ub)$, and the inverse relation gives $(au)b\equiv b$.
+
+  \begin{lean}
     · intro hx
 
       have h₁ := modEq_mul (modEq_refl n a) hx
       have h₂ := modEq_mul hu (modEq_refl n b)
+  \end{lean}
 
-      have heq : a * (u * b) = (a * u) * b := by
-        ring
-      rw [heq] at h₁
+  Rewriting $a(ub)=(au)b$ yields $ax\equiv b\pmod n$.
 
-      exact modEq_trans h₁ (by simpa only [one_mul] using h₂)
+  \begin{lean}
+    have heq : a * (u * b) = (a * u) * b := by
+      ring
+    rw [heq] at h₁
+
+    exact modEq_trans h₁ (by simpa only [one_mul] using h₂)
   \end{lean}
 \end{proof}
 
@@ -342,8 +375,9 @@
     let x := ∑ i ∈ s.attach, a i * N i * u i i.property
   \end{lean}
 
-  Modulo $n_i$, the $i$th summand is $a_i$, while every other summand contains the factor $n_i$.
-  Hence the constructed sum solves every congruence.
+  Fix $i$.
+  Subtracting $a_i$ from the constructed sum amounts to subtracting $a_i$ from its $i$th summand
+  and leaving the others unchanged.
 
   \begin{lean}
     have hx (i : ι) (hi : i ∈ s) : x ≡ a i [ZMOD n i] := by
@@ -366,30 +400,39 @@
 
           · simp
         rw [he]
+  \end{lean}
 
-      apply (modEq_iff_dvd_sub _ _ _).2
-      rw [hsum]
-      apply Finset.dvd_sum
-      intro j hj
-      by_cases he : j.val = i
+  For the $i$th summand, the inverse relation makes the adjusted term divisible by $n_i$.
 
-      · subst i
-        simp only [↓reduceIte]
+  \begin{lean}
+    apply (modEq_iff_dvd_sub _ _ _).2
+    rw [hsum]
+    apply Finset.dvd_sum
+    intro j hj
+    by_cases he : j.val = i
 
-        obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 (hu j.val j.property)
+    · subst i
+      simp only [↓reduceIte]
 
-        exact ⟨a j * k, by nlinarith [congrArg (fun z => a j * z) hk]⟩
+      obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 (hu j.val j.property)
 
-      · simp only [he, ↓reduceIte, sub_zero]
+      exact ⟨a j * k, by nlinarith [congrArg (fun z => a j * z) hk]⟩
+  \end{lean}
 
-        have hmem : i ∈ s.erase j.val := Finset.mem_erase.mpr ⟨Ne.symm he, hi⟩
+  Every other summand contains $n_i$ in its complementary product.
+  Each adjusted summand is thus divisible by $n_i$, so their sum is too.
 
-        obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem n hmem
+  \begin{lean}
+    · simp only [he, ↓reduceIte, sub_zero]
 
-        exact ⟨a j * k * u j j.property, by
-            change N j = n i * k at hk
-            rw [hk]
-            ring⟩
+      have hmem : i ∈ s.erase j.val := Finset.mem_erase.mpr ⟨Ne.symm he, hi⟩
+
+      obtain ⟨k, hk⟩ := Finset.dvd_prod_of_mem n hmem
+
+      exact ⟨a j * k * u j j.property, by
+          change N j = n i * k at hk
+          rw [hk]
+          ring⟩
   \end{lean}
 
   Two simultaneous solutions have a difference divisible by every $n_i$.

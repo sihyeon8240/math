@@ -168,9 +168,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{proof}
   Write $d=\gcd(a,b)>0$.
-  Since $c\mid d$, there is $k\in\Z$ with $d=ck$.
-  If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$.
-  If $c\le0$, then $c<d$ immediately.
+  Since $c\mid d$, choose $k\in\Z$ with $d=ck$.
 
   \begin{lean}
     obtain ⟨hpos, _, _, _, hcommon⟩ := gcd_spec a b hab
@@ -179,7 +177,12 @@ In particular, $0\mid z$ if and only if $z=0$.
       exact_mod_cast hpos
 
     obtain ⟨k, hk⟩ := hcommon c hca hcb
+  \end{lean}
 
+  If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$.
+  If $c\le0$, then $c<d$ immediately.
+
+  \begin{lean}
     by_cases hc : 0 < c
 
     · have hkpos : 0 < k := by
@@ -229,14 +232,17 @@ In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{proof}
   Since $\gcd(a,b)$ is a common divisor, the hypothesis gives $\gcd(a,b)\le d$.
-  The preceding bound applied to $d$ gives $d\le\gcd(a,b)$.
-  Antisymmetry proves equality.
 
   \begin{lean}
     have hspec := gcd_spec a b hab
 
     have hle := hgreatest (gcd a b) hspec.2.1 hspec.2.2.1
+  \end{lean}
 
+  The preceding bound applied to $d$ gives $d\le\gcd(a,b)$.
+  Antisymmetry proves equality.
+
+  \begin{lean}
     have hge := common_divisor_le_gcd a b d hab hda hdb
 
     exact_mod_cast (le_antisymm hle hge)

@@ -9,11 +9,7 @@
 \end{theorem}
 
 \begin{proof}
-  Multiplication by the nonzero class of $a$ permutes the nonzero residue classes.
-  Multiplying all these equalities yields $a^{p-1}P=P$, where $P$ is the product of all nonzero
-  classes.
-  Each factor is invertible, so cancellation gives the result.
-  The auxiliary permutation-product lemma implements this finite argument directly.
+  The class of $a$ modulo $p$ is nonzero, so it is invertible.
 
   \begin{lean}
     let : Fact p.Prime := ⟨Nat.prime_def.mpr hp⟩
@@ -21,9 +17,19 @@
     have hne : (a : ZMod p) ≠ 0 := by
       intro h
       exact ha ((ZMod.intCast_zmod_eq_zero_iff_dvd a p).1 h)
+  \end{lean}
 
+  Multiplication by this class permutes the nonzero residue classes.
+  Multiplying the equalities gives $a^{p-1}P=P$, where $P$ is the product of these classes.
+  Cancelling the invertible product gives $a^{p-1}=1$.
+
+  \begin{lean}
     have h := pow_card_by_permutation (Units.mk0 (a : ZMod p) hne)
+  \end{lean}
 
+  Passing from units to residue classes gives $a^{p-1}\equiv1\pmod p$.
+
+  \begin{lean}
     have hv := congrArg (fun u : (ZMod p)ˣ => (u : ZMod p)) h
     simp only [Units.val_pow_eq_pow_val, Units.val_mk0, Units.val_one,
       Fintype.card_units, ZMod.card] at hv
@@ -44,8 +50,7 @@
 \end{theorem}
 
 \begin{proof}
-  If $p\mid a$, both sides are zero modulo $p$.
-  Otherwise multiply Fermat\textquotesingle s congruence by $a$.
+  If $p\mid a$, both $a^p$ and $a$ are zero modulo $p$.
 
   \begin{lean}
     have hpos : 0 < p := by
@@ -57,7 +62,11 @@
       rw [zero_pow (ne_of_gt hpos)] at hz
       exact Chapter03.modEq_trans hz
         (Chapter03.modEq_symm ((Chapter03.modEq_zero_iff _ _).2 hpa))
+  \end{lean}
 
+  Otherwise multiply Fermat\textquotesingle s congruence by $a$ to obtain $a^p\equiv a\pmod p$.
+
+  \begin{lean}
     · have h := Chapter03.modEq_mul (fermat p hp a hpa) (Chapter03.modEq_refl (p : ℤ) a)
       simpa only [← pow_succ, Nat.sub_add_cancel hpos, one_mul] using h
   \end{lean}
@@ -97,7 +106,6 @@
 \begin{proof}
   Raise the congruence modulo $p$ to the $p$th power, and the one modulo $q$ to the $q$th power.
   Fermat\textquotesingle s theorem reduces their right-hand sides to $a$.
-  The two distinct primes are coprime, so their product divides $a^{pq}-a$.
 
   \begin{lean}
     have h₁ := Chapter03.modEq_trans (Chapter03.modEq_pow hqp p) (fermat_all p hp a)
@@ -105,6 +113,12 @@
     have h₂ := Chapter03.modEq_trans (Chapter03.modEq_pow hpq q) (fermat_all q hq a)
     rw [← pow_mul, Nat.mul_comm q p] at h₁
     rw [← pow_mul] at h₂
+  \end{lean}
+
+  The two distinct primes are coprime.
+  Their product therefore divides $a^{pq}-a$, giving the required congruence.
+
+  \begin{lean}
     apply (Chapter03.modEq_iff_dvd_sub _ _ _).2
     rw [Nat.cast_mul]
     exact Chapter01.mul_dvd_of_coprime p q _ (gcd_distinct_primes p q hp hq hne)
@@ -155,7 +169,7 @@
 
 \begin{proof}
   An odd integer is coprime to two: writing $n=2k+1$ gives the Bezout identity $1=n-2k$.
-  Cancel two in one direction and multiply by two in the other.
+  Cancel two in the pseudoprime congruence to obtain $2^{n-1}\equiv1\pmod n$.
 
   \begin{lean}
     have hpos : 0 < n := by
@@ -167,7 +181,12 @@
     · intro h
       apply Chapter03.modEq_cancel (gcd_odd_two n hn)
       simpa only [← pow_succ', Nat.sub_add_cancel hpos, mul_one] using h.2
+  \end{lean}
 
+  Conversely, multiply $2^{n-1}\equiv1\pmod n$ by two.
+  This gives the defining pseudoprime congruence, and compositeness is already assumed.
+
+  \begin{lean}
     · intro h
       refine ⟨hc, ?_⟩
 
@@ -290,11 +309,9 @@
 \end{theorem}
 
 \begin{proof}
-  Fix $a$.
-  For each prime factor $p$, either $p\mid a$, or Fermat\textquotesingle s theorem and $p-1\mid
-    n-1$ give $a^{n-1}\equiv1\pmod p$.
-  In either case $a^n\equiv a\pmod p$.
-  Pairwise coprimality combines these congruences modulo their product.
+  Fix a base $a$.
+  To combine congruences modulo the prime factors, first note that those factors are nonzero and
+  pairwise coprime.
 
   \begin{lean}
     refine ⟨hc, ?_⟩
@@ -310,7 +327,14 @@
 
     · intro p hps q hqs hne
       exact gcd_distinct_primes p q (hp p hps) (hp q hqs) hne
+  \end{lean}
 
+  For each prime factor $p$, either $p\mid a$, or Fermat\textquotesingle s theorem and $p-1\mid
+    n-1$ give $a^{n-1}\equiv1\pmod p$.
+  In either case $a^n\equiv a\pmod p$.
+  Pairwise coprimality combines these congruences modulo their product.
+
+  \begin{lean}
     · intro p hps
       exact (Chapter03.modEq_iff_dvd_sub _ _ _).1
         (fermat_of_sub_one_dvd p _ (hp p hps) (by
@@ -330,9 +354,9 @@
 \end{theorem}
 
 \begin{proof}
-  If $p^2\mid n$, use the defining congruence with base $p$.
-  Since $n\ge2$, both $p^n$ and $n$ are divisible by $p^2$, so $p^2\mid p$.
-  Cancelling $p$ would make a prime divide one, a contradiction.
+  Suppose $p^2\mid n$ for a prime $p$.
+  Use the defining congruence with base $p$.
+  Since $n\ge2$, both $p^n$ and $n$ have a factor $p^2$.
 
   \begin{lean}
     refine ⟨by
@@ -350,7 +374,12 @@
 
     have hpow : (p : ℤ) ^ n = (p : ℤ) ^ 2 * (p : ℤ) ^ (n - 2) := by
       rw [← pow_add, Nat.add_sub_cancel' hn]
+  \end{lean}
 
+  Substituting these factorizations into the congruence and cancelling the nonzero factor $p$
+  gives an integer multiple of $p$ equal to one.
+
+  \begin{lean}
     have hcancel : (p : ℤ) * ((p : ℤ) ^ (n - 2) - (t : ℤ) * k) = 1 := by
       have hpne : (p : ℤ) ≠ 0 := by
         have := hp.1
@@ -359,7 +388,12 @@
       apply mul_left_cancel₀ hpne
       rw [ht', hpow] at hk
       nlinarith [hk]
+  \end{lean}
 
+  This would make a prime divide one, a contradiction.
+  Thus no prime square divides $n$.
+
+  \begin{lean}
     have hd : p ∣ 1 := Int.natCast_dvd_natCast.mp
       ⟨(p : ℤ) ^ (n - 2) - (t : ℤ) * k, hcancel.symm⟩
 

@@ -40,8 +40,7 @@
 \begin{proof}
   Use strong induction on $n$.
   Zero has the empty expansion.
-  For positive $n$, division by $b$ gives $n=bq+r$, where $0\le r<b$ and $0\le q<n$.
-  Expand $q$ by induction and prepend $r$; if the tail is empty, positivity of $n$ ensures $r\ne0$.
+  For positive $n$, division by $b$ gives $n=bq+r$ with $0\le r<b$.
 
   \begin{lean}
     have hex : ∀ n : ℕ, ∃ ds : List ℕ, CanonicalDigits b ds ∧ digitValue b ds = n := by
@@ -56,41 +55,55 @@
             Chapter01.existsUnique_quotient_remainder n ⟨b, by omega⟩
           change (n : ℤ) = q * b + r at heq
           change r < b at hr
+  \end{lean}
 
-          have hb' : (1 : ℤ) < b := by
-            exact_mod_cast hb
-          have hr' : (r : ℤ) < b := by
-            exact_mod_cast hr
-          have hq : 0 ≤ q := by
-            nlinarith
-          have hnpos : (0 : ℤ) < n := by
-            omega
-          have hqn : q < n := by
-            nlinarith
-          have hlt : q.toNat < n := by
-            omega
+  Since $b>1$ and $n>0$, the quotient satisfies $0\le q<n$.
+  Its natural-number representation can therefore be expanded by induction.
 
-          obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
+  \begin{lean}
+    have hb' : (1 : ℤ) < b := by
+      exact_mod_cast hb
+    have hr' : (r : ℤ) < b := by
+      exact_mod_cast hr
+    have hq : 0 ≤ q := by
+      nlinarith
+    have hnpos : (0 : ℤ) < n := by
+      omega
+    have hqn : q < n := by
+      nlinarith
+    have hlt : q.toNat < n := by
+      omega
 
-          refine ⟨r :: ds, ⟨hr, ?_, hds⟩, ?_⟩
+    obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
+  \end{lean}
 
-          · intro hnil hrzero
-            rw [hnil] at hval
-            change 0 = q.toNat at hval
+  Prepend $r$ to this expansion.
+  The digit is less than $b$, and if the tail is empty, positivity of $n$ ensures $r\ne0$.
 
-            have : q = 0 := by
-              omega
-            rw [this, hrzero] at heq
-            simp only [zero_mul, Nat.cast_zero, add_zero] at heq
-            exact hn (by exact_mod_cast heq)
+  \begin{lean}
+    refine ⟨r :: ds, ⟨hr, ?_, hds⟩, ?_⟩
 
-          · change r + b * digitValue b ds = n
-            rw [hval]
+    · intro hnil hrzero
+      rw [hnil] at hval
+      change 0 = q.toNat at hval
 
-            have hc : (q.toNat : ℤ) = q := Int.toNat_of_nonneg hq
-            exact_mod_cast (show (r : ℤ) + (b : ℤ) * q.toNat = n by
-                rw [hc]
-                nlinarith)
+      have : q = 0 := by
+        omega
+      rw [this, hrzero] at heq
+      simp only [zero_mul, Nat.cast_zero, add_zero] at heq
+      exact hn (by exact_mod_cast heq)
+  \end{lean}
+
+  The positional value of the new list is $r+bq=n$, completing the existence proof.
+
+  \begin{lean}
+    · change r + b * digitValue b ds = n
+      rw [hval]
+
+      have hc : (q.toNat : ℤ) = q := Int.toNat_of_nonneg hq
+      exact_mod_cast (show (r : ℤ) + (b : ℤ) * q.toNat = n by
+          rw [hc]
+          nlinarith)
   \end{lean}
 
   The construction gives existence.
@@ -281,7 +294,11 @@
 
     · rintro ⟨k, hk⟩
       omega
+  \end{lean}
 
+  Conversely, both zero and five are divisible by five.
+
+  \begin{lean}
     · rintro (rfl | rfl) <;> decide
   \end{lean}
 \end{proof}

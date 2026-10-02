@@ -224,32 +224,39 @@ multiplicities, possibly in different orders.
 
   If $n>1$ is not prime, it has a divisor $d$ different from $1$ and $n$.
   Write $n=dk$.
-  Positivity gives $d,k>0$.
-  If $d\ge n$, then $k=1$, contradicting $d\ne n$; hence $d<n$.
-  Also $d\ge2$, so $k<n$.
 
   \begin{lean}
     · have hdiv : ∃ d : ℕ, d ∣ n ∧ d ≠ 1 ∧ d ≠ n := by
         simpa only [isPrime, hgt, true_and, not_forall, not_or, exists_prop] using hp
 
       obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
+  \end{lean}
 
-      have hdpos : 0 < d := by
-        nlinarith
-      have hkpos : 0 < k := by
-        nlinarith
+  Since $n=dk>0$ and $d,k$ are natural numbers, both factors are positive.
 
-      have hdlt : d < n := by
-        by_contra h
-        have hk1 : k = 1 := by
-          nlinarith
-        simp [hk1] at hk
-        exact hdn hk.symm
+  \begin{lean}
+    have hdpos : 0 < d := by
+      nlinarith
+    have hkpos : 0 < k := by
+      nlinarith
+  \end{lean}
 
-      have hklt : k < n := by
-        have hd2 : 2 ≤ d := by
-          omega
+  If $d\ge n$, then $k=1$, contradicting $d\ne n$; hence $d<n$.
+  Also $d\ge2$, so $k<n$.
+  These bounds allow the induction hypothesis to be applied to both factors.
+
+  \begin{lean}
+    have hdlt : d < n := by
+      by_contra h
+      have hk1 : k = 1 := by
         nlinarith
+      simp [hk1] at hk
+      exact hdn hk.symm
+
+    have hklt : k < n := by
+      have hd2 : 2 ≤ d := by
+        omega
+      nlinarith
   \end{lean}
 
   By the induction hypothesis, $d$ and $k$ have prime factor lists.

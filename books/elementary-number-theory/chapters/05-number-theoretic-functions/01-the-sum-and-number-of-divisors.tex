@@ -46,9 +46,7 @@
 \end{theorem}
 
 \begin{proof}
-  If $n=dk$, uniqueness of prime factorization makes $e_n=e_d+e_k$.
-  Conversely, subtract the exponent vector of $d$ from that of $n$.
-  Its product supplies the quotient witnessing divisibility.
+  If $n=dk$, uniqueness of prime factorization gives $e_n=e_d+e_k$, hence $e_d\le e_n$.
 
   \begin{lean}
     constructor
@@ -59,7 +57,12 @@
         nlinarith
       rw [hk, primeExponents_mul d k hd hkpos]
       exact le_add_right le_rfl
+  \end{lean}
 
+  Conversely, subtract the exponent vector of $d$ from that of $n$.
+  Its product supplies the quotient witnessing divisibility.
+
+  \begin{lean}
     · intro hle
 
       have hsum : primeExponents d + (primeExponents n - primeExponents d) =
@@ -88,8 +91,6 @@
 
 \begin{proof}
   The support of $e$ lies among the prime factors of $n$, so its product is positive.
-  Uniqueness of prime factorization recovers $e$ from that product, and the coordinatewise
-  divisibility criterion applies.
 
   \begin{lean}
     have hp : ∀ p ∈ e.support, Chapter02.isPrime p := by
@@ -103,7 +104,12 @@
       omega
 
     have hpos := factorValue_pos e hp
+  \end{lean}
 
+  Uniqueness of prime factorization recovers $e$ from that product.
+  The coordinatewise divisibility criterion then shows that the product divides $n$.
+
+  \begin{lean}
     have heq := (primeExponents_unique (factorValue e) hpos e hp rfl).symm
 
     exact ⟨hpos, (dvd_iff_primeExponents_le _ n hpos hn).2 (by
@@ -125,7 +131,6 @@
 \begin{proof}
   The divisor-exponent correspondence is a bijection between the divisors and the integer box
   $0\le e(p)\le e_n(p)$.
-  Each coordinate has $e_n(p)+1$ choices, so finite counting gives the product.
 
   \begin{lean}
     classical
@@ -148,6 +153,12 @@
         obtain ⟨hpos, hdiv, heq⟩ := divisor_exponents n hn e (Finset.mem_Iic.mp he)
 
         exact ⟨factorValue e, Nat.mem_divisors.mpr ⟨hdiv, ne_of_gt hn⟩, heq⟩
+  \end{lean}
+
+  Each coordinate has $e_n(p)+1$ choices.
+  Counting the box therefore gives the stated product.
+
+  \begin{lean}
     rw [tau, hcard, Finsupp.card_Iic]
     simp only [Nat.card_Iic]
   \end{lean}
@@ -176,7 +187,7 @@
 
 \begin{proof}
   Choose $n$ with $f(n)\ne0$.
-  Multiplicativity at $(1,n)$ gives $f(n)=f(1)f(n)$, and cancellation gives the result.
+  The integers one and $n$ are coprime.
 
   \begin{lean}
     obtain ⟨n, hn, hfn⟩ := hne
@@ -184,7 +195,12 @@
     have hcop : Chapter01.gcd 1 n = 1 :=
       (Chapter01.gcd_eq_one_iff_exists_mul_add_mul 1 n (Or.inl (by decide))).2
         ⟨1, 0, by ring⟩
+  \end{lean}
 
+  Multiplicativity gives $f(n)=f(1)f(n)$.
+  Cancelling the nonzero value $f(n)$ yields $f(1)=1$.
+
+  \begin{lean}
     have h := hf 1 n (by decide) hn hcop
     rw [one_mul] at h
     exact mul_right_cancel₀ hfn ((one_mul (f n)).trans h).symm
@@ -205,15 +221,18 @@
 
 \begin{proof}
   Allocate the prime factors of $d$ to $m$ or $n$ using Euclid\textquotesingle s lemma.
-  For uniqueness, if $ab=ce$ with $a,c\mid m$ and $b,e\mid n$, inherited coprimality gives $a\mid
-    c$ and $c\mid a$.
-  Thus $a=c$, and positivity permits cancellation to obtain $b=e$.
-  The same Bezout argument proves that divisors of coprime integers remain coprime.
+  This gives a factorization $d=ab$ with $a\mid m$ and $b\mid n$.
 
   \begin{lean}
     obtain ⟨a, b, ha, hb, hab⟩ := exists_divisor_split m n d
       (Nat.pos_of_mem_divisors hd) (Nat.dvd_of_mem_divisors hd)
+  \end{lean}
 
+  For uniqueness, suppose $ab=ce$ with $c\mid m$ and $e\mid n$.
+  Inherited coprimality gives $a\mid c$ and $c\mid a$, hence $a=c$.
+  Positivity then permits cancellation to obtain $b=e$.
+
+  \begin{lean}
     refine ⟨(a, b), ⟨ha, hb, hab⟩, ?_⟩
     rintro ⟨c, e⟩ ⟨hc, he, hce⟩
 
@@ -244,11 +263,17 @@
 
 \begin{proof}
   For coprime $m,n$, uniquely write every divisor of $mn$ as $ab$ with $a\mid m$ and $b\mid n$.
-  Since $a,b$ are coprime, replace $f(ab)$ by $f(a)f(b)$ and factor the double sum.
+  The divisor sum becomes a double sum.
 
   \begin{lean}
     intro m n hm hn hcop
     rw [sum_divisors_mul f m n hm hn hcop, divisorSum, divisorSum, Finset.sum_mul_sum]
+  \end{lean}
+
+  The divisors $a,b$ inherit coprimality.
+  Replace $f(ab)$ by $f(a)f(b)$ term by term to obtain the product of the two divisor sums.
+
+  \begin{lean}
     apply Finset.sum_congr rfl
     intro a ha
     apply Finset.sum_congr rfl
@@ -312,9 +337,8 @@
 \end{theorem}
 
 \begin{proof}
-  Distinct prime powers are coprime.
-  Apply multiplicativity successively to the nonempty product of prime powers.
-  Nonemptiness avoids making an unwarranted assumption that $f(1)=1$.
+  The prime-power factorization of $n>1$ has nonempty support.
+  Otherwise its product would be one.
 
   \begin{lean}
     have hnpos : 0 < n := by
@@ -331,6 +355,13 @@
       change (∏ p ∈ (primeExponents n).support, p ^ primeExponents n p) = n at hv
       rw [he, Finset.prod_empty] at hv
       omega
+  \end{lean}
+
+  Distinct prime powers are coprime.
+  Apply multiplicativity successively to this nonempty product.
+  Nonemptiness avoids assuming $f(1)=1$.
+
+  \begin{lean}
     calc
       f n = f (factorValue (primeExponents n)) := congrArg f hspec.2.symm
       _ = _ := multiplicative_prod _ hs (fun p => p ^ primeExponents n p)
@@ -457,9 +488,7 @@
 \end{theorem}
 
 \begin{proof}
-  The divisors already include the distinct elements one and $n$.
-  If there are only two, these are all the divisors.
-  Conversely, the definition of primality says precisely that no other divisor exists.
+  The positive divisors include the distinct elements one and $n$.
 
   \begin{lean}
     have hnpos : 0 < n := by
@@ -481,7 +510,11 @@
     have hcard : ({1, n} : Finset ℕ).card = 2 := by
       rw [Finset.card_insert_of_notMem, Finset.card_singleton]
       simpa only [Finset.mem_singleton] using (by omega : (1 : ℕ) ≠ n)
+  \end{lean}
 
+  If there are only two divisors, these are all of them, so $n$ is prime.
+
+  \begin{lean}
     constructor
 
     · intro ht
@@ -497,7 +530,12 @@
       have hmem := Nat.mem_divisors.mpr ⟨hd, ne_of_gt hnpos⟩
       rw [heq, Finset.mem_insert, Finset.mem_singleton] at hmem
       exact hmem
+  \end{lean}
 
+  Conversely, primality says that one and $n$ are exactly the divisors.
+  Their number is two.
+
+  \begin{lean}
     · intro hp
 
       have heq : n.divisors = {1, n} := by
@@ -520,9 +558,8 @@
 \end{theorem}
 
 \begin{proof}
-  One and $n$ already contribute $n+1$.
-  Any further positive divisor would strictly increase the sum.
-  Conversely, the two divisors of a prime sum to $n+1$.
+  One and $n$ already contribute $n+1$ to the divisor sum.
+  If the sum equals $n+1$, consider any divisor other than these two.
 
   \begin{lean}
     have hnpos : 0 < n := by
@@ -559,15 +596,25 @@
 
             · rw [he]
               exact Nat.mem_divisors_self n (ne_of_gt hnpos)
+  \end{lean}
 
-          have hle := Finset.sum_le_sum_of_subset hsub (f := fun k => k)
-          rw [Finset.sum_insert (by simp only [Finset.mem_insert, Finset.mem_singleton,
-            hd1, hdn, or_self, not_false_eq_true]),
-            Finset.sum_insert (by simpa only [Finset.mem_singleton] using
-              (by omega : (1 : ℕ) ≠ n)), Finset.sum_singleton] at hle
-          change d + (1 + n) ≤ sigma n at hle
-          omega
+  This further divisor is positive.
+  Its contribution would make the divisor sum strictly greater than $n+1$, a contradiction.
 
+  \begin{lean}
+    have hle := Finset.sum_le_sum_of_subset hsub (f := fun k => k)
+    rw [Finset.sum_insert (by simp only [Finset.mem_insert, Finset.mem_singleton,
+      hd1, hdn, or_self, not_false_eq_true]),
+      Finset.sum_insert (by simpa only [Finset.mem_singleton] using
+        (by omega : (1 : ℕ) ≠ n)), Finset.sum_singleton] at hle
+    change d + (1 + n) ≤ sigma n at hle
+    omega
+  \end{lean}
+
+  Conversely, a prime has exactly the two divisors one and $n$.
+  Their sum is $n+1$.
+
+  \begin{lean}
     · intro hp
 
       have heq : n.divisors = {1, n} := by
@@ -604,8 +651,7 @@
 \end{theorem}
 
 \begin{proof}
-  The map $d\mapsto n/d$ permutes the positive divisors.
-  Multiply the original divisor product by this permuted product; each paired factor is $d(n/d)=n$.
+  The map $d\mapsto n/d$ permutes the positive divisors, so it preserves their product.
 
   \begin{lean}
     have hperm : (∏ d ∈ n.divisors, n / d) = ∏ d ∈ n.divisors, d := by
@@ -629,7 +675,12 @@
 
       · intro d hd
         rfl
+  \end{lean}
 
+  Multiply the original product by this permuted product.
+  Each paired factor is $d(n/d)=n$, giving one factor $n$ for each divisor.
+
+  \begin{lean}
     rw [pow_two]
     nth_rw 2 [← hperm]
     rw [← Finset.prod_mul_distrib]

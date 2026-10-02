@@ -148,14 +148,17 @@
 
 \begin{proof}
   At exponent zero both sides are one.
-  Multiply the induction hypothesis by the original congruence to pass to the next exponent.
 
   \begin{lean}
     induction k with
     | zero =>
       simp only [pow_zero]
       exact modEq_refl n 1
+  \end{lean}
 
+  Multiply the induction hypothesis by the original congruence to pass to the next exponent.
+
+  \begin{lean}
     | succ k ih => simpa only [pow_succ] using modEq_mul ih h
   \end{lean}
 \end{proof}
@@ -190,9 +193,7 @@
 
 \begin{proof}
   The division algorithm gives $a=qn+r$ with $0\le r<n$.
-  Conversely, any congruent representative $s$ in this interval supplies a quotient through
-  $a-s=kn$.
-  Uniqueness of the quotient--remainder pair forces $s=r$.
+  The identity $a-r=qn$ shows that $r$ is a congruent representative.
 
   \begin{lean}
     obtain ⟨⟨q, r⟩, ⟨ha, hr⟩, hu⟩ := Chapter01.existsUnique_quotient_remainder a n
@@ -203,7 +204,13 @@
       exact ⟨q, by
           change a = q * (n : ℤ) + r at ha
           nlinarith⟩
+  \end{lean}
 
+  Conversely, any congruent representative $s$ in this interval supplies a quotient through
+  $a-s=kn$.
+  Uniqueness of the quotient--remainder pair forces $s=r$.
+
+  \begin{lean}
     · intro s hs
 
       obtain ⟨k, hk⟩ := (modEq_iff_dvd_sub _ _ _).1 hs.2
@@ -238,10 +245,7 @@
 \end{theorem}
 
 \begin{proof}
-  Uniqueness immediately gives pairwise incongruence.
-  Conversely, pairwise incongruence makes the map from the $n$ indices to the $n$ residue classes
-  injective.
-  Finite counting makes it surjective as well, giving existence and uniqueness for every integer.
+  Uniqueness of a representative immediately gives pairwise incongruence.
 
   \begin{lean}
     let : NeZero n := ⟨ne_of_gt hn⟩
@@ -253,24 +257,34 @@
       obtain ⟨k, hk, hu⟩ := h (a i)
 
       exact (hu i (modEq_refl _ _)).trans (hu j hij).symm
+  \end{lean}
 
+  Conversely, pairwise incongruence makes the map from the $n$ indices to the $n$ residue classes
+  injective.
+
+  \begin{lean}
     · intro h
 
       have hinj : Function.Injective (fun i : Fin n => (a i : ZMod n)) := by
         intro i j heq
         exact h i j ((ZMod.intCast_eq_intCast_iff _ _ n).1 heq)
+  \end{lean}
 
-      have hsurj := (Finite.injective_iff_surjective_of_equiv (ZMod.finEquiv n).toEquiv).1 hinj
+  Finite counting makes this map surjective as well.
+  Every integer therefore has a representative, and injectivity makes it unique.
 
-      intro x
+  \begin{lean}
+    have hsurj := (Finite.injective_iff_surjective_of_equiv (ZMod.finEquiv n).toEquiv).1 hinj
 
-      obtain ⟨i, hi⟩ := hsurj (x : ZMod n)
+    intro x
 
-      refine ⟨i, (ZMod.intCast_eq_intCast_iff _ _ n).1 hi.symm, ?_⟩
+    obtain ⟨i, hi⟩ := hsurj (x : ZMod n)
 
-      intro j hj
-      apply hinj
-      exact ((ZMod.intCast_eq_intCast_iff _ _ n).2 hj).symm.trans hi.symm
+    refine ⟨i, (ZMod.intCast_eq_intCast_iff _ _ n).1 hi.symm, ?_⟩
+
+    intro j hj
+    apply hinj
+    exact ((ZMod.intCast_eq_intCast_iff _ _ n).2 hj).symm.trans hi.symm
   \end{lean}
 \end{proof}
 

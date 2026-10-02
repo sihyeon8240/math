@@ -57,10 +57,8 @@ other; a zero pair is characterized by having zero as a common divisor.
 \end{lemma}
 
 \begin{proof}
-
   An integer $c$ divides $|z|$ exactly when it divides $z$.
   For $z\ge0$ this is immediate; for $z<0$, negate the multiplication witness.
-  Apply this to both inputs and use the common-divisor characterization.
 
   \begin{lean}
     have hdiv (c z : ℤ) : c ∣ |z| ↔ c ∣ z := by
@@ -69,10 +67,13 @@ other; a zero pair is characterized by having zero as a common divisor.
       · rw [abs_of_nonneg hz]
       · rw [abs_of_neg (lt_of_not_ge hz)]
         constructor <;> rintro ⟨k, hk⟩ <;> exact ⟨-k, by linarith⟩
-
-    exact gcd_eq_of_common_divisors _ _ _ _ (fun c => by rw [hdiv, hdiv])
   \end{lean}
 
+  Apply this equivalence to both inputs and use the common-divisor characterization of the gcd.
+
+  \begin{lean}
+    exact gcd_eq_of_common_divisors _ _ _ _ (fun c => by rw [hdiv, hdiv])
+  \end{lean}
 \end{proof}
 
 Absolute values reduce the computation to nonnegative inputs.
@@ -290,10 +291,8 @@ is followed by $(b,r)$.
 \end{lemma}
 
 \begin{proof}
-
   The integer $(ab)^2$ is positive.
-  Its natural-number representation has the same value, and $(ab)^2=a(ab^2)=b(a^2b)$ supplies the
-  two divisibility witnesses.
+  Its natural-number representation has the same value.
 
   \begin{lean}
     have hp : 0 < (a * b) * (a * b) := mul_self_pos.mpr (mul_ne_zero ha hb)
@@ -301,13 +300,17 @@ is followed by $(b,r)$.
     refine ⟨((a * b) * (a * b)).toNat, ?_, ?_, ?_⟩
 
     · omega
+  \end{lean}
+
+  The identities $(ab)^2=a(ab^2)=b(a^2b)$ supply the two divisibility witnesses.
+
+  \begin{lean}
     · rw [Int.toNat_of_nonneg (le_of_lt hp)]
       exact ⟨a * b * b, by ring⟩
 
     · rw [Int.toNat_of_nonneg (le_of_lt hp)]
       exact ⟨a * a * b, by ring⟩
   \end{lean}
-
 \end{proof}
 
 \begin{definition}

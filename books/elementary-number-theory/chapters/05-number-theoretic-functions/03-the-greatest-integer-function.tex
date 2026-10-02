@@ -59,8 +59,8 @@
 \end{theorem}
 
 \begin{proof}
-  The division identity $N=kq+r$ with $0\le r<k$ gives $q\le N/k<q+1$.
-  These bounds identify the floor with $q$.
+  Write $N=kq+r$ with $0\le r<k$.
+  Then $q\le N/k$.
 
   \begin{lean}
     have hkreal : (0 : ℝ) < k := by
@@ -73,7 +73,12 @@
 
     · apply (le_div_iff₀ hkreal).mpr
       exact_mod_cast Nat.div_mul_le_self N k
+  \end{lean}
 
+  The strict bound $r<k$ gives $N/k<q+1$.
+  The two inequalities identify the floor with $q$.
+
+  \begin{lean}
     · apply (div_lt_iff₀ hkreal).mpr
       simp only [Int.cast_natCast]
 
@@ -96,9 +101,8 @@
 \end{theorem}
 
 \begin{proof}
-  Send a multiple $n$ to $n/k$.
-  This is a bijection with $\{1,\ldots,\lfloor N/k\rfloor\}$, whose inverse is multiplication by
-  $k$.
+  Send a positive multiple $n\le N$ to $n/k$.
+  This quotient lies between one and $\lfloor N/k\rfloor$.
 
   \begin{lean}
     classical
@@ -115,30 +119,45 @@
 
         apply Finset.mem_Icc.mpr
         exact ⟨Nat.div_pos (Nat.le_of_dvd hnpos hdiv) hk, Nat.div_le_div_right hnle⟩
+  \end{lean}
 
-      · intro m hm n hn heq
+  Two such multiples with equal quotients are equal, since multiplication by $k$ recovers each
+  multiple.
 
-        have hmd := (Finset.mem_filter.mp hm).2
+  \begin{lean}
+    · intro m hm n hn heq
 
-        have hnd := (Finset.mem_filter.mp hn).2
+      have hmd := (Finset.mem_filter.mp hm).2
 
-        have h := congrArg (fun q => q * k) heq
-        rwa [Nat.div_mul_cancel hmd, Nat.div_mul_cancel hnd] at h
+      have hnd := (Finset.mem_filter.mp hn).2
 
-      · intro j hj
+      have h := congrArg (fun q => q * k) heq
+      rwa [Nat.div_mul_cancel hmd, Nat.div_mul_cancel hnd] at h
+  \end{lean}
 
-        obtain ⟨hjpos, hjle⟩ := Finset.mem_Icc.mp hj
+  Conversely, for every $1\le j\le\lfloor N/k\rfloor$, the integer $jk$ is a positive multiple at
+  most $N$ and has quotient $j$.
 
-        refine ⟨j * k, ?_, Nat.mul_div_cancel j hk⟩
+  \begin{lean}
+    · intro j hj
 
-        apply Finset.mem_filter.mpr
-        constructor
+      obtain ⟨hjpos, hjle⟩ := Finset.mem_Icc.mp hj
 
-        · apply Finset.mem_Icc.mpr
-          exact ⟨mul_pos hjpos hk, (Nat.le_div_iff_mul_le hk).1 hjle⟩
+      refine ⟨j * k, ?_, Nat.mul_div_cancel j hk⟩
 
-        · exact ⟨j, by ring⟩
+      apply Finset.mem_filter.mpr
+      constructor
 
+      · apply Finset.mem_Icc.mpr
+        exact ⟨mul_pos hjpos hk, (Nat.le_div_iff_mul_le hk).1 hjle⟩
+
+      · exact ⟨j, by ring⟩
+  \end{lean}
+
+  This bijection identifies the number of multiples with the number of integers from one to
+  $\lfloor N/k\rfloor$, which is $\lfloor N/k\rfloor$.
+
+  \begin{lean}
     rw [hcard, Nat.card_Icc, Nat.add_sub_cancel]
   \end{lean}
 \end{proof}
@@ -179,9 +198,9 @@
 \end{theorem}
 
 \begin{proof}
-  Add the floor bounds for $a$ and $b$ and compare with those for $a+b$.
-  The integer difference is strictly greater than minus one and strictly less than two, leaving
-  exactly the stated possibilities.
+  Add the floor bounds for $a$ and $b$ and compare them with those for $a+b$.
+  The difference $\lfloor a+b\rfloor-\lfloor a\rfloor-\lfloor b\rfloor$ is greater than minus one
+  and less than two.
 
   \begin{lean}
     have ha := floor_spec a
@@ -195,7 +214,12 @@
 
     have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by
       linarith
+  \end{lean}
 
+  These bounds also hold as inequalities between integers.
+  The only possible integer differences are zero and one.
+
+  \begin{lean}
     have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by
       exact_mod_cast hlow
 
@@ -237,8 +261,7 @@
 
 \begin{proof}
   It suffices to compare every prime exponent in the denominator and numerator.
-  Legendre\textquotesingle s formula with a common upper bound reduces this to \[ \left\lfloor\frac r{p^j}\right\rfloor+\left\lfloor\frac{n-r}{p^j}\right\rfloor\le\left\lfloor\frac n{p^j}\right\rfloor. \] Multiplying the two integer quotients by $p^j$ shows that their sum is at most $n/p^j$.
-  Sum these inequalities and apply the exponent criterion for divisibility.
+  A zero exponent in the denominator needs no further argument.
 
   \begin{lean}
     apply (dvd_iff_primeExponents_le _ _
@@ -249,7 +272,13 @@
 
     · rw [he]
       exact Nat.zero_le _
+  \end{lean}
 
+  For a nonzero exponent, the corresponding $p$ is prime.
+  Legendre\textquotesingle s formula with a common upper bound reduces the comparison to a sum of
+  quotient inequalities.
+
+  \begin{lean}
     · have hp := (primeExponents_spec (r.factorial * (n - r).factorial)
         (mul_pos (Nat.factorial_pos r) (Nat.factorial_pos (n - r)))).1 p
         (Finsupp.mem_support_iff.mpr he)
@@ -261,20 +290,26 @@
 
       apply Finset.sum_le_sum
       intro j hj
+  \end{lean}
 
-      have hpos : 0 < p ^ j := pow_pos (by
-          have := hp.1
-          omega) j
+  For each $j$, multiplying the quotients by $p^j$ gives bounds by $r$ and $n-r$.
+  Their sum is at most $n$, so the sum of the quotients is at most $\lfloor n/p^j\rfloor$.
+  Summing proves the required exponent inequality.
 
-      apply (Nat.le_div_iff_mul_le hpos).2
+  \begin{lean}
+    have hpos : 0 < p ^ j := pow_pos (by
+        have := hp.1
+        omega) j
 
-      have h₁ := Nat.div_mul_le_self r (p ^ j)
+    apply (Nat.le_div_iff_mul_le hpos).2
 
-      have h₂ := Nat.div_mul_le_self (n - r) (p ^ j)
+    have h₁ := Nat.div_mul_le_self r (p ^ j)
 
-      have hsum : r + (n - r) = n := Nat.add_sub_cancel' hr
+    have h₂ := Nat.div_mul_le_self (n - r) (p ^ j)
 
-      nlinarith
+    have hsum : r + (n - r) = n := Nat.add_sub_cancel' hr
+
+    nlinarith
   \end{lean}
 \end{proof}
 
@@ -293,11 +328,7 @@
 
 \begin{proof}
   Multiplication of the displayed product by $a!
-  $ gives $(a+r)!$.
-  The preceding theorem gives $r!
-    a!\mid(a+r)!$.
-  Cancel the positive factor $a!
-  $ to obtain the claimed divisibility.
+  $ gives $(a+r)!$, as follows by induction on $r$.
 
   \begin{lean}
     have hfactor : (∏ k ∈ Finset.Ico (a + 1) (a + r + 1), k) * a.factorial =
@@ -311,7 +342,14 @@
         rw [mul_right_comm, ih]
         rw [show a + (r + 1) = (a + r) + 1 by omega, Nat.factorial_succ]
         ring
+  \end{lean}
 
+  The preceding theorem gives $r!
+    a!\mid(a+r)!$.
+  Cancel the positive factor $a!
+  $ to obtain the claimed divisibility.
+
+  \begin{lean}
     obtain ⟨k, hk⟩ := factorials_dvd_factorial (a + r) r (by omega)
     rw [show a + r - r = a by omega] at hk
 

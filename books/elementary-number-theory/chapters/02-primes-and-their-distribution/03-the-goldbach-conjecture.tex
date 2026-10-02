@@ -56,12 +56,16 @@
 \begin{proof}
   Induct on the number of factors.
   The empty product is $1=4\cdot0+1$.
-  If the first factor is $4u+1$ and the remaining product is $4v+1$, then their product is
-  $4(4uv+u+v)+1$.
 
   \begin{lean}
     induction l with
     | nil => exact ⟨0, by simp⟩
+  \end{lean}
+
+  If the first factor is $4u+1$ and the remaining product is $4v+1$, their product is
+  $4(4uv+u+v)+1$.
+
+  \begin{lean}
     | cons a l ih =>
       obtain ⟨u, hu⟩ := hl a List.mem_cons_self
       obtain ⟨v, hv⟩ := ih (fun b hb => hl b (List.mem_cons_of_mem a hb))
@@ -69,7 +73,6 @@
       rw [List.prod_cons, hu, hv]
       ring
   \end{lean}
-
 \end{proof}
 
 The notation $a\bmod4$ below means the remainder upon division by $4$; in Lean it is written
