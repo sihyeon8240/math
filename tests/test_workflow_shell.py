@@ -25,7 +25,7 @@ class WorkflowShellTests(unittest.TestCase):
 
     def test_configuration_shell_helpers_parse(self):
         for relative in (
-            "scripts/check-dependabot-image-update.sh",
+            "scripts/open-image-pin-pr.sh",
             "scripts/check-image-tag.sh",
             "scripts/check-toolchain.sh",
             "scripts/export-config.sh",
@@ -263,9 +263,8 @@ printf '%s\\n' "$MANIFEST"
         self.assertNotIn("scripts/check-environment.sh", text)
         self.assertIn("cut -c 1-12", text)
         self.assertIn("RELEASE_TAG=texlive-${input_hash}", text)
-        self.assertIn("pull_request_target:", wrapper)
-        self.assertIn("github.actor", wrapper)
-        self.assertIn("dependabot[bot]", wrapper)
+        self.assertNotIn("pull_request_target:", wrapper)
+        self.assertIn("workflow_dispatch:", wrapper)
         self.assertIn("if: needs.prepare.outputs.exists != 'true'", text)
         self.assertIn('make image pin DIGEST="$DIGEST"', wrapper)
         self.assertIn("prepare-image.yml", wrapper)
@@ -281,14 +280,6 @@ printf '%s\\n' "$MANIFEST"
         self.assertIn("config/toolchain.env", text)
         self.assertIn("scripts/check-toolchain.sh", text)
         self.assertNotIn("scripts/check-environment.sh", text)
-
-    def test_dependabot_image_update_is_restricted(self):
-        text = (ROOT / "scripts/check-dependabot-image-update.sh").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("unexpected changed file", text)
-        self.assertIn("FROM", text)
-        self.assertNotIn("eval", text)
 
     def test_source_check_always_runs_unit_tests(self):
         workflow = yaml.safe_load(
@@ -332,7 +323,9 @@ printf '%s\\n' "$MANIFEST"
 
     def test_external_actions_are_pinned_to_full_commit_shas(self):
         reference = re.compile(r"^[^/@]+/[^/@]+(?:/[^/@]+)*@[0-9a-f]{40}$")
-        for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
+        paths = sorted((ROOT / ".github/workflows").glob("*.yml"))
+        paths += sorted((ROOT / ".github/actions").rglob("action.yml"))
+        for path in paths:
             workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
             pending = [workflow]
             while pending:
@@ -395,6 +388,141 @@ printf '%s\\n' "$MANIFEST"
             "Login to GitHub Container Registry",
             [step.get("name") for step in jobs["prepare"]["steps"]],
         )
+
+    def test_pr_images_do_not_use_registry_credentials_or_publish(self):
+        workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/prepare-image.yml").read_text()
+        )
+        for job in workflow["jobs"].values():
+            for step in job.get("steps", []):
+                if (
+                    "login-action@" in step.get("uses", "")
+                    or "docker push" in step.get("run", "")
+                    or "imagetools create" in step.get("run", "")
+                ):
+                    with self.subTest(step=step.get("name")):
+                        self.assertIn("github.event_name != 'pull_request'", step["if"])
+        build_steps = workflow["jobs"]["build"]["steps"]
+        archive = next(
+            step for step in build_steps if "docker save" in step.get("run", "")
+        )
+        self.assertIn("github.event_name == 'pull_request'", archive["if"])
+        self.assertIn("matrix.arch == 'amd64'", archive["if"])
+        for name in ("latex", "book"):
+            steps = self.build_workflow()["jobs"][name]["steps"]
+            loader = next(
+                index
+                for index, step in enumerate(steps)
+                if step.get("uses") == "./.github/actions/load-toolchain"
+            )
+            consumer = next(
+                index
+                for index, step in enumerate(steps)
+                if "texlive-action@" in step.get("uses", "")
+            )
+            self.assertLess(loader, consumer)
+        for step in self.build_workflow()["jobs"]["book"]["steps"]:
+            if step.get("name") in {
+                "Record the verified build",
+                "Upload verified build for reuse after merge",
+            }:
+                self.assertIn("needs.prepare-image.outputs.artifact == ''", step["if"])
+
+    def test_run_local_image_selection_does_not_access_the_registry(self):
+        workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/prepare-image.yml").read_text()
+        )
+        script = next(
+            step["run"]
+            for step in workflow["jobs"]["publish"]["steps"]
+            if step.get("id") == "image"
+        )
+        for digest, success in (("sha256:" + "a" * 64, True), ("invalid", False)):
+            with (
+                self.subTest(digest=digest),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                root = Path(temporary)
+                (root / "build/image-digests").mkdir(parents=True)
+                (root / "build/image-digests/amd64").write_text(digest + "\n")
+                docker = root / "docker"
+                docker.write_text("#!/bin/sh\nexit 99\n")
+                docker.chmod(0o755)
+                output = root / "output"
+                result = subprocess.run(
+                    ["bash", "-euo", "pipefail", "-c", script],
+                    cwd=root,
+                    env={
+                        **os.environ,
+                        "PATH": f"{root}:{os.environ['PATH']}",
+                        "GITHUB_EVENT_NAME": "pull_request",
+                        "GITHUB_OUTPUT": str(output),
+                        "GITHUB_RUN_ID": "123",
+                        "GITHUB_RUN_ATTEMPT": "2",
+                        "IMAGE_NAME": "ghcr.io/example/toolchain",
+                    },
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+                self.assertEqual(result.returncode == 0, success, result.stderr)
+                if success:
+                    self.assertEqual(
+                        output.read_text(),
+                        f"digest={'a' * 64}\n"
+                        "reference=ghcr.io/example/toolchain:build-123-2-amd64\n",
+                    )
+                else:
+                    self.assertFalse(output.exists())
+
+    def test_loaded_image_must_match_identity_and_architecture(self):
+        action = yaml.safe_load(
+            (ROOT / ".github/actions/load-toolchain/action.yml").read_text()
+        )
+        script = action["runs"]["steps"][-1]["run"]
+        for image_id, arch, success in (
+            ("sha256:" + "a" * 64, "amd64", True),
+            ("sha256:" + "b" * 64, "amd64", False),
+            ("sha256:" + "a" * 64, "arm64", False),
+        ):
+            with self.subTest(image=image_id, arch=arch):
+                with tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    archive = root / "image.tar.gz"
+                    archive.touch()
+                    docker = root / "docker"
+                    docker.write_text(
+                        "#!/usr/bin/env bash\n"
+                        'if [[ "$1" == load ]]; then exit 0; fi\n'
+                        'case "$5" in\n'
+                        "  '{{.Id}}') echo \"$IMAGE_ID\" ;;\n"
+                        "  '{{.Architecture}}') echo \"$IMAGE_ARCH\" ;;\n"
+                        "  *) exit 2 ;;\n"
+                        "esac\n"
+                    )
+                    docker.chmod(0o755)
+                    result = subprocess.run(
+                        ["bash", "-euo", "pipefail", "-c", script],
+                        env={
+                            **os.environ,
+                            "PATH": f"{root}:{os.environ['PATH']}",
+                            "ARCHIVE": str(archive),
+                            "IMAGE": "ghcr.io/example/toolchain:local",
+                            "DIGEST": "a" * 64,
+                            "IMAGE_ID": image_id,
+                            "IMAGE_ARCH": arch,
+                        },
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertEqual(result.returncode == 0, success, result.stderr)
+                    self.assertEqual(archive.exists(), not success)
+
+    def test_image_pin_requires_combined_checks(self):
+        job = self.build_workflow()["jobs"]["pin-image"]
+        self.assertEqual(job["needs"], ["prepare-image", "check", "build-check"])
+        self.assertNotIn("always()", job["if"])
 
     def test_incomplete_or_invalid_existing_images_are_not_reused(self):
         manifests = [

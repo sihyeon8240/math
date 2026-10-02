@@ -244,7 +244,9 @@ permissions, concurrency, and publication implementation.
 `build.yml` owns PR and main CI, including the existing **Check sources** and
 **Verify textbook builds** status checks. Source checks and affected-book planning
 start independently; image preparation runs once and its immutable digest is
-shared by formatting and PDF jobs. Both events still validate sources and Lean.
+shared by formatting and PDF jobs. New PR images are smoke-tested on both native
+platforms and passed to consumers as a run-local AMD64 artifact without registry
+publication. Both events still validate sources and Lean.
 
 Cache restores still run normal validation. After a merge, CI may reuse a
 verified PR artifact when its full source tree and build environment match;

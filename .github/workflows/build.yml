@@ -6,7 +6,6 @@ on:
     branches: [main]
 permissions:
   contents: read
-  packages: write
   actions: read
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event_name == 'push' && github.sha || github.ref }}
@@ -125,9 +124,16 @@ jobs:
     name: Source formatting
     needs: prepare-image
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Load the tested PR image
+        if: needs.prepare-image.outputs.artifact != ''
+        uses: ./.github/actions/load-toolchain
+        with:
+          artifact: ${{ needs.prepare-image.outputs.artifact }}
+          image: ${{ needs.prepare-image.outputs.image }}
+          digest: ${{ needs.prepare-image.outputs.digest }}
       - name: Cache LaTeX formatting checks
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
@@ -168,13 +174,16 @@ jobs:
     with:
       ref: ${{ github.sha }}
   pin-image:
-    needs: prepare-image
+    needs: [prepare-image, check, build-check]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
+    concurrency:
+      group: image-pin-pull-request
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Pin the tested image in repository consumers
@@ -184,21 +193,7 @@ jobs:
       - name: Open an image pin pull request
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add config/container-image.txt .devcontainer/devcontainer.json
-          git commit -m "build(toolchain): pin tested development image"
-          branch="automation/image-pin-${GITHUB_RUN_ID}"
-          git push origin "HEAD:refs/heads/${branch}"
-          gh pr create \
-            --base main \
-            --head "$branch" \
-            --title "build(toolchain): pin tested development image" \
-            --body "Pins the image prepared and tested by the textbook CI workflow."
+        run: ./scripts/open-image-pin-pr.sh
   plan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -275,12 +270,12 @@ jobs:
       - name: Identify the build inputs
         id: inputs
         env:
-          IMAGE: ${{ needs.prepare-image.outputs.image }}
+          DIGEST: ${{ needs.prepare-image.outputs.digest }}
           BOOK: ${{ matrix.book }}
         run: |
           mkdir -p "build/$BOOK"
           echo "tree=$(git rev-parse 'HEAD^{tree}')" >> "$GITHUB_OUTPUT"
-          echo "image=${IMAGE##*@sha256:}" >> "$GITHUB_OUTPUT"
+          echo "image=$DIGEST" >> "$GITHUB_OUTPUT"
       - name: Reuse a verified PDF from the merged pull request
         id: reuse
         if: github.event_name == 'push'
@@ -297,6 +292,13 @@ jobs:
           key: latex-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.book }}-${{ steps.inputs.outputs.image }}-${{ steps.inputs.outputs.tree }}
           restore-keys: |
             latex-v1-${{ runner.os }}-${{ runner.arch }}-${{ matrix.book }}-${{ steps.inputs.outputs.image }}-
+      - name: Load the tested PR image
+        if: needs.prepare-image.outputs.artifact != ''
+        uses: ./.github/actions/load-toolchain
+        with:
+          artifact: ${{ needs.prepare-image.outputs.artifact }}
+          image: ${{ needs.prepare-image.outputs.image }}
+          digest: ${{ needs.prepare-image.outputs.digest }}
       - name: Build and strictly check in the prepared image
         if: steps.reuse.outputs.reused != 'true'
         uses: xu-cheng/texlive-action@22c04326a5d855880f9d39bb955138bf11c6df80 # v3
@@ -324,13 +326,13 @@ jobs:
           if-no-files-found: error
           retention-days: 90
       - name: Record the verified build
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && needs.prepare-image.outputs.artifact == ''
         env:
           IMAGE: ${{ needs.prepare-image.outputs.image }}
           BOOK: ${{ matrix.book }}
         run: python3 scripts/verified-build.py record --book "$BOOK" --image "$IMAGE"
       - name: Upload verified build for reuse after merge
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && needs.prepare-image.outputs.artifact == ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: ${{ matrix.book }}-verified-build

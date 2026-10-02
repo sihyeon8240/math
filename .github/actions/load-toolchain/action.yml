@@ -1,0 +1,31 @@
+name: Load tested toolchain image
+description: Load a run-local PR image and verify its identity before use
+inputs:
+  artifact:
+    required: true
+    description: Image artifact from this workflow run
+  image:
+    required: true
+    description: Expected local image tag
+  digest:
+    required: true
+    description: Expected image ID without the sha256 prefix
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+      with:
+        name: ${{ inputs.artifact }}
+        path: ${{ runner.temp }}/toolchain-image
+    - name: Load and verify the tested image
+      shell: bash
+      env:
+        ARCHIVE: ${{ runner.temp }}/toolchain-image/image.tar.gz
+        IMAGE: ${{ inputs.image }}
+        DIGEST: ${{ inputs.digest }}
+      run: |
+        [[ "$DIGEST" =~ ^[0-9a-f]{64}$ ]]
+        docker load --input "$ARCHIVE"
+        test "$(docker image inspect "$IMAGE" --format '{{.Id}}')" = "sha256:$DIGEST"
+        test "$(docker image inspect "$IMAGE" --format '{{.Architecture}}')" = amd64
+        rm "$ARCHIVE"
