@@ -2,8 +2,6 @@ import Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Tactic.Positivity
 
-set_option autoImplicit false
-
 namespace MathematicalAnalysis.Chapter02
 
 open Set Metric
@@ -62,12 +60,13 @@ theorem limit_unique (u : ℕ → X) (p q : X)
   rw [dist_comm p (u (max N M))] at ht
   linarith
 
-/-- Proposition: boundedness and uniqueness, paired with the printed theorem. -/
+/-- Proposition: a convergent sequence is bounded and has a unique limit. -/
 theorem convergent_properties (u : ℕ → X) (p : X) (hp : Filter.Tendsto u Filter.atTop (nhds p)) :
     Bornology.IsBounded (range u) ∧ ∀ q : X, Filter.Tendsto u Filter.atTop (nhds q) → p = q := by
   exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
 
-/-- Lemma: finite exceptional indices, rather than finitely many values. -/
+/-- Lemma: convergence is equivalent to finitely many indices outside every ball
+about the limit. The condition counts indices, rather than distinct values. -/
 theorem tendsto_iff_finite_exceptions (u : ℕ → X) (p : X) :
     Filter.Tendsto u Filter.atTop (nhds p) ↔
       ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
@@ -128,7 +127,9 @@ theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ derivedSet E) :
 
   exact ⟨N, fun n hn => (hd n).trans (hN n hn)⟩
 
-/-- Theorem: Both parts of the neighborhood characterization in the textbook. -/
+/-- Theorem: convergence is characterized by finitely many indices outside each
+ball about the limit, and every limit point is approached by a sequence of
+points in the set that differ from the limit. -/
 theorem neighborhood_characterization (u : ℕ → X) (p : X) :
     (Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
     (∀ E : Set X, p ∈ derivedSet E →

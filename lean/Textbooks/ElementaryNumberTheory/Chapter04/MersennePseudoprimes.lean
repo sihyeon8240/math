@@ -149,6 +149,7 @@ theorem mersenne_odd (n : ℕ) (hn : 0 < n) : Odd (mersenne n) := by
   rw [he]
   omega
 
+/-- Lemma: 341 is a base-two pseudoprime, used to start the unbounded construction. -/
 private theorem pseudoprime_seed : IsPseudoprime 2 341 := by
   refine ⟨⟨by decide, ?_⟩, ?_⟩
 

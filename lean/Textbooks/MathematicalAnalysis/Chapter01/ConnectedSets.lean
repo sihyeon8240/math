@@ -2,8 +2,6 @@ import Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces
 import Mathlib.Tactic.Ring
 import Mathlib.Topology.Connected.Basic
 
-set_option autoImplicit false
-
 namespace MathematicalAnalysis.Chapter01
 
 open Set Metric

@@ -4,8 +4,6 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Tactic.Convert
 import Mathlib.Tactic.Positivity
 
-set_option autoImplicit false
-
 namespace MathematicalAnalysis.Chapter01
 
 open Set Metric
@@ -256,7 +254,8 @@ theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
 
     exact mem_iUnion.mpr ⟨i, mem_iUnion.mpr ⟨his, hqp ▸ hq⟩⟩
 
-/-- Theorem: the empty indexing family is covered by its FIP hypothesis. -/
+/-- Theorem: a family of compact sets with the finite intersection property has a
+nonempty intersection. The empty family is included via the same hypothesis. -/
 theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
     (hK : ∀ i, IsCompact (K i))
     (hfinite : ∀ s : Finset ι, (⋂ i ∈ s, K i).Nonempty) :

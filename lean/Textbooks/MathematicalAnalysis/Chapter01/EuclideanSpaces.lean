@@ -2,8 +2,6 @@ import Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Tactic.Tauto
 
-set_option autoImplicit false
-
 namespace MathematicalAnalysis.Chapter01
 
 open Set Metric

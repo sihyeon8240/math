@@ -1,8 +1,6 @@
 import Textbooks.LinearAlgebra.Chapter03.Composition
 import Textbooks.LinearAlgebra.Chapter03.RankNullity
 
-set_option autoImplicit false
-
 namespace LinearAlgebra.Chapter03
 
 open Chapter01

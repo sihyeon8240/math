@@ -5,8 +5,6 @@ import Mathlib.Tactic.Choose
 import Mathlib.Tactic.Linarith
 import Mathlib.Tactic.Push
 
-set_option autoImplicit false
-
 namespace MathematicalAnalysis.Chapter01
 
 open Set Metric
@@ -154,7 +152,7 @@ theorem open_iff_compl_derivedSet (E : Set X) :
 
     exact h hl hp
 
-/-- Lemma: Representational bridge for the textbook's definition of closedness. -/
+/-- Lemma: a set is closed exactly when it contains all its limit points. -/
 theorem closed_iff_derivedSet (E : Set X) :
     IsClosed E ↔ derivedSet E ⊆ E := by
   have h := open_iff_compl_derivedSet Eᶜ
