@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 
 import yaml
+from workflow_support import condition_allows
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -583,18 +584,58 @@ printf '%s\\n' "$MANIFEST"
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(output, "exists=true\n")
 
-    def test_publish_skips_changes_without_pdf_or_site_impact(self):
-        condition = self.build_workflow()["jobs"]["publish"]["if"]
-        self.assertIn("needs.plan.outputs.count != '0'", condition)
-        self.assertIn("needs.plan.outputs.site_changed == 'true'", condition)
-        self.assertIn("needs.plan.outputs.snapshot_changed == 'true'", condition)
-
-    def test_publish_requires_source_and_build_checks(self):
+    def test_publish_condition_requires_main_changes_and_successful_gates(self):
         publish = self.build_workflow()["jobs"]["publish"]
-        for gate in ("check", "build-check"):
-            with self.subTest(gate=gate):
-                self.assertIn(gate, publish["needs"])
-                self.assertIn(f"needs.{gate}.result == 'success'", publish["if"])
+        for gate in ("plan", "book", "check", "build-check"):
+            self.assertIn(gate, publish["needs"])
+        baseline = {
+            "github.event_name": "push",
+            "github.ref": "refs/heads/main",
+            "needs.plan.result": "success",
+            "needs.book.result": "success",
+            "needs.check.result": "success",
+            "needs.build-check.result": "success",
+            "needs.plan.outputs.count": "1",
+            "needs.plan.outputs.site_changed": "false",
+            "needs.plan.outputs.snapshot_changed": "false",
+        }
+        self.assertTrue(condition_allows(publish["if"], baseline))
+        for gate in ("plan", "book", "check", "build-check"):
+            for result in ("success", "failure", "cancelled", "skipped"):
+                with self.subTest(gate=gate, result=result):
+                    expected = result == "success" or (
+                        gate == "book" and result == "skipped"
+                    )
+                    self.assertEqual(
+                        condition_allows(
+                            publish["if"], {**baseline, f"needs.{gate}.result": result}
+                        ),
+                        expected,
+                    )
+        for event, branch, count, site, snapshot in itertools.product(
+            ("push", "workflow_dispatch", "pull_request"),
+            ("refs/heads/main", "refs/heads/local-work"),
+            ("0", "1"),
+            ("false", "true"),
+            ("false", "true"),
+        ):
+            with self.subTest(
+                event=event, branch=branch, count=count, site=site, snapshot=snapshot
+            ):
+                context = {
+                    **baseline,
+                    "github.event_name": event,
+                    "github.ref": branch,
+                    "needs.plan.outputs.count": count,
+                    "needs.plan.outputs.site_changed": site,
+                    "needs.plan.outputs.snapshot_changed": snapshot,
+                }
+                expected = (
+                    event in {"push", "workflow_dispatch"}
+                    and branch == "refs/heads/main"
+                    and (count != "0" or site == "true" or snapshot == "true")
+                )
+                self.assertEqual(condition_allows(publish["if"], context), expected)
 
     def test_snapshot_readme_change_does_not_redeploy_pages(self):
         condition = self.build_workflow()["jobs"]["pages"]["if"]

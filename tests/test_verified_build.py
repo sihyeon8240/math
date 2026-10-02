@@ -86,10 +86,37 @@ class VerifiedBuildTests(unittest.TestCase):
                 )
 
     def test_file_checksums_are_checked(self):
-        with self.assertRaisesRegex(ValueError, "checksum"):
-            BUILD.verify_archive(
-                self.archive(manifest_update={"checksums": {}}), self.expected, self.run
-            )
+        checksums = {name: BUILD.checksum(data) for name, data in self.files.items()}
+        cases = {"missing": {}}
+        for name in self.files:
+            cases[name] = {**checksums, name: "0" * 64}
+
+        for name, changed in cases.items():
+            with (
+                self.subTest(case=name),
+                self.assertRaisesRegex(ValueError, "checksum"),
+            ):
+                BUILD.verify_archive(
+                    self.archive(manifest_update={"checksums": changed}),
+                    self.expected,
+                    self.run,
+                )
+
+    def test_changed_file_contents_do_not_match_original_checksums(self):
+        checksums = {name: BUILD.checksum(data) for name, data in self.files.items()}
+        for name, original in self.files.items():
+            with (
+                self.subTest(file=name),
+                self.assertRaisesRegex(ValueError, "checksum"),
+            ):
+                BUILD.verify_archive(
+                    self.archive(
+                        files={**self.files, name: original + b"tampered"},
+                        manifest_update={"checksums": checksums},
+                    ),
+                    self.expected,
+                    self.run,
+                )
 
     def test_unexpected_paths_and_missing_files_are_rejected(self):
         for data in (
