@@ -148,7 +148,8 @@ theorem prime_dvd_common_difference (p d n : ℕ) (hn : 2 < n)
 
       · have := hp.1
         omega
-      · have hdpos : 0 < d := by omega
+      · have hdpos : 0 < d := by
+          omega
         nlinarith [hp.1]
 
     by_contra hqd

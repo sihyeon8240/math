@@ -23,16 +23,18 @@ def generate(scope: str, *, book: str | None = None, check: bool = False) -> int
 
     stale: list[Path] = []
     updates: dict[Path, str] = {}
+    proof_template = None
     for item in selected:
         book_dir = ROOT / "books" / item["slug"]
         updates.update(expected_files(book_dir, scope, book=item))
         if scope in {"sec", "all"}:
-            template = (ROOT / "common/templates/proofs.yml").read_text(
-                encoding="utf-8"
-            )
             for path in proof_index_paths(book_dir):
                 if not path.exists():
-                    updates[path] = template
+                    if proof_template is None:
+                        proof_template = (
+                            ROOT / "common/templates/proofs.yml"
+                        ).read_text(encoding="utf-8")
+                    updates[path] = proof_template
     for path, expected in updates.items():
         current = path.read_text(encoding="utf-8") if path.is_file() else ""
         if current != expected:

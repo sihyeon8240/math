@@ -2,7 +2,7 @@ For integers $c,z$, define $c\mid z$ to mean that $z=ck$ for some $k\in\Z$.
 In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{theorem}
-  \label{nt:thm:positive-common-divisor}
+  \label{ent:thm:positive-common-divisor}
   Suppose $a,b\in\Z$ are not both zero.
   There is a positive natural number $d$ which divides both $a$ and $b$, is an integer linear
   combination of them, and is divisible by every common divisor.
@@ -134,7 +134,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:gcd-spec}
+  \label{ent:thm:gcd-spec}
   For integers $a,b$ not both zero, $\gcd(a,b)$ is positive, divides both inputs, is an integer
   linear combination of them, and is divisible by every common divisor.
 
@@ -156,7 +156,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:common-divisor-le-gcd}
+  \label{ent:thm:common-divisor-le-gcd}
   Suppose $a,b\in\Z$ are not both zero and $c\in\Z$ divides both.
   Then $c\le\gcd(a,b)$.
 
@@ -168,9 +168,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{proof}
   Write $d=\gcd(a,b)>0$.
-  Since $c\mid d$, there is $k\in\Z$ with $d=ck$.
-  If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$.
-  If $c\le0$, then $c<d$ immediately.
+  Since $c\mid d$, choose $k\in\Z$ with $d=ck$.
 
   \begin{lean}
     obtain ⟨hpos, _, _, _, hcommon⟩ := gcd_spec a b hab
@@ -179,7 +177,12 @@ In particular, $0\mid z$ if and only if $z=0$.
       exact_mod_cast hpos
 
     obtain ⟨k, hk⟩ := hcommon c hca hcb
+  \end{lean}
 
+  If $c>0$, positivity of $d$ forces $k>0$, hence $k\ge1$ and $d\ge c$.
+  If $c\le0$, then $c<d$ immediately.
+
+  \begin{lean}
     by_cases hc : 0 < c
 
     · have hkpos : 0 < k := by
@@ -194,7 +197,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-zero-zero}
+  \label{ent:thm:gcd-zero-zero}
   The zero-pair convention is $\gcd(0,0)=0$.
 
   \begin{lean}
@@ -216,7 +219,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-eq-of-greatest}
+  \label{ent:thm:gcd-eq-of-greatest}
   Suppose $a,b\in\Z$ are not both zero and $d\in\N$ divides both.
   If every integer common divisor is at most $d$, then $\gcd(a,b)=d$.
 
@@ -229,14 +232,17 @@ In particular, $0\mid z$ if and only if $z=0$.
 
 \begin{proof}
   Since $\gcd(a,b)$ is a common divisor, the hypothesis gives $\gcd(a,b)\le d$.
-  The preceding bound applied to $d$ gives $d\le\gcd(a,b)$.
-  Antisymmetry proves equality.
 
   \begin{lean}
     have hspec := gcd_spec a b hab
 
     have hle := hgreatest (gcd a b) hspec.2.1 hspec.2.2.1
+  \end{lean}
 
+  The preceding bound applied to $d$ gives $d\le\gcd(a,b)$.
+  Antisymmetry proves equality.
+
+  \begin{lean}
     have hge := common_divisor_le_gcd a b d hab hda hdb
 
     exact_mod_cast (le_antisymm hle hge)
@@ -244,7 +250,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:bezout}
+  \label{ent:thm:bezout}
   Suppose $a,b\in\Z$ are not both zero.
   There are integers $x,y$ such that $\gcd(a,b)=ax+by$.
 
@@ -264,7 +270,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-linear-combinations}
+  \label{ent:thm:gcd-linear-combinations}
   Suppose $a,b\in\Z$ are not both zero.
   The set of integer linear combinations $ax+by$ is exactly the set of integer multiples of
   $\gcd(a,b)$.
@@ -320,7 +326,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-one-bezout}
+  \label{ent:thm:gcd-one-bezout}
   Let $a,b\in\Z$ be not both zero.
   They are relatively prime, meaning $\gcd(a,b)=1$, if and only if there are integers $x,y$ with
   $1=ax+by$.
@@ -384,7 +390,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:gcd-div-gcd}
+  \label{ent:thm:gcd-div-gcd}
   For integers $a,b$ not both zero, set $d=\gcd(a,b)$.
   Then $\gcd(a/d,b/d)=1$, where the quotients are integers.
 
@@ -445,7 +451,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:coprime-product-divides}
+  \label{ent:thm:coprime-product-divides}
   Let $a,b,c\in\Z$.
   If $\gcd(a,b)=1$, $a\mid c$, and $b\mid c$, then $ab\mid c$.
 
@@ -497,7 +503,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:euclid-lemma}
+  \label{ent:thm:euclid-lemma}
   Let $a,b,c\in\Z$ with $\gcd(a,b)=1$.
   If $a\mid bc$, then $a\mid c$ (Euclid\textquotesingle s lemma).
 
@@ -543,7 +549,7 @@ In particular, $0\mid z$ if and only if $z=0$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-divisibility-characterization}
+  \label{ent:thm:gcd-divisibility-characterization}
   Let $a,b\in\Z$ be not both zero and let $d\in\Z$ be positive.
   Then $d=\gcd(a,b)$ if and only if $d$ divides both inputs and every integer common divisor of
   $a,b$ divides $d$.

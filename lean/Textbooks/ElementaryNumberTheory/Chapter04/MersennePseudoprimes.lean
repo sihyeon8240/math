@@ -73,12 +73,14 @@ theorem mersenne_composite (n : ℕ) (hc : Chapter02.isComposite n) :
 
   have hdlt : d < n := lt_of_le_of_ne (Nat.le_of_dvd hnpos hd) hdn
 
-  have hd2 : 2 ≤ d := by omega
+  have hd2 : 2 ≤ d := by
+    omega
 
   have hsmall : mersenne d < mersenne n := by
     have hpow := Nat.pow_lt_pow_right (by decide : 1 < 2) hdlt
 
-    have hpos : 0 < 2 ^ d := by positivity
+    have hpos : 0 < 2 ^ d := by
+      positivity
     dsimp [mersenne]
     omega
 
@@ -147,6 +149,7 @@ theorem mersenne_odd (n : ℕ) (hn : 0 < n) : Odd (mersenne n) := by
   rw [he]
   omega
 
+/-- Lemma: 341 is a base-two pseudoprime, used to start the unbounded construction. -/
 private theorem pseudoprime_seed : IsPseudoprime 2 341 := by
   refine ⟨⟨by decide, ?_⟩, ?_⟩
 

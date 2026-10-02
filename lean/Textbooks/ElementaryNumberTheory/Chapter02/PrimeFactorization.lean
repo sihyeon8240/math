@@ -16,7 +16,8 @@ theorem exists_prime_factors (n : ℕ) (hn : 0 < n) :
 
     · exact ⟨[], by simp, by simpa using hone.symm⟩
 
-    · have hgt : 1 < n := by omega
+    · have hgt : 1 < n := by
+        omega
       by_cases hp : isPrime n
 
       · exact ⟨[n], by simpa, by simp⟩
@@ -25,16 +26,22 @@ theorem exists_prime_factors (n : ℕ) (hn : 0 < n) :
           simpa only [isPrime, hgt, true_and, not_forall, not_or, exists_prop] using hp
 
         obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
-        have hdpos : 0 < d := by nlinarith
-        have hkpos : 0 < k := by nlinarith
+
+        have hdpos : 0 < d := by
+          nlinarith
+        have hkpos : 0 < k := by
+          nlinarith
+
         have hdlt : d < n := by
           by_contra h
-          have hk1 : k = 1 := by nlinarith
+          have hk1 : k = 1 := by
+            nlinarith
           simp [hk1] at hk
           exact hdn hk.symm
 
         have hklt : k < n := by
-          have hd2 : 2 ≤ d := by omega
+          have hd2 : 2 ≤ d := by
+            omega
           nlinarith
 
         obtain ⟨l, hl, heql⟩ := ih d hdlt hdpos
@@ -60,7 +67,8 @@ theorem prime_factors_perm (l m : List ℕ) (hl : ∀ p ∈ l, isPrime p)
     | cons q m =>
       have hq := (hm q List.mem_cons_self).1
       change 1 = q * m.prod at hprod
-      have hmpos : 0 < m.prod := by nlinarith
+      have hmpos : 0 < m.prod := by
+        nlinarith
       nlinarith
 
   | cons p l ih =>

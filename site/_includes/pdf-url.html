@@ -1,0 +1,5 @@
+{%- assign pdf_path = '/pdf/' | append: include.book.slug | append: '.pdf' -%}
+{{- pdf_path | relative_url -}}
+{%- if include.book.snapshot_revision != empty and include.book.snapshot_revision -%}
+?v={{- include.book.snapshot_revision | url_encode -}}
+{%- endif -%}

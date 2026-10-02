@@ -1,0 +1,15 @@
+proofs:
+- id: ma:lem:convergent-bounded
+  declaration: MathematicalAnalysis.Chapter02.convergent_bounded
+- id: ma:lem:limit-unique
+  declaration: MathematicalAnalysis.Chapter02.limit_unique
+- id: ma:thm:convergent-sequence-is-bounded
+  declaration: MathematicalAnalysis.Chapter02.convergent_properties
+- id: ma:lem:reciprocal-small
+  declaration: MathematicalAnalysis.Chapter02.reciprocal_small
+- id: ma:lem:convergesTo-iff-finite-exceptions
+  declaration: MathematicalAnalysis.Chapter02.tendsto_iff_finite_exceptions
+- id: ma:lem:sequence-at-limit-point
+  declaration: MathematicalAnalysis.Chapter02.sequence_at_limit_point
+- id: ma:thm:neighborhood
+  declaration: MathematicalAnalysis.Chapter02.neighborhood_characterization

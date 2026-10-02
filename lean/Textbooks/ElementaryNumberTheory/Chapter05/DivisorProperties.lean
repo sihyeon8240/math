@@ -4,7 +4,8 @@ namespace ElementaryNumberTheory.Chapter05
 
 /-- Theorem: primality is equivalent to having exactly two positive divisors. -/
 theorem tau_eq_two_iff (n : ℕ) (hn : 1 < n) : tau n = 2 ↔ Chapter02.isPrime n := by
-  have hnpos : 0 < n := by omega
+  have hnpos : 0 < n := by
+    omega
 
   have hnne : n ≠ 0 := ne_of_gt hnpos
 
@@ -51,7 +52,8 @@ theorem tau_eq_two_iff (n : ℕ) (hn : 1 < n) : tau n = 2 ↔ Chapter02.isPrime 
 
 /-- Theorem: a positive integer greater than one is prime exactly when its divisor sum is n+1. -/
 theorem sigma_eq_succ_iff (n : ℕ) (hn : 1 < n) : sigma n = n + 1 ↔ Chapter02.isPrime n := by
-  have hnpos : 0 < n := by omega
+  have hnpos : 0 < n := by
+    omega
 
   have hnne : n ≠ 0 := ne_of_gt hnpos
 

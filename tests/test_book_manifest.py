@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 import yaml
+from test_support import write_yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
@@ -84,6 +85,7 @@ class ManifestModuleTests(unittest.TestCase):
         self, book: dict[str, object], defaults: dict[str, object] | None = None
     ):
         temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
         root = Path(temporary.name)
         book = {"version": "1.0.0", **book}
         slug = str(book.get("slug", "sample"))
@@ -91,25 +93,22 @@ class ManifestModuleTests(unittest.TestCase):
         book_dir.mkdir(parents=True)
         (book_dir / "book.tex").write_text("", encoding="utf-8")
         manifest_path = root / "books.yml"
-        manifest_path.write_text(
-            yaml.safe_dump(
-                {
-                    "schema_version": 1,
-                    "defaults": defaults
-                    or {
-                        "author": "Sample Author",
-                        "build": True,
-                        "check": False,
-                        "release": False,
-                        "site": True,
-                    },
-                    "books": [book],
+        write_yaml(
+            manifest_path,
+            {
+                "schema_version": 1,
+                "defaults": defaults
+                if defaults is not None
+                else {
+                    "author": "Sample Author",
+                    "build": True,
+                    "check": False,
+                    "release": False,
+                    "site": True,
                 },
-                sort_keys=False,
-            ),
-            encoding="utf-8",
+                "books": [book],
+            },
         )
-        self.addCleanup(temporary.cleanup)
         return root, manifest_path, book_dir
 
     def test_load_manifest_merges_defaults_and_sorts(self) -> None:
@@ -128,11 +127,29 @@ class ManifestModuleTests(unittest.TestCase):
         self.assertFalse(book["release"])
         self.assertTrue(book["site"])
 
+    def test_manifest_accepts_semver_hyphenated_prereleases(self) -> None:
+        for version in ("1.2.3--alpha", "1.2.3-alpha--beta", "1.2.3-rc.1"):
+            with self.subTest(version=version):
+                root, path, _ = self.fixture(
+                    {
+                        "slug": "sample",
+                        "title": "Sample",
+                        "status": "draft",
+                        "order": 10,
+                        "version": version,
+                    }
+                )
+                self.assertEqual(
+                    load_manifest(path, root)["books"][0]["version"], version
+                )
+
     def test_load_manifest_rejects_invalid_fields(self) -> None:
         for override, diagnostic in (
             ({"unknown": 1}, "unknown field"),
             ({"build": "yes"}, "must be boolean"),
             ({"version": "1.0"}, "invalid version"),
+            ({"version": "01.2.3"}, "invalid version"),
+            ({"version": "1.2.3-01"}, "invalid version"),
             ({"author": ""}, "author"),
         ):
             with self.subTest(override=override):

@@ -95,17 +95,19 @@ theorem existsUnique_digits (b : ℕ) (hb : 1 < b) (n : ℕ) :
         change (n : ℤ) = q * b + r at heq
         change r < b at hr
 
-        have hb' : (1 : ℤ) < b := by exact_mod_cast hb
+        have hb' : (1 : ℤ) < b := by
+          exact_mod_cast hb
 
-        have hr' : (r : ℤ) < b := by exact_mod_cast hr
-
-        have hq : 0 ≤ q := by nlinarith
-
-        have hnpos : (0 : ℤ) < n := by omega
-
-        have hqn : q < n := by nlinarith
-
-        have hlt : q.toNat < n := by omega
+        have hr' : (r : ℤ) < b := by
+          exact_mod_cast hr
+        have hq : 0 ≤ q := by
+          nlinarith
+        have hnpos : (0 : ℤ) < n := by
+          omega
+        have hqn : q < n := by
+          nlinarith
+        have hlt : q.toNat < n := by
+          omega
 
         obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
 
@@ -115,7 +117,8 @@ theorem existsUnique_digits (b : ℕ) (hb : 1 < b) (n : ℕ) :
           rw [hnil] at hval
           change 0 = q.toNat at hval
 
-          have : q = 0 := by omega
+          have : q = 0 := by
+            omega
           rw [this, hrzero] at heq
           simp only [zero_mul, Nat.cast_zero, add_zero] at heq
           exact hn (by exact_mod_cast heq)

@@ -224,7 +224,7 @@ content`, or `misc fixes`.
 
 Examples:
 
-    content(mathematical-analysis-1): clarify the definition of uniform continuity
+    content(mathematical-analysis): clarify the definition of uniform continuity
     fix(elementary-number-theory): correct the hypothesis of Euler's theorem
     build(makefile): preserve argument order in help output
     docs(contributing): document textbook validation steps

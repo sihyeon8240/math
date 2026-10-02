@@ -21,24 +21,32 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: generated-pdfs
+          path: pdf-snapshot
       - name: Resolve source commit
         id: source
         env:
           CALL_SHA: ${{ inputs.source_sha }}
         shell: bash
         run: |
-          if [[ -n "$CALL_SHA" ]]; then
-            echo "sha=$CALL_SHA" >> "$GITHUB_OUTPUT"
-          else
-            echo "sha=main" >> "$GITHUB_OUTPUT"
+          snapshot_sha="$(cat pdf-snapshot/.source-sha)"
+          if [[ ! "$snapshot_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::PDF snapshot has an invalid source commit"
+            exit 1
           fi
+          if [[ -n "$CALL_SHA" && "$CALL_SHA" != "$snapshot_sha" ]]; then
+            echo "::error::PDF snapshot source differs from the requested source commit"
+            exit 1
+          fi
+          echo "sha=$snapshot_sha" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ steps.source.outputs.sha }}
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          ref: generated-pdfs
-          path: pdf-snapshot
+          # Preserve the snapshot checkout when checking out the source at the root.
+          clean: false
       - name: Load repository configuration
         id: config
         run: ./scripts/export-config.sh

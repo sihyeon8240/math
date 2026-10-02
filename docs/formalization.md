@@ -76,6 +76,22 @@ witness selection, local claims, case analysis, and the final conclusion.
 Separate these units with one blank line. Keep consecutive tactics that perform
 one short calculation together; do not insert a blank line after every tactic.
 
+Place a blank line where the subgoal or the purpose of the argument changes.
+Keep introductions, representation conversions, and short calculations for the
+same local goal together. Related `have` claims or `obtain` steps may form one
+unit; do not separate every declaration mechanically. For example, the interval
+compactness proof first establishes the prerequisites for the supremum, then
+locates it in the interval:
+
+```lean
+  have hne : T.Nonempty := ⟨a, ha⟩
+  have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
+
+  let c := sSup T
+  have hac : a ≤ c := le_csSup hb ha
+  have hcb : c ≤ b := csSup_le hne (fun x hx => hx.1.2)
+```
+
 Indent each nested `by` proof and branch body by two spaces. Align sibling
 `·` branches and named cases, and distinguish substantial branches with blank
 lines. Wrap long declaration hypotheses and conclusions with four-space
@@ -145,8 +161,7 @@ Current book policies are:
 
 - [Elementary Number Theory](../books/elementary-number-theory/formalization.md).
 - [Linear Algebra](../books/linear-algebra/formalization.md).
-- [Mathematical Analysis I](../books/mathematical-analysis-1/formalization.md).
-- [Mathematical Analysis II](../books/mathematical-analysis-2/formalization.md).
+- [Mathematical Analysis](../books/mathematical-analysis/formalization.md).
 
 Each policy records starting structures, accepted results, results developed in
 the book, and scoped external exceptions. Keep it concise and organize accepted
@@ -390,7 +405,7 @@ sources.
 
 A verified LaTeX theorem needs two parts:
 
-1. A repository-global theorem label such as `an1:thm:compactness`.
+1. A repository-global theorem label such as `ma:thm:compactness`.
 2. An entry in the matching chapter or appendix shard below naming its Lean
    proof declaration.
 
@@ -411,8 +426,8 @@ Both shard kinds use the same entry schema:
 
 ```yaml
 proofs:
-  - id: an1:thm:compactness
-    declaration: MathematicalAnalysis1.Chapter01.compactness
+  - id: ma:thm:compactness
+    declaration: MathematicalAnalysis.Chapter01.compactness
 ```
 
 This is a schema example; use the actual checked declaration and label. The

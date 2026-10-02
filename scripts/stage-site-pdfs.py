@@ -74,6 +74,11 @@ def stage(downloaded: Path, destination: Path) -> None:
     if not downloaded.is_dir():
         raise ValueError(f"PDF input directory not found: {downloaded}")
 
+    input_path = downloaded.resolve()
+    output_path = destination.resolve()
+    if input_path.is_relative_to(output_path) or output_path.is_relative_to(input_path):
+        raise ValueError("PDF input and destination directories must not overlap")
+
     artifacts = snapshot_artifacts(downloaded, registered, expected)
 
     missing = sorted(expected - artifacts.keys())

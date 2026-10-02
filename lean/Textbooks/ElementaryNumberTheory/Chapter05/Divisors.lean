@@ -23,7 +23,8 @@ def divisorSum (f : ℕ → ℤ) (n : ℕ) : ℤ := ∑ d ∈ n.divisors, f d
 theorem gcd_divisors_eq_one (m n a b : ℕ) (hm : 0 < m) (_hn : 0 < n)
     (hcop : Chapter01.gcd m n = 1) (ha : a ∣ m) (hb : b ∣ n) :
     Chapter01.gcd a b = 1 := by
-  have hmz : (m : ℤ) ≠ 0 := by omega
+  have hmz : (m : ℤ) ≠ 0 := by
+    omega
 
   obtain ⟨u, v, huv⟩ :=
     (Chapter01.gcd_eq_one_iff_exists_mul_add_mul m n (Or.inl hmz)).1 hcop
@@ -32,7 +33,8 @@ theorem gcd_divisors_eq_one (m n a b : ℕ) (hm : 0 < m) (_hn : 0 < n)
   obtain ⟨s, hs⟩ := hb
 
   have haz : (a : ℤ) ≠ 0 := by
-    have : 0 < a := by nlinarith
+    have : 0 < a := by
+      nlinarith
     omega
 
   apply (Chapter01.gcd_eq_one_iff_exists_mul_add_mul a b (Or.inl haz)).2

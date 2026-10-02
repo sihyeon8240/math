@@ -7,8 +7,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
-import yaml
+from test_support import book_record, manifest_document, write_yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 SPEC = importlib.util.spec_from_file_location(
@@ -26,33 +27,23 @@ class ProofLinkTests(unittest.TestCase):
         for order, entry in enumerate(entries, 1):
             slug = str(entry["slug"])
             records.append(
-                {
-                    "slug": slug,
-                    "title": slug.title(),
-                    "version": "0.1.0",
-                    "label_prefix": slug[:2],
-                    "status": "draft",
-                    "order": order * 10,
-                    **entry,
-                }
+                book_record(
+                    **{
+                        "version": "0.1.0",
+                        "label_prefix": slug[:2],
+                        "order": order * 10,
+                        **entry,
+                    }
+                )
             )
             book = self.root / "books" / slug / "book.tex"
             book.parent.mkdir(parents=True, exist_ok=True)
             book.touch()
-        return {
-            "schema_version": 1,
-            "defaults": {
-                "author": "Author",
-                "build": True,
-                "check": True,
-                "release": False,
-                "site": False,
-            },
-            "books": records,
-        }
+        return manifest_document(records)
 
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         tex = self.root / "books/sample/chapters/01-start/01-result.tex"
         tex.parent.mkdir(parents=True)
@@ -76,13 +67,38 @@ class ProofLinkTests(unittest.TestCase):
             "declaration": "Sample.Chapter01.result",
         }
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
+    def test_multiple_proofs_reuse_one_source_scan(self) -> None:
+        source = self.root / "books/sample/chapters/01-start/01-result.tex"
+        source.write_text(
+            "\\begin{theorem}\\label{sa:thm:result}Result.\\end{theorem}\n"
+            "\\begin{lemma}\\label{sa:lem:other}Other.\\end{lemma}\n",
+            encoding="utf-8",
+        )
+        self.write_yaml(
+            "books/sample/chapters/01-start/proofs.yml",
+            {
+                "proofs": [
+                    self.entry,
+                    {"id": "sa:lem:other", "declaration": "Sample.Chapter01.other"},
+                ]
+            },
+        )
+        reads = []
+        original = Path.read_text
+
+        def tracked(path, *args, **kwargs):
+            if path == source:
+                reads.append(path)
+            return original(path, *args, **kwargs)
+
+        with patch.object(Path, "read_text", tracked):
+            errors, proofs = MODULE.validate_index(self.root)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(proofs), 2)
+        self.assertEqual(reads, [source])
 
     def write_yaml(self, path: str, data: object) -> None:
-        target = self.root / path
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+        write_yaml(self.root / path, data)
 
     def errors(self, entries: list[object]) -> list[str]:
         self.write_yaml(
@@ -369,7 +385,7 @@ class ProofLinkTests(unittest.TestCase):
                 {
                     "slug": "analysis",
                     "label_prefix": "an",
-                    "lean_module": "MathematicalAnalysis1",
+                    "lean_module": "MathematicalAnalysis",
                 },
                 {
                     "slug": "algebra",
@@ -379,9 +395,9 @@ class ProofLinkTests(unittest.TestCase):
             ),
         )
         textbooks = self.root / "lean/Textbooks"
-        for module in ("MathematicalAnalysis1", "LinearAlgebra"):
+        for module in ("MathematicalAnalysis", "LinearAlgebra"):
             (textbooks / module).mkdir(parents=True)
-        source = textbooks / "MathematicalAnalysis1/Chapter01/WellOrdering.lean"
+        source = textbooks / "MathematicalAnalysis/Chapter01/WellOrdering.lean"
         source.parent.mkdir(parents=True)
         source.write_text("import Textbooks.LinearAlgebra.All\n", encoding="utf-8")
         errors = MODULE.validate_import_boundaries(self.root)

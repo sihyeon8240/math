@@ -73,9 +73,11 @@ theorem exists_square_eq_neg_one_iff (p : ℕ) (hp : Chapter02.isPrime p) (hodd 
 
       obtain ⟨k, hk⟩ := hh
 
-      have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+      have hpz : (2 : ℤ) < p := by
+        exact_mod_cast hp2
 
-      have hkpos : 0 < k := by nlinarith
+      have hkpos : 0 < k := by
+        nlinarith
       nlinarith
 
     have hpow := Chapter03.modEq_pow hx m
@@ -89,9 +91,11 @@ theorem exists_square_eq_neg_one_iff (p : ℕ) (hp : Chapter02.isPrime p) (hodd 
 
     obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 hh
 
-    have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+    have hpz : (2 : ℤ) < p := by
+      exact_mod_cast hp2
 
-    have hkneg : k < 0 := by nlinarith
+    have hkneg : k < 0 := by
+      nlinarith
     nlinarith
 
   · intro hpmod

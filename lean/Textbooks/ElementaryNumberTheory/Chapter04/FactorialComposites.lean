@@ -15,7 +15,8 @@ private theorem double_le_factorial (n : ℕ) (hn : 3 ≤ n) : 2 * n ≤ n.facto
       rw [Nat.factorial_succ]
       nlinarith
 
-    · have he : n = 2 := by omega
+    · have he : n = 2 := by
+        omega
       subst n
       decide
 
@@ -24,11 +25,13 @@ theorem exists_composite_factorial_add_one_gt (B : ℕ) :
     ∃ n : ℕ, B < n.factorial + 1 ∧ Chapter02.isComposite (n.factorial + 1) := by
   obtain ⟨p, hp, hlarge⟩ := Chapter02.exists_prime_gt (B + 5)
 
-  have hp3 : 3 ≤ p - 1 := by omega
+  have hp3 : 3 ≤ p - 1 := by
+    omega
 
   have hfac := double_le_factorial (p - 1) hp3
 
-  have hpbound : p < (p - 1).factorial + 1 := by omega
+  have hpbound : p < (p - 1).factorial + 1 := by
+    omega
 
   have hd : p ∣ (p - 1).factorial + 1 := by
     apply Int.natCast_dvd_natCast.mp

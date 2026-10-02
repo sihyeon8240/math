@@ -19,7 +19,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:mobius-one}
+  \label{ent:thm:mobius-one}
   The M\"obius function has $\mu(1)=1$.
 
   \begin{lean}
@@ -36,7 +36,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-prime-pow}
+  \label{ent:thm:mobius-prime-pow}
   For a prime $p$, $\mu(p^k)=w(k)$: the values are one for $k=0$, minus one for $k=1$, and zero
   thereafter.
 
@@ -60,7 +60,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-eq-zero-of-prime-sq-dvd}
+  \label{ent:thm:mobius-eq-zero-of-prime-sq-dvd}
   If $n>0$ and $p^2\mid n$ for a prime $p$, then $\mu(n)=0$.
 
   \begin{lean}
@@ -70,8 +70,7 @@
 \end{theorem}
 
 \begin{proof}
-  The divisibility criterion gives $e_n(p)\ge2$.
-  Its contribution is zero, so the whole product vanishes.
+  The divisibility criterion gives $e_n(p)\ge2$, so $p$ belongs to the prime support.
 
   \begin{lean}
     have hle := (dvd_iff_primeExponents_le (p ^ 2) n
@@ -83,7 +82,12 @@
 
     have hmem : p ∈ (primeExponents n).support :=
       Finsupp.mem_support_iff.mpr (by omega)
+  \end{lean}
 
+  The contribution at $p$ is zero.
+  Therefore the whole defining product for $\mu(n)$ vanishes.
+
+  \begin{lean}
     apply Finset.prod_eq_zero hmem
     simp only [mobiusWeight, ite_eq_right (by omega : primeExponents n p ≠ 0),
       ite_eq_right (by omega : primeExponents n p ≠ 1)]
@@ -91,7 +95,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-eq-sign}
+  \label{ent:thm:mobius-eq-sign}
   If positive $n$ has no prime-square divisor and has $r$ distinct prime factors, then
   $\mu(n)=(-1)^r$.
 
@@ -103,8 +107,9 @@
 \end{theorem}
 
 \begin{proof}
-  Every exponent in the prime support is positive and less than two, hence equals one.
-  Every factor in the defining product is therefore minus one.
+  Every exponent in the prime support is positive.
+  The absence of prime-square divisors makes it less than two, hence equal to one.
+  Each corresponding factor is therefore minus one.
 
   \begin{lean}
     rw [mobius, ite_eq_right (ne_of_gt hn), Finsupp.prod]
@@ -125,14 +130,20 @@
         rw [primeExponents_prime_pow p 2 hp, Finsupp.single_le_iff]
         omega
 
-      have he : primeExponents n p = 1 := by omega
+      have he : primeExponents n p = 1 := by
+        omega
       simp only [he, mobiusWeight, one_ne_zero, ↓reduceIte]
+  \end{lean}
+
+  The defining product is consequently minus one raised to the number of distinct prime factors.
+
+  \begin{lean}
     rw [Finset.prod_congr rfl hweight, Finset.prod_const]
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-multiplicative}
+  \label{ent:thm:mobius-multiplicative}
   The M\"obius function is multiplicative.
 
   \begin{lean}
@@ -155,7 +166,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-mobius}
+  \label{ent:thm:sum-mobius}
   For positive $n$, \[ \sum_{d\mid n}\mu(d)=
     \begin{cases}
       1 & n=1, \\0&n>1.
@@ -168,17 +179,20 @@
 \end{theorem}
 
 \begin{proof}
-  The divisor sum of $\mu$ is multiplicative.
-  On every positive prime power it is $1-1+0+\cdots+0=0$.
-  For $n>1$, its nonempty prime-power factorization therefore has a zero factor.
-  At one the sole summand is one.
+  At one the sole summand is $\mu(1)=1$.
 
   \begin{lean}
     by_cases he : n = 1
 
     · subst n
       simp only [divisorSum, Nat.divisors_one, Finset.sum_singleton, mobius_one, ↓reduceIte]
+  \end{lean}
 
+  For $n>1$, the divisor sum of $\mu$ is multiplicative, so it is the product of its values on the
+  prime powers.
+  The prime support is nonempty.
+
+  \begin{lean}
     · rw [ite_eq_right he, multiplicative_prime_powers _
         (divisorSum_multiplicative _ mobius_multiplicative) n (by omega)]
 
@@ -189,16 +203,21 @@
         change (∏ p ∈ (primeExponents n).support, p ^ primeExponents n p) = n at hh
         rw [Finset.not_nonempty_iff_eq_empty.mp h, Finset.prod_empty] at hh
         exact he hh.symm
+  \end{lean}
 
-      obtain ⟨p, hp⟩ := hs
-      apply Finset.prod_eq_zero hp
-      exact divisorSum_mobius_prime_pow p _ ((primeExponents_spec n hn).1 p hp)
-        (Nat.pos_of_ne_zero (Finsupp.mem_support_iff.mp hp))
+  Choose a prime in this support.
+  The divisor sum on its positive power is $1-1+0+\cdots+0=0$, so the entire product vanishes.
+
+  \begin{lean}
+    obtain ⟨p, hp⟩ := hs
+    apply Finset.prod_eq_zero hp
+    exact divisorSum_mobius_prime_pow p _ ((primeExponents_spec n hn).1 p hp)
+      (Nat.pos_of_ne_zero (Finsupp.mem_support_iff.mp hp))
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-inversion}
+  \label{ent:thm:mobius-inversion}
   Let $F(n)=\sum_{d\mid n}f(d)$ for every positive $n$.
   Then \[ f(n)=\sum_{d\mid n}\mu(d)F(n/d). \]
 
@@ -244,7 +263,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:mobius-inversion-complement}
+  \label{ent:thm:mobius-inversion-complement}
   Under the same hypotheses, \[ f(n)=\sum_{d\mid n}\mu(n/d)F(d). \]
 
   \begin{lean}
@@ -269,7 +288,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-of-divisorsum}
+  \label{ent:thm:multiplicative-of-divisorsum}
   If the divisor sum of $f$ is multiplicative, then $f$ is multiplicative.
 
   \begin{lean}
@@ -279,14 +298,20 @@
 \end{theorem}
 
 \begin{proof}
-  M\"obius inversion writes $f$ as the convolution of two multiplicative functions.
-  To see that this convolution is multiplicative, split divisors of a coprime product as $ab$ and
-  their complementary divisors as $(m/a)(n/b)$; the double sum factors.
-  The checked auxiliary lemma carries out this reindexing.
+  The convolution of $\mu$ with the multiplicative function given by the divisor sum is
+  multiplicative.
+  The convolution lemma proves this by splitting divisors of a coprime product and factoring the
+  double sum.
 
   \begin{lean}
     have hconv := convolution_multiplicative mobius (divisorSum f) mobius_multiplicative hf
+  \end{lean}
 
+  M\"obius inversion identifies this convolution with $f$.
+  Substitute the inversion formula into its multiplicativity identity to obtain multiplicativity of
+  $f$.
+
+  \begin{lean}
     intro m n hm hn hcop
 
     have hh := hconv m n hm hn hcop
@@ -300,7 +325,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:multiplicative-iff-divisorsum}
+  \label{ent:thm:multiplicative-iff-divisorsum}
   An arithmetic function is multiplicative if and only if its divisor sum is multiplicative.
 
   \begin{lean}

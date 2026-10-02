@@ -22,7 +22,8 @@ theorem gcd_odd_two (n : ℕ) (hn : Odd n) : Chapter01.gcd n 2 = 1 := by
   apply (Chapter01.gcd_eq_one_iff_exists_mul_add_mul n 2 (Or.inr (by decide))).2
   refine ⟨1, -(k : ℤ), ?_⟩
   exact_mod_cast (show (1 : ℤ) = (n : ℤ) * 1 + 2 * -(k : ℤ) by
-    have hh : (n : ℤ) = 2 * (k : ℤ) + 1 := by exact_mod_cast hk
+    have hh : (n : ℤ) = 2 * (k : ℤ) + 1 := by
+      exact_mod_cast hk
     linarith)
 
 /-- Theorem: for odd composite n, the two customary base-two congruences agree. -/
@@ -104,7 +105,8 @@ theorem absolutePseudoprime_squareFree (n : ℕ) (h : IsAbsolutePseudoprime n) :
   obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 (h.2 p)
   obtain ⟨t, ht⟩ := hpn
 
-  have ht' : (n : ℤ) = (p : ℤ) ^ 2 * t := by exact_mod_cast ht
+  have ht' : (n : ℤ) = (p : ℤ) ^ 2 * t := by
+    exact_mod_cast ht
 
   have hpow : (p : ℤ) ^ n = (p : ℤ) ^ 2 * (p : ℤ) ^ (n - 2) := by
     rw [← pow_add, Nat.add_sub_cancel' hn]
@@ -125,7 +127,8 @@ theorem absolutePseudoprime_squareFree (n : ℕ) (h : IsAbsolutePseudoprime n) :
 
   have := hp.1
 
-  have hu' : 0 < u := by nlinarith
+  have hu' : 0 < u := by
+    nlinarith
   nlinarith
 
 end ElementaryNumberTheory.Chapter04

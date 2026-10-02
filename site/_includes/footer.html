@@ -1,0 +1,12 @@
+<footer class="site-footer">
+  <p class="site-footer__brand">
+    {% assign title_words = site.title | split: ' ' %}
+    {% for word in title_words %}<span>{{ word | escape }}</span> {% endfor %}
+  </p>
+  <p>
+    <span>This site is open source.</span>
+    <a href="{{ site.github.repository_url | escape }}/edit/main/{{ page.edit_path | escape }}">
+      Improve this page.
+    </a>
+  </p>
+</footer>

@@ -1,12 +1,5 @@
 import Textbooks.LinearAlgebra.Chapter04.MatrixMaps
 
-/-!
-Matrices relative to finite ordered bases.
-`Basis.equivFun` is the coordinate map and `LinearMap.toMatrix b c f` has
-source basis `b` and target basis `c`. Only its entry formula is used from
-Mathlib; the representation, uniqueness, and isomorphism proofs are local.
--/
-
 namespace LinearAlgebra.Chapter04
 
 open scoped BigOperators Matrix

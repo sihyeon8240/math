@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest import mock
 
 import yaml
+from test_support import git_environment
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -262,6 +263,8 @@ class AffectedBookTests(unittest.TestCase):
                 return subprocess.run(
                     ["git", *arguments],
                     cwd=root,
+                    env=git_environment(),
+                    timeout=10,
                     check=True,
                     capture_output=True,
                     text=True,

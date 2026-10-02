@@ -338,4 +338,18 @@ theorem zero_space_dimension [Subsingleton V] : HasDimension K V 0 := by
   rw [hx]
   exact zero_mem _
 
+/-- Definition: index an established finite basis by the dimension. -/
+noncomputable def finiteBasis [Module.Finite K V] :
+    Module.Basis (Fin (Module.finrank K V)) K V := by
+  classical
+
+  let h := hasFiniteBasis_iff_finite.mpr (inferInstance : Module.Finite K V)
+  let s := Classical.choose h
+  have hs := Classical.choose_spec h
+
+  have hc : Fintype.card s = Module.finrank K V := by
+    simpa only [Fintype.card_coe] using (finrank_eq_card_of_basis hs).symm
+
+  exact (basisOfSet hs).reindex ((Fintype.equivFin s).trans (finCongr hc))
+
 end LinearAlgebra.Chapter01

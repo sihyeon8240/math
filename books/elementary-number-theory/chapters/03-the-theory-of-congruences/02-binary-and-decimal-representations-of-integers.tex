@@ -26,7 +26,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:existsunique-digits}
+  \label{ent:thm:existsunique-digits}
   For each natural number $n$ and base $b>1$, there is exactly one canonical digit list with value
   $n$.
   For positive $n$, this list is nonempty.
@@ -40,8 +40,7 @@
 \begin{proof}
   Use strong induction on $n$.
   Zero has the empty expansion.
-  For positive $n$, division by $b$ gives $n=bq+r$, where $0\le r<b$ and $0\le q<n$.
-  Expand $q$ by induction and prepend $r$; if the tail is empty, positivity of $n$ ensures $r\ne0$.
+  For positive $n$, division by $b$ gives $n=bq+r$ with $0\le r<b$.
 
   \begin{lean}
     have hex : ∀ n : ℕ, ∃ ds : List ℕ, CanonicalDigits b ds ∧ digitValue b ds = n := by
@@ -56,39 +55,55 @@
             Chapter01.existsUnique_quotient_remainder n ⟨b, by omega⟩
           change (n : ℤ) = q * b + r at heq
           change r < b at hr
+  \end{lean}
 
-          have hb' : (1 : ℤ) < b := by exact_mod_cast hb
+  Since $b>1$ and $n>0$, the quotient satisfies $0\le q<n$.
+  Its natural-number representation can therefore be expanded by induction.
 
-          have hr' : (r : ℤ) < b := by exact_mod_cast hr
+  \begin{lean}
+    have hb' : (1 : ℤ) < b := by
+      exact_mod_cast hb
+    have hr' : (r : ℤ) < b := by
+      exact_mod_cast hr
+    have hq : 0 ≤ q := by
+      nlinarith
+    have hnpos : (0 : ℤ) < n := by
+      omega
+    have hqn : q < n := by
+      nlinarith
+    have hlt : q.toNat < n := by
+      omega
 
-          have hq : 0 ≤ q := by nlinarith
+    obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
+  \end{lean}
 
-          have hnpos : (0 : ℤ) < n := by omega
+  Prepend $r$ to this expansion.
+  The digit is less than $b$, and if the tail is empty, positivity of $n$ ensures $r\ne0$.
 
-          have hqn : q < n := by nlinarith
+  \begin{lean}
+    refine ⟨r :: ds, ⟨hr, ?_, hds⟩, ?_⟩
 
-          have hlt : q.toNat < n := by omega
+    · intro hnil hrzero
+      rw [hnil] at hval
+      change 0 = q.toNat at hval
 
-          obtain ⟨ds, hds, hval⟩ := ih q.toNat hlt
+      have : q = 0 := by
+        omega
+      rw [this, hrzero] at heq
+      simp only [zero_mul, Nat.cast_zero, add_zero] at heq
+      exact hn (by exact_mod_cast heq)
+  \end{lean}
 
-          refine ⟨r :: ds, ⟨hr, ?_, hds⟩, ?_⟩
+  The positional value of the new list is $r+bq=n$, completing the existence proof.
 
-          · intro hnil hrzero
-            rw [hnil] at hval
-            change 0 = q.toNat at hval
+  \begin{lean}
+    · change r + b * digitValue b ds = n
+      rw [hval]
 
-            have : q = 0 := by omega
-            rw [this, hrzero] at heq
-            simp only [zero_mul, Nat.cast_zero, add_zero] at heq
-            exact hn (by exact_mod_cast heq)
-
-          · change r + b * digitValue b ds = n
-            rw [hval]
-
-            have hc : (q.toNat : ℤ) = q := Int.toNat_of_nonneg hq
-            exact_mod_cast (show (r : ℤ) + (b : ℤ) * q.toNat = n by
-                rw [hc]
-                nlinarith)
+      have hc : (q.toNat : ℤ) = q := Int.toNat_of_nonneg hq
+      exact_mod_cast (show (r : ℤ) + (b : ℤ) * q.toNat = n by
+          rw [hc]
+          nlinarith)
   \end{lean}
 
   The construction gives existence.
@@ -104,7 +119,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:existsunique-binary-digits}
+  \label{ent:thm:existsunique-binary-digits}
   Every natural number has a unique canonical base-two expansion.
   Since each digit is less than two, the digits are zero and one.
 
@@ -137,7 +152,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:positionalvalue-modeq}
+  \label{ent:thm:positionalvalue-modeq}
   An integer polynomial takes congruent values at congruent arguments: if $a\equiv b\pmod n$, then
   $P(a)\equiv P(b)\pmod n$.
 
@@ -173,7 +188,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:nine-dvd-iff-digit-sum}
+  \label{ent:thm:nine-dvd-iff-digit-sum}
   A decimal positional value is divisible by $9$ precisely when the sum of its digits is divisible
   by $9$.
   The identity also holds for arbitrary integer coefficients.
@@ -196,7 +211,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:three-dvd-iff-digit-sum}
+  \label{ent:thm:three-dvd-iff-digit-sum}
   A decimal positional value is divisible by $3$ precisely when the sum of its digits is divisible
   by $3$.
   The identity also holds for arbitrary integer coefficients.
@@ -218,7 +233,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:eleven-dvd-iff-alternating-sum}
+  \label{ent:thm:eleven-dvd-iff-alternating-sum}
   A decimal positional value is divisible by $11$ precisely when the alternating sum of its
   digits, starting with the units digit is divisible by $11$.
   The identity also holds for arbitrary integer coefficients.
@@ -241,7 +256,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:two-dvd-iff-last-digit}
+  \label{ent:thm:two-dvd-iff-last-digit}
   A nonempty decimal expansion is divisible by two exactly when its units digit is even.
 
   \begin{lean}
@@ -259,7 +274,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:five-dvd-iff-last-digit}
+  \label{ent:thm:five-dvd-iff-last-digit}
   For a units digit $0\le d<10$, a decimal expansion is divisible by five exactly when $d=0$ or
   $d=5$.
 
@@ -279,13 +294,17 @@
 
     · rintro ⟨k, hk⟩
       omega
+  \end{lean}
 
+  Conversely, both zero and five are divisible by five.
+
+  \begin{lean}
     · rintro (rfl | rfl) <;> decide
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:four-dvd-iff-last-two-digits}
+  \label{ent:thm:four-dvd-iff-last-two-digits}
   A decimal positional value with units digit $d$ and tens digit $e$ is divisible by four exactly
   when $d+10e$ is divisible by four.
 
@@ -308,7 +327,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:detects-single-digit-error}
+  \label{ent:thm:detects-single-digit-error}
   If $\gcd(10,w)=1$ and $d,e$ are distinct decimal digits, then $wd\not\equiv we\pmod{10}$.
 
   \begin{lean}

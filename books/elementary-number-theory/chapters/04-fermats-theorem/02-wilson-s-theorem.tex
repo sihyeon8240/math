@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:wilson}
+  \label{ent:thm:wilson}
   If $p$ is prime, then $(p-1)!
     \equiv-1\pmod p$.
 
@@ -10,13 +10,8 @@
 \end{theorem}
 
 \begin{proof}
-  Pair every nonzero residue with its inverse.
-  A fixed point satisfies $x^2=1$, hence is one or minus one.
-  After removing minus one, all inverse pairs multiply to one, and the possible fixed point one
-  does too.
-  The remaining factor is minus one.
-  The code identifies the product of the nonzero residues with the factorial, using the
-  inverse-pair lemma proved in the module.
+  Identify nonzero residue classes with their representatives $1,\ldots,p-1$.
+  A nonzero class has its representative in this interval.
 
   \begin{lean}
     classical
@@ -42,31 +37,57 @@
           apply ZMod.val_injective p
           simpa only [ZMod.val_zero] using hz
         omega
+  \end{lean}
 
-      · intro u hu v hv h
-        exact Units.ext (ZMod.val_injective p h)
+  Equal representatives give equal classes, so the correspondence is injective.
 
-      · intro k hk
+  \begin{lean}
+    · intro u hu v hv h
+      exact Units.ext (ZMod.val_injective p h)
+  \end{lean}
 
-        have hk' := Finset.mem_Ico.mp hk
+  Conversely, an integer in this interval represents a nonzero class and hence a unit.
+  This proves surjectivity.
 
-        have hne : (k : ZMod p) ≠ 0 := by
-          intro hz
+  \begin{lean}
+    · intro k hk
 
-          have hh := congrArg ZMod.val hz
-          rw [ZMod.val_natCast_of_lt hk'.2, ZMod.val_zero] at hh
-          omega
+      have hk' := Finset.mem_Ico.mp hk
 
-        exact ⟨Units.mk0 (k : ZMod p) hne, Finset.mem_univ _,
-          ZMod.val_natCast_of_lt hk'.2⟩
+      have hne : (k : ZMod p) ≠ 0 := by
+        intro hz
 
-      · intro u hu
-        exact (ZMod.natCast_zmod_val _).symm
+        have hh := congrArg ZMod.val hz
+        rw [ZMod.val_natCast_of_lt hk'.2, ZMod.val_zero] at hh
+        omega
 
+      exact ⟨Units.mk0 (k : ZMod p) hne, Finset.mem_univ _,
+        ZMod.val_natCast_of_lt hk'.2⟩
+  \end{lean}
+
+  The representative and its residue class have the same value modulo $p$, so the bijection
+  preserves the product.
+
+  \begin{lean}
+    · intro u hu
+      exact (ZMod.natCast_zmod_val _).symm
+  \end{lean}
+
+  The product of these representatives is $(p-1)!
+  $.
+
+  \begin{lean}
     have hf : (∏ k ∈ Finset.Ico 1 p, (k : ZMod p)) = ((p - 1).factorial : ZMod p) := by
       rw [← Nat.cast_prod, ← Finset.prod_Ico_id_eq_factorial]
       rw [Nat.sub_add_cancel hpos]
+  \end{lean}
 
+  Pair each nonzero class with its inverse.
+  Fixed points satisfy $x^2=1$, so they are one or minus one.
+  All inverse pairs and the fixed point one contribute one, leaving minus one.
+  The inverse-pair lemma therefore gives Wilson\textquotesingle s congruence.
+
+  \begin{lean}
     apply (ZMod.intCast_eq_intCast_iff _ _ p).1
     simpa only [Int.cast_natCast, Int.cast_neg, Int.cast_one] using
       (hf.symm.trans (hprod.symm.trans (prod_units_eq_neg_one p)))
@@ -74,7 +95,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:prime-of-wilson}
+  \label{ent:thm:prime-of-wilson}
   If $n>1$ and $(n-1)!
     \equiv-1\pmod n$, then $n$ is prime.
 
@@ -86,11 +107,8 @@
 
 \begin{proof}
   Let $d$ divide $n$.
-  If $d\ne n$, then $1\le d\le n-1$, so $d$ divides $(n-1)!
-  $.
-  It also divides $(n-1)!
-    +1$ by the congruence, and therefore divides one.
-  Thus every divisor is one or $n$.
+  If $d=n$, the desired alternative already holds.
+  Otherwise positivity and divisibility give $1\le d\le n-1$.
 
   \begin{lean}
     refine ⟨hn, ?_⟩
@@ -103,39 +121,57 @@
         obtain ⟨k, hk⟩ := hd
         by_contra hh
 
-        have hz : d = 0 := by omega
+        have hz : d = 0 := by
+          omega
         rw [hz, zero_mul] at hk
         omega
 
       have hdle : d ≤ n := by
         obtain ⟨k, hk⟩ := hd
 
-        have hkpos : 0 < k := by nlinarith
+        have hkpos : 0 < k := by
+          nlinarith
         nlinarith
+  \end{lean}
 
-      have hdf : (d : ℤ) ∣ (n - 1).factorial :=
-        Int.natCast_dvd_natCast.mpr (dvd_factorial d (n - 1) hdpos (by omega))
+  Consequently $d$ divides $(n-1)!
+  $.
+  The congruence and $d\mid n$ also imply that $d$ divides $(n-1)!
+    +1$.
 
-      obtain ⟨u, hu⟩ := hdf
-      obtain ⟨v, hv⟩ := Int.natCast_dvd_natCast.mpr hd
-      obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 h
+  \begin{lean}
+    have hdf : (d : ℤ) ∣ (n - 1).factorial :=
+      Int.natCast_dvd_natCast.mpr (dvd_factorial d (n - 1) hdpos (by omega))
 
-      have hone : (1 : ℤ) = d * (v * k - u) := by
-        rw [hu, hv] at hk
-        nlinarith
+    obtain ⟨u, hu⟩ := hdf
+    obtain ⟨v, hv⟩ := Int.natCast_dvd_natCast.mpr hd
+    obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 h
+  \end{lean}
 
-      have hdz : (0 : ℤ) < d := by exact_mod_cast hdpos
+  Subtracting these multiples shows that $d$ divides one.
+  Since $d$ is positive, it equals one.
+  Thus every divisor is one or $n$.
 
-      have hkp : 0 < v * k - u := by nlinarith
-      left
+  \begin{lean}
+    have hone : (1 : ℤ) = d * (v * k - u) := by
+      rw [hu, hv] at hk
+      nlinarith
 
-      have : (d : ℤ) = 1 := by nlinarith
-      exact_mod_cast this
+    have hdz : (0 : ℤ) < d := by
+      exact_mod_cast hdpos
+
+    have hkp : 0 < v * k - u := by
+      nlinarith
+    left
+
+    have : (d : ℤ) = 1 := by
+      nlinarith
+    exact_mod_cast this
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:prime-iff-wilson}
+  \label{ent:thm:prime-iff-wilson}
   For $n>1$, primality is equivalent to $(n-1)!
     \equiv-1\pmod n$.
 
@@ -167,7 +203,7 @@
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:half-factorial}
+  \label{ent:thm:half-factorial}
   If $p=2m+1$, then in the residue ring modulo $p$, \[ (p-1)!=(-1)^m(m!)^2. \]
 
   \begin{lean}
@@ -221,7 +257,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:exists-square-eq-neg-one-iff}
+  \label{ent:thm:exists-square-eq-neg-one-iff}
   For an odd prime $p$, the congruence $x^2\equiv-1\pmod p$ has an integer solution exactly when
   $p\equiv1\pmod4$.
 
@@ -233,9 +269,9 @@
 
 \begin{proof}
   Write $p=2m+1$.
-  If $x^2\equiv-1$, then $p\nmid x$.
-  Raising the square congruence to the $m$th power and using Fermat gives $(-1)^m\equiv1$.
-  If $p\equiv3\pmod4$, then $m$ is odd, forcing $p\mid2$, contrary to $p>2$.
+  Suppose $x^2\equiv-1\pmod p$.
+  If $p\mid x$, this congruence would force $p\mid1$, which is impossible.
+  Thus $p\nmid x$.
 
   \begin{lean}
     have hp2 : 2 < p := by
@@ -266,26 +302,42 @@
 
         obtain ⟨k, hk⟩ := hh
 
-        have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+        have hpz : (2 : ℤ) < p := by
+          exact_mod_cast hp2
 
-        have hkpos : 0 < k := by nlinarith
+        have hkpos : 0 < k := by
+          nlinarith
         nlinarith
+  \end{lean}
 
-      have hpow := Chapter03.modEq_pow hx m
-      rw [← pow_mul, show 2 * m = p - 1 by omega] at hpow
+  Raise the square congruence to the $m$th power.
+  Since $2m=p-1$, Fermat\textquotesingle s theorem gives $(-1)^m\equiv1\pmod p$.
 
-      have hh := Chapter03.modEq_trans (Chapter03.modEq_symm hpow) (fermat p hp x hnot)
-      by_contra hne
+  \begin{lean}
+    have hpow := Chapter03.modEq_pow hx m
+    rw [← pow_mul, show 2 * m = p - 1 by omega] at hpow
 
-      have hm : Odd m := Nat.odd_iff.mpr (by omega)
-      rw [hm.neg_one_pow] at hh
+    have hh := Chapter03.modEq_trans (Chapter03.modEq_symm hpow) (fermat p hp x hnot)
+  \end{lean}
 
-      obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 hh
+  If $p$ were not one modulo four, the odd prime $p>2$ would be three modulo four and $m$ would be
+  odd.
+  The last congruence would then force $p\mid2$, contrary to $p>2$.
 
-      have hpz : (2 : ℤ) < p := by exact_mod_cast hp2
+  \begin{lean}
+    by_contra hne
 
-      have hkneg : k < 0 := by nlinarith
+    have hm : Odd m := Nat.odd_iff.mpr (by omega)
+    rw [hm.neg_one_pow] at hh
+
+    obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 hh
+
+    have hpz : (2 : ℤ) < p := by
+      exact_mod_cast hp2
+
+    have hkneg : k < 0 := by
       nlinarith
+    nlinarith
   \end{lean}
 
   If $p\equiv1\pmod4$, then $m$ is even.
@@ -311,7 +363,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:infinite-factorial-composites}
+  \label{ent:thm:infinite-factorial-composites}
   Infinitely many composite integers have the form $n!
     +1$.
 

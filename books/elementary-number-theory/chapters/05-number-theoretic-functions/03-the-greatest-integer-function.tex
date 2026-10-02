@@ -1,5 +1,5 @@
 \begin{theorem}
-  \label{nt:thm:floor-spec}
+  \label{ent:thm:floor-spec}
   For every real $x$, its greatest integer satisfies $\lfloor x\rfloor\le x<\lfloor x\rfloor+1$.
   In particular, $x=\lfloor x\rfloor+\theta$ for a real $0\le\theta<1$.
 
@@ -24,7 +24,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-eq-self-iff}
+  \label{ent:thm:floor-eq-self-iff}
   A real number equals its floor exactly when it is an integer.
 
   \begin{lean}
@@ -48,7 +48,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-nat-div}
+  \label{ent:thm:floor-nat-div}
   For natural $N$ and positive $k$, the integer quotient is $N/k=\lfloor N/k\rfloor$, where the
   quotient inside the floor is taken in the real numbers.
 
@@ -59,11 +59,12 @@
 \end{theorem}
 
 \begin{proof}
-  The division identity $N=kq+r$ with $0\le r<k$ gives $q\le N/k<q+1$.
-  These bounds identify the floor with $q$.
+  Write $N=kq+r$ with $0\le r<k$.
+  Then $q\le N/k$.
 
   \begin{lean}
-    have hkreal : (0 : ℝ) < k := by exact_mod_cast hk
+    have hkreal : (0 : ℝ) < k := by
+      exact_mod_cast hk
     have heq := Nat.mod_add_div N k
     have hlt := Nat.mod_lt N hk
 
@@ -72,18 +73,25 @@
 
     · apply (le_div_iff₀ hkreal).mpr
       exact_mod_cast Nat.div_mul_le_self N k
+  \end{lean}
 
+  The strict bound $r<k$ gives $N/k<q+1$.
+  The two inequalities identify the floor with $q$.
+
+  \begin{lean}
     · apply (div_lt_iff₀ hkreal).mpr
       simp only [Int.cast_natCast]
 
-      have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by exact_mod_cast heq
-      have hrlt : ((N % k : ℕ) : ℝ) < k := by exact_mod_cast hlt
+      have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by
+        exact_mod_cast heq
+      have hrlt : ((N % k : ℕ) : ℝ) < k := by
+        exact_mod_cast hlt
       linarith
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:card-multiples}
+  \label{ent:thm:card-multiples}
   The number of multiples of positive $k$ in $\{1,\ldots,N\}$ is $\lfloor N/k\rfloor$.
 
   \begin{lean}
@@ -93,9 +101,8 @@
 \end{theorem}
 
 \begin{proof}
-  Send a multiple $n$ to $n/k$.
-  This is a bijection with $\{1,\ldots,\lfloor N/k\rfloor\}$, whose inverse is multiplication by
-  $k$.
+  Send a positive multiple $n\le N$ to $n/k$.
+  This quotient lies between one and $\lfloor N/k\rfloor$.
 
   \begin{lean}
     classical
@@ -112,36 +119,51 @@
 
         apply Finset.mem_Icc.mpr
         exact ⟨Nat.div_pos (Nat.le_of_dvd hnpos hdiv) hk, Nat.div_le_div_right hnle⟩
+  \end{lean}
 
-      · intro m hm n hn heq
+  Two such multiples with equal quotients are equal, since multiplication by $k$ recovers each
+  multiple.
 
-        have hmd := (Finset.mem_filter.mp hm).2
+  \begin{lean}
+    · intro m hm n hn heq
 
-        have hnd := (Finset.mem_filter.mp hn).2
+      have hmd := (Finset.mem_filter.mp hm).2
 
-        have h := congrArg (fun q => q * k) heq
-        rwa [Nat.div_mul_cancel hmd, Nat.div_mul_cancel hnd] at h
+      have hnd := (Finset.mem_filter.mp hn).2
 
-      · intro j hj
+      have h := congrArg (fun q => q * k) heq
+      rwa [Nat.div_mul_cancel hmd, Nat.div_mul_cancel hnd] at h
+  \end{lean}
 
-        obtain ⟨hjpos, hjle⟩ := Finset.mem_Icc.mp hj
+  Conversely, for every $1\le j\le\lfloor N/k\rfloor$, the integer $jk$ is a positive multiple at
+  most $N$ and has quotient $j$.
 
-        refine ⟨j * k, ?_, Nat.mul_div_cancel j hk⟩
+  \begin{lean}
+    · intro j hj
 
-        apply Finset.mem_filter.mpr
-        constructor
+      obtain ⟨hjpos, hjle⟩ := Finset.mem_Icc.mp hj
 
-        · apply Finset.mem_Icc.mpr
-          exact ⟨mul_pos hjpos hk, (Nat.le_div_iff_mul_le hk).1 hjle⟩
+      refine ⟨j * k, ?_, Nat.mul_div_cancel j hk⟩
 
-        · exact ⟨j, by ring⟩
+      apply Finset.mem_filter.mpr
+      constructor
 
+      · apply Finset.mem_Icc.mpr
+        exact ⟨mul_pos hjpos hk, (Nat.le_div_iff_mul_le hk).1 hjle⟩
+
+      · exact ⟨j, by ring⟩
+  \end{lean}
+
+  This bijection identifies the number of multiples with the number of integers from one to
+  $\lfloor N/k\rfloor$, which is $\lfloor N/k\rfloor$.
+
+  \begin{lean}
     rw [hcard, Nat.card_Icc, Nat.add_sub_cancel]
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:legendre}
+  \label{ent:thm:legendre}
   For a prime $p$ and natural $n$, the exponent of $p$ in $n!
   $ is \[ v_p(n!)=\sum_{j=1}^{n}\left\lfloor\frac{n}{p^j}\right\rfloor. \] Larger indices contribute zero, so this is also the usual finite sum over $j\ge1$.
 
@@ -165,7 +187,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-add-carry}
+  \label{ent:thm:floor-add-carry}
   For real $a,b$, the difference $\lfloor a+b\rfloor-\lfloor a\rfloor-\lfloor b\rfloor$ is either
   zero or one.
 
@@ -176,9 +198,9 @@
 \end{theorem}
 
 \begin{proof}
-  Add the floor bounds for $a$ and $b$ and compare with those for $a+b$.
-  The integer difference is strictly greater than minus one and strictly less than two, leaving
-  exactly the stated possibilities.
+  Add the floor bounds for $a$ and $b$ and compare them with those for $a+b$.
+  The difference $\lfloor a+b\rfloor-\lfloor a\rfloor-\lfloor b\rfloor$ is greater than minus one
+  and less than two.
 
   \begin{lean}
     have ha := floor_spec a
@@ -187,20 +209,29 @@
 
     have hab := floor_spec (a + b)
 
-    have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by linarith
+    have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+      linarith
 
-    have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by linarith
+    have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by
+      linarith
+  \end{lean}
 
-    have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by exact_mod_cast hlow
+  These bounds also hold as inequalities between integers.
+  The only possible integer differences are zero and one.
 
-    have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by exact_mod_cast hhigh
+  \begin{lean}
+    have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+      exact_mod_cast hlow
+
+    have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by
+      exact_mod_cast hhigh
 
     omega
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:floor-add-ge}
+  \label{ent:thm:floor-add-ge}
   For all real $a,b$, $\lfloor a+b\rfloor\ge\lfloor a\rfloor+\lfloor b\rfloor$.
 
   \begin{lean}
@@ -217,7 +248,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:factorials-dvd-factorial}
+  \label{ent:thm:factorials-dvd-factorial}
   For natural $r\le n$, the factorial quotient $n!
     /(r!(n-r)!)$ is an integer.
   This includes the endpoint cases $r=0,n$, when the quotient is one.
@@ -230,8 +261,7 @@
 
 \begin{proof}
   It suffices to compare every prime exponent in the denominator and numerator.
-  Legendre\textquotesingle s formula with a common upper bound reduces this to \[ \left\lfloor\frac r{p^j}\right\rfloor+\left\lfloor\frac{n-r}{p^j}\right\rfloor\le\left\lfloor\frac n{p^j}\right\rfloor. \] Multiplying the two integer quotients by $p^j$ shows that their sum is at most $n/p^j$.
-  Sum these inequalities and apply the exponent criterion for divisibility.
+  A zero exponent in the denominator needs no further argument.
 
   \begin{lean}
     apply (dvd_iff_primeExponents_le _ _
@@ -242,7 +272,13 @@
 
     · rw [he]
       exact Nat.zero_le _
+  \end{lean}
 
+  For a nonzero exponent, the corresponding $p$ is prime.
+  Legendre\textquotesingle s formula with a common upper bound reduces the comparison to a sum of
+  quotient inequalities.
+
+  \begin{lean}
     · have hp := (primeExponents_spec (r.factorial * (n - r).factorial)
         (mul_pos (Nat.factorial_pos r) (Nat.factorial_pos (n - r)))).1 p
         (Finsupp.mem_support_iff.mpr he)
@@ -254,25 +290,31 @@
 
       apply Finset.sum_le_sum
       intro j hj
+  \end{lean}
 
-      have hpos : 0 < p ^ j := pow_pos (by
-          have := hp.1
-          omega) j
+  For each $j$, multiplying the quotients by $p^j$ gives bounds by $r$ and $n-r$.
+  Their sum is at most $n$, so the sum of the quotients is at most $\lfloor n/p^j\rfloor$.
+  Summing proves the required exponent inequality.
 
-      apply (Nat.le_div_iff_mul_le hpos).2
+  \begin{lean}
+    have hpos : 0 < p ^ j := pow_pos (by
+        have := hp.1
+        omega) j
 
-      have h₁ := Nat.div_mul_le_self r (p ^ j)
+    apply (Nat.le_div_iff_mul_le hpos).2
 
-      have h₂ := Nat.div_mul_le_self (n - r) (p ^ j)
+    have h₁ := Nat.div_mul_le_self r (p ^ j)
 
-      have hsum : r + (n - r) = n := Nat.add_sub_cancel' hr
+    have h₂ := Nat.div_mul_le_self (n - r) (p ^ j)
 
-      nlinarith
+    have hsum : r + (n - r) = n := Nat.add_sub_cancel' hr
+
+    nlinarith
   \end{lean}
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:factorial-dvd-consecutive-product}
+  \label{ent:thm:factorial-dvd-consecutive-product}
   The product of any $r$ consecutive positive integers is divisible by $r!
   $.
   More precisely, $r!
@@ -286,11 +328,7 @@
 
 \begin{proof}
   Multiplication of the displayed product by $a!
-  $ gives $(a+r)!$.
-  The preceding theorem gives $r!
-    a!\mid(a+r)!$.
-  Cancel the positive factor $a!
-  $ to obtain the claimed divisibility.
+  $ gives $(a+r)!$, as follows by induction on $r$.
 
   \begin{lean}
     have hfactor : (∏ k ∈ Finset.Ico (a + 1) (a + r + 1), k) * a.factorial =
@@ -304,7 +342,14 @@
         rw [mul_right_comm, ih]
         rw [show a + (r + 1) = (a + r) + 1 by omega, Nat.factorial_succ]
         ring
+  \end{lean}
 
+  The preceding theorem gives $r!
+    a!\mid(a+r)!$.
+  Cancel the positive factor $a!
+  $ to obtain the claimed divisibility.
+
+  \begin{lean}
     obtain ⟨k, hk⟩ := factorials_dvd_factorial (a + r) r (by omega)
     rw [show a + r - r = a by omega] at hk
 
@@ -316,7 +361,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-divisorsum}
+  \label{ent:thm:sum-divisorsum}
   For $F(n)=\sum_{d\mid n}f(d)$ and every natural $N$, \[ \sum_{n=1}^N F(n)=\sum_{k=1}^N f(k)\left\lfloor\frac Nk\right\rfloor. \] No multiplicativity assumption is needed.
 
   \begin{lean}
@@ -368,7 +413,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-tau}
+  \label{ent:thm:sum-tau}
   For natural $N$, \[ \sum_{n=1}^N\tau(n)=\sum_{k=1}^N\left\lfloor\frac Nk\right\rfloor. \]
 
   \begin{lean}
@@ -388,7 +433,7 @@
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:sum-sigma}
+  \label{ent:thm:sum-sigma}
   For natural $N$, \[ \sum_{n=1}^N\sigma(n)=\sum_{k=1}^N k\left\lfloor\frac Nk\right\rfloor. \]
 
   \begin{lean}

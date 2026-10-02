@@ -262,8 +262,17 @@ The two remainders are equal: $r'=r$.
 
 Group displayed proofs by mathematical reasoning unit using the
 [Lean readability conventions](formalization.md#lean-readability), matching the
-checked source. Use blank lines between local claims and substantial branches,
-and indent nested proofs consistently.
+checked source. Use blank lines between groups of related local claims and
+substantial branches, and indent nested proofs consistently.
+
+Split a proof with several substantive reasoning units into several `lean`
+environments, each immediately preceded by the mathematical explanation of that
+unit. Do not put the complete proof in one environment and rely on blank lines
+inside the code to separate its arguments. Give substantial directions of an
+implication or cases their own explanation/code pairs. A short proof consisting
+of one calculation may remain in one environment. Preserve the complete checked
+code and its order across the fragments; only presentation indentation may
+change.
 
 Keep the closing `\end{lean}` on its own line. The formatter preserves
 relative Lean indentation, but aligns the block to the surrounding environment

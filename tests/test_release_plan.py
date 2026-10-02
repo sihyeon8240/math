@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 class ReleasePlanTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         scripts.mkdir()
@@ -37,9 +38,6 @@ class ReleasePlanTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def run_plan(
         self, tag: str, **environment: str
     ) -> subprocess.CompletedProcess[str]:
@@ -50,6 +48,7 @@ class ReleasePlanTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=10,
         )
 
     def test_valid_tag_exports_version_and_single_book_matrix(self) -> None:
@@ -59,6 +58,13 @@ class ReleasePlanTests(unittest.TestCase):
             result.stdout.splitlines(),
             ["alpha_version=1.2.3", "version=1.2.3", 'matrix={"book":["alpha"]}'],
         )
+
+    def test_hyphenated_prerelease_tags_are_accepted(self) -> None:
+        for version in ("1.2.3--alpha", "1.2.3-alpha--beta", "1.2.3-rc.1"):
+            with self.subTest(version=version):
+                result = self.run_plan(f"alpha-v{version}", VERSION=version)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(f"version={version}\n", result.stdout)
 
     def test_invalid_or_disabled_book_tag_is_rejected(self) -> None:
         invalid = self.run_plan("alpha-1.2.3")

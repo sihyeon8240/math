@@ -40,3 +40,9 @@ accepted background.
 Accept the fundamental theorem of algebra for complex eigenvalue existence and
 triangularization, where polynomial splitting is needed. Prove its
 linear-algebra consequences locally.
+
+For the continuous-function and Fourier examples in Chapter V only, accept
+continuity, definite-integral linearity and positivity, elementary change of
+variables and integration of trigonometric and complex exponential functions.
+These examples do not assume Fourier convergence, completeness, or the existence
+of infinite-dimensional bases.

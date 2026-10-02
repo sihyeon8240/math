@@ -43,9 +43,11 @@ theorem prime_dvd_list_prod (p : ℕ) (hp : isPrime p) (l : List ℤ)
   induction l with
   | nil =>
     obtain ⟨k, hk⟩ := h
-    have hpos : (1 : ℤ) < p := by exact_mod_cast hp.1
+    have hpos : (1 : ℤ) < p := by
+      exact_mod_cast hp.1
     change 1 = (p : ℤ) * k at hk
-    have hkpos : 0 < k := by nlinarith
+    have hkpos : 0 < k := by
+      nlinarith
     nlinarith
 
   | cons a l ih =>
@@ -58,7 +60,8 @@ theorem prime_dvd_list_prod (p : ℕ) (hp : isPrime p) (l : List ℤ)
 /-- Lemma: the integer product result specializes to natural numbers. -/
 theorem prime_dvd_mul_nat (p a b : ℕ) (hp : isPrime p) (h : p ∣ a * b) :
     p ∣ a ∨ p ∣ b := by
-  have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by exact_mod_cast h
+  have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by
+    exact_mod_cast h
   rcases prime_dvd_mul p hp a b h' with ha | hb
 
   · exact Or.inl (Int.natCast_dvd_natCast.mp ha)
@@ -71,7 +74,8 @@ theorem prime_eq_of_dvd_prod (p : ℕ) (hp : isPrime p) (l : List ℕ)
   | nil =>
     obtain ⟨k, hk⟩ := h
     change 1 = p * k at hk
-    have hkpos : 0 < k := by nlinarith [hp.1]
+    have hkpos : 0 < k := by
+      nlinarith [hp.1]
     nlinarith [hp.1]
 
   | cons q l ih =>

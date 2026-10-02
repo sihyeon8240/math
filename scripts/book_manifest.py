@@ -15,9 +15,6 @@ MANIFEST_PATH = REPO_ROOT / "books.yml"
 SLUG_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 LABEL_PREFIX_PATTERN = re.compile(r"[a-z][a-z0-9]*")
 LEAN_MODULE_PATTERN = re.compile(r"[A-Z][A-Za-z0-9]*")
-VERSION_PATTERN = re.compile(
-    r"^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?$"
-)
 STATUS_LABELS = {
     "draft": "Draft",
     "review": "In Review",
@@ -42,6 +39,27 @@ BOOK_FIELDS = {
     "release",
     "site",
 }
+
+
+def version_key(value: str) -> tuple:
+    """SemVer precedence, excluding build metadata (unsupported by books.yml)."""
+    match = re.fullmatch(
+        r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
+        r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?",
+        value,
+    )
+    if not match:
+        raise ValueError(f"invalid semantic version: {value}")
+    major, minor, patch, suffix = match.groups()
+    identifiers = []
+    for part in suffix.split(".") if suffix else []:
+        if part.isdigit():
+            if len(part) > 1 and part.startswith("0"):
+                raise ValueError(f"invalid numeric prerelease identifier: {value}")
+            identifiers.append((0, int(part)))
+        else:
+            identifiers.append((1, part))
+    return (int(major), int(minor), int(patch), suffix is None, tuple(identifiers))
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
@@ -236,8 +254,14 @@ def load_manifest(
         ):
             raise ValueError(f"book '{slug}' must have a non-empty single-line author")
 
-        if not isinstance(version, str) or not VERSION_PATTERN.fullmatch(version):
+        if not isinstance(version, str):
             raise ValueError(f"book '{slug}' has an invalid version")
+        try:
+            version_key(version)
+        except ValueError as error:
+            raise ValueError(
+                f"book '{slug}' has an invalid version: {error}"
+            ) from error
 
         short_title = book.get("short_title")
         if short_title is not None and (

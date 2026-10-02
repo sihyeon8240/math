@@ -144,7 +144,8 @@ or `strict-pdf-v1` policy when their corresponding semantics change.
 `prepare-image.yml` builds `linux/amd64` on `ubuntu-24.04` and `linux/arm64`
 on `ubuntu-24.04-arm`. Both native runners must be available to the repository.
 Each runner loads its single-platform image, checks its architecture, runs the
-toolchain smoke test, and pushes the tested image under a run-specific tag.
+toolchain smoke test, and, for main pushes or manual dispatches, pushes the
+tested image under a run-specific tag.
 The publish job combines the recorded immutable digests only after both builds
 succeed. Consumers pin the resulting multi-platform index digest, allowing
 Docker to select the host architecture.
@@ -154,8 +155,30 @@ platform list, and build policy version. Bump the policy version when changing
 build or validation semantics that require a fresh image. Existing tags are
 reused only if their index includes both Linux platforms; incompatible existing
 tags fail without being overwritten. Publication validates the index by digest
-before returning it to callers. The first successful workflow run updates the
-consumer pin through the existing pin pull request automation.
+before returning it to callers. Main CI creates a consumer pin PR only after
+source, formatting, and affected-PDF checks pass.
+
+PRs, including fork and Dependabot PRs, reuse an existing content-tagged image
+when available. Otherwise both native platforms are built and smoke-tested
+without registry login or publication. The AMD64 image is exported as a compressed
+run-local artifact for formatting and PDF jobs; consumers verify its image ID
+and architecture after loading it. The archive expires after one day and is
+deleted from each consumer after loading. These builds do not produce reusable
+verified-PDF artifacts: main must build against a published index digest.
+
+`build-image.yml` is a manual preparation workflow, not a privileged PR handler.
+Dispatch it on a reviewed branch to publish and pin its image, or on main to
+open a pin PR after smoke tests. A branch pin update also requires CI approval.
+Normal Dependabot Dockerfile PRs use the ordinary PR validation flow; main
+publishes their image after merge.
+
+Pin PR creation shares `scripts/open-image-pin-pr.sh`, skips stale main runs,
+reuses a PR or already-pushed branch on retries, and skips images already covered
+by an open pin PR. PRs created or updated with `GITHUB_TOKEN` require a maintainer
+to select **Approve workflows to run** in the
+PR merge box before CI starts. This intentionally retains the default token;
+no additional App credentials or personal access token are required. See
+[GitHub's token event rules](https://docs.github.com/en/actions/concepts/security/github_token#when-github_token-triggers-workflow-runs).
 
 Digest artifacts expire after one day. Temporary `build-<run>-<attempt>-<arch>`
 registry tags are retained, including when the other architecture fails; final

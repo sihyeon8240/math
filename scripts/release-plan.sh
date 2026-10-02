@@ -14,7 +14,7 @@ mapfile -t releasable_books < <(
 )
 
 version_pattern='[0-9]+\.[0-9]+\.[0-9]+'
-version_pattern+='(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?'
+version_pattern+='(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?'
 single_book_pattern='^([a-z0-9]+(-[a-z0-9]+)*)-v'
 single_book_pattern+="($version_pattern)\$"
 

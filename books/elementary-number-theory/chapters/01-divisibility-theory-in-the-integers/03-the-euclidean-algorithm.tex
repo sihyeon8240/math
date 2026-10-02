@@ -3,7 +3,7 @@ Pairs with the same common divisors have equal gcds: for nonzero pairs, each gcd
 other; a zero pair is characterized by having zero as a common divisor.
 
 \begin{lemma}
-  \label{nt:thm:gcd-remainder}
+  \label{ent:thm:gcd-remainder}
   If $a,b,q,r\in\Z$ and $a=qb+r$, then $\gcd(a,b)=\gcd(b,r)$.
   No sign or size condition on the remainder is needed for this identity.
 
@@ -47,7 +47,7 @@ other; a zero pair is characterized by having zero as a common divisor.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:thm:gcd-abs}
+  \label{ent:thm:gcd-abs}
   For all integers $a,b$, taking absolute values leaves the gcd unchanged:
   $\gcd(|a|,|b|)=\gcd(a,b)$.
 
@@ -57,10 +57,8 @@ other; a zero pair is characterized by having zero as a common divisor.
 \end{lemma}
 
 \begin{proof}
-
   An integer $c$ divides $|z|$ exactly when it divides $z$.
   For $z\ge0$ this is immediate; for $z<0$, negate the multiplication witness.
-  Apply this to both inputs and use the common-divisor characterization.
 
   \begin{lean}
     have hdiv (c z : ℤ) : c ∣ |z| ↔ c ∣ z := by
@@ -69,10 +67,13 @@ other; a zero pair is characterized by having zero as a common divisor.
       · rw [abs_of_nonneg hz]
       · rw [abs_of_neg (lt_of_not_ge hz)]
         constructor <;> rintro ⟨k, hk⟩ <;> exact ⟨-k, by linarith⟩
-
-    exact gcd_eq_of_common_divisors _ _ _ _ (fun c => by rw [hdiv, hdiv])
   \end{lean}
 
+  Apply this equivalence to both inputs and use the common-divisor characterization of the gcd.
+
+  \begin{lean}
+    exact gcd_eq_of_common_divisors _ _ _ _ (fun c => by rw [hdiv, hdiv])
+  \end{lean}
 \end{proof}
 
 Absolute values reduce the computation to nonnegative inputs.
@@ -96,7 +97,7 @@ is followed by $(b,r)$.
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:euclidean-termination}
+  \label{ent:thm:euclidean-termination}
   For every $a,b\in\N$, a finite Euclidean division trace starts at $(a,b)$ and ends at some
   $(g,0)$.
 
@@ -135,7 +136,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:euclidean-correctness}
+  \label{ent:thm:euclidean-correctness}
   If a Euclidean trace starts at $(a,b)$ and ends at $(g,0)$, then $\gcd(a,b)=g$.
 
   \begin{lean}
@@ -161,7 +162,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:euclidean-positive}
+  \label{ent:thm:euclidean-positive}
   If the initial second input $b$ is positive, then the terminal entry $g$ of a Euclidean trace is
   positive.
   Hence it is the last nonzero remainder, or the initial divisor if the first remainder is zero.
@@ -186,7 +187,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-positive-factor}
+  \label{ent:thm:gcd-positive-factor}
   For integers $a,b,k$ with $k>0$, we have $\gcd(ka,kb)=k\gcd(a,b)$.
 
   \begin{lean}
@@ -253,7 +254,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{corollary}
-  \label{nt:thm:gcd-nonzero-factor}
+  \label{ent:thm:gcd-nonzero-factor}
   For integers $a,b$ and any nonzero integer $k$, we have $\gcd(ka,kb)=|k|\gcd(a,b)$.
 
   \begin{lean}
@@ -280,7 +281,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{lemma}
-  \label{nt:thm:positive-common-multiple}
+  \label{ent:thm:positive-common-multiple}
   Any two nonzero integers $a,b$ have a positive natural number that is divisible by both.
 
   \begin{lean}
@@ -290,10 +291,8 @@ is followed by $(b,r)$.
 \end{lemma}
 
 \begin{proof}
-
   The integer $(ab)^2$ is positive.
-  Its natural-number representation has the same value, and $(ab)^2=a(ab^2)=b(a^2b)$ supplies the
-  two divisibility witnesses.
+  Its natural-number representation has the same value.
 
   \begin{lean}
     have hp : 0 < (a * b) * (a * b) := mul_self_pos.mpr (mul_ne_zero ha hb)
@@ -301,13 +300,17 @@ is followed by $(b,r)$.
     refine ⟨((a * b) * (a * b)).toNat, ?_, ?_, ?_⟩
 
     · omega
+  \end{lean}
+
+  The identities $(ab)^2=a(ab^2)=b(a^2b)$ supply the two divisibility witnesses.
+
+  \begin{lean}
     · rw [Int.toNat_of_nonneg (le_of_lt hp)]
       exact ⟨a * b * b, by ring⟩
 
     · rw [Int.toNat_of_nonneg (le_of_lt hp)]
       exact ⟨a * a * b, by ring⟩
   \end{lean}
-
 \end{proof}
 
 \begin{definition}
@@ -324,7 +327,7 @@ is followed by $(b,r)$.
 \end{definition}
 
 \begin{theorem}
-  \label{nt:thm:lcm-spec}
+  \label{ent:thm:lcm-spec}
   For nonzero integers $a,b$, the number $m=\operatorname{lcm}(a,b)$ is positive, satisfies $a\mid
     m$ and $b\mid m$, and obeys $m\le c$ for every positive integer common multiple $c$.
 
@@ -368,7 +371,7 @@ is followed by $(b,r)$.
 \end{proof}
 
 \begin{theorem}
-  \label{nt:thm:gcd-lcm-product}
+  \label{ent:thm:gcd-lcm-product}
   For positive integers $a,b$, we have $\gcd(a,b)\operatorname{lcm}(a,b)=ab$.
 
   \begin{lean}

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-import yaml
+from test_support import book_record, manifest_document, write_yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
@@ -33,36 +33,20 @@ class LeanManifestTests(unittest.TestCase):
         self.root = Path(self.temporary.name)
         self.write_yaml(
             "books.yml",
-            {
-                "schema_version": 1,
-                "defaults": {
-                    "author": "Author",
-                    "build": True,
-                    "check": True,
-                    "release": False,
-                    "site": False,
-                },
-                "books": [
-                    {
-                        "slug": "sample",
-                        "title": "Sample",
-                        "version": "0.1.0",
-                        "label_prefix": "sa",
-                        "lean_module": "Sample",
-                        "status": "draft",
-                        "order": 10,
-                    },
-                    {
-                        "slug": "empty",
-                        "title": "Empty",
-                        "version": "0.1.0",
-                        "label_prefix": "em",
-                        "lean_module": "Empty",
-                        "status": "draft",
-                        "order": 20,
-                    },
-                ],
-            },
+            manifest_document(
+                [
+                    book_record(
+                        version="0.1.0", label_prefix="sa", lean_module="Sample"
+                    ),
+                    book_record(
+                        "empty",
+                        version="0.1.0",
+                        label_prefix="em",
+                        lean_module="Empty",
+                        order=20,
+                    ),
+                ]
+            ),
         )
         for slug in ("sample", "empty"):
             self.write_yaml(
@@ -82,9 +66,7 @@ class LeanManifestTests(unittest.TestCase):
         self.manifest("Chapter01", ["VectorSpaces", "Bases"])
 
     def write_yaml(self, name: str, data: object) -> None:
-        path = self.root / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+        write_yaml(self.root / name, data)
 
     def topic(self, chapter: str, name: str) -> Path:
         path = self.root / "lean/Textbooks/Sample" / chapter / f"{name}.lean"

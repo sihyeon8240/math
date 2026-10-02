@@ -29,13 +29,16 @@ def load_yaml(path: Path) -> dict[str, Any]:
     return data
 
 
-def load_proof_index(root: Path) -> tuple[list[str], list[dict[str, Any]]]:
+def load_proof_index(
+    root: Path, *, books: list[dict[str, Any]] | None = None
+) -> tuple[list[str], list[dict[str, Any]]]:
     """Load proof shards in deterministic book/chapter order."""
     errors: list[str] = []
-    try:
-        books = load_manifest(root / "books.yml", root)["books"]
-    except ValueError as error:
-        return [str(error)], []
+    if books is None:
+        try:
+            books = load_manifest(root / "books.yml", root)["books"]
+        except ValueError as error:
+            return [str(error)], []
 
     paths: list[Path] = []
     for book in books:

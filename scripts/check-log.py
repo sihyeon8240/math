@@ -39,6 +39,9 @@ FAILURES = {
         re.I,
     ),
 }
+PDF_OUTPUT = re.compile(
+    r"^Output written on .+\.pdf\s+\(\d+ pages?,\s+\d+ bytes\)\.", re.M
+)
 OVERFULL = re.compile(r"Overfull \\[hv]box", re.I)
 
 
@@ -55,6 +58,13 @@ def main() -> int:
     failed = False
     for path in args.logs:
         text = path.read_text(encoding="utf-8", errors="replace")
+
+        if not text.strip():
+            print(f"{path}: error: empty LaTeX log", file=sys.stderr)
+            failed = True
+        elif not PDF_OUTPUT.search(text):
+            print(f"{path}: error: missing PDF completion message", file=sys.stderr)
+            failed = True
 
         for name, pattern in FAILURES.items():
             count = len(pattern.findall(text))

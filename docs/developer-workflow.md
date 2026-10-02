@@ -244,7 +244,9 @@ permissions, concurrency, and publication implementation.
 `build.yml` owns PR and main CI, including the existing **Check sources** and
 **Verify textbook builds** status checks. Source checks and affected-book planning
 start independently; image preparation runs once and its immutable digest is
-shared by formatting and PDF jobs. Both events still validate sources and Lean.
+shared by formatting and PDF jobs. New PR images are smoke-tested on both native
+platforms and passed to consumers as a run-local AMD64 artifact without registry
+publication. Both events still validate sources and Lean.
 
 Cache restores still run normal validation. After a merge, CI may reuse a
 verified PR artifact when its full source tree and build environment match;
@@ -259,6 +261,12 @@ Maintainers can bootstrap or safely rebuild that snapshot by manually dispatchin
 **Build textbooks**, which selects every build-enabled book. Pull requests and
 fork pull requests do not publish.
 
+**Deploy static site** checks out the source commit recorded in the downloaded
+PDF snapshot's `.source-sha`, including for manual dispatches. Calls from the
+build workflow must match that commit, so a newer snapshot cannot be mixed with
+an older source checkout. To publish new source changes, run **Build textbooks**
+first; deploying the site alone republishes the existing snapshot.
+
 ### Releases
 
 A reviewed `release: false` to `release: true` change requests publication of
@@ -272,7 +280,7 @@ order. Release targets must also have `build: true`. A version change while
 On `local-work` or another development branch, run:
 
 ```bash
-make book release BOOK=mathematical-analysis-1 VERSION=0.1.0
+make book release BOOK=mathematical-analysis VERSION=0.1.0
 ```
 
 This enables `release: true`, sets that book's version in `books.yml`, and

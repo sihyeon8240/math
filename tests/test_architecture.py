@@ -9,6 +9,7 @@ import unittest
 from pathlib import Path
 
 import yaml
+from test_support import book_record, manifest_document, write_yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 SPEC = importlib.util.spec_from_file_location(
@@ -23,6 +24,7 @@ SPEC.loader.exec_module(MODULE)
 class ArchitectureTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.book = self.root / "books/sample"
         chapter = self.book / "chapters/01-start"
@@ -71,31 +73,11 @@ class ArchitectureTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def write_manifest(self, **book_overrides: object) -> None:
-        book = {
-            "slug": "sample",
-            "title": "Sample",
-            "version": "1.0.0",
-            "status": "draft",
-            "order": 10,
-        }
-        book.update(book_overrides)
-        manifest = {
-            "schema_version": 1,
-            "defaults": {
-                "author": "Sample Author",
-                "build": True,
-                "check": True,
-                "release": False,
-                "site": False,
-            },
-            "books": [book],
-        }
-        (self.root / "books.yml").write_text(
-            yaml.safe_dump(manifest, sort_keys=False), encoding="utf-8"
+        book = book_record(**book_overrides)
+        write_yaml(
+            self.root / "books.yml",
+            manifest_document([book], author="Sample Author"),
         )
 
     def entry(self, text: str) -> None:
