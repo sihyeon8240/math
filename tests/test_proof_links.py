@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
@@ -75,6 +76,36 @@ class ProofLinkTests(unittest.TestCase):
             "id": "sa:thm:result",
             "declaration": "Sample.Chapter01.result",
         }
+
+    def test_multiple_proofs_reuse_one_source_scan(self) -> None:
+        source = self.root / "books/sample/chapters/01-start/01-result.tex"
+        source.write_text(
+            "\\begin{theorem}\\label{sa:thm:result}Result.\\end{theorem}\n"
+            "\\begin{lemma}\\label{sa:lem:other}Other.\\end{lemma}\n",
+            encoding="utf-8",
+        )
+        self.write_yaml(
+            "books/sample/chapters/01-start/proofs.yml",
+            {
+                "proofs": [
+                    self.entry,
+                    {"id": "sa:lem:other", "declaration": "Sample.Chapter01.other"},
+                ]
+            },
+        )
+        reads = []
+        original = Path.read_text
+
+        def tracked(path, *args, **kwargs):
+            if path == source:
+                reads.append(path)
+            return original(path, *args, **kwargs)
+
+        with patch.object(Path, "read_text", tracked):
+            errors, proofs = MODULE.validate_index(self.root)
+        self.assertEqual(errors, [])
+        self.assertEqual(len(proofs), 2)
+        self.assertEqual(reads, [source])
 
     def tearDown(self) -> None:
         self.temporary.cleanup()

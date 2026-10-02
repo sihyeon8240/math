@@ -41,10 +41,11 @@ def theorem_labels(text: str) -> set[str]:
 
 def index_latex_labels(
     root: Path, books: dict[str, dict[str, Any]]
-) -> tuple[list[str], dict[str, Path]]:
+) -> tuple[list[str], dict[str, Path], dict[Path, set[str]]]:
     """Map globally unique LaTeX labels to their source files."""
     errors: list[str] = []
     sources: dict[str, Path] = {}
+    result_labels: dict[Path, set[str]] = {}
     for slug in sorted(books):
         book = root / "books" / slug
         paths = sorted(
@@ -56,6 +57,7 @@ def index_latex_labels(
             if path.name == "index.tex":
                 continue
             text = path.read_text(encoding="utf-8", errors="replace")
+            result_labels[path] = theorem_labels(text)
             for label in command_arguments(text, {"label"}):
                 previous = sources.get(label.argument)
                 if previous is not None:
@@ -65,22 +67,22 @@ def index_latex_labels(
                     )
                 else:
                     sources[label.argument] = path
-    return errors, sources
+    return errors, sources, result_labels
 
 
 def validate_index(root: Path = ROOT) -> tuple[list[str], list[dict[str, Any]]]:
-    errors, proofs = load_proof_index(root)
     try:
         books_data = load_manifest(root / "books.yml", root)
     except ValueError as error:
-        return errors + [str(error)], []
+        return [str(error)], []
 
+    errors, proofs = load_proof_index(root, books=books_data["books"])
     books = {
         book.get("slug"): book
         for book in books_data.get("books", [])
         if isinstance(book, dict) and isinstance(book.get("slug"), str)
     }
-    label_errors, label_sources = index_latex_labels(root, books)
+    label_errors, label_sources, result_labels = index_latex_labels(root, books)
     errors.extend(label_errors)
     seen_ids: set[str] = set()
     seen_declarations: set[str] = set()
@@ -158,7 +160,7 @@ def validate_index(root: Path = ROOT) -> tuple[list[str], list[dict[str, Any]]]:
                 f"{prefix} label belongs outside shard chapter {chapter!r}: "
                 f"{tex_path.relative_to(root)}"
             )
-        if proof_id not in theorem_labels(tex_path.read_text(encoding="utf-8")):
+        if proof_id not in result_labels[tex_path]:
             errors.append(
                 f"{prefix} label is not owned by a supported theorem environment"
             )
