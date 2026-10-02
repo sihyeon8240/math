@@ -293,6 +293,23 @@ printf '%s\\n' "$MANIFEST"
         self.assertEqual(unit_test["run"], "make test")
         self.assertNotIn("if", unit_test)
 
+    def test_source_job_defers_lean_checks_to_its_lean_step(self):
+        workflow = yaml.safe_load(
+            (ROOT / ".github/workflows/build.yml").read_text(encoding="utf-8")
+        )
+        steps = workflow["jobs"]["source"]["steps"]
+        lean = next(
+            i for i, step in enumerate(steps) if step.get("run") == "make lean check"
+        )
+        repository = next(
+            i
+            for i, step in enumerate(steps)
+            if step.get("run") == "./scripts/check-repository.sh --defer-lean"
+        )
+        self.assertLess(lean, repository)
+        self.assertNotIn("if", steps[lean])
+        self.assertNotIn("continue-on-error", steps[lean])
+
     def test_source_check_uses_supported_lean_make_contract(self):
         workflow = yaml.safe_load(
             (ROOT / ".github/workflows/build.yml").read_text(encoding="utf-8")

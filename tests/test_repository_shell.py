@@ -60,9 +60,7 @@ class FullCheckTests(unittest.TestCase):
                     )
                     self.assertEqual(result.returncode, status, result.stderr)
                     calls = capture.read_text().splitlines()
-                    self.assertEqual(
-                        calls[0], "check-repository.sh --defer-proof-links"
-                    )
+                    self.assertEqual(calls[0], "check-repository.sh --defer-lean")
                     self.assertIn("normalize-eof.sh --check --exclude-formatted", calls)
                     self.assertEqual(calls.count("check-lean.sh "), 1)
                     self.assertEqual("build-all.sh check" in calls, status == 0)

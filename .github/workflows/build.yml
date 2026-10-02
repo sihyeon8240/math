@@ -82,7 +82,7 @@ jobs:
       - name: Check Lean proofs and LaTeX links
         run: make lean check
       - name: Repository structure, metadata, labels, generated files, and draft markers
-        run: ./scripts/check-repository.sh
+        run: ./scripts/check-repository.sh --defer-lean
       - name: Python formatting and lint
         run: make format py check
       - name: Unit tests

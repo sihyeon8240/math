@@ -5,8 +5,8 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 PYTHON="${PYTHON:-python3}"
 
-if [[ $# -gt 1 || ($# -eq 1 && "$1" != --defer-proof-links) ]]; then
-  echo "usage: $0 [--defer-proof-links]" >&2
+if [[ $# -gt 1 || ($# -eq 1 && "$1" != --defer-proof-links && "$1" != --defer-lean) ]]; then
+  echo "usage: $0 [--defer-proof-links|--defer-lean]" >&2
   exit 2
 fi
 
@@ -29,14 +29,16 @@ shellcheck --severity=error scripts/*.sh
 
 "$PYTHON" scripts/books.py validate
 "$PYTHON" scripts/generate-contents.py all --check
-"$PYTHON" scripts/generate-lean.py --check
+if [[ "${1:-}" != --defer-lean ]]; then
+  "$PYTHON" scripts/generate-lean.py --check
+fi
 "$PYTHON" scripts/check-architecture.py
 "$PYTHON" scripts/check-docs.py
 "$PYTHON" scripts/generate-site-pages.py --output-dir "$site_pages"
 "$PYTHON" scripts/generate-site-pages.py --check --output-dir "$site_pages"
 "$PYTHON" scripts/check-image-reference.py
 # The full check validates these links together with their Lean declarations.
-if [[ "${1:-}" != --defer-proof-links ]]; then
+if [[ "${1:-}" != --defer-proof-links && "${1:-}" != --defer-lean ]]; then
   "$PYTHON" scripts/check-proof-links.py
 fi
 
