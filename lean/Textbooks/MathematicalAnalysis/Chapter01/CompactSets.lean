@@ -395,13 +395,10 @@ theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
     exact mem_iUnion.mpr ⟨i₀, mem_iUnion.mpr ⟨Finset.mem_singleton_self _, hi₀⟩⟩
 
   have hne : T.Nonempty := ⟨a, ha⟩
-
   have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
 
   let c := sSup T
-
   have hac : a ≤ c := le_csSup hb ha
-
   have hcb : c ≤ b := csSup_le hne (fun x hx => hx.1.2)
 
   obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (show c ∈ Icc a b from ⟨hac, hcb⟩))
@@ -414,7 +411,6 @@ theorem interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
   obtain ⟨s, hs⟩ := ht.2
 
   let d := min b (c + r / 2)
-
   have hcd : c ≤ d := le_min hcb (by linarith)
 
   have hd : d ∈ T := by

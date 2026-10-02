@@ -692,13 +692,10 @@ Only this defining property is needed.
 
   \begin{lean}
     have hne : T.Nonempty := ⟨a, ha⟩
-
     have hb : BddAbove T := ⟨b, fun x hx => hx.1.2⟩
 
     let c := sSup T
-
     have hac : a ≤ c := le_csSup hb ha
-
     have hcb : c ≤ b := csSup_le hne (fun x hx => hx.1.2)
 
     obtain ⟨i, hi⟩ := mem_iUnion.mp (hc (show c ∈ Icc a b from ⟨hac, hcb⟩))
@@ -717,7 +714,6 @@ Only this defining property is needed.
     obtain ⟨s, hs⟩ := ht.2
 
     let d := min b (c + r / 2)
-
     have hcd : c ≤ d := le_min hcb (by linarith)
 
     have hd : d ∈ T := by
