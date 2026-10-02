@@ -11,6 +11,8 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from test_support import write_executable
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -32,16 +34,16 @@ class FullCheckTests(unittest.TestCase):
             ]
             for name in names:
                 script = scripts / name
-                script.write_text(
+                write_executable(
+                    script,
                     "#!/bin/sh\n"
                     'printf "%s %s\\n" "${0##*/}" "$*" >> "$CAPTURE"\n'
                     + (
                         'exit "${LEAN_EXIT_CODE:-0}"\n'
                         if name == "check-lean.sh"
                         else ""
-                    )
+                    ),
                 )
-                script.chmod(0o755)
 
             for status in (0, 7):
                 with self.subTest(status=status):
@@ -57,6 +59,7 @@ class FullCheckTests(unittest.TestCase):
                         capture_output=True,
                         text=True,
                         check=False,
+                        timeout=30,
                     )
                     self.assertEqual(result.returncode, status, result.stderr)
                     calls = capture.read_text().splitlines()
@@ -80,8 +83,7 @@ class RepositorySourceCheckTests(unittest.TestCase):
             # Syntax checking must reject the script independently of ShellCheck.
             for name in ("rg", "shellcheck"):
                 command = binary / name
-                command.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-                command.chmod(0o755)
+                write_executable(command, "#!/bin/sh\nexit 0\n")
             result = subprocess.run(
                 [str(scripts / "check-repository.sh")],
                 cwd=root,
@@ -133,6 +135,7 @@ class CleanTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -161,13 +164,12 @@ class BuildVSCodeTests(unittest.TestCase):
             bin_dir = root / "bin"
             bin_dir.mkdir()
             latexmk = bin_dir / "latexmk"
-            latexmk.write_text(
+            write_executable(
+                latexmk,
                 "#!/usr/bin/env bash\n"
                 "set -euo pipefail\n"
                 'printf "%s\\n" "$PWD" "$@" > "$LATEXMK_CAPTURE"\n',
-                encoding="utf-8",
             )
-            latexmk.chmod(0o755)
             capture = root / "latexmk-arguments"
             environment = os.environ.copy()
             environment["PATH"] = f"{bin_dir}:{environment['PATH']}"
@@ -185,6 +187,7 @@ class BuildVSCodeTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -245,6 +248,7 @@ class CleanArtifactsTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -257,32 +261,28 @@ class CleanArtifactsTests(unittest.TestCase):
 class MakeBooksTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         scripts.mkdir()
         shutil.copy2(ROOT / "Makefile", self.root / "Makefile")
         shutil.copy2(ROOT / "scripts/check-log.py", scripts / "check-log.py")
         build = scripts / "build-book.sh"
-        build.write_text(
+        write_executable(
+            build,
             "#!/usr/bin/env bash\n"
             "set -euo pipefail\n"
             'mkdir -p "build/$1"\n'
             'printf %b "${BUILD_LOG_TEXT:-}" > "build/$1/book.log"\n',
-            encoding="utf-8",
         )
-        build.chmod(0o755)
         build_all = scripts / "build-all.sh"
-        build_all.write_text(
+        write_executable(
+            build_all,
             "#!/usr/bin/env bash\n"
             "set -euo pipefail\n"
             'printf %s "$*" > bulk-arguments\n'
             'printf %s "${CHECK_LOG_STRICT:-0}" > bulk-strict\n',
-            encoding="utf-8",
         )
-        build_all.chmod(0o755)
-
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
 
     def run_make(
         self, *goals: str, log_text: str = ""
@@ -294,6 +294,7 @@ class MakeBooksTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
     def test_check_rejects_a_latex_log_error(self) -> None:
@@ -339,6 +340,7 @@ class MakeBooksTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -367,6 +369,7 @@ class MakeUsageTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
 
                 self.assertEqual(result.returncode, 2)
@@ -379,6 +382,7 @@ class MakeUsageTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 2)
@@ -398,6 +402,7 @@ class MakeUsageTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 2)
@@ -416,6 +421,7 @@ class MakeUsageTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 2)
@@ -441,7 +447,7 @@ class FormatTexTests(unittest.TestCase):
             )
             for name in ("format-tex.sh", "normalize-eof.sh"):
                 shutil.copy2(ROOT / "scripts" / name, scripts / name)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             sentence = (
                 "A mathematical explanation "
                 + "with enough detail to require several source lines " * 4
@@ -461,7 +467,9 @@ class FormatTexTests(unittest.TestCase):
             )
             path = root / "proof.tex"
             path.write_text(source, encoding="utf-8")
-            subprocess.run(["git", "add", "proof.tex"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "proof.tex"], cwd=root, check=True, timeout=30
+            )
 
             def run(*arguments: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(
@@ -471,6 +479,7 @@ class FormatTexTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
 
             result = run("--check")
@@ -513,7 +522,7 @@ class FormatTexTests(unittest.TestCase):
             )
             for name in ("format-tex.sh", "normalize-eof.sh"):
                 shutil.copy2(ROOT / "scripts" / name, scripts / name)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             metadata = (
                 "% !TEX root = book.tex\n"
                 "% BEGIN GENERATED APPENDICES\n"
@@ -529,7 +538,9 @@ class FormatTexTests(unittest.TestCase):
             )
             path = root / "proof.tex"
             path.write_text(source)
-            subprocess.run(["git", "add", "proof.tex"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "proof.tex"], cwd=root, check=True, timeout=30
+            )
 
             def run(*arguments: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(
@@ -539,6 +550,7 @@ class FormatTexTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
 
             result = run()
@@ -576,7 +588,7 @@ class FormatTexTests(unittest.TestCase):
             )
             for name in ("format-tex.sh", "normalize-eof.sh"):
                 shutil.copy2(ROOT / "scripts" / name, scripts / name)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             body = "  classical\n  have h : 0 ≤ a := by\n    nlinarith\n"
             source = (
                 "\\begin{proof}\n"
@@ -621,7 +633,9 @@ class FormatTexTests(unittest.TestCase):
             )
             path = root / "proof.tex"
             path.write_text(source, encoding="utf-8")
-            subprocess.run(["git", "add", "proof.tex"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "proof.tex"], cwd=root, check=True, timeout=30
+            )
 
             def run(*arguments: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(
@@ -631,6 +645,7 @@ class FormatTexTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
 
             result = run("--check")
@@ -659,7 +674,7 @@ class FormatTexTests(unittest.TestCase):
             )
             for name in ("format-tex.sh", "normalize-eof.sh"):
                 shutil.copy2(ROOT / "scripts" / name, scripts / name)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             source = (
                 "\\begin{theorem}\n"
                 "Suppose $a\\in\\Z$. % unmatched { in a comment\n"
@@ -691,7 +706,9 @@ class FormatTexTests(unittest.TestCase):
             )
             path = root / "theorem.tex"
             path.write_text(source, encoding="utf-8")
-            subprocess.run(["git", "add", "theorem.tex"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "theorem.tex"], cwd=root, check=True, timeout=30
+            )
 
             def run(*arguments: str) -> subprocess.CompletedProcess[str]:
                 return subprocess.run(
@@ -701,6 +718,7 @@ class FormatTexTests(unittest.TestCase):
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
 
             result = run("--check")
@@ -733,15 +751,18 @@ class FormatTexTests(unittest.TestCase):
             shutil.copy2(
                 ROOT / "scripts/normalize-eof.sh", scripts / "normalize-eof.sh"
             )
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             (root / "tracked.tex").write_text("tracked\n", encoding="utf-8")
             (root / "draft.tex").write_text("draft\n", encoding="utf-8")
-            subprocess.run(["git", "add", "tracked.tex"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "tracked.tex"], cwd=root, check=True, timeout=30
+            )
 
             binary = root / "bin"
             binary.mkdir()
             latexindent = binary / "latexindent"
-            latexindent.write_text(
+            write_executable(
+                latexindent,
                 "#!/usr/bin/env python3\n"
                 "import os\n"
                 "import pathlib\n"
@@ -755,9 +776,7 @@ class FormatTexTests(unittest.TestCase):
                 '        if argument.endswith((".tex", ".sty")):\n'
                 '            stream.write(argument + "\\n")\n'
                 '            print(pathlib.Path(argument).read_text(), end="")\n',
-                encoding="utf-8",
             )
-            latexindent.chmod(0o755)
             capture = root / "capture.txt"
             result = subprocess.run(
                 [str(scripts / "format-tex.sh"), "--check"],
@@ -771,6 +790,7 @@ class FormatTexTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -790,18 +810,21 @@ class FormatShellTests(unittest.TestCase):
             shutil.copy2(
                 ROOT / "scripts/normalize-eof.sh", scripts / "normalize-eof.sh"
             )
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             (scripts / "tracked.sh").write_text(
                 "#!/usr/bin/env bash\n", encoding="utf-8"
             )
             (scripts / "draft.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
             (root / "outside.sh").write_text("#!/usr/bin/env bash\n", encoding="utf-8")
-            subprocess.run(["git", "add", "scripts/tracked.sh"], cwd=root, check=True)
+            subprocess.run(
+                ["git", "add", "scripts/tracked.sh"], cwd=root, check=True, timeout=30
+            )
 
             binary = root / "bin"
             binary.mkdir()
             shfmt = binary / "shfmt"
-            shfmt.write_text(
+            write_executable(
+                shfmt,
                 "#!/usr/bin/env python3\n"
                 "import os\n"
                 "import pathlib\n"
@@ -811,9 +834,7 @@ class FormatShellTests(unittest.TestCase):
                 "    for argument in sys.argv[1:]:\n"
                 '        if argument.endswith(".sh"):\n'
                 '            stream.write(argument + "\\n")\n',
-                encoding="utf-8",
             )
-            shfmt.chmod(0o755)
             capture = root / "capture.txt"
             result = subprocess.run(
                 [str(scripts / "format-shell.sh"), "--check"],
@@ -826,6 +847,7 @@ class FormatShellTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -855,6 +877,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -874,6 +897,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -893,6 +917,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
             invalid_result = subprocess.run(
                 [
@@ -904,6 +929,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(valid_result.returncode, 0, valid_result.stderr)
@@ -914,7 +940,7 @@ class NormalizeEofTests(unittest.TestCase):
     def test_full_check_excludes_only_paths_covered_by_formatters(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             covered = [
                 "scripts/helper.py",
                 "tests/test_sample.py",
@@ -927,7 +953,7 @@ class NormalizeEofTests(unittest.TestCase):
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_bytes(b"missing newline")
-            subprocess.run(["git", "add", "."], cwd=root, check=True)
+            subprocess.run(["git", "add", "."], cwd=root, check=True, timeout=30)
 
             command = [str(ROOT / "scripts/normalize-eof.sh"), "--check"]
             result = subprocess.run(
@@ -936,6 +962,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
             self.assertEqual(result.returncode, 1)
             for name in covered:
@@ -949,6 +976,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
             self.assertEqual(standalone.returncode, 1)
             for name in covered + remaining:
@@ -957,7 +985,7 @@ class NormalizeEofTests(unittest.TestCase):
     def test_without_paths_processes_tracked_text_only(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=30)
             tracked = root / "tracked.txt"
             untracked = root / "untracked.txt"
             binary = root / "binary.dat"
@@ -965,7 +993,10 @@ class NormalizeEofTests(unittest.TestCase):
             untracked.write_bytes(b"untracked")
             binary.write_bytes(b"binary\0data")
             subprocess.run(
-                ["git", "add", "tracked.txt", "binary.dat"], cwd=root, check=True
+                ["git", "add", "tracked.txt", "binary.dat"],
+                cwd=root,
+                check=True,
+                timeout=30,
             )
 
             result = subprocess.run(
@@ -974,6 +1005,7 @@ class NormalizeEofTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 0, result.stderr)
@@ -985,6 +1017,7 @@ class NormalizeEofTests(unittest.TestCase):
 class BuildBookTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         scripts.mkdir()
@@ -1005,7 +1038,8 @@ class BuildBookTests(unittest.TestCase):
         (book / "book.tex").write_text("book", encoding="utf-8")
         binary = self.root / "bin"
         binary.mkdir()
-        (binary / "latexmk").write_text(
+        write_executable(
+            binary / "latexmk",
             textwrap.dedent("""\
             #!/usr/bin/env bash
             set -euo pipefail
@@ -1017,13 +1051,8 @@ class BuildBookTests(unittest.TestCase):
             touch "$LATEXMK_CAPTURE/book.pdf"
             exit "${LATEXMK_EXIT_CODE:-0}"
             """),
-            encoding="utf-8",
         )
-        (binary / "latexmk").chmod(0o755)
         self.path = f"{binary}:{os.environ['PATH']}"
-
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
 
     def test_build_creates_mirrored_output_and_passes_texinputs(self) -> None:
         output = self.root / "build/sample"
@@ -1039,6 +1068,7 @@ class BuildBookTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -1065,6 +1095,7 @@ class BuildBookTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -1089,6 +1120,7 @@ class BuildBookTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 17, result.stderr)
@@ -1104,6 +1136,7 @@ class BuildBookTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
         self.assertEqual(result.returncode, 2)
@@ -1119,10 +1152,9 @@ class EnvironmentCheckTests(unittest.TestCase):
             scripts = root / "scripts"
             scripts.mkdir()
             shutil.copy2(ROOT / "scripts/check-environment.sh", scripts)
-            (scripts / "check-toolchain.sh").write_text(
-                "#!/usr/bin/env bash\nexit 0\n", encoding="utf-8"
+            write_executable(
+                scripts / "check-toolchain.sh", "#!/usr/bin/env bash\nexit 0\n"
             )
-            (scripts / "check-toolchain.sh").chmod(0o755)
 
             result = subprocess.run(
                 [str(scripts / "check-environment.sh")],
@@ -1130,6 +1162,7 @@ class EnvironmentCheckTests(unittest.TestCase):
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=30,
             )
 
             self.assertEqual(result.returncode, 1)
@@ -1139,6 +1172,7 @@ class EnvironmentCheckTests(unittest.TestCase):
 class NewBookTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         templates = self.root / "common/templates"
@@ -1170,9 +1204,6 @@ class NewBookTests(unittest.TestCase):
         )
         (scripts / "generate-contents.py").write_text("", encoding="utf-8")
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def run_new(
         self, slug: str = "new-book", **environment: str
     ) -> subprocess.CompletedProcess[str]:
@@ -1183,6 +1214,7 @@ class NewBookTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
     def test_success_creates_minimal_scaffold(self) -> None:

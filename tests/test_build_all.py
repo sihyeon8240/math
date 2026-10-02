@@ -11,12 +11,15 @@ import time
 import unittest
 from pathlib import Path
 
+from test_support import stop_process_group, write_executable
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class BuildAllTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         scripts.mkdir()
@@ -40,7 +43,8 @@ class BuildAllTests(unittest.TestCase):
         """),
             encoding="utf-8",
         )
-        (scripts / "build-book.sh").write_text(
+        write_executable(
+            scripts / "build-book.sh",
             textwrap.dedent("""\
             #!/usr/bin/env python3
             import fcntl
@@ -112,9 +116,7 @@ class BuildAllTests(unittest.TestCase):
                 print("failure output for " + slug, file=sys.stderr)
                 raise SystemExit(7)
         """),
-            encoding="utf-8",
         )
-        (scripts / "build-book.sh").chmod(0o755)
         self.tmpdir = self.root / "tmp"
         self.tmpdir.mkdir()
         self.env = {
@@ -129,9 +131,6 @@ class BuildAllTests(unittest.TestCase):
             "TMPDIR": str(self.tmpdir),
         }
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def run_build(
         self, purpose: str = "build", **env: str
     ) -> subprocess.CompletedProcess[str]:
@@ -142,6 +141,7 @@ class BuildAllTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=30,
         )
 
     def test_no_targets_succeeds(self) -> None:
@@ -215,7 +215,9 @@ class BuildAllTests(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            start_new_session=True,
         )
+        self.addCleanup(stop_process_group, process)
         deadline = time.monotonic() + 5
         try:
             while time.monotonic() < deadline:
@@ -239,8 +241,7 @@ class BuildAllTests(unittest.TestCase):
             self.assertNotIn("end beta", events)
         finally:
             release.touch()
-
-        stdout, stderr = process.communicate(timeout=5)
+            stdout, stderr = process.communicate(timeout=5)
         self.assertEqual(process.returncode, 0, stderr or stdout)
 
     def test_check_selects_check_targets_and_removes_temporary_logs(self) -> None:
@@ -276,7 +277,9 @@ class BuildAllTests(unittest.TestCase):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
+            start_new_session=True,
         )
+        self.addCleanup(stop_process_group, process)
         pid_file = self.root / "pids"
         deadline = time.monotonic() + 5
         while time.monotonic() < deadline:
@@ -284,7 +287,6 @@ class BuildAllTests(unittest.TestCase):
                 break
             time.sleep(0.01)
         else:
-            process.kill()
             self.fail("workers did not start")
 
         child_pids = [int(value) for value in pid_file.read_text().splitlines()]

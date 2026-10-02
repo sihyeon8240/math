@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 class ReleasePlanTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         scripts = self.root / "scripts"
         scripts.mkdir()
@@ -37,9 +38,6 @@ class ReleasePlanTests(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def run_plan(
         self, tag: str, **environment: str
     ) -> subprocess.CompletedProcess[str]:
@@ -50,6 +48,7 @@ class ReleasePlanTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=10,
         )
 
     def test_valid_tag_exports_version_and_single_book_matrix(self) -> None:

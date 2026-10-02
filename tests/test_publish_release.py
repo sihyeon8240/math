@@ -11,15 +11,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from test_support import git_environment, write_executable
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class PublishReleaseTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.repo = self.root / "repo"
         self.repo.mkdir()
+        self.environment = git_environment()
         self.git("init", "-b", "main")
         self.git("config", "user.name", "Test")
         self.git("config", "user.email", "test@example.invalid")
@@ -29,14 +33,17 @@ class PublishReleaseTests(unittest.TestCase):
             shutil.copy2(ROOT / "scripts" / name, scripts / name)
         (scripts / "books.py").write_text('print("1.1.0")\n')
         validator = scripts / "release-plan.sh"
-        validator.write_text("#!/usr/bin/env bash\nexit 0\n")
-        validator.chmod(0o755)
+        write_executable(validator, "#!/usr/bin/env bash\nexit 0\n")
         self.git("add", ".")
         self.git("commit", "-m", "Initial")
         self.sha = self.git("rev-parse", "HEAD")
         origin = self.root / "origin.git"
         subprocess.run(
-            ["git", "init", "--bare", str(origin)], check=True, capture_output=True
+            ["git", "init", "--bare", str(origin)],
+            env=self.environment,
+            check=True,
+            capture_output=True,
+            timeout=10,
         )
         self.git("remote", "add", "origin", str(origin))
         self.git("push", "origin", "main")
@@ -54,7 +61,9 @@ class PublishReleaseTests(unittest.TestCase):
         self.state = self.root / "state.json"
         self.state.write_text(json.dumps({"draft": None, "assets": {}, "calls": []}))
         gh = self.bin / "gh"
-        gh.write_text("""#!/usr/bin/env python3
+        write_executable(
+            gh,
+            """#!/usr/bin/env python3
 import json
 import os
 import pathlib
@@ -89,15 +98,17 @@ elif a[:2] == ["release", "edit"]:
 else:
     sys.exit(98)
 path.write_text(json.dumps(s))
-""")
-        gh.chmod(0o755)
-
-    def tearDown(self):
-        self.temporary.cleanup()
+""",
+        )
 
     def git(self, *args):
         return subprocess.check_output(
-            ["git", *args], cwd=self.repo, text=True, stderr=subprocess.DEVNULL
+            ["git", *args],
+            cwd=self.repo,
+            env=self.environment,
+            text=True,
+            stderr=subprocess.DEVNULL,
+            timeout=10,
         ).strip()
 
     def run_publish(self, **env):
@@ -105,7 +116,7 @@ path.write_text(json.dumps(s))
             [str(self.repo / "scripts/publish-release.sh"), "alpha", str(self.package)],
             cwd=self.repo,
             env={
-                **os.environ,
+                **self.environment,
                 "PATH": f"{self.bin}:{os.environ['PATH']}",
                 "GITHUB_ACTIONS": "true",
                 "GITHUB_EVENT_NAME": "push",
@@ -117,6 +128,7 @@ path.write_text(json.dumps(s))
             },
             text=True,
             capture_output=True,
+            timeout=10,
         )
 
     def test_success_publishes_verified_assets_and_retry_is_noop(self):

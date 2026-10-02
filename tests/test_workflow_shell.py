@@ -12,6 +12,7 @@ import unittest
 from pathlib import Path
 
 import yaml
+from test_support import write_executable
 from workflow_support import condition_allows
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ class WorkflowShellTests(unittest.TestCase):
                     text=True,
                     capture_output=True,
                     check=False,
+                    timeout=30,
                 )
                 self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -99,6 +101,7 @@ raise SystemExit(2)
                     "SITE": " ".join(site),
                     "REQUIRE_LOG": str(require_log),
                 },
+                timeout=30,
             )
             snapshot = {
                 path.name: path.read_bytes()
@@ -116,7 +119,8 @@ raise SystemExit(2)
             root = Path(temporary)
             output = root / "output"
             git = root / "git"
-            git.write_text(
+            write_executable(
+                git,
                 """#!/usr/bin/env bash
 case "$1" in
   fetch) exit "${FETCH_STATUS:-0}" ;;
@@ -126,9 +130,7 @@ case "$1" in
   *) exit 2 ;;
 esac
 """,
-                encoding="utf-8",
             )
-            git.chmod(0o755)
             env = {
                 **os.environ,
                 **values,
@@ -141,6 +143,7 @@ esac
                 text=True,
                 capture_output=True,
                 check=False,
+                timeout=30,
             )
             return result, output.read_text(encoding="utf-8")
 
@@ -223,6 +226,7 @@ printf '%s\\n' "$MANIFEST"
                 text=True,
                 capture_output=True,
                 check=False,
+                timeout=30,
             )
             return result, output.read_text(encoding="utf-8") if output.exists() else ""
 
@@ -327,6 +331,7 @@ printf '%s\\n' "$MANIFEST"
             text=True,
             capture_output=True,
             check=False,
+            timeout=30,
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("./scripts/check-lean.sh", result.stdout)
@@ -464,8 +469,7 @@ printf '%s\\n' "$MANIFEST"
                 (root / "build/image-digests").mkdir(parents=True)
                 (root / "build/image-digests/amd64").write_text(digest + "\n")
                 docker = root / "docker"
-                docker.write_text("#!/bin/sh\nexit 99\n")
-                docker.chmod(0o755)
+                write_executable(docker, "#!/bin/sh\nexit 99\n")
                 output = root / "output"
                 result = subprocess.run(
                     ["bash", "-euo", "pipefail", "-c", script],
@@ -482,6 +486,7 @@ printf '%s\\n' "$MANIFEST"
                     capture_output=True,
                     text=True,
                     check=False,
+                    timeout=30,
                 )
                 self.assertEqual(result.returncode == 0, success, result.stderr)
                 if success:
@@ -509,16 +514,16 @@ printf '%s\\n' "$MANIFEST"
                     archive = root / "image.tar.gz"
                     archive.touch()
                     docker = root / "docker"
-                    docker.write_text(
+                    write_executable(
+                        docker,
                         "#!/usr/bin/env bash\n"
                         'if [[ "$1" == load ]]; then exit 0; fi\n'
                         'case "$5" in\n'
                         "  '{{.Id}}') echo \"$IMAGE_ID\" ;;\n"
                         "  '{{.Architecture}}') echo \"$IMAGE_ARCH\" ;;\n"
                         "  *) exit 2 ;;\n"
-                        "esac\n"
+                        "esac\n",
                     )
-                    docker.chmod(0o755)
                     result = subprocess.run(
                         ["bash", "-euo", "pipefail", "-c", script],
                         env={
@@ -533,6 +538,7 @@ printf '%s\\n' "$MANIFEST"
                         capture_output=True,
                         text=True,
                         check=False,
+                        timeout=30,
                     )
                     self.assertEqual(result.returncode == 0, success, result.stderr)
                     self.assertEqual(archive.exists(), not success)

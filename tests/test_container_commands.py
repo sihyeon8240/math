@@ -11,6 +11,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from test_support import write_executable
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -27,14 +29,14 @@ class ContainerCommandTests(unittest.TestCase):
         self.image = "ghcr.io/example/math@sha256:" + "a" * 64
         (self.root / "config/container-image.txt").write_text(self.image + "\n")
         docker = self.root / "bin/docker"
-        docker.write_text(
+        write_executable(
+            docker,
             f"#!{sys.executable}\n"
             "import json, os, sys\n"
             "from pathlib import Path\n"
             "Path(os.environ['DOCKER_ARGUMENTS']).write_text(json.dumps(sys.argv[1:]))\n"
-            "sys.exit(int(os.environ.get('DOCKER_EXIT', '0')))\n"
+            "sys.exit(int(os.environ.get('DOCKER_EXIT', '0')))\n",
         )
-        docker.chmod(0o755)
         self.arguments_path = self.root / "arguments.json"
         self.environment = {
             **os.environ,
@@ -54,6 +56,7 @@ class ContainerCommandTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=10,
         )
 
     def arguments(self) -> list[str]:
@@ -126,6 +129,7 @@ class ContainerCommandTests(unittest.TestCase):
             env={**self.environment, "DOCKER_EXIT": "23"},
             capture_output=True,
             check=False,
+            timeout=10,
         )
         self.assertEqual(result.returncode, 23)
         self.assertIn(f"{self.root}:/workspace", self.arguments())
@@ -142,6 +146,7 @@ class ContainerCommandTests(unittest.TestCase):
                 stdout=slave,
                 stderr=subprocess.PIPE,
                 check=False,
+                timeout=10,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertIn("--tty", self.arguments())
@@ -170,6 +175,7 @@ class ContainerCommandTests(unittest.TestCase):
                 env={**self.environment, "ELAN_HOME": str(elan_home)},
                 capture_output=True,
                 check=False,
+                timeout=10,
             )
             self.assertEqual(result.returncode, 37, result.stderr)
             self.assertEqual(self.arguments(), ["default", "leanprover/lean4:v99.0.0"])

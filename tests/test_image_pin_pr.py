@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+
+from test_support import git_environment, write_executable
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -27,15 +28,7 @@ class ImagePinPrTests(unittest.TestCase):
             remote = root / "remote.git"
             work = root / "work"
             work.mkdir()
-            env = {
-                **os.environ,
-                "GIT_CONFIG_GLOBAL": os.devnull,
-                "GIT_CONFIG_NOSYSTEM": "1",
-                "GIT_AUTHOR_NAME": "Test",
-                "GIT_AUTHOR_EMAIL": "test@example.com",
-                "GIT_COMMITTER_NAME": "Test",
-                "GIT_COMMITTER_EMAIL": "test@example.com",
-            }
+            env = git_environment()
 
             def git(*args, cwd=work):
                 return subprocess.run(
@@ -80,7 +73,8 @@ class ImagePinPrTests(unittest.TestCase):
                 git("reset", "--mixed", sha)
 
             gh = root / "gh"
-            gh.write_text(
+            write_executable(
+                gh,
                 """#!/usr/bin/env python3
 import json
 import os
@@ -101,9 +95,8 @@ elif args[:2] == ["pr", "create"]:
     print("https://example.com/pr/new")
 else:
     raise SystemExit(2)
-"""
+""",
             )
-            gh.chmod(0o755)
             log = root / "pr.log"
             body_log = root / "body.log"
             result = subprocess.run(

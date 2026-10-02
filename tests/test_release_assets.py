@@ -10,12 +10,15 @@ import textwrap
 import unittest
 from pathlib import Path
 
+from test_support import write_executable
+
 ROOT = Path(__file__).resolve().parent.parent
 
 
 class ReleaseAssetTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         self.script = self.root / "upload-release-assets.sh"
         shutil.copy2(ROOT / "scripts/upload-release-assets.sh", self.script)
@@ -30,7 +33,8 @@ class ReleaseAssetTests(unittest.TestCase):
         self.pdf.write_bytes(b"pdf")
         self.checksums.write_text("checksum\n", encoding="utf-8")
         gh = self.bin / "gh"
-        gh.write_text(
+        write_executable(
+            gh,
             textwrap.dedent("""\
             #!/usr/bin/env bash
             set -euo pipefail
@@ -58,12 +62,7 @@ class ReleaseAssetTests(unittest.TestCase):
               *) exit 98 ;;
             esac
             """),
-            encoding="utf-8",
         )
-        gh.chmod(0o755)
-
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
 
     def run_upload(self, existing: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
@@ -78,6 +77,7 @@ class ReleaseAssetTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            timeout=10,
         )
 
     def test_matching_existing_asset_is_kept_and_only_missing_asset_is_uploaded(

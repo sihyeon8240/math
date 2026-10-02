@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-import yaml
+from test_support import book_record, manifest_document, write_yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 SPEC = importlib.util.spec_from_file_location(
@@ -27,33 +27,23 @@ class ProofLinkTests(unittest.TestCase):
         for order, entry in enumerate(entries, 1):
             slug = str(entry["slug"])
             records.append(
-                {
-                    "slug": slug,
-                    "title": slug.title(),
-                    "version": "0.1.0",
-                    "label_prefix": slug[:2],
-                    "status": "draft",
-                    "order": order * 10,
-                    **entry,
-                }
+                book_record(
+                    **{
+                        "version": "0.1.0",
+                        "label_prefix": slug[:2],
+                        "order": order * 10,
+                        **entry,
+                    }
+                )
             )
             book = self.root / "books" / slug / "book.tex"
             book.parent.mkdir(parents=True, exist_ok=True)
             book.touch()
-        return {
-            "schema_version": 1,
-            "defaults": {
-                "author": "Author",
-                "build": True,
-                "check": True,
-                "release": False,
-                "site": False,
-            },
-            "books": records,
-        }
+        return manifest_document(records)
 
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
         tex = self.root / "books/sample/chapters/01-start/01-result.tex"
         tex.parent.mkdir(parents=True)
@@ -107,13 +97,8 @@ class ProofLinkTests(unittest.TestCase):
         self.assertEqual(len(proofs), 2)
         self.assertEqual(reads, [source])
 
-    def tearDown(self) -> None:
-        self.temporary.cleanup()
-
     def write_yaml(self, path: str, data: object) -> None:
-        target = self.root / path
-        target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+        write_yaml(self.root / path, data)
 
     def errors(self, entries: list[object]) -> list[str]:
         self.write_yaml(
