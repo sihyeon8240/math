@@ -1,7 +1,7 @@
 schema_version: 1
 
 defaults:
-  author: MUHO CHOI
+  author: Muho Choi
   build: true
   check: true
   release: false
