@@ -86,6 +86,31 @@ class SnapshotLayoutTests(unittest.TestCase):
                 [path.name for path in destination.iterdir()], ["alpha.pdf"]
             )
 
+    def test_overlapping_paths_preserve_input_and_existing_output(self):
+        for target in ("snapshot", "snapshot/pdf", ".", "alias"):
+            with (
+                self.subTest(target=target),
+                tempfile.TemporaryDirectory() as temporary,
+            ):
+                root = Path(temporary)
+                downloaded = root / "snapshot"
+                pdf = downloaded / "pdf"
+                pdf.mkdir(parents=True)
+                source = pdf / "alpha.pdf"
+                source.write_bytes(b"original")
+                sentinel = root / "keep.txt"
+                sentinel.write_text("keep", encoding="utf-8")
+                (root / "alias").symlink_to(pdf, target_is_directory=True)
+                with mock.patch.object(
+                    site_pdf_staging,
+                    "registered_and_site_slugs",
+                    return_value=({"alpha"}, {"alpha"}),
+                ):
+                    with self.assertRaisesRegex(ValueError, "must not overlap"):
+                        site_pdf_staging.stage(downloaded, root / target)
+                self.assertEqual(source.read_bytes(), b"original")
+                self.assertEqual(sentinel.read_text(encoding="utf-8"), "keep")
+
     def test_incomplete_snapshot_fails(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
