@@ -87,9 +87,11 @@
     induction l with
     | nil =>
       obtain ⟨k, hk⟩ := h
-      have hpos : (1 : ℤ) < p := by exact_mod_cast hp.1
+      have hpos : (1 : ℤ) < p := by
+        exact_mod_cast hp.1
       change 1 = (p : ℤ) * k at hk
-      have hkpos : 0 < k := by nlinarith
+      have hkpos : 0 < k := by
+        nlinarith
       nlinarith
   \end{lean}
 
@@ -124,7 +126,8 @@
   $\N$.
 
   \begin{lean}
-    have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by exact_mod_cast h
+    have h' : (p : ℤ) ∣ (a : ℤ) * (b : ℤ) := by
+      exact_mod_cast h
     rcases prime_dvd_mul p hp a b h' with ha | hb
 
     · exact Or.inl (Int.natCast_dvd_natCast.mp ha)
@@ -154,7 +157,8 @@
     | nil =>
       obtain ⟨k, hk⟩ := h
       change 1 = p * k at hk
-      have hkpos : 0 < k := by nlinarith [hp.1]
+      have hkpos : 0 < k := by
+        nlinarith [hp.1]
       nlinarith [hp.1]
   \end{lean}
 
@@ -211,7 +215,8 @@ multiplicities, possibly in different orders.
 
       · exact ⟨[], by simp, by simpa using hone.symm⟩
 
-      · have hgt : 1 < n := by omega
+      · have hgt : 1 < n := by
+          omega
         by_cases hp : isPrime n
 
         · exact ⟨[n], by simpa, by simp⟩
@@ -228,16 +233,20 @@ multiplicities, possibly in different orders.
         simpa only [isPrime, hgt, true_and, not_forall, not_or, exists_prop] using hp
 
       obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
-      have hdpos : 0 < d := by nlinarith
-      have hkpos : 0 < k := by nlinarith
+      have hdpos : 0 < d := by
+        nlinarith
+      have hkpos : 0 < k := by
+        nlinarith
       have hdlt : d < n := by
         by_contra h
-        have hk1 : k = 1 := by nlinarith
+        have hk1 : k = 1 := by
+          nlinarith
         simp [hk1] at hk
         exact hdn hk.symm
 
       have hklt : k < n := by
-        have hd2 : 2 ≤ d := by omega
+        have hd2 : 2 ≤ d := by
+          omega
         nlinarith
   \end{lean}
 
@@ -285,7 +294,8 @@ multiplicities, possibly in different orders.
       | cons q m =>
         have hq := (hm q List.mem_cons_self).1
         change 1 = q * m.prod at hprod
-        have hmpos : 0 < m.prod := by nlinarith
+        have hmpos : 0 < m.prod := by
+          nlinarith
         nlinarith
   \end{lean}
 

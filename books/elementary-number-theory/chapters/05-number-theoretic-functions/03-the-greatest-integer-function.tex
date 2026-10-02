@@ -63,7 +63,8 @@
   These bounds identify the floor with $q$.
 
   \begin{lean}
-    have hkreal : (0 : ℝ) < k := by exact_mod_cast hk
+    have hkreal : (0 : ℝ) < k := by
+      exact_mod_cast hk
     have heq := Nat.mod_add_div N k
     have hlt := Nat.mod_lt N hk
 
@@ -76,8 +77,10 @@
     · apply (div_lt_iff₀ hkreal).mpr
       simp only [Int.cast_natCast]
 
-      have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by exact_mod_cast heq
-      have hrlt : ((N % k : ℕ) : ℝ) < k := by exact_mod_cast hlt
+      have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by
+        exact_mod_cast heq
+      have hrlt : ((N % k : ℕ) : ℝ) < k := by
+        exact_mod_cast hlt
       linarith
   \end{lean}
 \end{proof}
@@ -187,13 +190,17 @@
 
     have hab := floor_spec (a + b)
 
-    have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by linarith
+    have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+      linarith
 
-    have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by linarith
+    have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by
+      linarith
 
-    have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by exact_mod_cast hlow
+    have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+      exact_mod_cast hlow
 
-    have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by exact_mod_cast hhigh
+    have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by
+      exact_mod_cast hhigh
 
     omega
   \end{lean}

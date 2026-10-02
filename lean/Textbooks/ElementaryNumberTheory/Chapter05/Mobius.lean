@@ -40,9 +40,11 @@ theorem prime_support_disjoint (m n : ℕ) (hm : 0 < m) (hn : 0 < n)
 
   obtain ⟨k, hk⟩ := hdiv
 
-  have hp' : (1 : ℤ) < p := by exact_mod_cast hp.1
+  have hp' : (1 : ℤ) < p := by
+    exact_mod_cast hp.1
 
-  have hkpos : 0 < k := by nlinarith
+  have hkpos : 0 < k := by
+    nlinarith
   nlinarith
 
 /-- Theorem: the Möbius function is multiplicative. -/
@@ -106,7 +108,8 @@ theorem mobius_eq_sign (n : ℕ) (hn : 0 < n)
       rw [primeExponents_prime_pow p 2 hp, Finsupp.single_le_iff]
       omega
 
-    have he : primeExponents n p = 1 := by omega
+    have he : primeExponents n p = 1 := by
+      omega
     simp only [he, mobiusWeight, one_ne_zero, ↓reduceIte]
   rw [Finset.prod_congr rfl hweight, Finset.prod_const]
 
@@ -123,7 +126,8 @@ theorem sum_mobiusWeight (k : ℕ) :
     · subst k
       norm_num [mobiusWeight]
 
-    · have hne : k + 1 ≠ 1 := by omega
+    · have hne : k + 1 ≠ 1 := by
+        omega
 
       simp only [hk, ↓reduceIte, mobiusWeight, Nat.succ_ne_zero, hne, zero_add]
 

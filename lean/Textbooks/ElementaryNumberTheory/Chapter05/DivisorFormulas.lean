@@ -109,12 +109,14 @@ theorem geometric_sum_eq_div (p k : ℕ) (hp : 1 < p) :
     | succ r ih =>
       rw [Finset.sum_range_succ, pow_succ]
 
-      have hpp : p - 1 + 1 = p := by omega
+      have hpp : p - 1 + 1 = p := by
+        omega
       nlinarith [congrArg (fun z => z * p ^ r) hpp]
 
   have h := hgeom (k + 1)
 
-  have hh : p ^ (k + 1) - 1 = (p - 1) * (∑ j ∈ Finset.range (k + 1), p ^ j) := by omega
+  have hh : p ^ (k + 1) - 1 = (p - 1) * (∑ j ∈ Finset.range (k + 1), p ^ j) := by
+    omega
   rw [hh, Nat.mul_div_right _ (by omega : 0 < p - 1)]
 
 /-- Corollary: the geometric quotient formula for the sum of prime-power divisors. -/
@@ -129,9 +131,11 @@ theorem gcd_eq_one_symm (a b : ℕ) (h : Chapter01.gcd a b = 1) :
     by_contra hh
     push Not at hh
 
-    have ha : a = 0 := by exact_mod_cast hh.1
+    have ha : a = 0 := by
+      exact_mod_cast hh.1
 
-    have hb : b = 0 := by exact_mod_cast hh.2
+    have hb : b = 0 := by
+      exact_mod_cast hh.2
     subst a b
     rw [Nat.cast_zero, Chapter01.gcd_zero_zero] at h
     contradiction
@@ -225,7 +229,8 @@ including Burton's identically zero function. -/
 theorem multiplicative_prime_powers (f : ℕ → ℤ) (hf : IsMultiplicative f)
     (n : ℕ) (hn : 1 < n) :
     f n = ∏ p ∈ (primeExponents n).support, f (p ^ primeExponents n p) := by
-  have hnpos : 0 < n := by omega
+  have hnpos : 0 < n := by
+    omega
 
   have hspec := primeExponents_spec n hnpos
 

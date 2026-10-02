@@ -69,7 +69,8 @@ theorem convergent_properties (u : ℕ → X) (p : X) (hp : Filter.Tendsto u Fil
 
 /-- Lemma: finite exceptional indices, rather than finitely many values. -/
 theorem tendsto_iff_finite_exceptions (u : ℕ → X) (p : X) :
-    Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
+    Filter.Tendsto u Filter.atTop (nhds p) ↔
+      ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
   rw [Metric.tendsto_atTop]
   constructor
 

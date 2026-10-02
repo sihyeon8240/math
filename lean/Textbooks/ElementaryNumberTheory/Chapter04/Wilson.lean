@@ -136,14 +136,16 @@ theorem prime_of_wilson (n : ℕ) (hn : 1 < n)
       obtain ⟨k, hk⟩ := hd
       by_contra hh
 
-      have hz : d = 0 := by omega
+      have hz : d = 0 := by
+        omega
       rw [hz, zero_mul] at hk
       omega
 
     have hdle : d ≤ n := by
       obtain ⟨k, hk⟩ := hd
 
-      have hkpos : 0 < k := by nlinarith
+      have hkpos : 0 < k := by
+        nlinarith
       nlinarith
 
     have hdf : (d : ℤ) ∣ (n - 1).factorial :=
@@ -157,12 +159,15 @@ theorem prime_of_wilson (n : ℕ) (hn : 1 < n)
       rw [hu, hv] at hk
       nlinarith
 
-    have hdz : (0 : ℤ) < d := by exact_mod_cast hdpos
+    have hdz : (0 : ℤ) < d := by
+      exact_mod_cast hdpos
 
-    have hkp : 0 < v * k - u := by nlinarith
+    have hkp : 0 < v * k - u := by
+      nlinarith
     left
 
-    have : (d : ℤ) = 1 := by nlinarith
+    have : (d : ℤ) = 1 := by
+      nlinarith
     exact_mod_cast this
 
 /-- Corollary: Wilson's congruence is an exact primality criterion. -/

@@ -345,7 +345,8 @@
     obtain ⟨k, hk⟩ := (Chapter03.modEq_iff_dvd_sub _ _ _).1 (h.2 p)
     obtain ⟨t, ht⟩ := hpn
 
-    have ht' : (n : ℤ) = (p : ℤ) ^ 2 * t := by exact_mod_cast ht
+    have ht' : (n : ℤ) = (p : ℤ) ^ 2 * t := by
+      exact_mod_cast ht
 
     have hpow : (p : ℤ) ^ n = (p : ℤ) ^ 2 * (p : ℤ) ^ (n - 2) := by
       rw [← pow_add, Nat.add_sub_cancel' hn]
@@ -366,7 +367,8 @@
 
     have := hp.1
 
-    have hu' : 0 < u := by nlinarith
+    have hu' : 0 < u := by
+      nlinarith
     nlinarith
   \end{lean}
 \end{proof}

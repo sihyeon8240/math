@@ -100,7 +100,8 @@ theorem modEq_cancel_gcd {n c a b : ℤ} (hn : n ≠ 0)
   have hcop := Chapter01.gcd_div_gcd_eq_one n c (Or.inl hn)
   generalize hg : Chapter01.gcd n c = g at *
 
-  have hdne : (g : ℤ) ≠ 0 := by exact_mod_cast ne_of_gt hd
+  have hdne : (g : ℤ) ≠ 0 := by
+    exact_mod_cast ne_of_gt hd
 
   have hnu : n / (g : ℤ) = u := by
     rw [hu]

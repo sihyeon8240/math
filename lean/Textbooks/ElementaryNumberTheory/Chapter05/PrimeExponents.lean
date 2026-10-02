@@ -66,7 +66,8 @@ theorem dvd_iff_primeExponents_le (d n : ℕ) (hd : 0 < d) (hn : 0 < n) :
 
   · rintro ⟨k, hk⟩
 
-    have hkpos : 0 < k := by nlinarith
+    have hkpos : 0 < k := by
+      nlinarith
     rw [hk, primeExponents_mul d k hd hkpos]
     exact le_add_right le_rfl
 

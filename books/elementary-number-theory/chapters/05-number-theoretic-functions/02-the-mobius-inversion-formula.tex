@@ -125,7 +125,8 @@
         rw [primeExponents_prime_pow p 2 hp, Finsupp.single_le_iff]
         omega
 
-      have he : primeExponents n p = 1 := by omega
+      have he : primeExponents n p = 1 := by
+        omega
       simp only [he, mobiusWeight, one_ne_zero, ↓reduceIte]
     rw [Finset.prod_congr rfl hweight, Finset.prod_const]
   \end{lean}

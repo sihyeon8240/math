@@ -55,7 +55,8 @@
 
     · rintro ⟨k, hk⟩
 
-      have hkpos : 0 < k := by nlinarith
+      have hkpos : 0 < k := by
+        nlinarith
       rw [hk, primeExponents_mul d k hd hkpos]
       exact le_add_right le_rfl
 
@@ -316,7 +317,8 @@
   Nonemptiness avoids making an unwarranted assumption that $f(1)=1$.
 
   \begin{lean}
-    have hnpos : 0 < n := by omega
+    have hnpos : 0 < n := by
+      omega
 
     have hspec := primeExponents_spec n hnpos
 
@@ -460,7 +462,8 @@
   Conversely, the definition of primality says precisely that no other divisor exists.
 
   \begin{lean}
-    have hnpos : 0 < n := by omega
+    have hnpos : 0 < n := by
+      omega
 
     have hnne : n ≠ 0 := ne_of_gt hnpos
 
@@ -522,7 +525,8 @@
   Conversely, the two divisors of a prime sum to $n+1$.
 
   \begin{lean}
-    have hnpos : 0 < n := by omega
+    have hnpos : 0 < n := by
+      omega
 
     have hnne : n ≠ 0 := ne_of_gt hnpos
 

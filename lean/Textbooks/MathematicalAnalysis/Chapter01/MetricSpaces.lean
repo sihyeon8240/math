@@ -56,7 +56,8 @@ theorem isBounded_iff (E : Set X) :
       refine ⟨r + r, ?_⟩
       intro x hx y hy
       have hx' : dist x p < r := hs hx
-      have hy' : dist p y < r := by simpa only [mem_ball, dist_comm] using hs hy
+      have hy' : dist p y < r := by
+        simpa only [mem_ball, dist_comm] using hs hy
       exact (dist_triangle x p y).trans (add_le_add hx'.le hy'.le)
 
     · refine ⟨0, ?_⟩

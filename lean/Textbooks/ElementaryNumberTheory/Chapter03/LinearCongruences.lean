@@ -86,7 +86,8 @@ theorem linear_modEq_iff_inverse (n a b u x : ℤ) (hu : IsModularInverse n a u)
 
     have h₂ := modEq_mul hu (modEq_refl n x)
 
-    have heq : u * (a * x) = (a * u) * x := by ring
+    have heq : u * (a * x) = (a * u) * x := by
+      ring
     rw [heq] at h₁
     exact modEq_trans (modEq_symm (by simpa only [one_mul] using h₂)) h₁
 
@@ -96,7 +97,8 @@ theorem linear_modEq_iff_inverse (n a b u x : ℤ) (hu : IsModularInverse n a u)
 
     have h₂ := modEq_mul hu (modEq_refl n b)
 
-    have heq : a * (u * b) = (a * u) * b := by ring
+    have heq : a * (u * b) = (a * u) * b := by
+      ring
     rw [heq] at h₁
     exact modEq_trans h₁ (by simpa only [one_mul] using h₂)
 
@@ -157,7 +159,8 @@ theorem linear_solution_classes (n a b x₀ : ℤ) (hn : 0 < n)
 
   obtain ⟨hg, _, ⟨u, hu⟩, _, _⟩ := Chapter01.gcd_spec a n (Or.inr hnne)
 
-  have hgne : (Chapter01.gcd a n : ℤ) ≠ 0 := by exact_mod_cast ne_of_gt hg
+  have hgne : (Chapter01.gcd a n : ℤ) ≠ 0 := by
+    exact_mod_cast ne_of_gt hg
 
   have hquot : n / (Chapter01.gcd a n : ℤ) = u := by
     calc
@@ -167,7 +170,8 @@ theorem linear_solution_classes (n a b x₀ : ℤ) (hn : 0 < n)
       _ = u := Int.mul_ediv_cancel_left u hgne
 
   have hupos : 0 < u := by
-    have hgz : (0 : ℤ) < Chapter01.gcd a n := by exact_mod_cast hg
+    have hgz : (0 : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast hg
     nlinarith
 
   constructor
@@ -207,16 +211,20 @@ theorem linear_solution_classes (n a b x₀ : ℤ) (hn : 0 < n)
           rw [hk]
           nlinarith [congrArg (fun z => z * k) hu]
 
-    have hsbound : (s.val : ℤ) < Chapter01.gcd a n := by exact_mod_cast s.isLt
+    have hsbound : (s.val : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast s.isLt
 
-    have hrbound : (r : ℤ) < Chapter01.gcd a n := by exact_mod_cast hr
+    have hrbound : (r : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast hr
 
-    have hgz : (0 : ℤ) < Chapter01.gcd a n := by exact_mod_cast hg
+    have hgz : (0 : ℤ) < Chapter01.gcd a n := by
+      exact_mod_cast hg
 
     have hkzero : k = 0 := by
       rcases lt_trichotomy k 0 with hneg | hzero | hpos
 
-      · have : k ≤ -1 := by omega
+      · have : k ≤ -1 := by
+          omega
         nlinarith [Int.natCast_nonneg s.val, Int.natCast_nonneg r]
 
       · exact hzero

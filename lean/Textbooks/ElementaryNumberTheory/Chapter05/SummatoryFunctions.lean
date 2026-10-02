@@ -84,7 +84,8 @@ theorem sum_tau (N : ℕ) :
     (∑ n ∈ Finset.Icc 1 N, (tau n : ℤ)) = ∑ k ∈ Finset.Icc 1 N, (N / k : ℕ) := by
   have h := sum_divisorSum (fun _ => 1) N
 
-  simpa only [divisorSum, Finset.sum_const, nsmul_eq_mul, mul_one, one_mul, tau, Nat.cast_sum] using h
+  simpa only [divisorSum, Finset.sum_const, nsmul_eq_mul, mul_one, one_mul, tau,
+    Nat.cast_sum] using h
 
 /-- Corollary: the summatory divisor sum is the weighted quotient sum. -/
 theorem sum_sigma (N : ℕ) :
@@ -123,13 +124,17 @@ theorem floor_add_carry (a b : ℝ) :
 
   have hab := floor_spec (a + b)
 
-  have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by linarith
+  have hlow : (⌊a⌋ : ℝ) + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+    linarith
 
-  have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by linarith
+  have hhigh : (⌊a + b⌋ : ℝ) < ⌊a⌋ + ⌊b⌋ + 2 := by
+    linarith
 
-  have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by exact_mod_cast hlow
+  have hlow' : ⌊a⌋ + ⌊b⌋ - 1 < ⌊a + b⌋ := by
+    exact_mod_cast hlow
 
-  have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by exact_mod_cast hhigh
+  have hhigh' : ⌊a + b⌋ < ⌊a⌋ + ⌊b⌋ + 2 := by
+    exact_mod_cast hhigh
 
   omega
 
@@ -140,7 +145,8 @@ theorem floor_add_ge (a b : ℝ) : ⌊a⌋ + ⌊b⌋ ≤ ⌊a + b⌋ := by
 /-- Theorem: natural division is the floor of the corresponding real quotient. -/
 theorem floor_nat_div (N k : ℕ) (hk : 0 < k) :
     ⌊(N : ℝ) / k⌋ = ((N / k : ℕ) : ℤ) := by
-  have hkreal : (0 : ℝ) < k := by exact_mod_cast hk
+  have hkreal : (0 : ℝ) < k := by
+    exact_mod_cast hk
   have heq := Nat.mod_add_div N k
   have hlt := Nat.mod_lt N hk
 
@@ -153,8 +159,10 @@ theorem floor_nat_div (N k : ℕ) (hk : 0 < k) :
   · apply (div_lt_iff₀ hkreal).mpr
     simp only [Int.cast_natCast]
 
-    have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by exact_mod_cast heq
-    have hrlt : ((N % k : ℕ) : ℝ) < k := by exact_mod_cast hlt
+    have hreal : (N % k : ℕ) + (k : ℝ) * (N / k : ℕ) = N := by
+      exact_mod_cast heq
+    have hrlt : ((N % k : ℕ) : ℝ) < k := by
+      exact_mod_cast hlt
     linarith
 
 end ElementaryNumberTheory.Chapter05
