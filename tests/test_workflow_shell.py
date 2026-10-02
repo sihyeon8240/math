@@ -651,29 +651,36 @@ printf '%s\\n' "$MANIFEST"
         self.assertEqual(calls, [])
         self.assertIn("PDF artifact is missing or empty", result.stderr)
 
-    def test_pages_uses_explicit_source_for_reusable_calls(self):
+    def test_pages_requires_snapshot_source_correspondence(self):
         workflow = yaml.safe_load((ROOT / ".github/workflows/pages.yml").read_text())
         step = next(
             step
             for step in workflow["jobs"]["deploy"]["steps"]
             if step.get("id") == "source"
         )
-        for event, sha in (
-            ("push", "a" * 40),
-            ("workflow_dispatch", "b" * 40),
-            ("workflow_dispatch", ""),
+        for snapshot_sha, call_sha, success in (
+            ("a" * 40, "a" * 40, True),
+            ("b" * 40, "", True),
+            ("a" * 40, "b" * 40, False),
+            ("invalid", "", False),
+            ("", "", False),
+            (None, "", False),
         ):
             with (
-                self.subTest(event=event, sha=sha),
+                self.subTest(snapshot=snapshot_sha, call=call_sha),
                 tempfile.TemporaryDirectory() as temporary,
             ):
-                output = Path(temporary) / "output"
+                root = Path(temporary)
+                output = root / "output"
+                (root / "pdf-snapshot").mkdir()
+                if snapshot_sha is not None:
+                    (root / "pdf-snapshot/.source-sha").write_text(snapshot_sha + "\n")
                 result = subprocess.run(
                     ["bash", "-euo", "pipefail", "-c", step["run"]],
+                    cwd=root,
                     env={
                         **os.environ,
-                        "EVENT_NAME": event,
-                        "CALL_SHA": sha,
+                        "CALL_SHA": call_sha,
                         "GITHUB_OUTPUT": str(output),
                     },
                     capture_output=True,
@@ -681,8 +688,11 @@ printf '%s\\n' "$MANIFEST"
                     check=False,
                     timeout=10,
                 )
-                self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(output.read_text(), f"sha={sha or 'main'}\n")
+                self.assertEqual(result.returncode == 0, success, result.stderr)
+                if success:
+                    self.assertEqual(output.read_text(), f"sha={snapshot_sha}\n")
+                else:
+                    self.assertFalse(output.exists())
 
     def test_source_gate_rejects_unsuccessful_dependencies(self):
         job = self.build_workflow()["jobs"]["check"]

@@ -261,6 +261,12 @@ Maintainers can bootstrap or safely rebuild that snapshot by manually dispatchin
 **Build textbooks**, which selects every build-enabled book. Pull requests and
 fork pull requests do not publish.
 
+**Deploy static site** checks out the source commit recorded in the downloaded
+PDF snapshot's `.source-sha`, including for manual dispatches. Calls from the
+build workflow must match that commit, so a newer snapshot cannot be mixed with
+an older source checkout. To publish new source changes, run **Build textbooks**
+first; deploying the site alone republishes the existing snapshot.
+
 ### Releases
 
 A reviewed `release: false` to `release: true` change requests publication of
