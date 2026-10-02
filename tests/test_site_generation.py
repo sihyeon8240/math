@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import io
+import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -31,6 +32,7 @@ class SiteGenerationTests(unittest.TestCase):
                     "status": "review",
                     "order": 10,
                     "site": True,
+                    "release": False,
                 },
                 {
                     "slug": "beta",
@@ -39,6 +41,7 @@ class SiteGenerationTests(unittest.TestCase):
                     "status": "archived",
                     "order": 20,
                     "site": True,
+                    "release": True,
                 },
                 {
                     "slug": "hidden",
@@ -92,11 +95,37 @@ class SiteGenerationTests(unittest.TestCase):
             pages["alpha.md"].removeprefix("---\n").removesuffix("---\n")
         )
         self.assertEqual(front_matter["layout"], "book")
+        self.assertEqual(front_matter["stylesheet"], "book")
+        self.assertEqual(front_matter["edit_path"], "site/_layouts/book.html")
         self.assertEqual(front_matter["slug"], "alpha")
         self.assertEqual(front_matter["status_label"], "In Review")
         self.assertEqual(front_matter["order"], 10)
         self.assertNotIn("description", pages["alpha.md"].lower())
         self.assertNotIn("hidden.md", pages)
+
+    def test_pdf_revision_is_shared_and_changes_with_source_checkout(self) -> None:
+        for revision in ("a" * 40, "b" * 40):
+            with (
+                self.subTest(revision=revision),
+                mock.patch.object(
+                    site_generator, "snapshot_revision", return_value=revision
+                ) as source,
+            ):
+                books = site_generator.site_books(self.manifest())
+
+            source.assert_called_once_with()
+            self.assertEqual(
+                [book["snapshot_revision"] for book in books], [revision] * 2
+            )
+            self.assertEqual([book["release"] for book in books], [False, True])
+
+    def test_exported_sources_can_render_without_git_metadata(self) -> None:
+        with mock.patch.object(
+            site_generator.subprocess,
+            "run",
+            side_effect=subprocess.CalledProcessError(128, "git"),
+        ):
+            self.assertEqual(site_generator.snapshot_revision(), "")
 
     def test_check_rejects_missing_pages_directory_without_creating_it(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

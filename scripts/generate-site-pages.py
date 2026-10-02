@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import subprocess
 import sys
 from pathlib import Path
 
@@ -18,17 +19,36 @@ except ModuleNotFoundError:
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PAGES_DIR = REPO_ROOT / "site" / "books"
-SITE_FIELDS = ("slug", "title", "short_title", "status", "order", "site")
+SITE_FIELDS = ("slug", "title", "short_title", "status", "order", "site", "release")
+
+
+def snapshot_revision() -> str:
+    """Identify the source checkout paired with the published PDF snapshot."""
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        # Exported sources can still render without Git metadata.
+        return ""
+    return result.stdout.strip()
 
 
 def site_books(manifest: dict) -> list[dict]:
     selected = [source for source in manifest["books"] if source["site"]]
     registered = registered_results() if selected else {}
+    revision = snapshot_revision() if selected else ""
     books = []
     for source in selected:
         book = {field: source.get(field) for field in SITE_FIELDS}
         book["display_short_title"] = source.get("short_title") or source["title"]
         book["status_label"] = STATUS_LABELS[source["status"]]
+        book["snapshot_revision"] = revision
         lean = book_lean_metrics(source["slug"], registered=registered)
         book["lean_verified"] = lean["verified"]
         book["lean_total"] = lean["total"]
@@ -39,7 +59,12 @@ def site_books(manifest: dict) -> list[dict]:
 
 def render_site_page(book: dict) -> str:
     """Render manifest-derived metadata as a book page's front matter."""
-    front_matter = {"layout": "book", **book}
+    front_matter = {
+        "layout": "book",
+        "stylesheet": "book",
+        "edit_path": "site/_layouts/book.html",
+        **book,
+    }
     return (
         "---\n"
         + yaml.safe_dump(front_matter, allow_unicode=True, sort_keys=False)

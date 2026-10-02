@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ site.description | escape }}">
+    <title>{% if page.title %}{{ page.title | escape }} · {% endif %}{{ site.title | escape }}</title>
+    <link rel="stylesheet" href="{{ '/assets/common.css' | relative_url }}">
+    {% assign stylesheet_path = '/assets/' | append: page.stylesheet | append: '.css' %}
+    <link rel="stylesheet" href="{{ stylesheet_path | relative_url }}">
+  </head>
+  <body>
+    <div class="page-shell">
+      {% include header.html %}
+      <main id="main-content">
+        {{ content }}
+      </main>
+      {% include footer.html %}
+    </div>
+  </body>
+</html>

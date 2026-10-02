@@ -7,6 +7,8 @@ import unittest
 from html.parser import HTMLParser
 from pathlib import Path
 
+import yaml
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
@@ -51,37 +53,29 @@ class SiteStylesheetTests(unittest.TestCase):
         return re.sub(r"/\*.*?\*/", "", source, flags=re.DOTALL)
 
     def test_book_layout_uses_dedicated_external_stylesheet(self) -> None:
-        self.assert_external_stylesheet(
-            Path("site/_layouts/book.html"), Path("site/assets/book.css")
-        )
+        self.assertTrue((REPO_ROOT / "site/assets/book.css").is_file())
+        layout = (REPO_ROOT / "site/_layouts/book.html").read_text(encoding="utf-8")
+        front_matter = yaml.safe_load(layout.split("---", 2)[1])
+        self.assertEqual(front_matter["layout"], "default")
 
     def test_homepage_uses_dedicated_external_stylesheet(self) -> None:
-        self.assert_external_stylesheet(
-            Path("site/index.html"), Path("site/assets/index.css")
-        )
+        self.assertTrue((REPO_ROOT / "site/assets/index.css").is_file())
+        homepage = (REPO_ROOT / "site/index.html").read_text(encoding="utf-8")
+        front_matter = yaml.safe_load(homepage.split("---", 2)[1])
+        self.assertEqual(front_matter["stylesheet"], "index")
 
     def test_pages_use_shared_external_stylesheet(self) -> None:
-        for document in (Path("site/index.html"), Path("site/_layouts/book.html")):
-            with self.subTest(document=document):
-                self.assert_external_stylesheet(
-                    document, Path("site/assets/common.css")
-                )
+        self.assert_external_stylesheet(
+            Path("site/_layouts/default.html"), Path("site/assets/common.css")
+        )
 
     def test_stylesheets_provide_focus_and_reduced_motion_rules(self) -> None:
         common = self.stylesheet_source(Path("site/assets/common.css"))
         self.assertRegex(common, r":focus-visible[^{}]*\{[^}]+\}")
-        for asset in ("common", "book", "index"):
-            with self.subTest(stylesheet=asset):
-                self.assertRegex(
-                    self.stylesheet_source(Path(f"site/assets/{asset}.css")),
-                    r"@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{",
-                )
-
-    def test_book_preview_is_cache_busted_for_each_site_build(self) -> None:
-        layout = (REPO_ROOT / "site/_layouts/book.html").read_text(encoding="utf-8")
-        self.assertIn("pdf_preview_version = site.time | date: '%s'", layout)
-        self.assertIn('data="{{ pdf_url }}?v={{ pdf_preview_version }}"', layout)
-        self.assertIn('href="{{ pdf_url }}"', layout)
+        self.assertRegex(
+            common,
+            r"@media\s*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)\s*\{",
+        )
 
     def test_project_resources_show_lean_coverage(self) -> None:
         layout = (REPO_ROOT / "site/_layouts/book.html").read_text(encoding="utf-8")

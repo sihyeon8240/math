@@ -47,12 +47,14 @@ branch. Pages checks out that complete snapshot and stages only `site: true`
 books as `pdf/<slug>.pdf`; PDFs for registered books with `site: false` are
 ignored. The snapshot README comes from `.github/generated-pdfs-README.md`.
 
-Book-page presentation rules live in `site/assets/book.css`; edit that
-stylesheet when changing the shared book layout appearance or responsive
-behavior.
+The shared document layout and header/footer includes live under
+`site/_layouts/` and `site/_includes/`. Site identity lives in `site/_config.yml`.
+Shared component and accessibility rules live in `site/assets/common.css`;
+`index.css` and `book.css` own page-specific presentation and responsive behavior.
 
 The index discovers generated book pages through `site.pages`, sorts their front
-matter by manifest order, and renders canonical titles and status labels. The
+matter by manifest order, and renders short titles and status labels. Detail
+pages and accessible link names retain the full canonical title. The
 common book layout reads the same page front matter, including Lean coverage
 generated from the proof index. No separate Jekyll data file is generated or
 consumed, and generated pages are not tracked by Git. Separate book descriptions
@@ -68,15 +70,40 @@ Coverage cannot exceed 100%. When the LaTeX count is zero, both the linked count
 and the percentage are zero.
 
 Status labels and the `short_title` fallback are defined once in the generator.
+The official-release link appears when a site-enabled book has `release: true`
+and points to the repository's release listing. It does not assume that GitHub
+has a release marked as latest or that a pending publication has succeeded.
 See [Repository architecture](ARCHITECTURE.md#metadata-and-automation) for
 metadata ownership and automation policy.
 
+## PDF snapshot URLs
+
+The generator records the source checkout's commit as `snapshot_revision`.
+Pages builds check out the source commit recorded by the PDF snapshot, so this
+identifies the published snapshot. The shared PDF URL include uses the same
+revision query for cards, previews, direct reading, fallback links, and downloads.
+Rebuilding the same commit preserves the URL; a different commit changes it.
+Source exports without Git metadata use unversioned URLs. Uncommitted local
+PDF changes do not change the revision; disable browser caching when previewing
+such changes locally.
+
 ## Refreshing local pages
 
-After changing `books.yml`, theorem sources, or proof-index entries, run
+After changing `books.yml`, theorem sources, proof-index entries, or the source
+checkout's commit, run
 `make site` and then `make site check` before a local Jekyll build. This refreshes
 both publication status and Lean coverage; do not edit generated page front
 matter or commit `site/books/`. A stale-page error reports local generated
 state, not necessarily an invalid manifest. CI generates fresh pages for each
 site build. `make check source` checks rendering in a temporary directory and
 does not refresh or validate your existing local pages.
+
+## Rendered validation
+
+Run `python3 -m unittest discover -s tests -p 'test_site_*.py' -v` with Jekyll
+installed to check generated HTML, special-character titles, short titles,
+relative links, release visibility, and consistent PDF URLs. With matching
+Chromium and ChromeDriver installed, the same command also checks heading and
+panel bounds at mobile, tablet, and desktop widths. Tool-dependent tests report
+skips when those executables are unavailable. Fixtures and rendered output stay
+in automatically cleaned temporary directories.

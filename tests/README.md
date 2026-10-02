@@ -35,8 +35,12 @@ boolean gate expressions. It supports comparisons, boolean operators, and the
 `always()` and `cancelled()` functions used by these tests; it does not emulate
 GitHub Actions job scheduling or implicit status checks.
 
-Site contract tests check actual stylesheet links and accessibility rule presence.
-They do not assert rendered layout or pin spacing values, selectors, or breakpoints.
+Site contract tests check stylesheet wiring and shared accessibility rules.
+`test_site_rendering.py` uses Jekyll to check HTML, metadata escaping, relative
+links, release visibility, and PDF URL consistency. With matching Chromium and
+ChromeDriver, it also checks that headings and panels fit representative screen
+widths. It does not pin visual spacing or screenshots. These optional tool checks
+report skips when their executables are absent and use temporary output.
 Lean audit and LaTeX rendering tests require their corresponding toolchains and
 report skips when their prerequisite executables are absent. LaTeX fixtures live
 in `fixtures/`; build output stays under ignored `build/` directories.
