@@ -11,10 +11,10 @@ import yaml
 
 try:
     from scripts.book_manifest import STATUS_LABELS, load_manifest
-    from scripts.lean_coverage import book_lean_metrics
+    from scripts.lean_coverage import book_lean_metrics, registered_results
 except ModuleNotFoundError:
     from book_manifest import STATUS_LABELS, load_manifest
-    from lean_coverage import book_lean_metrics
+    from lean_coverage import book_lean_metrics, registered_results
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PAGES_DIR = REPO_ROOT / "site" / "books"
@@ -22,14 +22,14 @@ SITE_FIELDS = ("slug", "title", "short_title", "status", "order", "site")
 
 
 def site_books(manifest: dict) -> list[dict]:
+    selected = [source for source in manifest["books"] if source["site"]]
+    registered = registered_results() if selected else {}
     books = []
-    for source in manifest["books"]:
-        if not source["site"]:
-            continue
+    for source in selected:
         book = {field: source.get(field) for field in SITE_FIELDS}
         book["display_short_title"] = source.get("short_title") or source["title"]
         book["status_label"] = STATUS_LABELS[source["status"]]
-        lean = book_lean_metrics(source["slug"])
+        lean = book_lean_metrics(source["slug"], registered=registered)
         book["lean_verified"] = lean["verified"]
         book["lean_total"] = lean["total"]
         book["lean_coverage"] = lean["percentage"]

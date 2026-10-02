@@ -15,7 +15,8 @@ try:
         load_sections,
         section_filenames,
     )
-    from scripts.lean_coverage import book_lean_metrics
+    from scripts.latex_scan import theorem_label_groups
+    from scripts.lean_coverage import registered_results, result_metrics
 except ModuleNotFoundError:
     from bibtex import entry_keys
     from book_manifest import load_manifest
@@ -26,7 +27,8 @@ except ModuleNotFoundError:
         load_sections,
         section_filenames,
     )
-    from lean_coverage import book_lean_metrics
+    from latex_scan import theorem_label_groups
+    from lean_coverage import registered_results, result_metrics
 
 ROOT = Path(__file__).resolve().parent.parent
 ENVIRONMENTS = {
@@ -65,8 +67,10 @@ def count_env(text: str, names: tuple[str, ...]) -> int:
     return sum(text.count(rf"\begin{{{name}}}") for name in names)
 
 
-def inspect(book: dict) -> dict:
+def inspect(book: dict, registered: dict[str, set[str]] | None = None) -> dict:
     directory = ROOT / "books" / book["slug"]
+    source_texts = {path: read(path) for path in directory.rglob("*.tex")}
+    source_lines = {path: len(text.splitlines()) for path, text in source_texts.items()}
 
     chapter_data, appendix_data = load_book_contents(directory)
     chapter_paths = [
@@ -92,17 +96,17 @@ def inspect(book: dict) -> dict:
 
         sections.extend(chapter_sections)
         chapter_sizes[chapter.parent.name] = sum(
-            len(read(path).splitlines()) for path in chapter_sections
+            source_lines.get(path, 0) for path in chapter_sections
         )
 
-    content = "\n".join(read(path) for path in sections)
+    content = "\n".join(source_texts.get(path, "") for path in sections)
     lines = len(content.splitlines())
     bibliography = len(entry_keys(read(directory / "references.bib")))
     largest_section = max(
         (
             (
                 path.relative_to(directory).as_posix(),
-                len(read(path).splitlines()),
+                source_lines.get(path, 0),
             )
             for path in sections
         ),
@@ -110,7 +114,14 @@ def inspect(book: dict) -> dict:
         default=("none", 0),
     )
 
-    lean = book_lean_metrics(book["slug"])
+    if registered is None:
+        registered = registered_results(ROOT)
+    results = [
+        labels
+        for text in source_texts.values()
+        for labels in theorem_label_groups(text)
+    ]
+    lean = result_metrics(results, registered.get(book["slug"], set()))
     result = {
         "title": book.get("title", book["slug"]),
         "version": book["version"],
@@ -143,7 +154,8 @@ def inspect(book: dict) -> dict:
 def main() -> int:
     try:
         books = load_manifest()["books"]
-        data = [inspect(book) for book in books]
+        registered = registered_results(ROOT) if books else {}
+        data = [inspect(book, registered) for book in books]
 
         print(
             "=" * 50

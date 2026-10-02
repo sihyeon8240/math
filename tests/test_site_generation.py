@@ -170,13 +170,21 @@ class SiteGenerationTests(unittest.TestCase):
                         "book_lean_metrics",
                         return_value={"verified": 0, "total": 0, "percentage": 0.0},
                     ) as metrics,
+                    mock.patch.object(
+                        site_generator, "registered_results", return_value={}
+                    ) as registered,
                     redirect_stdout(io.StringIO()),
                 ):
                     self.assertEqual(
                         site_generator.generate(pages_dir=Path(temporary), book=book), 0
                     )
+                registered.assert_called_once_with()
                 self.assertEqual(
-                    metrics.call_args_list, [mock.call(slug) for slug in expected]
+                    metrics.call_args_list,
+                    [
+                        mock.call(slug, registered=registered.return_value)
+                        for slug in expected
+                    ],
                 )
 
     def test_single_hidden_book_fails(self) -> None:

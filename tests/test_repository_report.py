@@ -25,6 +25,23 @@ class RepositoryReportTests(unittest.TestCase):
             result = report.main()
         return result, output.getvalue()
 
+    def test_report_reuses_source_text_for_statistics_and_coverage(self) -> None:
+        book = report.load_manifest()["books"][0]
+        registered = report.registered_results()
+        original = Path.read_text
+        reads = []
+
+        def tracked(path, *args, **kwargs):
+            if path.suffix == ".tex":
+                reads.append(path)
+            return original(path, *args, **kwargs)
+
+        with mock.patch.object(Path, "read_text", tracked):
+            result = report.inspect(book, registered)
+        self.assertEqual(len(reads), len(set(reads)))
+        self.assertGreater(result["sections"], 0)
+        self.assertGreater(result["lean_verified"], 0)
+
     def test_empty_manifest_produces_a_complete_report(self) -> None:
         with mock.patch.object(report, "load_manifest", return_value={"books": []}):
             result, output = self.run_main()
