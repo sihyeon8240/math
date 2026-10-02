@@ -243,15 +243,19 @@ Euclidean spaces use this metric, including in dimension zero.
 \begin{proof}
   Use induction on $S$.
   For the empty set, $\delta=1$ works.
-  On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the
-  remaining indices.
-  It stays positive and is below every required radius.
 
   \begin{lean}
     classical
 
     induction s using Finset.induction_on with
     | empty => exact ⟨1, zero_lt_one, by simp only [Finset.notMem_empty, false_implies, implies_true]⟩
+  \end{lean}
+
+  On adjoining $i$, take the smaller of $r_i$ and the positive bound already obtained for the
+  remaining indices.
+  This stays positive and is below every required radius.
+
+  \begin{lean}
     | @insert i s hi ih =>
       obtain ⟨δ, hδ, hle⟩ := ih (fun j hj => hr j (Finset.mem_insert_of_mem hj))
 
@@ -262,7 +266,6 @@ Euclidean spaces use this metric, including in dimension zero.
       · exact min_le_left _ _
       · exact (min_le_right _ _).trans (hle j hj)
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.limit_point_infinite
@@ -428,9 +431,8 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  A point in the union belongs to one member $E_i$.
-  Choose a ball contained in that member; the same ball is contained in the union.
-  This argument also covers an empty family, since then there is no point to consider.
+  A point in the union belongs to some member $E_i$.
+  Choose a ball contained in that member.
 
   \begin{lean}
     apply Metric.isOpen_iff.mpr
@@ -438,10 +440,14 @@ Euclidean spaces use this metric, including in dimension zero.
 
     obtain ⟨i, hi⟩ := mem_iUnion.mp hp
     obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp (h i) p hi
-
-    exact ⟨r, hr, fun q hq => mem_iUnion.mpr ⟨i, hs hq⟩⟩
   \end{lean}
 
+  The same ball lies in the union.
+  For an empty family there is no point to consider.
+
+  \begin{lean}
+    exact ⟨r, hr, fun q hq => mem_iUnion.mpr ⟨i, hs hq⟩⟩
+  \end{lean}
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.closed_intersection
@@ -489,7 +495,6 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \begin{proof}
   At a point of the intersection, choose one positive radius for each set.
-  The smaller radius gives a ball lying in both sets.
 
   \begin{lean}
     apply Metric.isOpen_iff.mpr
@@ -497,13 +502,16 @@ Euclidean spaces use this metric, including in dimension zero.
 
     obtain ⟨r, hr, hEr⟩ := Metric.isOpen_iff.mp hE p hp.1
     obtain ⟨s, hs, hFs⟩ := Metric.isOpen_iff.mp hF p hp.2
+  \end{lean}
 
+  The smaller radius gives a ball lying in both sets and hence in their intersection.
+
+  \begin{lean}
     refine ⟨min r s, lt_min hr hs, ?_⟩
     intro q hq
     change dist q p < min r s at hq
     exact ⟨hEr (hq.trans_le (min_le_left _ _)), hFs (hq.trans_le (min_le_right _ _))⟩
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.open_finite_intersection
@@ -521,8 +529,6 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \begin{proof}
   For no indices the intersection is $X$, which contains a unit ball about each of its points.
-  Adjoining one index replaces an already open finite intersection by its intersection with one
-  more open set, so induction completes the proof.
 
   \begin{lean}
     classical
@@ -531,13 +537,17 @@ Euclidean spaces use this metric, including in dimension zero.
     | empty =>
       simp only [Finset.notMem_empty, iInter_of_empty, iInter_univ]
       exact Metric.isOpen_iff.mpr (fun p _ => ⟨1, zero_lt_one, subset_univ _⟩)
+  \end{lean}
 
+  Adjoining an index intersects the already open finite intersection with one more open set.
+  The preceding result completes the induction.
+
+  \begin{lean}
     | @insert i s hi ih =>
       rw [Finset.set_biInter_insert]
       exact open_intersection _ _ (hE i (Finset.mem_insert_self i s))
         (ih (fun j hj => hE j (Finset.mem_insert_of_mem hj)))
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.closed_finite_union
@@ -554,20 +564,23 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \begin{proof}
   The complements are open, so their finite intersection is open.
-  By De Morgan\textquotesingle s identity, this is the complement of the desired union; hence that
-  union is closed.
 
   \begin{lean}
     have ho := open_finite_intersection s (fun i => (E i)ᶜ)
       (fun i hi => (hE i hi).isOpen_compl)
+  \end{lean}
 
+  De Morgan\textquotesingle s identity identifies this intersection with the complement of the
+  desired union.
+  The union is therefore closed.
+
+  \begin{lean}
     have heq : (⋃ i ∈ s, E i)ᶜ = ⋂ i ∈ s, (E i)ᶜ := by
       ext p
       simp only [mem_compl_iff, mem_iUnion, mem_iInter, not_exists]
 
     exact isOpen_compl_iff.mp (heq ▸ ho)
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.closure_eq_union_derivedSet
@@ -657,7 +670,6 @@ Euclidean spaces use this metric, including in dimension zero.
 \begin{proof}
   Suppose $p$ is a limit point of $\overline E$ and $r>0$.
   Choose $q\in\overline E$ within $r/2$ of $p$, then $s\in E$ within $r/2$ of $q$.
-  The triangle inequality puts $s$ within $r$ of $p$, proving $p\in\overline E$.
 
   \begin{lean}
     apply (closed_iff_derivedSet _).mpr
@@ -667,7 +679,12 @@ Euclidean spaces use this metric, including in dimension zero.
 
     obtain ⟨q, hq, _, hdq⟩ := (mem_derivedSet_iff _ _).mp hp (r / 2) (half_pos hr)
     obtain ⟨s, hs, hds⟩ := Metric.mem_closure_iff.mp hq (r / 2) (half_pos hr)
+  \end{lean}
 
+  The triangle inequality puts $s$ within $r$ of $p$.
+  Every ball about $p$ therefore meets $E$, proving $p\in\overline E$.
+
+  \begin{lean}
     refine ⟨s, hs, ?_⟩
 
     have ht := dist_triangle p q s
@@ -675,7 +692,6 @@ Euclidean spaces use this metric, including in dimension zero.
     rw [dist_comm q p] at hdq
     linarith
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.closure_properties
@@ -857,8 +873,7 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \begin{proof}
   Failure to be interior means that no positive-radius ball lies in $E$.
-  Thus every such ball contains a point of $E^{c}$, giving membership in its closure.
-  Conversely, if every ball meets $E^{c}$, no ball can be contained in $E$.
+  Every such ball therefore contains a point of $E^c$, giving membership in its closure.
 
   \begin{lean}
     classical
@@ -875,14 +890,18 @@ Euclidean spaces use this metric, including in dimension zero.
       obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hn
 
       exact ⟨q, hqe, by rwa [dist_comm]⟩
+  \end{lean}
 
+  Conversely, if every ball meets $E^c$, no ball can be contained in $E$.
+  Thus the point is not interior.
+
+  \begin{lean}
     · intro h ⟨r, hr, hs⟩
 
       obtain ⟨q, hq, hd⟩ := h r hr
 
       exact hq (hs (by simpa only [mem_ball, dist_comm] using hd))
   \end{lean}
-
 \end{proof}
 
 \begin{definition}
@@ -925,20 +944,22 @@ Euclidean spaces use this metric, including in dimension zero.
 
 \begin{proof}
   There are no coordinates on which two empty tuples can differ, so they are equal.
-  Removing the center consequently removes every possible point of a ball.
 
   \begin{lean}
     have heq : ∀ x y : EuclideanSpace ℝ (Fin 0), x = y := by
       intro x y
       ext j
       exact Fin.elim0 j
+  \end{lean}
 
+  Removing the center consequently removes every possible point of a ball.
+
+  \begin{lean}
     refine ⟨heq p q, ?_⟩
     apply Set.eq_empty_iff_forall_notMem.mpr
     intro x hx
     exact hx.2 (heq x p)
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.EuclideanSpaces.euclidean_punctured_ball
@@ -957,7 +978,7 @@ Euclidean spaces use this metric, including in dimension zero.
 \begin{proof}
   Since $n>0$, the coordinate vector $e_0$ exists.
   Put $v=(r/2)e_0$, so $\|v\|=r/2>0$.
-  The point $p+v$ differs from $p$ and is at distance $r/2<r$ from it.
+  Consequently $p+v$ differs from $p$.
 
   \begin{lean}
     let v : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single ⟨0, n.pos⟩ (r / 2)
@@ -973,11 +994,15 @@ Euclidean spaces use this metric, including in dimension zero.
 
       rw [hz, norm_zero] at hv
       linarith
+  \end{lean}
 
+  The distance from $p+v$ to $p$ is $\|v\|=r/2<r$.
+  This is the required point in the punctured ball.
+
+  \begin{lean}
     · rw [dist_eq_norm, add_sub_cancel_left, hv]
       linarith
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.isolated_limit_compl
@@ -996,7 +1021,6 @@ Euclidean spaces use this metric, including in dimension zero.
 \begin{proof}
   For an isolated point $p$, choose $r>0$ with $E\cap B(p,r)=\{p\}$.
   For any $s>0$, take a distinct point within $\min(r,s)$ of $p$.
-  It must lie outside $E$, and therefore witnesses that $p$ is a limit point of $E^{c}$.
 
   \begin{lean}
     intro p hp
@@ -1007,7 +1031,12 @@ Euclidean spaces use this metric, including in dimension zero.
     intro s hs
 
     obtain ⟨q, hne, hd⟩ := hX p (min r s) (lt_min hr hs)
+  \end{lean}
 
+  If this point belonged to $E$, it would lie in $E\cap B(p,r)$ and equal $p$, a contradiction.
+  It lies in $E^c$ within radius $s$, witnessing the limit-point condition.
+
+  \begin{lean}
     refine ⟨q, ?_, hne, hd.trans_le (min_le_right _ _)⟩
     intro hq
 
@@ -1016,7 +1045,6 @@ Euclidean spaces use this metric, including in dimension zero.
     rw [heq, mem_singleton_iff] at hm
     exact hne hm
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.EuclideanSpaces.euclidean_boundary
@@ -1034,11 +1062,7 @@ Euclidean spaces use this metric, including in dimension zero.
 \end{proposition}
 
 \begin{proof}
-  An isolated point of either side is a limit point of the other, by the preceding two results.
-  Expand the two closures in $\partial E$ as the set together with its limit points.
-  Separate points which fail one of the two limit-point conditions from those satisfying both.
-  The former are exactly the isolated points of one side; the latter form
-  $E^{\prime}\cap(E^{c})^{\prime}$.
+  An isolated point of either side is a limit point of the other, by the preceding results.
 
   \begin{lean}
     have hE := isolated_limit_compl E (euclidean_punctured_ball n)
@@ -1047,9 +1071,20 @@ Euclidean spaces use this metric, including in dimension zero.
 
     rw [compl_compl] at hEc
     rw [isolated_eq_diff] at hE hEc
+  \end{lean}
+
+  Expand both closures in $\partial E$ as the set together with its limit points.
+
+  \begin{lean}
     rw [frontier, sdiff_eq_compl_inter,
       compl_interior_eq_closure_compl, closure_eq_union_derivedSet,
       closure_eq_union_derivedSet, isolated_eq_diff, isolated_eq_diff]
+  \end{lean}
+
+  Points failing one limit-point condition are exactly the isolated points of one side.
+  The remaining points form $E^{\prime}\cap(E^c)^{\prime}$.
+
+  \begin{lean}
     ext p
 
     have h1 := @hE p
@@ -1059,7 +1094,6 @@ Euclidean spaces use this metric, including in dimension zero.
     simp only [mem_inter_iff, mem_union, mem_sdiff, mem_compl_iff] at *
     tauto
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces.subspace_metric

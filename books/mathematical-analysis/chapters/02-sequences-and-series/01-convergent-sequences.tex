@@ -85,9 +85,7 @@ even when values repeat.
 
 \begin{proof}
   If $p\ne q$, let $r=d(p,q)>0$.
-  Beyond the larger of the two thresholds for radius $r/2$, a single term is within $r/2$ of both
-  points.
-  The triangle inequality would then give $d(p,q)<r$, a contradiction.
+  Choose a convergence threshold for each limit with radius $r/2$.
 
   \begin{lean}
     rw [Metric.tendsto_atTop] at hp hq
@@ -97,17 +95,25 @@ even when values repeat.
 
     obtain ⟨N, hN⟩ := hp (dist p q / 2) (half_pos hd)
     obtain ⟨M, hM⟩ := hq (dist p q / 2) (half_pos hd)
+  \end{lean}
 
+  Beyond the larger threshold, a single term is within $r/2$ of both points.
+
+  \begin{lean}
     have hn := hN (max N M) (le_max_left _ _)
 
     have hm := hM (max N M) (le_max_right _ _)
+  \end{lean}
 
+  The triangle inequality would give $d(p,q)<r$, a contradiction.
+  Thus the limits coincide.
+
+  \begin{lean}
     have ht := dist_triangle p (u (max N M)) q
 
     rw [dist_comm p (u (max N M))] at ht
     linarith
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter02.ConvergentSequences.convergent_properties
@@ -144,12 +150,15 @@ even when values repeat.
 
 \begin{proof}
   By the Archimedean property, choose $N>1/\varepsilon$.
-  For $n\geq N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$.
-  Dividing by $n+1>0$ proves the claim.
 
   \begin{lean}
     obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
+  \end{lean}
 
+  For $n\ge N$, positivity gives $1<N\varepsilon<(n+1)\varepsilon$.
+  Dividing by $n+1>0$ proves the claim.
+
+  \begin{lean}
     refine ⟨N, ?_⟩
     intro n hn
 
@@ -160,7 +169,6 @@ even when values repeat.
     apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
     nlinarith
   \end{lean}
-
 \end{proof}
 
 \begin{example}

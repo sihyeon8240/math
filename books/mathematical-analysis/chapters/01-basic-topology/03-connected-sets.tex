@@ -100,8 +100,7 @@
 \end{lemma}
 
 \begin{proof}
-  If $x\in\overline A$ were greater than $c$, choose a point $y\in A$ within $x-c$ of $x$.
-  Then $|x-y|<x-c$ would imply $y>c$, contradicting the upper bound.
+  If $x\in\overline A$ were greater than $c$, choose $y\in A$ within distance $x-c$ of $x$.
 
   \begin{lean}
     intro x hx
@@ -110,14 +109,17 @@
     have hc : c < x := lt_of_not_ge hn
 
     obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (x - c) (sub_pos.mpr hc)
+  \end{lean}
 
+  Then $|x-y|<x-c$ would imply $y>c$, contradicting the upper bound on $A$.
+
+  \begin{lean}
     rw [Real.dist_eq, abs_lt] at hd
 
     have hyc := h y hy
 
     linarith
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.ConnectedSets.closure_lower_bound
@@ -133,9 +135,7 @@
 \end{lemma}
 
 \begin{proof}
-  If $x\in\overline A$ were less than $c$, a point $y\in A$ within $c-x$ of $x$ would satisfy
-  $y<c$.
-  This contradicts the lower bound.
+  If $x\in\overline A$ were less than $c$, choose $y\in A$ within distance $c-x$ of $x$.
 
   \begin{lean}
     intro x hx
@@ -144,14 +144,17 @@
     have hc : x < c := lt_of_not_ge hn
 
     obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (c - x) (sub_pos.mpr hc)
+  \end{lean}
 
+  Then $|x-y|<c-x$ would imply $y<c$, contradicting the lower bound on $A$.
+
+  \begin{lean}
     rw [Real.dist_eq, abs_lt] at hd
 
     have hcy := h y hy
 
     linarith
   \end{lean}
-
 \end{proof}
 
 % Lean source: Textbooks.MathematicalAnalysis.Chapter01.ConnectedSets.no_separation_of_between
