@@ -14,10 +14,12 @@ CHECK_LOG = REPO_ROOT / "scripts" / "check-log.py"
 
 class CheckLogTests(unittest.TestCase):
     def run_checker(
-        self, text: str, *, strict: bool = False
+        self, text: str, *, strict: bool = False, completed: bool = True
     ) -> subprocess.CompletedProcess[str]:
         with tempfile.TemporaryDirectory() as directory:
             log = Path(directory) / "book.log"
+            if completed:
+                text += "Output written on book.pdf (1 page, 123 bytes).\n"
             log.write_text(text, encoding="utf-8")
             command = [sys.executable, str(CHECK_LOG), str(log)]
             if strict:
@@ -28,6 +30,32 @@ class CheckLogTests(unittest.TestCase):
         result = self.run_checker(text)
         self.assertEqual(result.returncode, 1)
         self.assertIn(diagnostic, result.stderr)
+
+    def test_empty_and_incomplete_logs_fail(self) -> None:
+        for strict in (False, True):
+            for text, diagnostic in (
+                ("", "empty LaTeX log"),
+                (" \n\t", "empty LaTeX log"),
+                ("This is LuaHBTeX\n", "missing PDF completion message"),
+                (
+                    "Output written on book.dvi (1 page, 123 bytes).\n",
+                    "missing PDF completion message",
+                ),
+            ):
+                with self.subTest(strict=strict, text=text):
+                    result = self.run_checker(text, strict=strict, completed=False)
+                    self.assertEqual(result.returncode, 1)
+                    self.assertIn(diagnostic, result.stderr)
+
+    def test_completed_pdf_logs_pass(self) -> None:
+        for summary in (
+            "Output written on book.pdf (1 page, 123 bytes).\n",
+            "Output written on book.pdf (42 pages, 123456 bytes).\n",
+            "Output written on book.pdf (42 pages,\n123456 bytes).\n",
+        ):
+            with self.subTest(summary=summary):
+                result = self.run_checker(summary, strict=True, completed=False)
+                self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_undefined_reference(self) -> None:
         self.assert_failure(

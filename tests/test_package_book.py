@@ -29,7 +29,8 @@ class PackageBookTests(unittest.TestCase):
             build.mkdir(parents=True)
             (build / "book.pdf").write_bytes(b"pdf")
             (build / "book.log").write_text(
-                "Overfull \\hbox (1.0pt too wide) detected at line 1\n",
+                "Overfull \\hbox (1.0pt too wide) detected at line 1\n"
+                "Output written on book.pdf (1 page, 123 bytes).\n",
                 encoding="utf-8",
             )
 

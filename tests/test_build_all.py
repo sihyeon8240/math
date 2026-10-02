@@ -51,7 +51,10 @@ class BuildAllTests(unittest.TestCase):
             slug = sys.argv[1]
             log = pathlib.Path("build") / slug / "book.log"
             log.parent.mkdir(parents=True, exist_ok=True)
-            log.write_text(os.environ.get("BOOK_LOG_TEXT", ""))
+            log.write_text(
+                os.environ.get("BOOK_LOG_TEXT", "")
+                + "Output written on book.pdf (1 page, 123 bytes).\\n"
+            )
             with pathlib.Path(os.environ["PID_FILE"]).open("a") as file:
                 file.write(str(os.getpid()) + "\\n")
             state = pathlib.Path(os.environ["STATE_FILE"])

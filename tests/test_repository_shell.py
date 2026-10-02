@@ -320,7 +320,10 @@ class MakeBooksTests(unittest.TestCase):
                 self.assertIn("build-failed", result.stderr)
 
     def test_strict_controls_overfull_box_failure(self) -> None:
-        log = "Overfull \\hbox (1.0pt too wide) detected at line 1\n"
+        log = (
+            "Overfull \\hbox (1.0pt too wide) detected at line 1\n"
+            "Output written on book.pdf (1 page, 123 bytes).\n"
+        )
 
         advisory = self.run_make("check", log_text=log)
         strict = self.run_make("check", "strict", log_text=log)
