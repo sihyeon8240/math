@@ -26,10 +26,12 @@ theorem exists_prime_factors (n : ℕ) (hn : 0 < n) :
           simpa only [isPrime, hgt, true_and, not_forall, not_or, exists_prop] using hp
 
         obtain ⟨d, ⟨k, hk⟩, hd1, hdn⟩ := hdiv
+
         have hdpos : 0 < d := by
           nlinarith
         have hkpos : 0 < k := by
           nlinarith
+
         have hdlt : d < n := by
           by_contra h
           have hk1 : k = 1 := by

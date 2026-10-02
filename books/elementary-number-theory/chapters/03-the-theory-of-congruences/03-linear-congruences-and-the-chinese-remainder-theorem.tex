@@ -282,23 +282,23 @@
     · intro hx
 
       have h₁ := modEq_mul (modEq_refl n u) hx
-
       have h₂ := modEq_mul hu (modEq_refl n x)
 
       have heq : u * (a * x) = (a * u) * x := by
         ring
       rw [heq] at h₁
+
       exact modEq_trans (modEq_symm (by simpa only [one_mul] using h₂)) h₁
 
     · intro hx
 
       have h₁ := modEq_mul (modEq_refl n a) hx
-
       have h₂ := modEq_mul hu (modEq_refl n b)
 
       have heq : a * (u * b) = (a * u) * b := by
         ring
       rw [heq] at h₁
+
       exact modEq_trans h₁ (by simpa only [one_mul] using h₂)
   \end{lean}
 \end{proof}
