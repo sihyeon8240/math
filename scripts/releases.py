@@ -5,37 +5,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
 
 import yaml
-from book_manifest import load_manifest
+from book_manifest import load_manifest, version_key
 from contents_manifest import expected_files
 
 ROOT = Path(__file__).resolve().parent.parent
-
-
-def version_key(value: str) -> tuple:
-    """SemVer precedence, excluding build metadata (unsupported by books.yml)."""
-    match = re.fullmatch(
-        r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
-        r"(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?",
-        value,
-    )
-    if not match:
-        raise ValueError(f"invalid semantic version: {value}")
-    major, minor, patch, suffix = match.groups()
-    identifiers = []
-    for part in suffix.split(".") if suffix else []:
-        if part.isdigit():
-            if len(part) > 1 and part.startswith("0"):
-                raise ValueError(f"invalid numeric prerelease identifier: {value}")
-            identifiers.append((0, int(part)))
-        else:
-            identifiers.append((1, part))
-    return (int(major), int(minor), int(patch), suffix is None, tuple(identifiers))
 
 
 def plan(previous: dict, current: dict) -> list[str]:

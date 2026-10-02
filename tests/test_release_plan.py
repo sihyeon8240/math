@@ -60,6 +60,13 @@ class ReleasePlanTests(unittest.TestCase):
             ["alpha_version=1.2.3", "version=1.2.3", 'matrix={"book":["alpha"]}'],
         )
 
+    def test_hyphenated_prerelease_tags_are_accepted(self) -> None:
+        for version in ("1.2.3--alpha", "1.2.3-alpha--beta", "1.2.3-rc.1"):
+            with self.subTest(version=version):
+                result = self.run_plan(f"alpha-v{version}", VERSION=version)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(f"version={version}\n", result.stdout)
+
     def test_invalid_or_disabled_book_tag_is_rejected(self) -> None:
         invalid = self.run_plan("alpha-1.2.3")
         disabled = self.run_plan("beta-v1.2.3")

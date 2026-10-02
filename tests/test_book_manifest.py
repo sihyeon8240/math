@@ -128,11 +128,29 @@ class ManifestModuleTests(unittest.TestCase):
         self.assertFalse(book["release"])
         self.assertTrue(book["site"])
 
+    def test_manifest_accepts_semver_hyphenated_prereleases(self) -> None:
+        for version in ("1.2.3--alpha", "1.2.3-alpha--beta", "1.2.3-rc.1"):
+            with self.subTest(version=version):
+                root, path, _ = self.fixture(
+                    {
+                        "slug": "sample",
+                        "title": "Sample",
+                        "status": "draft",
+                        "order": 10,
+                        "version": version,
+                    }
+                )
+                self.assertEqual(
+                    load_manifest(path, root)["books"][0]["version"], version
+                )
+
     def test_load_manifest_rejects_invalid_fields(self) -> None:
         for override, diagnostic in (
             ({"unknown": 1}, "unknown field"),
             ({"build": "yes"}, "must be boolean"),
             ({"version": "1.0"}, "invalid version"),
+            ({"version": "01.2.3"}, "invalid version"),
+            ({"version": "1.2.3-01"}, "invalid version"),
             ({"author": ""}, "author"),
         ):
             with self.subTest(override=override):
