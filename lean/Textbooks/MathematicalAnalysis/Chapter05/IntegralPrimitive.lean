@@ -51,12 +51,14 @@ theorem segmentIntegral_abs_le (a b x y : ℝ) (hab : a < b)
   · subst y
     simp only [segmentIntegral_self, abs_zero, sub_self, mul_zero, le_refl]
   simp only [segmentIntegral, hxy, ↓reduceDIte]
+
   have hs := riemannIntegrable_subinterval f (intervalBox_le a b x y hab hxy hx.1 hy.2) hf
   have hb : ∀ t ∈ Icc (-(intervalBox x y hxy).upper ()) (-(intervalBox x y hxy).lower ()),
       |f t| ≤ C := by
     intro t ht
     simp only [intervalBox, neg_neg] at ht
     exact hbound t ⟨hx.1.trans ht.1, ht.2.trans hy.2⟩
+
   simpa only [cellLength, intervalBox, neg_sub_neg] using
     riemannIntegral_abs_le (intervalBox x y hxy) f hs C hb
 
@@ -74,6 +76,7 @@ theorem integralPrimitive_difference_bound (a b : ℝ) (hab : a < b)
       -segmentIntegral x y f by ring, abs_neg, abs_of_nonpos (sub_nonpos.mpr hxy)]
     convert hb using 1
     ring
+
   · have he := segmentIntegral_add a b a y x hab le_rfl hy.1 hyx hx.2 f hf
     have hb := segmentIntegral_abs_le a b y x hab hy hx hyx f hf C hC hbound
     dsimp only [integralPrimitive]
@@ -119,6 +122,7 @@ theorem integral_constant_error (I : Box Unit) (f : ℝ → ℝ)
     (riemannIntegrable_const_mul I _ (-1) hc)
   have hv := riemannIntegral_linear I f (fun _ => c) 1 (-1) hf hc
   simp only [one_mul, neg_one_mul, riemannIntegral_constant] at hv hh
+
   have hb := riemannIntegral_abs_le I (fun t => f t + -c) hh ε (by
     intro t ht
     simpa only [sub_eq_add_neg] using he t ht)
@@ -154,13 +158,16 @@ theorem integralPrimitive_hasDerivAt (a b : ℝ) (hab : a < b)
       · rw [min_eq_right h, max_eq_left h] at ht
         rw [abs_of_nonpos (sub_nonpos.mpr ht.2)]
         linarith [ht.1, (abs_lt.mp hyr).1]
+
     exact (hc (by simpa only [Real.dist_eq] using htnear)).le
+
   rcases lt_or_gt_of_ne (sub_ne_zero.mp (abs_pos.mp hne)) with hxy | hyx
   · have hs := riemannIntegrable_subinterval f (intervalBox_le a b y x hab hxy hyI.1 hx.2.le) hf
     have hb := integral_constant_error (intervalBox y x hxy) f hs (f x) (ε / 2) (by
       simpa only [intervalBox, neg_neg, min_eq_right hxy.le, max_eq_left hxy.le] using he)
     have hv := segmentIntegral_add a b a y x hab le_rfl hyI.1 hxy.le hx.2.le f hf
     simp only [segmentIntegral, hxy, ↓reduceDIte] at hv
+
     have hid : (integralPrimitive a f y - integralPrimitive a f x) / (y - x) - f x =
         (riemannIntegral (intervalBox y x hxy) f - f x * (x - y)) / (x - y) := by
       dsimp only [integralPrimitive, segmentIntegral]
@@ -170,11 +177,13 @@ theorem integralPrimitive_hasDerivAt (a b : ℝ) (hab : a < b)
     rw [hid, abs_div, abs_of_pos (sub_pos.mpr hxy)]
     apply lt_of_le_of_lt ((div_le_iff₀ (sub_pos.mpr hxy)).mpr ?_) (half_lt_self hε)
     simpa only [cellLength, intervalBox, neg_sub_neg] using hb
+
   · have hs := riemannIntegrable_subinterval f (intervalBox_le a b x y hab hyx hx.1.le hyI.2) hf
     have hb := integral_constant_error (intervalBox x y hyx) f hs (f x) (ε / 2) (by
       simpa only [intervalBox, neg_neg, min_eq_left hyx.le, max_eq_right hyx.le] using he)
     have hv := segmentIntegral_add a b a x y hab le_rfl hx.1.le hyx.le hyI.2 f hf
     simp only [segmentIntegral, hyx, ↓reduceDIte] at hv
+
     have hid : (integralPrimitive a f y - integralPrimitive a f x) / (y - x) - f x =
         (riemannIntegral (intervalBox x y hyx) f - f x * (y - x)) / (y - x) := by
       dsimp only [integralPrimitive, segmentIntegral]

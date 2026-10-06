@@ -113,6 +113,7 @@ theorem real_tendsto_add (u v : ℕ → ℝ) (a b : ℝ)
   have hx := hN n ((le_max_left _ _).trans hn)
   have hy := hM n ((le_max_right _ _).trans hn)
   rw [Real.dist_eq] at hx hy ⊢
+
   have hbound : |u n + v n - (a + b)| ≤ |u n - a| + |v n - b| := by
     rw [show u n + v n - (a + b) = (u n - a) + (v n - b) by ring]
     exact abs_add_le _ _
@@ -132,14 +133,17 @@ theorem real_tendsto_mul (u v : ℕ → ℝ) (a b : ℝ)
 
   obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu δ hδ
   obtain ⟨M, hM⟩ := Metric.tendsto_atTop.mp hv δ hδ
+
   refine ⟨max N M, ?_⟩
   intro n hn
   have hx := hN n ((le_max_left _ _).trans hn)
   have hy := hM n ((le_max_right _ _).trans hn)
   rw [Real.dist_eq] at hx hy ⊢
+
   have hcalc : u n * v n - a * b = (u n - a) * b + u n * (v n - b) := by ring
   have hsum := abs_add_le ((u n - a) * b) (u n * (v n - b))
   rw [← hcalc, abs_mul, abs_mul] at hsum
+
   have hleft := mul_le_mul_of_nonneg_right hx.le (abs_nonneg b)
   have hright := mul_le_mul (hbound n).le hy.le (abs_nonneg _) hC.le
   nlinarith
@@ -159,7 +163,9 @@ theorem real_tendsto_inv (u : ℕ → ℝ) (a : ℝ)
   have ha' : 0 < |a| := abs_pos.mpr ha
   let δ := min (|a| / 2) (ε * |a| ^ 2 / 2)
   have hδ : 0 < δ := lt_min (half_pos ha') (by positivity)
+
   obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu δ hδ
+
   refine ⟨N, ?_⟩
   intro n hn
   have hd : |u n - a| < δ := hN n hn
@@ -168,11 +174,13 @@ theorem real_tendsto_inv (u : ℕ → ℝ) (a : ℝ)
   have htriangle : |a| ≤ |a - u n| + |u n| := by
     simpa only [sub_add_cancel] using abs_add_le (a - u n) (u n)
   rw [abs_sub_comm a (u n)] at htriangle
+
   have hlower : |a| / 2 < |u n| := by linarith
   have hprod : 0 < |u n| * |a| := mul_pos (abs_pos.mpr (hu0 n)) ha'
 
   rw [Real.dist_eq, one_div, one_div, inv_sub_inv (hu0 n) ha,
     abs_div, abs_mul, abs_sub_comm a (u n), div_lt_iff₀ hprod]
+
   have hmul := mul_lt_mul_of_pos_right hlower ha'
   nlinarith
 
@@ -190,6 +198,7 @@ theorem real_tendsto_squeeze (u v w : ℕ → ℝ) (a : ℝ)
   have hx : |u n - a| < ε := hN n ((le_max_left _ _).trans hn)
   have hz : |w n - a| < ε := hM n ((le_max_right _ _).trans hn)
   rw [Real.dist_eq, abs_lt]
+
   obtain ⟨hx', _⟩ := abs_lt.mp hx
   obtain ⟨_, hz'⟩ := abs_lt.mp hz
   constructor <;> linarith [huv n, hvw n]

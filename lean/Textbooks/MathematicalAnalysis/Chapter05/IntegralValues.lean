@@ -28,6 +28,7 @@ theorem taggedSum_bounds {I : Box Unit} (f : ℝ → ℝ) (P : Partition I) (τ 
     rw [hi]
     exact mul_le_mul_of_nonneg_right (csInf_le hb.bddBelow ⟨τ J, hτ J hJ, rfl⟩)
       (cellLength_pos J).le
+
   · apply Finset.sum_le_sum
     intro J hJ
     have hb := cell_image_bounded f (P.val.le_of_mem hJ) hf
@@ -64,8 +65,10 @@ theorem riemannIntegral_mono (I : Box Unit) (f g : ℝ → ℝ)
       rintro y ⟨x, hx, rfl⟩
       exact (hfg x (cell_subset_closed (P.val.le_of_mem hJ) hx)).trans
         (le_csSup hjg.bddAbove ⟨x, hx, rfl⟩)
+
     exact mul_le_mul_of_nonneg_right hsup
       (increment_nonneg id (P.val.le_of_mem hJ) (fun _ _ _ _ h => h))
+
   exact (integral_bounds I f id P hf.1 (fun _ _ _ _ h => h)).2.2.trans hsum
 
 /-- Theorem: an absolute bound on the integrand bounds the absolute integral
@@ -83,11 +86,13 @@ theorem riemannIntegral_abs_le (I : Box Unit) (f : ℝ → ℝ) (hf : RiemannInt
       apply csSup_le (cell_image_nonempty f J)
       rintro y ⟨x, hx, rfl⟩
       exact (abs_le.mp (hC x (cell_subset_closed (P.val.le_of_mem hJ) hx))).2
+
     have hi : increment id J = cellLength J := by
       dsimp [increment, cellLength]
       ring
     rw [hi]
     exact mul_le_mul_of_nonneg_right hsup (cellLength_pos J).le
+
   have hlower : -C * cellLength I ≤ lowerSum f id P := by
     dsimp only [lowerSum]
     rw [← sum_cellLengths P, Finset.mul_sum]
@@ -97,11 +102,13 @@ theorem riemannIntegral_abs_le (I : Box Unit) (f : ℝ → ℝ) (hf : RiemannInt
       apply le_csInf (cell_image_nonempty f J)
       rintro y ⟨x, hx, rfl⟩
       exact (abs_le.mp (hC x (cell_subset_closed (P.val.le_of_mem hJ) hx))).1
+
     have hi : increment id J = cellLength J := by
       dsimp [increment, cellLength]
       ring
     rw [hi]
     exact mul_le_mul_of_nonneg_right hinf (cellLength_pos J).le
+
   obtain ⟨hl, _, hu⟩ := integral_bounds I f id P hf.1 (fun _ _ _ _ h => h)
   dsimp only [riemannIntegral]
   exact abs_le.mpr ⟨by linarith [hf.2], by linarith⟩
@@ -139,6 +146,7 @@ theorem riemannIntegral_linear (I : Box Unit) (f g : ℝ → ℝ) (A B : ℝ)
   let δ := ε / (2 * (|A| + |B| + 1))
   have hp : 0 < 2 * (|A| + |B| + 1) := by positivity
   have hδ : 0 < δ := div_pos hε hp
+
   obtain ⟨P, hP⟩ := (riemannIntegrable_iff_gap I f hf.1).mp hf δ hδ
   obtain ⟨Q, hQ⟩ := (riemannIntegrable_iff_gap I g hg.1).mp hg δ hδ
   obtain ⟨S, hS⟩ := (riemannIntegrable_iff_gap I h hh.1).mp hh δ hδ
@@ -147,12 +155,14 @@ theorem riemannIntegral_linear (I : Box Unit) (f g : ℝ → ℝ) (A B : ℝ)
   have hτ : ∀ J ∈ R.val.boxes, τ J ∈ cell J := by
     intro J _
     exact ⟨le_rfl, neg_lt_neg (J.lower_lt_upper ())⟩
+
   have he (k : ℝ → ℝ) (hk : RiemannIntegrable I k) (T : Partition I)
       (hRT : Refines R T) (hT : upperSum k id T - lowerSum k id T < δ) :
       |riemannIntegral I k - taggedSum k R τ| ≤ δ := by
     have hr := refinement_sums k id T R hRT hk.1 (fun _ _ _ _ h => h)
     have ht := taggedSum_error k R τ hτ hk
     linarith [hr.1, hr.2]
+
   have ef := he f hf P (inf_le_left.trans inf_le_left) hP
   have eg := he g hg Q (inf_le_left.trans inf_le_right) hQ
   have eh := he h hh S inf_le_right hS
@@ -161,6 +171,7 @@ theorem riemannIntegral_linear (I : Box Unit) (f g : ℝ → ℝ) (A B : ℝ)
     apply Finset.sum_congr rfl
     intro J _
     ring
+
   have hid : riemannIntegral I h - (A * riemannIntegral I f + B * riemannIntegral I g) =
       (riemannIntegral I h - taggedSum h R τ) -
         (A * (riemannIntegral I f - taggedSum f R τ) +
@@ -168,6 +179,7 @@ theorem riemannIntegral_linear (I : Box Unit) (f g : ℝ → ℝ) (A B : ℝ)
     rw [hs]
     ring
   rw [hid]
+
   have hb : |(riemannIntegral I h - taggedSum h R τ) -
       (A * (riemannIntegral I f - taggedSum f R τ) +
         B * (riemannIntegral I g - taggedSum g R τ))| ≤
@@ -182,9 +194,11 @@ theorem riemannIntegral_linear (I : Box Unit) (f g : ℝ → ℝ) (A B : ℝ)
         (A * (riemannIntegral I f - taggedSum f R τ))
         (B * (riemannIntegral I g - taggedSum g R τ)))]
   rw [abs_mul, abs_mul] at hb
+
   have ea := mul_le_mul_of_nonneg_left ef (abs_nonneg A)
   have eb := mul_le_mul_of_nonneg_left eg (abs_nonneg B)
   have hd : δ * (2 * (|A| + |B| + 1)) = ε := div_mul_cancel₀ ε hp.ne'
+
   nlinarith only [hb, ea, eb, eh, hd, hδ, abs_nonneg A, abs_nonneg B]
 
 /-- Theorem: the absolute integral is at most the integral of the absolute value. -/

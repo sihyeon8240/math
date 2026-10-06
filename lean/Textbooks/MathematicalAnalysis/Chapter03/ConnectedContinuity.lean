@@ -20,7 +20,9 @@ theorem continuousOn_open_preimage (K : Set X) (f : X → Y) (hf : ContinuousOn 
     obtain ⟨δ, hδ, hd⟩ := Metric.continuousWithinAt_iff.mp
       (hf a a.property.1) ε hε
     exact ⟨δ, hδ, fun x hx hxa => hball (hd hx hxa)⟩
+
   choose r hr hd using hex
+
   refine ⟨⋃ a : A, ball a.val (r a), open_union _ (fun a => ball_open _ _), ?_⟩
   intro x hx
   constructor
@@ -43,10 +45,12 @@ theorem connected_image (K : Set X) (hK : IsPreconnected K) (f : X → Y)
     rcases hcover ⟨x, hx, rfl⟩ with h | h
     · exact Or.inl ((hPeq x hx).mpr h)
     · exact Or.inr ((hQeq x hx).mpr h)
+
   obtain ⟨u, ⟨x, hx, rfl⟩, hu⟩ := hIU
   obtain ⟨v, ⟨y, hy, rfl⟩, hv⟩ := hIV
   obtain ⟨z, hz, hzP, hzQ⟩ := hK P Q hP hQ hcov
     ⟨x, hx, (hPeq x hx).mpr hu⟩ ⟨y, hy, (hQeq y hy).mpr hv⟩
+
   exact ⟨f z, ⟨z, hz, rfl⟩, (hPeq z hz).mp hzP, (hQeq z hz).mp hzQ⟩
 
 /-- Lemma: every closed real interval is connected, including empty intervals. -/
@@ -79,6 +83,7 @@ theorem intermediate_value_interval (a b : ℝ) (hab : a ≤ b) (f : ℝ → ℝ
     exact intermediate_value_connected _ (connected_interval a b) f hf a b
       ⟨le_rfl, hab⟩ ⟨hab, le_rfl⟩ c
       (lt_of_le_of_ne hc.1 (Ne.symm ha)) (lt_of_le_of_ne hc.2 hb)
+
   · rw [min_eq_right h, max_eq_left h] at hc
     exact intermediate_value_connected _ (connected_interval a b) f hf b a
       ⟨hab, le_rfl⟩ ⟨le_rfl, hab⟩ c

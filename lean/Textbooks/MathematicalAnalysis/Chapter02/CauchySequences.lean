@@ -73,12 +73,14 @@ theorem cauchy_tendsto_of_subsequence (u : ℕ → X) (p : X) (hu : CauchySeq u)
   obtain ⟨N, hN⟩ := Metric.cauchySeq_iff.mp hu (ε / 2) (half_pos hε)
   obtain ⟨M, hM⟩ := Metric.tendsto_atTop.mp hlim (ε / 2) (half_pos hε)
   let k := max N M
+
   refine ⟨N, ?_⟩
   intro n hn
   have hclose := hN n hn (φ k) ((le_max_left N M).trans (hφ.id_le k))
   have hnear := hM k (le_max_right _ _)
   have ht := dist_triangle (u n) (u (φ k)) p
   change dist (u (φ k)) p < ε / 2 at hnear
+
   linarith
 
 /-- Theorem: every real Cauchy sequence converges, using boundedness and interval compactness. -/

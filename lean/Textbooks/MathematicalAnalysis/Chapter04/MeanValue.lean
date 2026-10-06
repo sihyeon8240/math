@@ -27,6 +27,7 @@ theorem derivative_zero_of_localMax (f : ℝ → ℝ) (d a : ℝ)
 
   · by_contra hn
     have hd : 0 < d := lt_of_not_ge hn
+
     obtain ⟨δ, hδ, hq⟩ := (hasDerivAt_iff_epsilon f d a).mp hf d hd
     let t := min r δ / 2
     have ht : 0 < t := half_pos (lt_min hr hδ)
@@ -38,10 +39,12 @@ theorem derivative_zero_of_localMax (f : ℝ → ℝ) (d a : ℝ)
     have hsign : (f (a + t) - f a) / (a + t - a) ≤ 0 :=
       div_nonpos_of_nonpos_of_nonneg (sub_nonpos.mpr hle) (by linarith)
     have hlow := (abs_lt.mp hquot).1
+
     linarith
 
   · by_contra hn
     have hd : d < 0 := lt_of_not_ge hn
+
     obtain ⟨δ, hδ, hq⟩ := (hasDerivAt_iff_epsilon f d a).mp hf (-d) (neg_pos.mpr hd)
     let t := min r δ / 2
     have ht : 0 < t := half_pos (lt_min hr hδ)
@@ -49,11 +52,13 @@ theorem derivative_zero_of_localMax (f : ℝ → ℝ) (d a : ℝ)
     have htδ : t < δ := (half_lt_self (lt_min hr hδ)).trans_le (min_le_right _ _)
     have hdist : |a - t - a| = t := by
       rw [show a - t - a = -t by ring, abs_neg, abs_of_pos ht]
+
     have hle := hbound (a - t) (by rwa [hdist])
     have hquot := hq (a - t) (by rwa [hdist]) (by rwa [hdist])
     have hsign : 0 ≤ (f (a - t) - f a) / (a - t - a) :=
       div_nonneg_of_nonpos (sub_nonpos.mpr hle) (by linarith)
     have hupp := (abs_lt.mp hquot).2
+
     linarith
 
 /-- Corollary: the derivative at a differentiable local minimum is zero. -/
@@ -62,10 +67,13 @@ theorem derivative_zero_of_localMin (f : ℝ → ℝ) (d a : ℝ)
   have hn : HasDerivAt (fun x => -f x) (-d) a := by
     simpa only [neg_one_mul, zero_mul, add_zero] using
       hasDerivAt_linear_combination f f d d (-1) 0 a hf hf
+
   have hm : IsLocalMax (fun x => -f x) a := by
     obtain ⟨r, hr, hb⟩ := (isLocalMin_iff f a).mp hmin
     exact (isLocalMax_iff _ a).mpr ⟨r, hr, fun x hx => neg_le_neg (hb x hx)⟩
+
   have hz := derivative_zero_of_localMax _ (-d) a hn hm
+
   linarith
 
 /-- Lemma: an extremum on an interval is a local extremum at each interior point. -/
@@ -84,15 +92,18 @@ theorem rolle (f : ℝ → ℝ) (df : ℝ → ℝ) (a b : ℝ) (hab : a < b)
     (hc : ContinuousOn f (Icc a b)) (hd : ∀ x ∈ Ioo a b, HasDerivAt f (df x) x)
     (heq : f a = f b) : ∃ c ∈ Ioo a b, df c = 0 := by
   have hbdd := compact_bounded _ (compact_image_on _ (interval_compact a b hab.le) f hc)
+
   obtain ⟨⟨u, hu, hfu⟩, ⟨v, hv, hfv⟩⟩ := extreme_value_interval a b hab.le f hc
   have hmax : ∀ x ∈ Icc a b, f x ≤ f u := by
     intro x hx
     rw [hfu]
     exact le_csSup hbdd.bddAbove ⟨x, hx, rfl⟩
+
   have hmin : ∀ x ∈ Icc a b, f v ≤ f x := by
     intro x hx
     rw [hfv]
     exact csInf_le hbdd.bddBelow ⟨x, hx, rfl⟩
+
   by_cases hgt : f a < f u
 
   · have hui : u ∈ Ioo a b := by
@@ -110,8 +121,10 @@ theorem rolle (f : ℝ → ℝ) (df : ℝ → ℝ) (a b : ℝ) (hab : a < b)
       have hm : IsLocalMin f v := by
         have hn := localMax_of_interval (fun x => -f x) a b v hvi
           (fun x hx => neg_le_neg (hmin x hx))
+
         obtain ⟨r, hr, hb⟩ := (isLocalMax_iff _ v).mp hn
         exact (isLocalMin_iff f v).mpr ⟨r, hr, fun x hx => neg_le_neg_iff.mp (hb x hx)⟩
+
       exact ⟨v, hvi, derivative_zero_of_localMin f (df v) v (hd v hvi) hm⟩
 
     · let c := (a + b) / 2
@@ -120,8 +133,10 @@ theorem rolle (f : ℝ → ℝ) (df : ℝ → ℝ) (a b : ℝ) (hab : a < b)
         intro x hx
         exact le_antisymm ((hmax x hx).trans (le_of_not_gt hgt))
           ((le_of_not_gt hlt).trans (hmin x hx))
+
       have hm := localMax_of_interval f a b c hci (fun x hx => by
         rw [hconst x hx, hconst c ⟨hci.1.le, hci.2.le⟩])
+
       exact ⟨c, hci, derivative_zero_of_localMax f (df c) c (hd c hci) hm⟩
 
 /-- Theorem: the Cauchy mean value theorem requires no nonzero derivative assumption. -/
@@ -136,13 +151,16 @@ theorem cauchy_mean_value (f g df dg : ℝ → ℝ) (a b : ℝ) (hab : a < b)
     exact continuous_sub _ _
       (continuous_mul _ _ (continuous_const _) ((continuousOn_iff_restrict _ _).mp hf))
       (continuous_mul _ _ (continuous_const _) ((continuousOn_iff_restrict _ _).mp hg))
+
   have hFD : ∀ x ∈ Ioo a b,
       HasDerivAt F ((g b - g a) * df x - (f b - f a) * dg x) x := by
     intro x hx
     simpa only [F, neg_mul, sub_eq_add_neg] using
       hasDerivAt_linear_combination f g (df x) (dg x)
         (g b - g a) (-(f b - f a)) x (hdf x hx) (hdg x hx)
+
   obtain ⟨c, hc, hzero⟩ := rolle F _ a b hab hF hFD (by dsimp [F]; ring)
+
   exact ⟨c, hc, by linarith⟩
 
 /-- Theorem: the scalar mean value theorem. -/
@@ -154,6 +172,7 @@ theorem mean_value (f df : ℝ → ℝ) (a b : ℝ) (hab : a < b)
     apply Metric.continuousWithinAt_iff.mpr
     intro ε hε
     exact ⟨ε, hε, fun _ _ hx => hx⟩
+
   obtain ⟨c, hc, heq⟩ := cauchy_mean_value f (fun x => x) df (fun _ => 1)
     a b hab hf hid hd (fun x _ => hasDerivAt_identity x)
   refine ⟨c, hc, (eq_div_iff (sub_ne_zero.mpr (ne_of_gt hab))).mpr ?_⟩

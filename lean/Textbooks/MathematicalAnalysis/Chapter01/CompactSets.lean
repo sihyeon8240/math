@@ -71,6 +71,7 @@ theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
   change dist x p < δ at hx
   change dist x q.val < dist q.val p / 2 at hxq
   change δ ≤ dist q.val p / 2 at hδq
+
   linarith
 
 /-- Proposition: concentric balls cover the whole space; a finite subcover
@@ -150,6 +151,7 @@ theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
 
   obtain ⟨i, hi⟩ := mem_iUnion.mp (hs (hFE hx))
   obtain ⟨his, hxi⟩ := mem_iUnion.mp hi
+
   cases i with
   | none => exact False.elim (hxi hx)
   | some j =>
@@ -575,6 +577,7 @@ theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) 
 
   convert h using 1
   ext x
+
   constructor
 
   · intro hx

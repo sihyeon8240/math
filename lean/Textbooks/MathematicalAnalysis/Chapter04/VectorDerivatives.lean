@@ -16,8 +16,10 @@ theorem euclidean_tendsto_iff {A : Type*} (l : Filter A) (m : ℕ)
       apply Metric.continuous_iff.mpr
       intro _ ε hε
       exact ⟨ε, hε, fun _ hx => hx⟩
+
     have hcoord := (continuous_euclidean_iff m _).mp hid j
     exact hcoord.continuousAt.tendsto.comp h
+
   · intro h
     have hp : Tendsto (fun x => (fun j => f x j : Fin m → ℝ)) l
         (𝓝 (fun j => v j)) := tendsto_pi_nhds.mpr h
@@ -32,6 +34,7 @@ theorem hasDerivAt_euclidean_iff (m : ℕ) (f : ℝ → EuclideanSpace ℝ (Fin 
   apply forall_congr'
   intro j
   rw [hasDerivAt_iff_limit]
+
   have heq : (fun x => slope f a x j) = fun x => (f x j - f a j) / (x - a) := by
     funext x
     rw [slope_def_module]
@@ -46,6 +49,7 @@ private theorem continuous_inner (m : ℕ) (v : EuclideanSpace ℝ (Fin m)) :
   refine ⟨ε / (‖v‖ + 1), div_pos hε hp, ?_⟩
   intro x hx
   rw [Real.dist_eq, ← inner_sub_right]
+
   have hsmall := (lt_div_iff₀ hp).mp hx
   have hbound := abs_real_inner_le_norm v (x - a)
   rw [← dist_eq_norm] at hbound
@@ -76,11 +80,13 @@ theorem vector_mean_value_inequality (m : ℕ)
     apply (continuousOn_iff_restrict _ _).mpr
     exact continuous_comp (fun x : Icc a b => f x) (fun x => inner ℝ v x)
       ((continuousOn_iff_restrict _ _).mp hf) (continuous_inner m v)
+
   obtain ⟨c, hc, heq⟩ := mean_value (fun x => inner ℝ v (f x))
     (fun x => inner ℝ v (df x)) a b hab hscalar
     (fun x hx => hasDerivAt_inner m v f (df x) x (hd x hx))
   have heq' := (eq_div_iff (sub_ne_zero.mpr (ne_of_gt hab))).mp heq
   rw [← inner_sub_right, real_inner_self_eq_norm_sq] at heq'
+
   have hbound := real_inner_le_norm v (df c)
   have hprod := mul_le_mul_of_nonneg_right hbound (sub_pos.mpr hab).le
   refine ⟨c, hc, ?_⟩

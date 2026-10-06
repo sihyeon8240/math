@@ -39,6 +39,7 @@ theorem isPreconnected_iff {X : Type*} [MetricSpace X] (E : Set X) :
 
   · intro h F G hF hG hcover hEF hEG
     by_contra hn
+
     have heq : E = (E ∩ F) ∪ (E ∩ G) := by
       ext x
       exact ⟨fun hx => (hcover hx).elim (fun hF => Or.inl ⟨hx, hF⟩)
@@ -80,8 +81,10 @@ theorem closure_upper_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, x ≤ c) :
   by_contra hn
 
   have hc : c < x := lt_of_not_ge hn
+
   obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (x - c) (sub_pos.mpr hc)
   rw [Real.dist_eq, abs_lt] at hd
+
   have hyc := h y hy
   linarith
 
@@ -92,8 +95,10 @@ theorem closure_lower_bound (A : Set ℝ) (c : ℝ) (h : ∀ x ∈ A, c ≤ x) :
   by_contra hn
 
   have hc : x < c := lt_of_not_ge hn
+
   obtain ⟨y, hy, hd⟩ := Metric.mem_closure_iff.mp hx (c - x) (sub_pos.mpr hc)
   rw [Real.dist_eq, abs_lt] at hd
+
   have hcy := h y hy
   linarith
 
@@ -192,6 +197,7 @@ theorem isPreconnected_iff_between (E : Set ℝ) :
         · exact Or.inl ⟨hy, h⟩
         · exact False.elim (hx (h ▸ hy))
         · exact Or.inr ⟨hy, h⟩
+
       · rintro (h | h) <;> exact h.1
 
     apply hc A B ⟨a, ha, hax⟩ ⟨b, hb, hxb⟩ heq

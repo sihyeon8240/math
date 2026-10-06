@@ -38,6 +38,7 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
     upperSum f id Q - riemannIntegral I f ≤ upperSum f id P - lowerSum f id P +
       4 * C * mesh Q * P.val.boxes.card := by
   classical
+
   let E := P.val.boxes.image (fun L => -L.lower ())
   let w := fun K : Box Unit => ∑ e ∈ E, increment (neighborhoodLength e (mesh Q)) K
   have hw (K : Box Unit) : 0 ≤ w K := by
@@ -45,6 +46,7 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
     intro e _
     exact sub_nonneg.mpr ((neighborhoodLength_bounds e (mesh Q) (mesh_pos Q).le).1
       (neg_le_neg (K.lower_le_upper ())))
+
   let R := commonRefinement Q P
   have hr : R.val = Q.val.biUnion (fun K => P.val.restrict K) := rfl
   have hsum (v : Box Unit → ℝ) : (∑ L ∈ R.val.boxes, v L) =
@@ -53,14 +55,17 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
   have hi (K : Box Unit) : increment id K = cellLength K := by
     dsimp [increment, cellLength]
     ring
+
   have hlocal : ∀ K ∈ Q.val.boxes, cellSup f K * cellLength K -
       (∑ L ∈ (P.val.restrict K).boxes, cellSup f L * cellLength L) ≤ 2 * C * w K := by
     intro K hK
     have hKI := Q.val.le_of_mem hK
     have htag : -K.upper () ∈ cell I := cell_mono hKI
       ⟨le_rfl, neg_lt_neg (K.lower_lt_upper ())⟩
+
     obtain ⟨L, hL, htagL⟩ := P.property _ ((neg_mem_box I _).mpr htag)
     have hLtag := (neg_mem_box L _).mp htagL
+
     by_cases hKL : K ≤ L
     · have ht : P.val.restrict K = ⊤ := by
         apply le_antisymm le_top
@@ -71,6 +76,7 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
         exact (inf_eq_left.mpr (WithBot.coe_le_coe.mpr hKL)).symm
       rw [ht, Prepartition.top_boxes, Finset.sum_singleton, sub_self]
       exact mul_nonneg (by positivity) (hw K)
+
     · have hcross : -L.lower () < -K.lower () := by
         by_contra hn
         apply hKL
@@ -84,6 +90,7 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
           linarith
         · dsimp [cellLength] at hm
           linarith
+
       have hlen : cellLength K ≤ w K := by
         rw [← hcover]
         dsimp only [w]
@@ -93,10 +100,12 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
           exact sub_nonneg.mpr ((neighborhoodLength_bounds e (mesh Q) (mesh_pos Q).le).1
             (neg_le_neg (K.lower_le_upper ())))
         · exact Finset.mem_image.mpr ⟨L, hL, rfl⟩
+
       have hsup : cellSup f K ≤ C := by
         apply csSup_le (cell_image_nonempty f K)
         rintro z ⟨x, hx, rfl⟩
         exact (abs_le.mp (hb x (cell_subset_closed hKI hx))).2
+
       have hlow : -C * cellLength K ≤ ∑ L ∈ (P.val.restrict K).boxes,
           cellSup f L * cellLength L := by
         have hlength := sum_cellLengths (restrictPartition P K hKI)
@@ -111,11 +120,16 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
             (show f (-J.upper ()) ∈ f '' cell J from ⟨_,
               ⟨le_rfl, neg_lt_neg (J.lower_lt_upper ())⟩, rfl⟩)
           change f (-J.upper ()) ≤ cellSup f J at hu
+
           linarith [(abs_le.mp hp).1]
+
         exact mul_le_mul_of_nonneg_right hs (cellLength_pos J).le
+
       have hu := mul_le_mul_of_nonneg_right hsup (cellLength_pos K).le
       have he := mul_le_mul_of_nonneg_left hlen (show 0 ≤ 2 * C by positivity)
+
       linarith
+
   have htotal : upperSum f id Q - upperSum f id R ≤
       2 * C * (E.card * (2 * mesh Q)) := by
     have hsw : ∑ K ∈ Q.val.boxes, w K ≤ E.card * (2 * mesh Q) := by
@@ -137,8 +151,10 @@ theorem upperSum_mesh_bound (I : Box Unit) (f : ℝ → ℝ)
     exact (Finset.sum_le_sum hlocal).trans (by
       rw [← Finset.mul_sum]
       exact mul_le_mul_of_nonneg_left hsw (by positivity))
+
   have hcard : (E.card : ℝ) ≤ P.val.boxes.card := by
     exact_mod_cast Finset.card_image_le
+
   have hp := refinement_sums f id P R inf_le_right hf.1 (fun _ _ _ _ h => h)
   have hl := (integral_bounds I f id P hf.1 (fun _ _ _ _ h => h)).1
   have he := mul_le_mul_of_nonneg_left hcard (show 0 ≤ 4 * C * mesh Q by positivity [mesh_pos Q])
@@ -159,16 +175,20 @@ theorem upperSum_tendsto (I : Box Unit) (f : ℝ → ℝ) (hf : RiemannIntegrabl
   have hD : 0 < D := by
     dsimp [D]
     positivity
+
   obtain ⟨N, hN⟩ := (Chapter02.real_tendsto_iff _ _).mp hm
     (ε / (2 * D)) (div_pos hε (by positivity))
+
   refine ⟨N, ?_⟩
   intro n hn
   have hs := upperSum_mesh_bound I f hf P (Q n) C hC hb
   have hu := (integral_bounds I f id (Q n) hf.1 (fun _ _ _ _ h => h)).2.2
   change riemannIntegral I f ≤ upperSum f id (Q n) at hu
   rw [abs_of_nonneg (sub_nonneg.mpr hu)]
+
   have hh := hN n hn
   rw [sub_zero, abs_of_pos (mesh_pos (Q n))] at hh
+
   have he : mesh (Q n) * (2 * D) < ε := (lt_div_iff₀ (by positivity)).mp hh
   dsimp only [D] at he
   nlinarith [mesh_pos (Q n)]

@@ -59,6 +59,7 @@ private theorem square_reciprocal_series : SeriesConverges (reciprocalTerms 2) :
   apply (condensation_test (reciprocalTerms 2)
     (fun n _ => (reciprocalTerms_pos 2 n).le)
     (fun _ _ _ hmn => reciprocalTerms_antitone 2 hmn)).mpr
+
   have heq : (fun j => (2 : ℝ) ^ j * reciprocalTerms 2 (2 ^ j)) =
       (fun j : ℕ => 1 * (1 / 2 : ℝ) ^ j) := by
     funext j
@@ -101,9 +102,11 @@ private theorem square_reciprocal_ratio_limit :
     rw [max_eq_left (by omega : 1 ≤ n + 1), max_eq_left hn]
     simp only [Nat.cast_add, Nat.cast_one]
     rw [abs_of_pos (by positivity)]
+
     have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast (by omega : n ≠ 0)
     field_simp [hn0]
     ring
+
   simpa only [mul_zero, add_zero, one_pow] using hlim.congr' heq
 
 /-- Theorem: upper root and ratio limits equal to one admit both convergence and divergence. -/
@@ -119,6 +122,7 @@ theorem root_ratio_tests_inconclusive_at_one :
     constant_one_series_diverges, fun n => ⟨(reciprocalTerms_pos 2 n).ne', one_ne_zero⟩,
     (liminf_limsup_of_tendsto _ 1 square_reciprocal_root_limit).2,
     square_reciprocal_ratio_limit, ?_, ?_⟩
+
   · simpa only [rootTerms, abs_one, Real.one_rpow, EReal.coe_one] using
       (liminf_limsup_of_tendsto _ 1 (real_tendsto_const 1)).2
   · change Tendsto (fun _ : ℕ => |(1 : ℝ) / 1|) atTop (𝓝 1)

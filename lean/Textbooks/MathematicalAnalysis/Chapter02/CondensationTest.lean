@@ -50,6 +50,7 @@ private theorem dyadic_partial_sum_bounds (u : ℕ → ℝ) (hpos : ∀ n, 0 ≤
     have hk : 2 ^ k ≤ (2 : ℕ) ^ (k + 1) := by
       rw [pow_succ]
       omega
+
     have hblock := dyadic_block_bounds u hu k
     rw [sum_Ico_eq_partialSums_sub u _ _ hk] at hblock
     rw [partialSums_succ, partialSums_succ]
@@ -84,6 +85,7 @@ private theorem condensation_nonneg (u : ℕ → ℝ) (hpos : ∀ n, 0 ≤ u n) 
     have hmono := partialSums_monotone u hpos hn
     have hbound := (dyadic_partial_sum_bounds u hpos hu n).1
     have hc := hB (Set.mem_range_self n)
+
     linarith
 
 /-- Theorem: a nonnegative nonincreasing series from index one converges exactly when
@@ -97,10 +99,12 @@ theorem condensation_test (u : ℕ → ℝ) (hpos : ∀ n, 0 < n → 0 ≤ u n)
   have hwmono : Antitone w := by
     intro m n hmn
     exact hu _ _ (Nat.zero_lt_one.trans_le (le_max_right m 1)) (max_le_max hmn le_rfl)
+
   have heq : u =ᶠ[atTop] w := eventually_atTop.mpr ⟨1, fun n hn => by
     dsimp [w]
     rw [max_eq_left hn]⟩
   rw [seriesConverges_congr_eventually u w heq, condensation_nonneg w hwpos hwmono]
+
   have hcond : (fun k => (2 : ℝ) ^ k * w (2 ^ k)) =
       (fun k => (2 : ℝ) ^ k * u (2 ^ k)) := by
     funext k

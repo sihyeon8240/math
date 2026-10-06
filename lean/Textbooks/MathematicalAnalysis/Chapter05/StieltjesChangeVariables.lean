@@ -29,6 +29,7 @@ private theorem mapInterval_cell (φ : ℝ ≃o ℝ) (I : Box Unit) :
 private theorem mapInterval_le (φ : ℝ ≃o ℝ) {I J : Box Unit} (h : I ≤ J) :
     mapInterval φ I ≤ mapInterval φ J := by
   apply Box.le_iff_bounds.mpr
+
   have hb := Box.le_iff_bounds.mp h
   exact ⟨fun _ => neg_le_neg (φ.monotone (neg_le_neg (hb.1 ()))),
     fun _ => neg_le_neg (φ.monotone (neg_le_neg (hb.2 ())))⟩
@@ -47,6 +48,7 @@ private theorem mapInterval_injective (φ : ℝ ≃o ℝ) : Function.Injective (
 def mapPartition (φ : ℝ ≃o ℝ) {I : Box Unit} (P : Partition I) :
     Partition (mapInterval φ I) := by
   classical
+
   let Q : Prepartition (mapInterval φ I) :=
     { boxes := P.val.boxes.image (mapInterval φ)
       le_of_mem' := by
@@ -62,24 +64,30 @@ def mapPartition (φ : ℝ ≃o ℝ) {I : Box Unit} (P : Partition I) :
         have ha := (neg_mem_box _ (-u ())).mp (by simpa using hu)
         have hb := (neg_mem_box _ (-u ())).mp (by simpa using hv)
         rw [mapInterval_cell] at ha hb
+
         obtain ⟨x, hx, he⟩ := ha
         obtain ⟨y, hy, hf⟩ := hb
         have hxy : x = y := φ.injective (he.trans hf.symm)
         subst y
+
         apply hne
         congr 1
         exact P.val.eq_of_mem_of_mem hL hM
           ((neg_mem_box L x).mpr hx) ((neg_mem_box M x).mpr hy) }
+
   refine ⟨Q, ?_⟩
   intro u hu
   have ht := (neg_mem_box _ (-u ())).mp (by simpa using hu)
   rw [mapInterval_cell] at ht
+
   obtain ⟨x, hx, hval⟩ := ht
   obtain ⟨K, hK, hmem⟩ := P.property _ ((neg_mem_box I x).mpr hx)
   refine ⟨mapInterval φ K, Finset.mem_image.mpr ⟨K, hK, rfl⟩, ?_⟩
+
   have hm : -u () ∈ cell (mapInterval φ K) := by
     rw [mapInterval_cell]
     exact ⟨x, (neg_mem_box K x).mp hmem, hval⟩
+
   have hh := (neg_mem_box _ (-u ())).mpr hm
   simpa only [neg_neg] using hh
 
@@ -87,8 +95,10 @@ private theorem transported_sums (φ : ℝ ≃o ℝ) (I : Box Unit) (f : ℝ →
     upperSum (fun x => f (φ x)) φ P = upperSum f id (mapPartition φ P) ∧
       lowerSum (fun x => f (φ x)) φ P = lowerSum f id (mapPartition φ P) := by
   classical
+
   have he (K : Box Unit) : f '' cell (mapInterval φ K) = (fun x => f (φ x)) '' cell K := by
     rw [mapInterval_cell, image_image]
+
   have hi (K : Box Unit) : increment id (mapInterval φ K) = increment φ K := by
     simp only [increment, mapInterval, intervalBox, neg_neg, id_eq]
   constructor <;> dsimp only [upperSum, lowerSum, mapPartition]
@@ -108,12 +118,14 @@ theorem stieltjes_change_orderIso (φ : ℝ ≃o ℝ) (I : Box Unit) (f : ℝ �
     StieltjesIntegrable I (fun x => f (φ x)) φ ∧
       stieltjesIntegral I (fun x => f (φ x)) φ = riemannIntegral (mapInterval φ I) f := by
   classical
+
   have hb : Bornology.IsBounded ((fun x => f (φ x)) '' Icc (-I.upper ()) (-I.lower ())) := by
     apply hf.1.subset
     rintro y ⟨x, hx, rfl⟩
     refine ⟨φ x, ?_, rfl⟩
     simp only [mapInterval, intervalBox, neg_neg]
     exact ⟨φ.monotone hx.1, φ.monotone hx.2⟩
+
   have hα : MonotoneOn (fun x => φ x) (Icc (-I.upper ()) (-I.lower ())) :=
     φ.monotone.monotoneOn _
   have hgap : StieltjesIntegrable I (fun x => f (φ x)) φ := by
@@ -129,14 +141,18 @@ theorem stieltjes_change_orderIso (φ : ℝ ≃o ℝ) (I : Box Unit) (f : ℝ �
       apply Prepartition.injective_boxes
       change (P.val.boxes.image (mapInterval φ)) = Q.val.boxes
       rw [hboxes, Finset.image_image]
+
       have hinv : ∀ K, mapInterval φ (mapInterval φ.symm K) = K := by
         intro K
         simpa only [OrderIso.symm_symm] using mapInterval_inverse φ.symm K
       simp only [Function.comp_def, hinv, Finset.image_id']
+
     obtain ⟨hu, hl⟩ := transported_sums φ I f P
+
     exact ⟨P, by
       rw [hu, hl, hP]
       exact hQ⟩
+
   refine ⟨hgap, ?_⟩
   apply sub_eq_zero.mp
   apply abs_eq_zero.mp
@@ -155,20 +171,24 @@ private theorem extend_interval_bijection (A B a b : ℝ) (hAB : A < B) (hab : a
     (hmap : MapsTo φ (Icc A B) (Icc a b)) (honto : SurjOn φ (Icc A B) (Icc a b)) :
     ∃ ψ : ℝ ≃o ℝ, (∀ x ∈ Icc A B, ψ x = φ x) ∧ ψ A = a ∧ ψ B = b := by
   classical
+
   have hA : A ∈ Icc A B := ⟨le_rfl, hAB.le⟩
   have hB : B ∈ Icc A B := ⟨hAB.le, le_rfl⟩
   have ha : φ A = a := by
     obtain ⟨x, hx, he⟩ := honto ⟨le_rfl, hab.le⟩
     have hm := hmono.monotoneOn hA hx hx.1
     linarith [(hmap hA).1]
+
   have hb : φ B = b := by
     obtain ⟨x, hx, he⟩ := honto ⟨hab.le, le_rfl⟩
     have hm := hmono.monotoneOn hx hB hx.2
     linarith [(hmap hB).2]
+
   let g := fun x => if x < A then x - A + a else if B < x then x - B + b else φ x
   have hg : ∀ x ∈ Icc A B, g x = φ x := by
     intro x hx
     simp only [g, not_lt.mpr hx.1, not_lt.mpr hx.2, ↓reduceIte]
+
   have hm : StrictMono g := by
     intro x y hxy
     by_cases hx : x < A
@@ -181,6 +201,7 @@ private theorem extend_interval_bijection (A B a b : ℝ) (hAB : A < B) (hab : a
         · simp only [g, hx, hy, hyB, ↓reduceIte]
           have hyI : y ∈ Icc A B := ⟨le_of_not_gt hy, le_of_not_gt hyB⟩
           linarith [(hmap hyI).1]
+
     · have hy : ¬ y < A := by linarith
       by_cases hxB : B < x
       · have hyB : B < y := hxB.trans hxy
@@ -192,6 +213,7 @@ private theorem extend_interval_bijection (A B a b : ℝ) (hAB : A < B) (hab : a
           linarith [(hmap hxI).2]
         · rw [hg x hxI, hg y ⟨le_of_not_gt hy, le_of_not_gt hyB⟩]
           exact hmono hxI ⟨le_of_not_gt hy, le_of_not_gt hyB⟩ hxy
+
   have hs : Function.Surjective g := by
     intro t
     by_cases ht : t < a
@@ -203,9 +225,12 @@ private theorem extend_interval_bijection (A B a b : ℝ) (hAB : A < B) (hab : a
         simp only [g, show ¬t - b + B < A by linarith,
           show B < t - b + B by linarith, ↓reduceIte]
         ring
+
       · obtain ⟨x, hx, he⟩ := honto ⟨le_of_not_gt ht, le_of_not_gt hbt⟩
         exact ⟨x, (hg x hx).trans he⟩
+
   let ψ := hm.orderIsoOfRightInverse g (Function.surjInv hs) (Function.rightInverse_surjInv hs)
+
   exact ⟨ψ, hg, (hg A hA).trans ha, (hg B hB).trans hb⟩
 
 private theorem stieltjes_congr (I : Box Unit) (f g α β : ℝ → ℝ)
@@ -223,13 +248,16 @@ private theorem stieltjes_congr (I : Box Unit) (f g α β : ℝ → ℝ)
     have hu : -J.lower () ∈ Icc (-I.upper ()) (-I.lower ()) :=
       ⟨(neg_le_neg (h.2 ())).trans (neg_le_neg (J.lower_le_upper ())), neg_le_neg (h.1 ())⟩
     simp only [increment, hαβ _ hl, hαβ _ hu]
+
   have hs (P : Partition I) :
       upperSum f α P = upperSum g β P ∧ lowerSum f α P = lowerSum g β P := by
     constructor <;> apply Finset.sum_congr rfl <;> intro J hJ
     all_goals simp only [cellSup, cellInf, hc J (P.val.le_of_mem hJ), hi J (P.val.le_of_mem hJ)]
+
   have hU : upperIntegral I f α = upperIntegral I g β := by
     unfold upperIntegral
     rw [show upperSum (I := I) f α = upperSum g β from funext (fun P => (hs P).1)]
+
   have hL : lowerIntegral I f α = lowerIntegral I g β := by
     unfold lowerIntegral
     rw [show lowerSum (I := I) f α = lowerSum g β from funext (fun P => (hs P).2)]
@@ -248,15 +276,19 @@ theorem stieltjes_change_variables (A B a b : ℝ) (hAB : A < B) (hab : a < b)
   obtain ⟨ψ, he, ha, hb⟩ := extend_interval_bijection A B a b hAB hab φ hmono hmap honto
   have hI : mapInterval ψ (intervalBox A B hAB) = intervalBox a b hab := by
     simp only [mapInterval, intervalBox, neg_neg, ha, hb]
+
   have hψ := stieltjes_change_orderIso ψ (intervalBox A B hAB) f (hI ▸ hf)
   have hfg : ∀ x ∈ Icc (-(intervalBox A B hAB).upper ()) (-(intervalBox A B hAB).lower ()),
       f (ψ x) = f (φ x) := by
     simp only [intervalBox, neg_neg]
     intro x hx
     rw [he x hx]
+
   have hα : ∀ x ∈ Icc (-(intervalBox A B hAB).upper ()) (-(intervalBox A B hAB).lower ()),
       ψ x = φ x := by simpa only [intervalBox, neg_neg] using he
+
   refine ⟨(stieltjes_congr _ _ _ _ _ hfg hα).mp hψ.1, ?_⟩
+
   have hsum (P : Partition (intervalBox A B hAB)) :
       upperSum (fun x => f (ψ x)) ψ P = upperSum (fun x => f (φ x)) φ P := by
     apply Finset.sum_congr rfl
@@ -268,10 +300,12 @@ theorem stieltjes_change_variables (A B a b : ℝ) (hAB : A < B) (hab : a < b)
     have hl : -J.upper () ∈ Icc A B := by
       dsimp only [intervalBox] at hj
       exact ⟨by linarith [hj.2 ()], by linarith [hj.1 (), J.lower_lt_upper ()]⟩
+
     have hu : -J.lower () ∈ Icc A B := by
       dsimp only [intervalBox] at hj
       exact ⟨by linarith [hj.2 (), J.lower_lt_upper ()], by linarith [hj.1 ()]⟩
     simp only [cellSup, him, increment, he _ hl, he _ hu]
+
   have hvalue : stieltjesIntegral (intervalBox A B hAB) (fun x => f (ψ x)) ψ =
       stieltjesIntegral (intervalBox A B hAB) (fun x => f (φ x)) φ := by
     unfold stieltjesIntegral upperIntegral

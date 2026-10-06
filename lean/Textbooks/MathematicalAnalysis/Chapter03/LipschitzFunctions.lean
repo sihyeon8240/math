@@ -20,6 +20,7 @@ theorem lipschitz_iff (f : X → Y) :
     intro x y
     exact (hK.dist_le_mul x y).trans
       (mul_le_mul_of_nonneg_right (by linarith) dist_nonneg)
+
   · rintro ⟨C, hC, h⟩
     exact ⟨⟨C, hC.le⟩, lipschitzWith_iff_dist_le_mul.mpr h⟩
 
@@ -37,6 +38,7 @@ theorem locallyLipschitzOn_iff (A : Set X) (f : X → Y) :
     intro x hx y hy
     exact (lipschitzOnWith_iff_dist_le_mul.mp hK x (hsub hx) y (hsub hy)).trans
       (mul_le_mul_of_nonneg_right (by linarith) dist_nonneg)
+
   · intro h a ha
     obtain ⟨δ, hδ, C, hC, hd⟩ := h a ha
     refine ⟨⟨C, hC.le⟩, ball a δ ∩ A,
@@ -55,6 +57,7 @@ theorem uniformContinuous_of_lipschitz (f : X → Y) (K : ℝ≥0)
   have hsmall := (lt_div_iff₀ hp).mp hxy
   have hbound := hf.dist_le_mul x y
   have hd : 0 ≤ dist x y := dist_nonneg
+
   nlinarith
 
 /-- Corollary: the same uniform bound holds when the domain is a subset. -/
@@ -64,6 +67,7 @@ theorem uniformContinuousOn_of_lipschitz (A : Set X) (f : X → Y) (K : ℝ≥0)
     apply lipschitzWith_iff_dist_le_mul.mpr
     intro x y
     exact lipschitzOnWith_iff_dist_le_mul.mp hf x x.property y y.property
+
   have hu := uniformContinuous_of_lipschitz (fun x : A => f x) K hsub
   apply Metric.uniformContinuousOn_iff.mpr
   intro ε hε

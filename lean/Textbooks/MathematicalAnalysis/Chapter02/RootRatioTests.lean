@@ -23,6 +23,7 @@ theorem geometric_series_converges (C q : ℝ) (hC : 0 ≤ C) (hq0 : 0 ≤ q) (h
   change (∑ k ∈ range n, C * q ^ k) ≤ C / (1 - q)
   rw [← mul_sum, geom_sum_eq hq1.ne]
   rw [le_div_iff₀ (sub_pos.mpr hq1)]
+
   have heq : C * ((q ^ n - 1) / (q - 1)) * (1 - q) = C * (1 - q ^ n) := by
     field_simp [sub_ne_zero.mpr hq1.ne]
     ring
@@ -40,6 +41,7 @@ theorem geometric_majorant (u : ℕ → ℝ) (C q : ℝ) (hC : 0 ≤ C)
 private theorem exists_real_bound_below_one (a : EReal) (ha : a < 1) :
     ∃ q : ℝ, 0 < q ∧ q < 1 ∧ a < (q : EReal) := by
   obtain ⟨b, hab, hb⟩ := exists_between ha
+
   induction b using EReal.rec with
   | bot => exact (not_lt_of_ge bot_le hab).elim
   | top => exact (not_lt_of_ge le_top hb).elim
@@ -50,12 +52,15 @@ private theorem exists_real_bound_below_one (a : EReal) (ha : a < 1) :
     have hq0 : 0 < q := by
       dsimp [q]
       linarith [le_max_right b 0]
+
     have hq1 : q < 1 := by
       dsimp [q]
       linarith
+
     have hbq : b < q := by
       dsimp [q]
       linarith [le_max_left b 0]
+
     exact ⟨q, hq0, hq1, hab.trans (EReal.coe_lt_coe_iff.mpr hbq)⟩
 
 /-- Lemma: an upper-limit bound supplies an eventual strict real upper bound. -/
@@ -82,6 +87,7 @@ theorem root_test_convergence (u : ℕ → ℝ)
     dsimp [rootTerms] at h
     rw [← Nat.cast_succ] at h
     simpa only [Nat.succ_eq_add_one, Nat.sub_add_cancel (by omega : 1 ≤ n)] using h
+
   have hpow := pow_le_pow_left₀ (Real.rpow_nonneg (abs_nonneg _) _) hrootn.le n
   rw [Real.rpow_inv_natCast_pow (abs_nonneg _) hn0] at hpow
   simpa only [one_mul] using hpow
@@ -95,6 +101,7 @@ theorem root_test_divergence (u : ℕ → ℝ)
   obtain ⟨n, hn, hrootn⟩ := ((limsup_eq_iff_thresholds _ _).mp rfl).2 1 hroot N
   have hnear : |u (n + 1)| < 1 := by
     simpa only [Real.dist_eq, sub_zero] using hN (n + 1) (by omega)
+
   have hrootn' : 1 < rootTerms u n := EReal.coe_lt_coe_iff.mp hrootn
   have hpow := pow_lt_pow_left₀ hrootn' zero_le_one (Nat.succ_ne_zero n)
   dsimp [rootTerms] at hpow
@@ -109,6 +116,7 @@ theorem ratio_upper_majorant (u : ℕ → ℝ) (q : ℝ) (hq : 0 < q)
   obtain ⟨N, hN⟩ := eventually_atTop.mp hstep
   let C := |u N| / q ^ N
   have hC : 0 ≤ C := div_nonneg (abs_nonneg _) (pow_nonneg hq.le _)
+
   refine ⟨C, hC, eventually_atTop.mpr ⟨N, ?_⟩⟩
   intro n hn
   induction n, hn using Nat.le_induction with
@@ -129,7 +137,9 @@ theorem ratio_test_convergence (u : ℕ → ℝ) (hu0 : ∀ᶠ n in atTop, u n �
     dsimp [ratioTerms] at hr
     rw [abs_div, div_lt_iff₀ (abs_pos.mpr hn)] at hr
     exact hr.le
+
   obtain ⟨C, hC, hbound⟩ := ratio_upper_majorant u q hq0 hstep
+
   exact geometric_majorant u C q hC hq0.le hq1 hbound
 
 /-- Theorem: eventually nonzero terms and ratios at least one force divergence. -/

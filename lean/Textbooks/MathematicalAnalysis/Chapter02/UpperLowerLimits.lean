@@ -91,8 +91,10 @@ private theorem limsup_thresholds {Y : Type*} [CompleteLinearOrder Y] [DenselyOr
 
     · intro b hb N
       have hN : b < ⨆ k ≥ N, u k := hb.trans_le (h ▸ iInf_le _ N)
+
       obtain ⟨n, hn⟩ := lt_iSup_iff.mp hN
       obtain ⟨hnN, hbn⟩ := lt_iSup_iff.mp hn
+
       exact ⟨n, hnN, hbn⟩
 
   · rintro ⟨hupper, hlower⟩
@@ -104,6 +106,7 @@ private theorem limsup_thresholds {Y : Type*} [CompleteLinearOrder Y] [DenselyOr
       obtain ⟨N, hN⟩ := hupper c hc
       have hbound : (⨆ n ≥ N, u n) ≤ c :=
         iSup_le fun n => iSup_le fun hn => (hN n hn).le
+
       exact ((iInf_le (fun N : ℕ => ⨆ n ≥ N, u n) N).trans hbound).trans_lt hcb
 
     · by_contra hn
@@ -111,6 +114,7 @@ private theorem limsup_thresholds {Y : Type*} [CompleteLinearOrder Y] [DenselyOr
       obtain ⟨N, hN⟩ := iInf_lt_iff.mp hb
       obtain ⟨n, hnN, hbn⟩ := hlower b hba N
       have hle : u n ≤ ⨆ k ≥ N, u k := le_iSup_of_le n (le_iSup_of_le hnN le_rfl)
+
       exact (not_lt_of_ge (hbn.le.trans hle)) hN
 
 private theorem antitone_tendsto_iInf {Y : Type*} [CompleteLinearOrder Y]
@@ -201,6 +205,7 @@ theorem limsup_eq_real_iff (u : ℕ → ℝ) (a : ℝ) :
       obtain ⟨n, hn, hlow⟩ := hlower (a - ε)
         (EReal.coe_lt_coe_iff.mpr (by linarith)) (M + 1)
       have hmem : n ∈ {n : ℕ | a - ε < u n} := EReal.coe_lt_coe_iff.mp hlow
+
       exact (Nat.not_succ_le_self M) (hn.trans (hM hmem))
 
   · rintro ⟨hupper, hlower⟩
@@ -212,6 +217,7 @@ theorem limsup_eq_real_iff (u : ℕ → ℝ) (a : ℝ) :
       | top => exact ⟨0, fun n _ => EReal.coe_lt_top (u n)⟩
       | coe b =>
         have hab : a < b := EReal.coe_lt_coe_iff.mp hb
+
         obtain ⟨N, hN⟩ := hupper (b - a) (sub_pos.mpr hab)
         refine ⟨N, fun n hn => EReal.coe_lt_coe_iff.mpr ?_⟩
         simpa only [add_sub_cancel] using hN n hn
@@ -222,6 +228,7 @@ theorem limsup_eq_real_iff (u : ℕ → ℝ) (a : ℝ) :
       | top => exact (not_lt_of_ge le_top hb).elim
       | coe b =>
         have hba : b < a := EReal.coe_lt_coe_iff.mp hb
+
         obtain ⟨n, hn, hnN⟩ := (hlower (a - b) (sub_pos.mpr hba)).exists_gt N
         change a - (a - b) < u n at hn
         refine ⟨n, hnN.le, EReal.coe_lt_coe_iff.mpr ?_⟩
@@ -231,7 +238,9 @@ private theorem limsup_mem_extended (u : ℕ → ℝ) :
     limsup (fun n => (u n : EReal)) atTop ∈ extendedSubsequentialLimits u := by
   classical
   generalize hL : limsup (fun n => (u n : EReal)) atTop = L
+
   have hthreshold := (limsup_eq_iff_thresholds _ L).mp hL
+
   induction L using EReal.rec with
   | bot =>
     refine ⟨id, strictMono_id, EReal.tendsto_nhds_bot_iff_real.mpr ?_⟩
@@ -244,12 +253,14 @@ private theorem limsup_mem_extended (u : ℕ → ℝ) :
       intro n m
       obtain ⟨k, hkm, hk⟩ := hthreshold.2 (n : ℝ) (EReal.coe_lt_top _) m
       exact ⟨k, hkm, EReal.coe_lt_coe_iff.mp hk⟩
+
     choose k hk hd using hex
     let φ : ℕ → ℕ := fun n => Nat.rec (k 0 0) (fun n prev => k (n + 1) (prev + 1)) n
     have hmono : StrictMono φ := by
       apply strictMono_nat_of_lt_succ
       intro n
       exact Nat.lt_of_lt_of_le (Nat.lt_succ_self (φ n)) (hk (n + 1) (φ n + 1))
+
     have hvalue : ∀ n : ℕ, (n : ℝ) < u (φ n) := by
       intro n
       cases n with
@@ -269,11 +280,13 @@ private theorem limsup_mem_extended (u : ℕ → ℝ) :
       have hδ : 0 < δ := by
         dsimp [δ]
         positivity
+
       obtain ⟨N, hN⟩ := hthreshold.1 (a + δ) (EReal.coe_lt_coe_iff.mpr (by linarith))
       obtain ⟨k, hk, hlow⟩ := hthreshold.2 (a - δ)
         (EReal.coe_lt_coe_iff.mpr (by linarith)) (max m N)
       have hupper := EReal.coe_lt_coe_iff.mp (hN k ((le_max_right _ _).trans hk))
       have hlower := EReal.coe_lt_coe_iff.mp hlow
+
       refine ⟨k, (le_max_left _ _).trans hk, ?_⟩
       rw [Real.dist_eq, abs_lt]
       constructor <;> linarith
@@ -287,12 +300,14 @@ private theorem extended_limit_le_limsup (u : ℕ → ℝ) (a : EReal)
     a ≤ limsup (fun n => (u n : EReal)) atTop := by
   obtain ⟨φ, hφ, hlim⟩ := ha
   by_contra hn
+
   obtain ⟨b, hbL, hba⟩ := exists_between (lt_of_not_ge hn)
   obtain ⟨N, hN⟩ := ((limsup_eq_iff_thresholds _ _).mp rfl).1 b hbL
   obtain ⟨M, hM⟩ := eventually_atTop.mp ((tendsto_order.mp hlim).1 b hba)
   let k := max N M
   have hupper := hN (φ k) ((le_max_left N M).trans (hφ.id_le k))
   have hlower := hM k (le_max_right _ _)
+
   exact (not_lt_of_ge hlower.le) hupper
 
 /-- Theorem: the upper limit is the supremum of the extended subsequential limits. -/
@@ -310,6 +325,7 @@ private theorem extended_tendsto_neg (u : ℕ → EReal) (a : EReal)
     have hb' : a < -b := EReal.lt_neg_comm.mp hb
     exact ((tendsto_order.mp hu).2 (-b) hb').mono
       (fun n hn => EReal.lt_neg_comm.mpr hn)
+
   · intro b hb
     have hb' : -b < a := EReal.neg_lt_comm.mp hb
     exact ((tendsto_order.mp hu).1 (-b) hb').mono
@@ -318,16 +334,19 @@ private theorem extended_tendsto_neg (u : ℕ → EReal) (a : EReal)
 private theorem limsup_neg_eq_neg_liminf (u : ℕ → ℝ) :
     limsup (fun n => (-u n : EReal)) atTop = -liminf (fun n => (u n : EReal)) atTop := by
   rw [limsup_tail_formula, (liminf_eq_and_tendsto_tail_inf u).1]
+
   have h := EReal.negOrderIso.map_iSup (fun n : ℕ => ⨅ k ≥ n, (u k : EReal))
   change -(⨆ n : ℕ, ⨅ k ≥ n, (u k : EReal)) = ⨅ n : ℕ, -(⨅ k ≥ n, (u k : EReal)) at h
   rw [h]
   congr 1
   funext n
+
   have hn := EReal.negOrderIso.map_iInf (fun k : ℕ => ⨅ (_ : k ≥ n), (u k : EReal))
   change -(⨅ k ≥ n, (u k : EReal)) = ⨆ k : ℕ, -(⨅ (_ : k ≥ n), (u k : EReal)) at hn
   rw [hn]
   congr 1
   funext k
+
   have hk := EReal.negOrderIso.map_iInf (fun _ : k ≥ n => (u k : EReal))
   exact hk.symm
 
@@ -338,9 +357,11 @@ theorem liminf_eq_sInf_subsequentialLimits (u : ℕ → ℝ) :
   have hmem := limsup_mem_extended (fun n => -u n)
   simp only [EReal.coe_neg] at hmem
   rw [hneg] at hmem
+
   obtain ⟨φ, hφ, hlim⟩ := hmem
   have hlim' := extended_tendsto_neg _ _ hlim
   simp only [EReal.coe_neg, neg_neg] at hlim'
+
   have hmin : liminf (fun n => (u n : EReal)) atTop ∈ extendedSubsequentialLimits u :=
     ⟨φ, hφ, hlim'⟩
   apply le_antisymm
@@ -351,6 +372,7 @@ theorem liminf_eq_sInf_subsequentialLimits (u : ℕ → ℝ) :
     have hnlim := extended_tendsto_neg _ _ hψlim
     have hnmem : -a ∈ extendedSubsequentialLimits (fun n => -u n) := by
       exact ⟨ψ, hψ, by simpa only [EReal.coe_neg] using hnlim⟩
+
     have hbound := extended_limit_le_limsup (fun n => -u n) (-a) hnmem
     simp only [EReal.coe_neg] at hbound
     rw [hneg] at hbound
@@ -390,6 +412,7 @@ theorem liminf_le_limsup (u : ℕ → ℝ) :
     iInf_le_of_le k (iInf_le_of_le (le_max_left N M) le_rfl)
   have hupp : (u k : EReal) ≤ ⨆ n ≥ M, (u n : EReal) :=
     le_iSup_of_le k (le_iSup_of_le (le_max_right N M) le_rfl)
+
   exact hlow.trans hupp
 
 /-- Lemma: nonnegative terms have nonnegative extended lower and upper limits. -/
@@ -406,6 +429,7 @@ theorem eventually_gt_of_lt_liminf (u : ℕ → ℝ) (q : ℝ)
     (hq : (q : EReal) < liminf (fun n => (u n : EReal)) atTop) :
     ∀ᶠ n in atTop, q < u n := by
   have h := (limsup_thresholds (Y := ERealᵒᵈ) (fun n => (u n : EReal)) _).mp rfl
+
   obtain ⟨N, hN⟩ := h.1 (q : EReal) hq
   exact eventually_atTop.mpr ⟨N, fun n hn => EReal.coe_lt_coe_iff.mp (hN n hn)⟩
 

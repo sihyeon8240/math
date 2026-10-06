@@ -27,10 +27,12 @@ theorem bounded_of_absolute_bound (I : Box Unit) (f : ℝ → ℝ) (C : ℝ)
     refine ⟨C, ?_⟩
     rintro y ⟨x, hx, rfl⟩
     exact (abs_le.mp (hC x hx)).2
+
   have hl : BddBelow (f '' Icc (-I.upper ()) (-I.lower ())) := by
     refine ⟨-C, ?_⟩
     rintro y ⟨x, hx, rfl⟩
     exact (abs_le.mp (hC x hx)).1
+
   exact hu.isBounded hl
 
 /-- Lemma: the oscillation on a cell bounds every difference of two function values. -/
@@ -58,11 +60,13 @@ theorem cell_oscillation_bound {I J : Box Unit} (f : ℝ → ℝ) (hJI : J ≤ I
     rintro z ⟨x, hx, rfl⟩
     have h := (abs_le.mp (hC x hx y hy)).2
     linarith
+
   have hinf : cellSup f J - C ≤ cellInf f J := by
     apply le_csInf (cell_image_nonempty f J)
     rintro z ⟨y, hy, rfl⟩
     have h := hsup y hy
     linarith
+
   linarith
 
 /-- Lemma: an oscillation bound transfers Riemann integrability to a function
@@ -79,6 +83,7 @@ theorem riemannIntegrable_of_difference_bound (I : Box Unit) (f g h : ℝ → �
   let δ := ε / (2 * (A + B + 1))
   have hp : 0 < 2 * (A + B + 1) := by linarith
   have hδ : 0 < δ := div_pos hε hp
+
   obtain ⟨P, hP⟩ := (riemannIntegrable_iff_gap I f hf.1).mp hf δ hδ
   obtain ⟨Q, hQ⟩ := (riemannIntegrable_iff_gap I g hg.1).mp hg δ hδ
   let R := commonRefinement P Q
@@ -94,6 +99,7 @@ theorem riemannIntegrable_of_difference_bound (I : Box Unit) (f g h : ℝ → �
     exact hxy.trans (add_le_add
       (mul_le_mul_of_nonneg_left (cell_difference_bound f (R.val.le_of_mem hJ) hf.1 x y hx hy) hA)
       (mul_le_mul_of_nonneg_left (cell_difference_bound g (R.val.le_of_mem hJ) hg.1 x y hx hy) hB))
+
   have hsum : upperSum h id R - lowerSum h id R ≤
       A * (upperSum f id R - lowerSum f id R) +
         B * (upperSum g id R - lowerSum g id R) := by
@@ -104,13 +110,16 @@ theorem riemannIntegrable_of_difference_bound (I : Box Unit) (f g h : ℝ → �
     have hweight : 0 ≤ increment id J := by
       dsimp only [increment, id_eq]
       linarith [J.lower_lt_upper ()]
+
     have hmul := mul_le_mul_of_nonneg_right (hosc J hJ) hweight
     nlinarith only [hmul]
+
   have hfsmall : upperSum f id R - lowerSum f id R ≤ δ := by linarith [hfr.1, hfr.2]
   have hgsmall : upperSum g id R - lowerSum g id R ≤ δ := by linarith [hgr.1, hgr.2]
   have ha := mul_le_mul_of_nonneg_left hfsmall hA
   have hb := mul_le_mul_of_nonneg_left hgsmall hB
   have heq : δ * (2 * (A + B + 1)) = ε := div_mul_cancel₀ ε hp.ne'
+
   exact ⟨R, by nlinarith⟩
 
 /-- Theorem: the sum of Riemann integrable functions is Riemann integrable. -/
@@ -121,6 +130,7 @@ theorem riemannIntegrable_add (I : Box Unit) (f g : ℝ → ℝ)
   obtain ⟨D, _, hD⟩ := absolute_bound I g hg.1
   have hb := bounded_of_absolute_bound I (fun x => f x + g x) (C + D)
     (fun x hx => (abs_add_le _ _).trans (add_le_add (hC x hx) (hD x hx)))
+
   apply riemannIntegrable_of_difference_bound I f g _ hf hg hb 1 1 zero_le_one zero_le_one
   intro x _ y _
   rw [show f x + g x - (f y + g y) = (f x - f y) + (g x - g y) by ring, one_mul, one_mul]
@@ -134,6 +144,7 @@ theorem riemannIntegrable_const_mul (I : Box Unit) (f : ℝ → ℝ) (c : ℝ)
     intro x hx
     rw [abs_mul]
     exact mul_le_mul_of_nonneg_left (hC x hx) (abs_nonneg c))
+
   apply riemannIntegrable_of_difference_bound I f f _ hf hf hb |c| 0 (abs_nonneg c) le_rfl
   intro x _ y _
   rw [← mul_sub, abs_mul, zero_mul, add_zero]
@@ -159,11 +170,13 @@ theorem riemannIntegrable_mul (I : Box Unit) (f g : ℝ → ℝ)
     intro x hx
     rw [abs_mul]
     exact mul_le_mul (hC x hx) (hD x hx) (abs_nonneg _) hCpos.le)
+
   apply riemannIntegrable_of_difference_bound I f g _ hf hg hb D C hDpos.le hCpos.le
   intro x hx y hy
   rw [show f x * g x - f y * g y = (f x - f y) * g x + f y * (g x - g y) by ring]
   refine (abs_add_le _ _).trans ?_
   rw [abs_mul, abs_mul]
+
   have hleft := mul_le_mul_of_nonneg_left (hD x hx) (abs_nonneg (f x - f y))
   have hright := mul_le_mul_of_nonneg_right (hC y hy) (abs_nonneg (g x - g y))
   nlinarith only [hleft, hright]

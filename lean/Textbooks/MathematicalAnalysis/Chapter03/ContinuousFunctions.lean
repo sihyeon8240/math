@@ -19,10 +19,12 @@ theorem continuous_iff_open_preimage (f : X → Y) :
     obtain ⟨ε, hε, hball⟩ := Metric.isOpen_iff.mp hU (f a) ha
     obtain ⟨δ, hδ, hd⟩ := Metric.continuousAt_iff.mp hf.continuousAt ε hε
     exact ⟨δ, hδ, fun x hx => hball (hd hx)⟩
+
   · intro h
     apply Metric.continuous_iff.mpr
     intro a ε hε
     have hopen := h (ball (f a) ε) (MathematicalAnalysis.Chapter01.ball_open _ _)
+
     obtain ⟨δ, hδ, hd⟩ := Metric.isOpen_iff.mp hopen a (mem_ball_self hε)
     exact ⟨δ, hδ, fun x hx => hd hx⟩
 
@@ -116,9 +118,11 @@ theorem continuous_euclidean_iff (m : ℕ) (f : X → EuclideanSpace ℝ (Fin m)
           dist x a < δ → dist (f x j) (f a j) < ε := by
         intro j
         exact Metric.continuousAt_iff.mp (h j).continuousAt ε hε
+
       choose r hr hd using hex
       obtain ⟨δ, hδ, hle⟩ := MathematicalAnalysis.Chapter01.finite_positive_lower_bound
         Finset.univ r (fun j _ => hr j)
+
       refine ⟨δ, hδ, ?_⟩
       intro x hx
       exact (dist_pi_lt_iff hε).mpr (fun j => hd j (hx.trans_le (hle j (Finset.mem_univ j))))

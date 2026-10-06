@@ -77,6 +77,7 @@ theorem compact_seqCompact (E : Set X) (hE : IsCompact E) : IsSeqCompact E := by
     exact ⟨k, hkm, by rwa [dist_comm]⟩
 
   obtain ⟨φ, hφ, hlim⟩ := subsequence_of_frequent_approximation u p happrox
+
   exact ⟨p, hpE, φ, hφ, hlim⟩
 
 /-- Lemma: a sequentially compact set contains its limit points. -/
@@ -94,6 +95,7 @@ theorem seqCompact_closed (E : Set X) (hE : IsSeqCompact E) : IsClosed E := by
   choose u hu hd using hex
   obtain ⟨q, hq, φ, hφ, hlim⟩ := hE hu
   by_contra hpE
+
   have hpq : p ≠ q := fun heq => hpE (heq.symm ▸ hq)
   have hε : 0 < dist p q / 2 := half_pos (dist_pos.mpr hpq)
 
@@ -104,6 +106,7 @@ theorem seqCompact_closed (E : Set X) (hE : IsSeqCompact E) : IsClosed E := by
   have hnearq := hN n (le_max_left _ _)
   have hden : (M + 1 : ℝ) ≤ φ n + 1 := by
     exact_mod_cast Nat.succ_le_succ ((le_max_right N M).trans (hφ.id_le n))
+
   have hnearp := (hd (φ n)).trans_le
     (one_div_le_one_div_of_le (by positivity) hden) |>.trans hM
   have htriangle := dist_triangle p (u (φ n)) q
@@ -125,6 +128,7 @@ theorem seqCompact_bounded (E : Set X) (hE : IsSeqCompact E) : Bornology.IsBound
     have hn : ¬ E ⊆ ball p (n + 1 : ℝ) := by
       intro hs
       exact hb ⟨p, n + 1, by positivity, hs⟩
+
     obtain ⟨x, hx, hdist⟩ := Set.not_subset.mp hn
     exact ⟨x, hx, by
       change ¬ dist x p < (n + 1 : ℝ) at hdist
@@ -139,9 +143,11 @@ theorem seqCompact_bounded (E : Set X) (hE : IsSeqCompact E) : Bornology.IsBound
   have hnear := hN n (le_max_left _ _)
   have hindex : (M : ℝ) ≤ φ n := by
     exact_mod_cast (le_max_right N M).trans (hφ.id_le n)
+
   have hfar := hd (φ n)
   have htriangle := dist_triangle (u (φ n)) q p
   change dist (u (φ n)) q < 1 at hnear
+
   linarith
 
 /-- Theorem: compactness, closed boundedness, and subsequence convergence are equivalent

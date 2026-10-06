@@ -35,8 +35,10 @@ theorem integral_derivative (I : Box Unit) (F f : ℝ → ℝ)
     apply hd x
     exact ⟨(neg_le_neg (hJI.2 ())).trans_lt hx.1,
       hx.2.trans_le (neg_le_neg (hJI.1 ()))⟩
+
   choose τ hτ hval using hm
   let tag := fun J => if hJ : J ∈ P.val.boxes then τ J hJ else -J.upper ()
+
   refine ⟨tag, ?_, ?_⟩
   · intro J hJ
     simp only [tag, dite_eq_left hJ]
@@ -67,12 +69,14 @@ theorem integration_by_parts (I : Box Unit) (F G f g : ℝ → ℝ)
     exact Chapter03.continuous_mul _ _
       ((Chapter03.continuousOn_iff_restrict _ _).mp hF)
       ((Chapter03.continuousOn_iff_restrict _ _).mp hG)
+
   have hfg := riemannIntegrable_mul I f G hf (continuous_riemannIntegrable I G hG)
   have hFg := riemannIntegrable_mul I F g (continuous_riemannIntegrable I F hF) hg
   have he := integral_derivative I (fun x => F x * G x)
     (fun x => f x * G x + F x * g x) hFG
     (fun x hx => Chapter04.hasDerivAt_product F G (f x) (g x) x (hdF x hx) (hdG x hx))
     (riemannIntegrable_add I _ _ hfg hFg)
+
   have hl := riemannIntegral_linear I (fun x => f x * G x) (fun x => F x * g x)
     1 1 hfg hFg
   simp only [one_mul] at hl

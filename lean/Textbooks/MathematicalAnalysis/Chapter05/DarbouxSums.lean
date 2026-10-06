@@ -60,8 +60,10 @@ theorem increment_nonneg {I J : Box Unit} (α : ℝ → ℝ) (hJI : J ≤ I)
   have hu := (Box.le_iff_bounds.mp hJI).2 ()
   have hlo : -J.upper () ∈ Icc (-I.upper ()) (-I.lower ()) := by
     constructor <;> linarith [J.lower_lt_upper ()]
+
   have hhi : -J.lower () ∈ Icc (-I.upper ()) (-I.lower ()) := by
     constructor <;> linarith [J.lower_lt_upper ()]
+
   exact sub_nonneg.mpr (hα hlo hhi (neg_le_neg (J.lower_le_upper ())))
 
 /-- Lemma: the infimum on a cell is no larger than its supremum. -/
@@ -69,6 +71,7 @@ theorem cellInf_le_cellSup {I J : Box Unit} (f : ℝ → ℝ) (hJI : J ≤ I)
     (hf : Bornology.IsBounded (f '' Icc (-I.upper ()) (-I.lower ()))) :
     cellInf f J ≤ cellSup f J := by
   have hb := cell_image_bounded f hJI hf
+
   obtain ⟨x, hx⟩ := cell_image_nonempty f J
   exact (csInf_le hb.bddBelow hx).trans (le_csSup hb.bddAbove hx)
 
@@ -79,6 +82,7 @@ theorem cell_extrema_mono {I J K : Box Unit} (f : ℝ → ℝ) (hJI : J ≤ I) (
   have hb := cell_image_bounded f hJI hf
   have hbk := cell_image_bounded f (hKJ.trans hJI) hf
   have hsub := image_mono (f := f) (cell_mono hKJ)
+
   constructor
   · exact csSup_le (cell_image_nonempty f K) (fun x hx => le_csSup hb.bddAbove (hsub hx))
   · exact le_csInf (cell_image_nonempty f K) (fun x hx => csInf_le hb.bddBelow (hsub hx))
@@ -101,15 +105,18 @@ theorem refinement_sums {I : Box Unit} (f α : ℝ → ℝ) (P Q : Partition I)
     lowerSum f α P ≤ lowerSum f α Q ∧ upperSum f α Q ≤ upperSum f α P := by
   have heq : Q.val = P.val.biUnion (fun J => Q.val.restrict J) := by
     rw [← Prepartition.inf_def, inf_eq_right.mpr hQP]
+
   have hsum (v : Box Unit → ℝ) :
       (∑ K ∈ Q.val.boxes, v K) =
         ∑ J ∈ P.val.boxes, ∑ K ∈ (Q.val.restrict J).boxes, v K := by
     conv_lhs => rw [heq]
     rw [Prepartition.biUnion_boxes, Prepartition.sum_biUnion_boxes]
+
   have hweights (J : Box Unit) (hJ : J ∈ P.val.boxes) :
       (∑ K ∈ (Q.val.restrict J).boxes, increment α K) = increment α J :=
     (incrementAdditive α).sum_partition_boxes le_top
       (Q.property.restrict (P.val.le_of_mem hJ))
+
   constructor
   · dsimp only [lowerSum]
     rw [hsum]
@@ -122,6 +129,7 @@ theorem refinement_sums {I : Box Unit} (f α : ℝ → ℝ) (P Q : Partition I)
     have hJI := P.val.le_of_mem hJ
     exact mul_le_mul_of_nonneg_right (cell_extrema_mono f hJI hKJ hf).2
       (increment_nonneg α (hKJ.trans hJI) hα)
+
   · dsimp only [upperSum]
     rw [hsum]
     apply Finset.sum_le_sum

@@ -65,6 +65,7 @@ theorem hasDerivAt_polynomial (P : Polynomial ℝ) (a : ℝ) :
     simpa only [Polynomial.eval_add, Polynomial.derivative_add, one_mul] using
       hasDerivAt_linear_combination (fun x => P.eval x) (fun x => Q.eval x)
         (P.derivative.eval a) (Q.derivative.eval a) 1 1 a hP hQ
+
   | monomial n c =>
     have h := hasDerivAt_product (fun _ : ℝ => c) (fun x => x ^ n)
       0 ((n : ℝ) * a ^ (n - 1)) a (hasDerivAt_constant c a) (hasDerivAt_power n a)

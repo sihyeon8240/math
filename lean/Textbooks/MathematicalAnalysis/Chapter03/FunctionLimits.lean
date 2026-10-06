@@ -33,6 +33,7 @@ theorem punctured_limit_iff_image (f : X → Y) (a : X) (L : Y) :
     refine ⟨δ, hδ, ?_⟩
     rintro y ⟨x, ⟨hx, hxa⟩, rfl⟩
     exact hd hxa hx
+
   · intro h ε hε
     obtain ⟨δ, hδ, hd⟩ := h ε hε
     exact ⟨δ, hδ, fun x hx hxa => hd ⟨x, ⟨hxa, hx⟩, rfl⟩⟩
@@ -56,12 +57,14 @@ theorem tendsto_within_iff_sequences (f : X → Y) (s : Set X) (a : X) (L : Y) :
     by_contra hf
     rw [Metric.tendsto_nhdsWithin_nhds] at hf
     push Not at hf
+
     obtain ⟨ε, hε, hbad⟩ := hf
     have hex : ∀ n : ℕ, ∃ x ∈ s,
         dist x a < 1 / (n + 1 : ℝ) ∧ ε ≤ dist (f x) L := by
       intro n
       obtain ⟨x, hx, hd, he⟩ := hbad (1 / (n + 1 : ℝ)) (by positivity)
       exact ⟨x, hx, hd, he⟩
+
     choose u hs hd he using hex
 
     have hu : Tendsto u atTop (𝓝 a) := by
@@ -70,11 +73,13 @@ theorem tendsto_within_iff_sequences (f : X → Y) (s : Set X) (a : X) (L : Y) :
       obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp
         MathematicalAnalysis.Chapter02.reciprocal_tendsto_zero r hr
       refine ⟨N, fun n hn => (hd n).trans ?_⟩
+
       have ht := hN n hn
       simpa only [Real.dist_eq, sub_zero, abs_of_pos (by positivity :
         0 < 1 / (n + 1 : ℝ))] using ht
 
     obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp (h u hs hu) ε hε
+
     exact (not_lt_of_ge (he N)) (hN N le_rfl)
 
 /-- Theorem: a punctured limit is equivalent to convergence along every
@@ -105,6 +110,7 @@ theorem continuousWithinAt_iff_image (f : X → Y) (s : Set X) (a : X) :
     refine ⟨δ, hδ, ?_⟩
     rintro y ⟨x, ⟨hx, hs⟩, rfl⟩
     exact hd hs hx
+
   · intro h ε hε
     obtain ⟨δ, hδ, hd⟩ := h ε hε
     exact ⟨δ, hδ, fun x hx hxa => hd ⟨x, ⟨hxa, hx⟩, rfl⟩⟩

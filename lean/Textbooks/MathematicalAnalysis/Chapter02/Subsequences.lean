@@ -41,6 +41,7 @@ theorem mem_subsequentialLimits_iff (u : ℕ → X) (p : X) :
     let n := max N (M + 1)
     have hnear := hN n (le_max_left _ _)
     have hle : φ n ≤ M := hM (show φ n ∈ {n : ℕ | dist (u n) p < ε} from hnear)
+
     exact (Nat.not_succ_le_self M)
       ((le_max_right N (M + 1)).trans ((hφ.id_le n).trans hle))
 
@@ -58,8 +59,10 @@ theorem bolzano_weierstrass (u : ℕ → ℝ) (hu : Bornology.IsBounded (range u
   have huI : ∀ n, u n ∈ Icc (-C) C := by
     intro n
     exact ⟨(abs_lt.mp (hbound n)).1.le, (abs_lt.mp (hbound n)).2.le⟩
+
   obtain ⟨p, _, φ, hφ, hlim⟩ := MathematicalAnalysis.Chapter01.compact_seqCompact _
     hinterval huI
+
   exact ⟨p, φ, hφ, hlim⟩
 
 /-- Theorem: a sequence converges exactly when every subsequence converges. -/
@@ -81,6 +84,7 @@ theorem tendsto_iff_succ (u : ℕ → X) (p : X) :
     intro m n hmn
     change m + 1 < n + 1
     omega
+
   · intro h
     apply Metric.tendsto_atTop.mpr
     intro ε hε

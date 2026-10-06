@@ -14,13 +14,16 @@ private theorem limit_combination {l : Filter ℝ} (u v : ℝ → ℝ) (a b A B 
     apply Metric.continuous_iff.mpr
     intro _ ε hε
     exact ⟨ε, hε, fun _ hx => (le_max_left _ _).trans_lt hx⟩
+
   have hq : Continuous (fun p : ℝ × ℝ => p.2) := by
     apply Metric.continuous_iff.mpr
     intro _ ε hε
     exact ⟨ε, hε, fun _ hx => (le_max_right _ _).trans_lt hx⟩
+
   have hc := continuous_add (fun p : ℝ × ℝ => A * p.1) (fun p => B * p.2)
     (continuous_mul _ _ (continuous_const A) hp)
     (continuous_mul _ _ (continuous_const B) hq)
+
   exact hc.continuousAt.tendsto.comp (hu.prodMk_nhds hv)
 
 private theorem limit_abs {l : Filter ℝ} (u : ℝ → ℝ) (a : ℝ)
@@ -31,16 +34,19 @@ private theorem limit_abs {l : Filter ℝ} (u : ℝ → ℝ) (a : ℝ)
     refine ⟨ε, hε, ?_⟩
     intro x hx
     exact (abs_abs_sub_abs_le_abs_sub x a).trans_lt hx
+
   exact hc.continuousAt.tendsto.comp hu
 
 private theorem limit_le {l : Filter ℝ} [NeBot l] (u v : ℝ → ℝ) (a b : ℝ)
     (hu : Tendsto u l (𝓝 a)) (hv : Tendsto v l (𝓝 b))
     (hle : ∀ᶠ x in l, u x ≤ v x) : a ≤ b := by
   by_contra hn
+
   have hab : b < a := lt_of_not_ge hn
   have hε : 0 < (a - b) / 3 := by positivity
   have h₁ := Metric.tendsto_nhds.mp hu ((a - b) / 3) hε
   have h₂ := Metric.tendsto_nhds.mp hv ((a - b) / 3) hε
+
   obtain ⟨x, hx, hy, hxy⟩ := (h₁.and (h₂.and hle)).exists
   rw [Real.dist_eq, abs_lt] at hx hy
   linarith
@@ -62,6 +68,7 @@ private theorem increment_bound (S : Set ℝ)
     obtain ⟨c, hc, hzero⟩ := rolle g dg x y hxy hg
       (fun z hz => he z (hS x hx y hy ⟨hz.1.le, hz.2.le⟩)) (sub_eq_zero.mp hn).symm
     exact h0 c (hS x hx y hy ⟨hc.1.le, hc.2.le⟩) hzero
+
   obtain ⟨c, hc, hmean⟩ := cauchy_mean_value f g df dg x y hxy hf hg
     (fun z hz => hd z (hS x hx y hy ⟨hz.1.le, hz.2.le⟩))
     (fun z hz => he z (hS x hx y hy ⟨hz.1.le, hz.2.le⟩))
@@ -69,8 +76,10 @@ private theorem increment_bound (S : Set ℝ)
   have hratio : (f y - f x) / (g y - g x) = df c / dg c := by
     apply (div_eq_div_iff hdiff (h0 c hcs)).mpr
     simpa only [mul_comm] using hmean
+
   have hsmall := hnear c hcs (hc.2.trans hyt)
   rw [← hratio] at hsmall
+
   have hid : (f y - f x) - L * (g y - g x) =
       ((f y - f x) / (g y - g x) - L) * (g y - g x) := by
     field_simp
@@ -90,9 +99,11 @@ private theorem eventually_denominator_ne {l : Filter ℝ} [NeBot l] (S : Set �
     intro x hx hxz hgx
     have hc : ContinuousOn g (Icc x z) := fun y hy =>
       (continuousAt_of_hasDerivAt g (dg y) y (hd y (hS x hx z hzS hy))).continuousWithinAt
+
     obtain ⟨c, hcI, hdc⟩ := rolle g dg x z hxz hc
       (fun y hy => hd y (hS x hx z hzS ⟨hy.1.le, hy.2.le⟩)) (hgx.trans hgz.symm)
     exact h0 c (hS x hx z hzS ⟨hcI.1.le, hcI.2.le⟩) hdc
+
   · obtain ⟨t, ht, _⟩ := (hbasis (fun _ => True)).mp (Eventually.of_forall (fun _ => trivial))
     exact (hbasis _).mpr ⟨t, ht, fun x hx _ hgx => hz ⟨x, hx, hgx⟩⟩
 
@@ -121,12 +132,15 @@ private theorem lhopital_zero {l : Filter ℝ} [NeBot l] (S : Set ℝ)
       filter_upwards [hy] with y hy
       exact increment_bound S hS f g df dg hd he h0 L (ε / 2) t
         (half_pos hε) hnear y x hy.1 hx.1 hy.2 hx.2
+
     have hfx : Tendsto (fun y => f x - f y) l (𝓝 (f x)) := by
       simpa only [one_mul, neg_one_mul, neg_zero, add_zero, sub_eq_add_neg] using
         limit_combination (fun _ => f x) f (f x) 0 1 (-1) tendsto_const_nhds hf
+
     have hgx : Tendsto (fun y => g x - g y) l (𝓝 (g x)) := by
       simpa only [one_mul, neg_one_mul, neg_zero, add_zero, sub_eq_add_neg] using
         limit_combination (fun _ => g x) g (g x) 0 1 (-1) tendsto_const_nhds hg
+
     have hleft := limit_abs _ _ (limit_combination _ _ _ _ 1 (-L) hfx hgx)
     have hright := limit_combination (fun y => |g x - g y|) (fun _ => (0 : ℝ))
       |g x| 0 (ε / 2) 0 (limit_abs _ _ hgx) tendsto_const_nhds
@@ -151,6 +165,7 @@ private theorem lhopital_infinity {l : Filter ℝ} [NeBot l] (S : Set ℝ)
     (Metric.tendsto_nhds.mp hr (ε / 4) (by positivity))
   have hy : ∀ᶠ y in l, y ∈ S ∧ y < t :=
     (hbasis _).mpr ⟨t, ht, fun y hy hyt => ⟨hy, hyt⟩⟩
+
   obtain ⟨y, hyS, hyt⟩ := hy.exists
   let B := ε / 4 * |g y| + |f y - L * g y|
   have hregion : ∀ᶠ x in l, x ∈ S ∧ x < y :=
@@ -163,17 +178,21 @@ private theorem lhopital_infinity {l : Filter ℝ} [NeBot l] (S : Set ℝ)
     have hlt : 4 * B / ε < g x := by linarith [le_max_right (1 : ℝ) (4 * B / ε)]
     have hmul := (div_lt_iff₀ hε).mp hlt
     nlinarith
+
   have hinc := increment_bound S hS f g df dg hd he h0 L (ε / 4) t
     (by positivity) hnear x y hx.1 hyS hx.2 hyt
   have hnum : |f x - L * g x| < ε * g x := by
     have ht := abs_add_le ((f x - L * g x) - (f y - L * g y)) (f y - L * g y)
     rw [sub_add_cancel] at ht
+
     have hid : (f y - f x) - L * (g y - g x) =
         -((f x - L * g x) - (f y - L * g y)) := by ring
     rw [hid, abs_neg] at hinc
+
     have hgabs := abs_add_le (g y) (-g x)
     rw [abs_neg, ← sub_eq_add_neg] at hgabs
     rw [abs_of_pos hgpos] at hgabs
+
     have hmul := mul_le_mul_of_nonneg_left hgabs (by positivity : 0 ≤ ε / 4)
     dsimp only [B] at hB
     nlinarith
@@ -190,7 +209,9 @@ private theorem right_basis (a b : ℝ) (hab : a < b) (p : ℝ → Prop) :
     have hat : a < t := by dsimp [t]; linarith [lt_min hr hab]
     have htr : t < r := by dsimp [t]; linarith [lt_min hr hab, min_le_left r b]
     have htb : t < b := by dsimp [t]; linarith [lt_min hr hab, min_le_right r b]
+
     exact ⟨t, ⟨hat, htb⟩, fun x hx hxt => hp ⟨hx.1, hxt.trans htr⟩⟩
+
   · rintro ⟨t, ht, hp⟩
     exact ⟨t, ht.1, fun x hx => hp x ⟨hx.1, hx.2.trans ht.2⟩ hx.2⟩
 
@@ -202,6 +223,7 @@ private theorem atBot_basis (b : ℝ) (p : ℝ → Prop) :
     refine ⟨min r b - 1, (show min r b - 1 < b by linarith [min_le_right r b]), ?_⟩
     intro x _ hxt
     exact hr x (by linarith [min_le_left r b])
+
   · rintro ⟨t, ht, hp⟩
     change t < b at ht
     refine ⟨t - 1, ?_⟩

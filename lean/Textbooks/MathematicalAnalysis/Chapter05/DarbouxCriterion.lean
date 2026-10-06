@@ -65,14 +65,19 @@ theorem stieltjesIntegrable_iff_gap (I : Box Unit) (f α : ℝ → ℝ)
     let R := commonRefinement P Q
     have hup := (refinement_sums f α P R inf_le_left hf hα).2
     have hlo := (refinement_sums f α Q R inf_le_right hf hα).1
+
     exact ⟨R, by linarith⟩
+
   · intro hgap
     refine ⟨hf, le_antisymm (lowerIntegral_le_upperIntegral I f α hf hα) ?_⟩
     by_contra hn
+
     have hp : 0 < upperIntegral I f α - lowerIntegral I f α :=
       sub_pos.mpr (lt_of_not_ge hn)
+
     obtain ⟨P, hP⟩ := hgap _ hp
     obtain ⟨hl, _, hu⟩ := integral_bounds I f α P hf hα
+
     linarith
 
 /-- Corollary: the Darboux gap criterion for Riemann integrability. -/

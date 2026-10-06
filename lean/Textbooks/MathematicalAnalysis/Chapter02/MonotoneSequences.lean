@@ -48,6 +48,7 @@ theorem bounded_monotone_converges (u : ℕ → ℝ)
     (hb : Bornology.IsBounded (range u)) (hm : Monotone u ∨ Antitone u) :
     ∃ a : ℝ, Tendsto u atTop (𝓝 a) := by
   obtain ⟨C, _, hC⟩ := (real_bounded_iff u).mp hb
+
   rcases hm with hm | hm
 
   · refine ⟨sSup (range u), monotone_tendsto_sSup u hm ⟨C, ?_⟩⟩

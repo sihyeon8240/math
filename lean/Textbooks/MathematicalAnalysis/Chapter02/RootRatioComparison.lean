@@ -13,6 +13,7 @@ private theorem roots_limsup_le_of_ratio_bound (u : ℕ → ℝ) (q : ℝ) (hq :
   have hlim : Tendsto w atTop (𝓝 q) := by
     simpa only [one_mul] using real_tendsto_mul _ _ _ _
       (nth_root_tendsto_one (C + 1) (by linarith)) (real_tendsto_const q)
+
   have hrootbound : ∀ᶠ n in atTop, rootTerms u n ≤ w n := by
     obtain ⟨N, hN⟩ := eventually_atTop.mp hbound
     apply eventually_atTop.mpr
@@ -22,9 +23,11 @@ private theorem roots_limsup_le_of_ratio_bound (u : ℕ → ℝ) (q : ℝ) (hq :
     have hmajor : |u (n + 1)| ≤ (C + 1) * q ^ (n + 1) := by
       have hb := hN (n + 1) (by omega)
       nlinarith
+
     have hroot := Real.rpow_le_rpow (abs_nonneg _) hmajor
       (by positivity : 0 ≤ (n + 1 : ℝ)⁻¹)
     rw [Real.mul_rpow (by linarith : 0 ≤ C + 1) hpow] at hroot
+
     have heq : (q ^ (n + 1)) ^ ((n + 1 : ℝ)⁻¹) = q := by
       simpa only [Nat.cast_succ] using
         Real.pow_rpow_inv_natCast hq.le (Nat.succ_ne_zero n)
@@ -55,6 +58,7 @@ private theorem roots_liminf_ge_of_ratio_bound (u : ℕ → ℝ) (q : ℝ) (hq :
   have hlim : Tendsto w atTop (𝓝 q) := by
     simpa only [one_mul] using real_tendsto_mul _ _ _ _
       (nth_root_tendsto_one C hC) (real_tendsto_const q)
+
   have hrootbound : ∀ᶠ n in atTop, w n ≤ rootTerms u n := by
     apply eventually_atTop.mpr
     refine ⟨N, ?_⟩
@@ -62,6 +66,7 @@ private theorem roots_liminf_ge_of_ratio_bound (u : ℕ → ℝ) (q : ℝ) (hq :
     have hroot := Real.rpow_le_rpow (mul_nonneg hC.le (pow_nonneg hq.le _))
       (hbound (n + 1) (by omega)) (by positivity : 0 ≤ (n + 1 : ℝ)⁻¹)
     rw [Real.mul_rpow hC.le (pow_nonneg hq.le _)] at hroot
+
     have heq : (q ^ (n + 1)) ^ ((n + 1 : ℝ)⁻¹) = q := by
       simpa only [Nat.cast_succ] using
         Real.pow_rpow_inv_natCast hq.le (Nat.succ_ne_zero n)
@@ -87,6 +92,7 @@ theorem root_ratio_comparison (u : ℕ → ℝ) (hu0 : ∀ᶠ n in atTop, u n �
 
   · by_contra h
     obtain ⟨b, hrootb, hbratio⟩ := exists_between (lt_of_not_ge h)
+
     induction b using EReal.rec with
     | bot => exact (not_lt_of_ge bot_le hrootb).elim
     | top => exact (not_lt_of_ge le_top hbratio).elim
@@ -97,10 +103,12 @@ theorem root_ratio_comparison (u : ℕ → ℝ) (hu0 : ∀ᶠ n in atTop, u n �
         dsimp [ratioTerms] at hr
         rw [abs_div, lt_div_iff₀ (abs_pos.mpr hn)] at hr
         exact hr.le
+
       exact (not_lt_of_ge (roots_liminf_ge_of_ratio_bound u q hq hu0 hstep)) hrootb
 
   · by_contra h
     obtain ⟨b, hratiob, hbroot⟩ := exists_between (lt_of_not_ge h)
+
     induction b using EReal.rec with
     | bot => exact (not_lt_of_ge bot_le hratiob).elim
     | top => exact (not_lt_of_ge le_top hbroot).elim
@@ -111,6 +119,7 @@ theorem root_ratio_comparison (u : ℕ → ℝ) (hu0 : ∀ᶠ n in atTop, u n �
         dsimp [ratioTerms] at hr
         rw [abs_div, div_lt_iff₀ (abs_pos.mpr hn)] at hr
         exact hr.le
+
       exact (not_lt_of_ge (roots_limsup_le_of_ratio_bound u q hq hstep)) hbroot
 
 end MathematicalAnalysis.Chapter02

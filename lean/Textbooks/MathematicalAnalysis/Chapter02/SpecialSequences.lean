@@ -40,11 +40,14 @@ theorem reciprocal_rpow_tendsto_zero (a : ℝ) (ha : 0 < a) :
   have hbase : (1 / ε) ^ a⁻¹ < n + 1 := by
     have hcast : (N : ℝ) ≤ n := by exact_mod_cast hn
     linarith
+
   have hpow := (Real.rpow_lt_rpow_iff (Real.rpow_nonneg (by positivity) _)
     (by positivity : 0 ≤ (n + 1 : ℝ)) ha).mpr hbase
   rw [Real.rpow_inv_rpow (by positivity) ha.ne'] at hpow
+
   have hp : 0 < (n + 1 : ℝ) ^ a := Real.rpow_pos_of_pos (by positivity) _
   rw [Real.dist_eq, sub_zero, abs_of_pos (div_pos zero_lt_one hp), div_lt_iff₀ hp]
+
   have he := (div_lt_iff₀ hε).mp hpow
   nlinarith
 
@@ -83,9 +86,11 @@ theorem geometric_contraction_tendsto_zero (u : ℕ → ℝ) (q : ℝ)
   have hMN : M ≤ n - N := by omega
   have hbound := hiter (n - N)
   rw [hsub] at hbound
+
   have hpower := pow_le_pow_of_le_one hq0 hq1.le hMN
   have hsmall := (lt_div_iff₀ (by linarith [abs_nonneg (u N)] : 0 < |u N| + 1)).mp hM
   rw [Real.dist_eq, sub_zero]
+
   have hmul := mul_le_mul_of_nonneg_left hpower (abs_nonneg (u N))
   have hpos := pow_nonneg hq0 M
   nlinarith
@@ -107,6 +112,7 @@ theorem nat_pow_div_exponential_tendsto_zero (k : ℕ) (b : ℝ) (hb : 1 < b) :
     have hcoord : (1 + 1 / (n + 1 : ℝ)) * (n + 1) = n + 2 := by
       field_simp
       ring
+
     have hcoordpow := congrArg (fun x : ℝ => x ^ k) hcoord
     rw [mul_pow] at hcoordpow
     dsimp [u, r]
@@ -121,13 +127,17 @@ theorem nat_pow_div_exponential_tendsto_zero (k : ℕ) (b : ℝ) (hb : 1 < b) :
   have hq0 : 0 ≤ q := by
     dsimp [q]
     positivity
+
   have hq1 : q < 1 := by
     dsimp [q]
     linarith
+
   have hgap : 0 < q - 1 / b := by
     dsimp [q]
     linarith
+
   apply geometric_contraction_tendsto_zero u q hq0 hq1
+
   obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hr (q - 1 / b) hgap
   apply eventually_atTop.mpr
   refine ⟨N, ?_⟩
@@ -137,6 +147,7 @@ theorem nat_pow_div_exponential_tendsto_zero (k : ℕ) (b : ℝ) (hb : 1 < b) :
   have hu0 : 0 ≤ u n := by
     dsimp [u]
     positivity
+
   have hr0 : 0 ≤ r n := by
     dsimp [r]
     positivity
@@ -156,6 +167,7 @@ theorem rpow_div_exponential_tendsto_zero (a γ : ℝ) (ha : 0 < a) :
 
   · intro n
     apply div_le_div_of_nonneg_right _ (by positivity)
+
     have hbase : 1 ≤ (n + 1 : ℝ) := by linarith [Nat.cast_nonneg (α := ℝ) n]
     simpa only [Real.rpow_natCast] using Real.rpow_le_rpow_of_exponent_le hbase hk.le
 
@@ -204,17 +216,20 @@ theorem index_nth_root_tendsto_one :
   apply Metric.tendsto_atTop.mpr
   intro ε hε
   have hlim := nat_pow_div_exponential_tendsto_zero 1 (1 + ε) (by linarith)
+
   obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hlim 1 zero_lt_one
   refine ⟨N, ?_⟩
   intro n hn
   have hnear := hN n hn
   rw [Real.dist_eq, sub_zero, pow_one, abs_of_nonneg (by positivity)] at hnear
+
   have hsmall := (div_lt_one (by positivity : 0 < (1 + ε) ^ (n + 1))).mp hnear
   have hroot := (Real.rpow_lt_rpow_iff (by positivity : 0 ≤ (n + 1 : ℝ))
     (pow_nonneg (by linarith) _) (by positivity : 0 < (n + 1 : ℝ)⁻¹)).mpr hsmall
   rw [← Nat.cast_succ] at hroot
   rw [Real.pow_rpow_inv_natCast (by linarith : 0 ≤ 1 + ε) (Nat.succ_ne_zero n)] at hroot
   simp only [Nat.cast_succ] at hroot
+
   have hlower : 1 ≤ (n + 1 : ℝ) ^ ((n + 1 : ℝ)⁻¹) := by
     exact Real.one_le_rpow (by linarith [Nat.cast_nonneg (α := ℝ) n]) (by positivity)
   rw [Real.dist_eq, abs_of_nonneg (sub_nonneg.mpr hlower)]

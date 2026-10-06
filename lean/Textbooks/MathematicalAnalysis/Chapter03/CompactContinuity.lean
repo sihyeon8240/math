@@ -18,6 +18,7 @@ theorem continuousOn_iff_restrict (f : X → Y) (K : Set X) :
     intro a ε hε
     obtain ⟨δ, hδ, hd⟩ := Metric.continuousWithinAt_iff.mp (h a a.property) ε hε
     exact ⟨δ, hδ, fun x hx => hd x.property hx⟩
+
   · intro h a ha
     apply Metric.continuousWithinAt_iff.mpr
     intro ε hε
@@ -33,6 +34,7 @@ theorem compact_image_on (K : Set X) (hK : IsCompact K) (f : X → Y)
     (fun x : K => f x) ((continuousOn_iff_restrict f K).mp hf)
   convert him using 1
   ext y
+
   constructor
   · rintro ⟨x, hx, rfl⟩
     exact ⟨⟨x, hx⟩, hx, rfl⟩
@@ -47,6 +49,7 @@ theorem extreme_value (K : Set X) (hK : IsCompact K) (hne : K.Nonempty)
   let S := f '' K
   have hc : IsCompact S := compact_image_on K hK f hf
   have hs : S.Nonempty := hne.image f
+
   obtain ⟨p, r, hr, hball⟩ := (isBounded_iff S).mp (compact_bounded S hc)
     (show Nonempty ℝ from ⟨0⟩)
   have hupper : BddAbove S := by
@@ -55,6 +58,7 @@ theorem extreme_value (K : Set X) (hK : IsCompact K) (hne : K.Nonempty)
     have hd := hball hx
     rw [mem_ball, Real.dist_eq, abs_lt] at hd
     linarith
+
   have hlower : BddBelow S := by
     refine ⟨p - r, ?_⟩
     intro x hx
@@ -70,6 +74,7 @@ theorem extreme_value (K : Set X) (hK : IsCompact K) (hne : K.Nonempty)
     refine ⟨x, hx, ?_⟩
     rw [Real.dist_eq, abs_of_nonpos (sub_nonpos.mpr (csInf_le hlower hx))]
     linarith
+
   have hinf : sInf S ∈ S := by
     have heq := (closure_properties S).2.1.mpr (compact_closed S hc)
     have hsub : closure S ⊆ S := by rw [← heq]
@@ -98,6 +103,7 @@ theorem continuous_inverse_of_compact (hX : IsCompact (univ : Set X))
     (f : X → Y) (hf : Continuous f) (hinj : Function.Injective f) :
     Continuous (Equiv.ofInjective f hinj).symm := by
   classical
+
   let e := Equiv.ofInjective f hinj
   apply (continuous_iff_open_preimage e.symm).mpr
   intro U hU
@@ -108,10 +114,12 @@ theorem continuous_inverse_of_compact (hX : IsCompact (univ : Set X))
     apply Metric.continuous_iff.mpr
     intro _ ε hε
     exact ⟨ε, hε, fun _ hx => hx⟩
+
   have hpre := (continuous_iff_open_preimage (Subtype.val : range f → Y)).mp hval _ hopen
   convert hpre using 1
   ext y
   have hfy : f (e.symm y) = y := Equiv.apply_ofInjective_symm hinj y
+
   constructor
   · intro hy ⟨x, hx, hxy⟩
     have heq : x = e.symm y := hinj (hxy.trans hfy.symm)
@@ -131,6 +139,7 @@ theorem continuous_inverse_interval (a b : ℝ) (hab : a ≤ b)
       ext x
       simp only [mem_preimage, x.property, mem_univ]
     rwa [heq] at hsub
+
   exact continuous_inverse_of_compact huniv f hf hinj
 
 /-- Definition: uniform continuity uses a single positive radius for every pair
@@ -150,13 +159,16 @@ theorem uniformContinuous_of_compact (hX : IsCompact (univ : Set X))
       dist x a < r → dist (f x) (f a) < ε / 2 := by
     intro a
     exact Metric.continuousAt_iff.mp hf.continuousAt (ε / 2) (half_pos hε)
+
   choose r hr hd using hex
   have hcover : (univ : Set X) ⊆ ⋃ a, ball a (r a / 2) := by
     intro a _
     exact mem_iUnion.mpr ⟨a, mem_ball_self (half_pos (hr a))⟩
+
   obtain ⟨s, hs⟩ := hX.elim_finite_subcover _ (fun a => ball_open _ _) hcover
   obtain ⟨δ, hδ, hle⟩ := finite_positive_lower_bound s (fun a => r a / 2)
     (fun a _ => half_pos (hr a))
+
   refine ⟨δ, hδ, ?_⟩
   intro x y hxy
   obtain ⟨a, ha⟩ := mem_iUnion.mp (hs (mem_univ x))
@@ -164,10 +176,12 @@ theorem uniformContinuous_of_compact (hX : IsCompact (univ : Set X))
   have hyx : dist y x < r a / 2 := by
     rw [dist_comm]
     exact hxy.trans_le (hle a has)
+
   have hya : dist y a < r a := by
     have ht := dist_triangle y x a
     change dist x a < r a / 2 at hxa
     linarith
+
   have hx := hd a (x := x) (hxa.trans (half_lt_self (hr a)))
   have hy := hd a (x := y) hya
   have ht := dist_triangle (f x) (f a) (f y)
@@ -183,8 +197,10 @@ theorem uniformContinuousOn_of_compact (K : Set X) (hK : IsCompact K)
       ext x
       simp only [mem_preimage, x.property, mem_univ]
     rwa [heq] at hsub
+
   have hu := uniformContinuous_of_compact huniv (fun x : K => f x)
     ((continuousOn_iff_restrict f K).mp hf)
+
   apply Metric.uniformContinuousOn_iff.mpr
   intro ε hε
   obtain ⟨δ, hδ, hd⟩ := Metric.uniformContinuous_iff.mp hu ε hε

@@ -71,6 +71,7 @@ theorem continuousAt_of_hasDerivAt (f : ℝ → ℝ) (d a : ℝ) (hf : HasDerivA
       have ht := abs_add_le ((f x - f a) / (x - a) - d) d
       rw [sub_add_cancel] at ht
       linarith
+
     have heq : f x - f a = ((f x - f a) / (x - a)) * (x - a) := by
       rw [div_mul_cancel₀ _ hn]
     rw [Real.dist_eq, heq, abs_mul]
@@ -124,6 +125,7 @@ theorem hasDerivAt_comp (f g : ℝ → ℝ) (df dg a : ℝ)
   have houter := (continuousAt_iff_sequences (derivativeSlope g dg (f a)) (f a)).mp
     (derivativeSlope_continuousAt g dg (f a) hg) (f ∘ u) hfu
   simp only [derivativeSlope, ↓reduceIte] at hinner houter
+
   have hprod := real_tendsto_mul _ _ dg df houter hinner
   convert hprod using 1
   funext n
