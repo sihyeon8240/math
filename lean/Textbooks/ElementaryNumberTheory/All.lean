@@ -34,3 +34,9 @@ import Textbooks.ElementaryNumberTheory.Chapter05.Mobius
 import Textbooks.ElementaryNumberTheory.Chapter05.MobiusInversion
 import Textbooks.ElementaryNumberTheory.Chapter05.SummatoryFunctions
 import Textbooks.ElementaryNumberTheory.Chapter05.FactorialExponents
+
+import Textbooks.ElementaryNumberTheory.Chapter06.Totient
+import Textbooks.ElementaryNumberTheory.Chapter06.ReducedResidues
+import Textbooks.ElementaryNumberTheory.Chapter06.TotientFormulas
+import Textbooks.ElementaryNumberTheory.Chapter06.Euler
+import Textbooks.ElementaryNumberTheory.Chapter06.EulerApplications
