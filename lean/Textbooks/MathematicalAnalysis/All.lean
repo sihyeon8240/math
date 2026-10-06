@@ -30,3 +30,16 @@ import Textbooks.MathematicalAnalysis.Chapter04.DerivativeProperties
 import Textbooks.MathematicalAnalysis.Chapter04.LHopital
 import Textbooks.MathematicalAnalysis.Chapter04.Taylor
 import Textbooks.MathematicalAnalysis.Chapter04.VectorDerivatives
+
+import Textbooks.MathematicalAnalysis.Chapter05.Partitions
+import Textbooks.MathematicalAnalysis.Chapter05.DarbouxSums
+import Textbooks.MathematicalAnalysis.Chapter05.DarbouxCriterion
+import Textbooks.MathematicalAnalysis.Chapter05.ContinuousIntegrability
+import Textbooks.MathematicalAnalysis.Chapter05.IntegrabilityOperations
+import Textbooks.MathematicalAnalysis.Chapter05.IntegralValues
+import Textbooks.MathematicalAnalysis.Chapter05.FiniteDiscontinuities
+import Textbooks.MathematicalAnalysis.Chapter05.Subintervals
+import Textbooks.MathematicalAnalysis.Chapter05.MeshConvergence
+import Textbooks.MathematicalAnalysis.Chapter05.StieltjesChangeVariables
+import Textbooks.MathematicalAnalysis.Chapter05.IntegralPrimitive
+import Textbooks.MathematicalAnalysis.Chapter05.FundamentalTheorem

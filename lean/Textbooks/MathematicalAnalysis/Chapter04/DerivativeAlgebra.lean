@@ -16,7 +16,7 @@ theorem hasDerivAt_constant (c a : ℝ) : HasDerivAt (fun _ : ℝ => c) 0 a := b
   simpa only [sub_self, zero_div, sub_zero, abs_zero] using hε
 
 /-- Lemma: the product rule follows by splitting the difference quotient into two terms. -/
-private theorem hasDerivAt_product (f g : ℝ → ℝ) (df dg a : ℝ)
+theorem hasDerivAt_product (f g : ℝ → ℝ) (df dg a : ℝ)
     (hf : HasDerivAt f df a) (hg : HasDerivAt g dg a) :
     HasDerivAt (fun x => f x * g x) (df * g a + f a * dg) a := by
   apply (hasDerivAt_iff_limit _ _ a).mpr
