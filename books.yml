@@ -12,7 +12,6 @@ books:
     title: Mathematical Analysis
     version: 0.1.0
     label_prefix: ma
-    lean_module: MathematicalAnalysis
     status: draft
     order: 10
     release: false
