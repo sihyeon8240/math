@@ -16,10 +16,10 @@ generate LaTeX assembly.
 
 ## Quick start
 
-The easiest supported setup is the development container. Local setup
-requirements are documented in the
-[developer workflow](docs/developer-workflow.md); `make doctor env` verifies
-them. Then run:
+The easiest supported setup is the development container. The
+[developer workflow](docs/developer-workflow.md#development-environment) explains
+where required tool versions are defined and how to check your environment.
+Then run:
 
 ```sh
 make doctor env

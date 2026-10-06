@@ -504,5 +504,7 @@ Lean project builds. Coverage counts textbook theorem, lemma, proposition, and
 corollary environments linked through chapter and appendix `proofs.yml` files,
 once per environment, relative to all such environments in the book. Lean-only
 results are excluded.
-Material omitted pedagogically may be supplied by Mathlib and should be described
-as a prerequisite at chapter or book level.
+Material omitted pedagogically may be supplied by Mathlib only within the owning
+book's [recorded prerequisite boundary](#book-owned-prerequisite-boundaries).
+Explain its prerequisite role in the chapter or book exposition; that explanation
+does not replace recording the accepted scope in the book's `formalization.md`.

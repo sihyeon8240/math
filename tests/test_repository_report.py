@@ -40,7 +40,13 @@ class RepositoryReportTests(unittest.TestCase):
             result = report.inspect(book, registered)
         self.assertEqual(len(reads), len(set(reads)))
         self.assertGreater(result["sections"], 0)
-        self.assertGreater(result["lean_verified"], 0)
+        labels = registered.get(book["slug"], set())
+        expected_verified = sum(
+            bool(group & labels)
+            for path in reads
+            for group in report.theorem_label_groups(original(path))
+        )
+        self.assertEqual(result["lean_verified"], expected_verified)
 
     def test_empty_manifest_produces_a_complete_report(self) -> None:
         with mock.patch.object(report, "load_manifest", return_value={"books": []}):

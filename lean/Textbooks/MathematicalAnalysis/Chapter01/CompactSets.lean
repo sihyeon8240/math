@@ -12,6 +12,28 @@ universe u
 
 variable {X : Type u} [MetricSpace X]
 
+/-- Definition: an indexed family of ambient open sets covers `E`. -/
+def IsOpenCoverOf {ι : Type*} (U : ι → Set X) (E : Set X) : Prop :=
+  (∀ i, IsOpen (U i)) ∧ E ⊆ ⋃ i, U i
+
+/-- Definition: the indices in `s` select a subcollection that still covers `E`. -/
+def IsSubcoverOf {ι : Type*} (U : ι → Set X) (E : Set X) (s : Set ι) : Prop :=
+  E ⊆ ⋃ i ∈ s, U i
+
+/-- Lemma: compactness means that every open cover has a finite subcover. -/
+theorem isCompact_iff_open_cover (E : Set X) :
+    IsCompact E ↔ ∀ {ι : Type u} (U : ι → Set X), IsOpenCoverOf U E →
+      ∃ s : Finset ι, IsSubcoverOf U E (s : Set ι) := by
+  constructor
+
+  · intro h ι U hU
+    exact h.elim_finite_subcover U hU.1 hU.2
+
+  · intro h
+    apply isCompact_of_finite_subcover
+    intro ι U hU hc
+    exact h U ⟨hU, hc⟩
+
 /-- Proposition: a finite union of balls avoiding an exterior point still
 avoids a sufficiently small ball about that point. -/
 theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
@@ -49,6 +71,7 @@ theorem compact_closed (E : Set X) (hE : IsCompact E) : IsClosed E := by
   change dist x p < δ at hx
   change dist x q.val < dist q.val p / 2 at hxq
   change δ ≤ dist q.val p / 2 at hδq
+
   linarith
 
 /-- Proposition: concentric balls cover the whole space; a finite subcover
@@ -128,50 +151,13 @@ theorem closed_subset_compact (E F : Set X) (hE : IsCompact E)
 
   obtain ⟨i, hi⟩ := mem_iUnion.mp (hs (hFE hx))
   obtain ⟨his, hxi⟩ := mem_iUnion.mp hi
+
   cases i with
   | none => exact False.elim (hxi hx)
   | some j =>
     exact mem_iUnion.mpr ⟨j, mem_iUnion.mpr
       ⟨Finset.mem_biUnion.mpr
         ⟨some j, his, by simp only [Option.toFinset_some, Finset.mem_singleton]⟩, hxi⟩⟩
-
-/-- Theorem: if every point has a ball meeting F at most at its center,
-a finite subcover would force F to be finite. -/
-theorem infinite_subset_limit_point (E F : Set X) (hE : IsCompact E)
-    (hFE : F ⊆ E) (hF : F.Infinite) : (derivedSet F ∩ E).Nonempty := by
-  classical
-
-  by_contra hn
-
-  have hlocal : ∀ p : E, ∃ r > 0, ∀ q ∈ F, dist q p.val < r → q = p.val := by
-    intro p
-    by_contra h
-    push Not at h
-    apply hn
-    refine ⟨p.val, ?_, p.property⟩
-    rw [mem_derivedSet_iff]
-    intro r hr
-
-    obtain ⟨q, hq, hd, hne⟩ := h r hr
-
-    exact ⟨q, hq, hne, hd⟩
-
-  choose r hr hsingle using hlocal
-
-  have hc : E ⊆ ⋃ p : E, ball p.val (r p) := by
-    intro p hp
-    exact mem_iUnion.mpr ⟨⟨p, hp⟩, by simpa only [mem_ball, dist_self] using hr ⟨p, hp⟩⟩
-
-  obtain ⟨s, hs⟩ := hE.elim_finite_subcover _ (fun p => ball_open _ _) hc
-
-  apply hF
-  apply (s.finite_toSet.image Subtype.val).subset
-  intro q hq
-
-  obtain ⟨p, hp⟩ := mem_iUnion.mp (hs (hFE hq))
-  obtain ⟨hps, hd⟩ := mem_iUnion.mp hp
-
-  exact ⟨p, hps, (hsingle p q hq hd).symm⟩
 
 /-- Proposition: compactness is unchanged on passage to a metric subspace. -/
 theorem compact_subspace (E Y : Set X) (hEY : E ⊆ Y) :
@@ -293,47 +279,6 @@ theorem compact_finite_intersection {ι : Type*} (K : ι → Set X)
     refine ⟨p, mem_iInter.mpr ?_⟩
     intro i
     exact False.elim (hi ⟨i⟩)
-
-/-- Lemma: nested intervals meet by the real least-upper-bound property. -/
-theorem nested_intervals (a b : ℕ → ℝ)
-    (h : ∀ n, a n ≤ a (n + 1) ∧ a (n + 1) ≤ b (n + 1) ∧ b (n + 1) ≤ b n) :
-    ∃ x : ℝ, ∀ n, a n ≤ x ∧ x ≤ b n := by
-  have ha : Monotone a := monotone_nat_of_le_succ (fun n => (h n).1)
-
-  have hb : Antitone b := antitone_nat_of_succ_le (fun n => (h n).2.2)
-
-  have hab : ∀ n, a n ≤ b n := fun n => (h n).1.trans ((h n).2.1.trans (h n).2.2)
-
-  have hcross : ∀ n m, a n ≤ b m := by
-    intro n m
-    rcases le_total n m with hnm | hmn
-
-    · exact (ha hnm).trans (hab m)
-    · exact (hab n).trans (hb hmn)
-
-  have hne : (range a).Nonempty := ⟨a 0, mem_range_self 0⟩
-
-  have hbd : BddAbove (range a) := ⟨b 0, by
-    rintro x ⟨n, rfl⟩
-    exact hcross n 0⟩
-
-  refine ⟨sSup (range a), ?_⟩
-  intro n
-  exact ⟨le_csSup hbd (mem_range_self n), csSup_le hne (by
-    rintro x ⟨m, rfl⟩
-    exact hcross m n)⟩
-
-/-- Theorem: choose one point in each nested coordinate interval. -/
-theorem nested_cells (k : ℕ) (a b : ℕ → Fin k → ℝ)
-    (h : ∀ n j, a n j ≤ a (n + 1) j ∧
-      a (n + 1) j ≤ b (n + 1) j ∧ b (n + 1) j ≤ b n j) :
-    ∃ x : EuclideanSpace ℝ (Fin k), ∀ n j, a n j ≤ x j ∧ x j ≤ b n j := by
-  have hex : ∀ j, ∃ x : ℝ, ∀ n, a n j ≤ x ∧ x ≤ b n j :=
-    fun j => nested_intervals (fun n => a n j) (fun n => b n j) (fun n => h n j)
-
-  choose x hx using hex
-
-  exact ⟨WithLp.toLp 2 x, fun n j => hx j n⟩
 
 /-- Lemma: pull an open cover back along a continuous map. -/
 theorem compact_image {A B : Type*} [TopologicalSpace A] [TopologicalSpace B]
@@ -632,6 +577,7 @@ theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) 
 
   convert h using 1
   ext x
+
   constructor
 
   · intro hx
@@ -639,10 +585,6 @@ theorem cell_compact (n : ℕ) (a b : Fin n → ℝ) (hab : ∀ j, a j ≤ b j) 
 
   · rintro ⟨y, hy, rfl⟩
     exact hy
-
-/-- Corollary: The one-dimensional interval statement, after the cell theorem. -/
-theorem closed_interval_compact (a b : ℝ) (hab : a ≤ b) : IsCompact (Icc a b) := by
-  exact interval_compact a b hab
 
 /-- Theorem: enclose a bounded set in a compact coordinate box. -/
 theorem heine_borel (n : ℕ) (E : Set (EuclideanSpace ℝ (Fin n))) :

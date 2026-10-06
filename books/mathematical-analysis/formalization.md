@@ -20,13 +20,15 @@ the complex numbers with their field operations, conjugation, and modulus.
   and rationals, uncountability of the reals and binary sequences, and Cantor's
   power-set theorem. General cardinal arithmetic is outside this boundary.
 - Elementary finite-dimensional linear algebra through bases, dimension, linear
-  maps, Euclidean inner products, and Cauchy-Schwarz, including coordinate norm
-  estimates and the resulting metric axioms. For multivariable analysis, also
-  accept rank-nullity, determinants, and orthogonalization.
+  maps, Euclidean inner products and norms, and Cauchy-Schwarz. Accept norm
+  definitions, norm axioms, and elementary coordinate norm estimates. For
+  multivariable analysis, also accept rank-nullity, determinants, and
+  orthogonalization.
 - Elementary real order theory: suprema and infima, the Archimedean property,
   density of the rationals, positive roots, and arbitrarily small reciprocal
   powers of a real number greater than one. Accept extended-real order and its
-  empty-set conventions. This does not assume sequence convergence theorems or
+  empty-set conventions. For real powers, accept algebraic laws, positivity,
+  and order comparisons. This does not assume sequence convergence theorems or
   other characterizations of completeness.
 - Elementary real and complex polynomial algebra through evaluation, degree
   rules, division, and the factor theorem.

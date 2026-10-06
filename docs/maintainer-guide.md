@@ -14,8 +14,9 @@ templates, and any repository-wide rename.
 
 ## Safe changes
 
-For shared styles, metadata, images, scripts, and templates, follow the owning
-policy and validation scope in the [architecture guide](ARCHITECTURE.md) and the
+For shared styles, metadata, images, scripts, and templates, follow the ownership
+policy in the [architecture guide](ARCHITECTURE.md), the
+[validation requirements](CONTRIBUTING.md#validation-by-change-category), and the
 operational commands in the [developer workflow](developer-workflow.md). Preserve
 public interfaces and test every affected consumer.
 

@@ -1,4 +1,5 @@
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Topology.DerivedSet
 import Mathlib.Topology.Perfect
 import Mathlib.Tactic.Choose
@@ -317,25 +318,6 @@ theorem closure_properties (E : Set X) :
 
       exact ⟨q, hEF hq, hn, hd⟩
 
-/-- Proposition: the supremum lies in the closure, by the accepted least-upper-bound property. -/
-theorem supremum_in_closure (E : Set ℝ) (hne : E.Nonempty) (hb : BddAbove E) :
-    sSup E ∈ closure E ∧ (IsClosed E → sSup E ∈ E) := by
-  have hc : sSup E ∈ closure E := by
-    apply Metric.mem_closure_iff.mpr
-    intro r hr
-
-    obtain ⟨q, hq, hlt⟩ := exists_lt_of_lt_csSup hne (sub_lt_self (sSup E) hr)
-
-    refine ⟨q, hq, ?_⟩
-    rw [Real.dist_eq, abs_of_nonneg (sub_nonneg.mpr (le_csSup hb hq))]
-    linarith
-
-  exact ⟨hc, fun h => by
-    have heq := (closure_properties E).2.1.mpr h
-
-    rw [← heq] at hc
-    exact hc⟩
-
 /-- Proposition: an isolated point is exactly a non-limit point in the set. -/
 theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ derivedSet E := by
   classical
@@ -384,30 +366,6 @@ theorem isolated_eq_diff (E : Set X) : isolatedPoints E = E \ derivedSet E := by
       subst q
       exact ⟨hp, by simpa only [mem_ball, dist_self] using hr⟩
 
-/-- Lemma: failure to contain a ball means every ball meets the complement. -/
-theorem compl_interior_eq_closure_compl (E : Set X) :
-    (interior E)ᶜ = closure Eᶜ := by
-  classical
-
-  ext p
-  rw [mem_compl_iff, mem_interior_iff_mem_nhds, Metric.mem_nhds_iff,
-    Metric.mem_closure_iff]
-  constructor
-
-  · intro h r hr
-
-    have hn : ¬ ball p r ⊆ E := fun hs => h ⟨r, hr, hs⟩
-
-    obtain ⟨q, hq, hqe⟩ := Set.not_subset.mp hn
-
-    exact ⟨q, hqe, by rwa [dist_comm]⟩
-
-  · intro h ⟨r, hr, hs⟩
-
-    obtain ⟨q, hq, hd⟩ := h r hr
-
-    exact hq (hs (by simpa only [mem_ball, dist_comm] using hd))
-
 /-- Proposition: relative openness is induced by an ambient open set. -/
 theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
     IsOpen ((Subtype.val : Y → X) ⁻¹' E) ↔
@@ -455,65 +413,95 @@ theorem relative_open (E Y : Set X) (hEY : E ⊆ Y) :
     rw [heq]
     exact ⟨hs hq, q.property⟩
 
-/-- Lemma: an isolated point of a set is a limit point
-of its complement when the ambient space has no isolated points. -/
-theorem isolated_limit_compl (E : Set X)
-    (hX : ∀ p : X, ∀ r > 0, ∃ q : X, q ≠ p ∧ dist q p < r) :
-    isolatedPoints E ⊆ derivedSet Eᶜ := by
-  intro p hp
-
-  obtain ⟨r, hr, heq⟩ := hp
-
-  rw [mem_derivedSet_iff]
-  intro s hs
-
-  obtain ⟨q, hne, hd⟩ := hX p (min r s) (lt_min hr hs)
-
-  refine ⟨q, ?_, hne, hd.trans_le (min_le_right _ _)⟩
-  intro hq
-
-  have hm : q ∈ E ∩ ball p r := ⟨hq, hd.trans_le (min_le_left _ _)⟩
-
-  rw [heq, mem_singleton_iff] at hm
-  exact hne hm
-
-/-- Lemma: the boundary definition agrees with the standard closures. -/
-theorem boundary_eq (E : Set X) :
-    frontier E = closure E ∩ closure Eᶜ := by
-  rw [frontier, sdiff_eq_compl_inter, compl_interior_eq_closure_compl, inter_comm]
-
-/-- Lemma: relative closedness is characterized by ambient limit points. -/
-theorem relative_closed (E Y : Set X) (hEY : E ⊆ Y) :
-    IsClosed ((Subtype.val : Y → X) ⁻¹' E) ↔ derivedSet E ∩ Y ⊆ E := by
-  rw [closed_iff_derivedSet]
-  constructor
-
-  · intro h p hp
-    apply h (show (⟨p, hp.2⟩ : Y) ∈ derivedSet (Subtype.val ⁻¹' E) from ?_)
-    rw [mem_derivedSet_iff]
-    intro r hr
-
-    obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp.1 r hr
-
-    refine ⟨⟨q, hEY hq⟩, hq, ?_, hd⟩
-    intro heq
-    exact hne (congrArg Subtype.val heq)
-
-  · intro h p hp
-    apply h
-    refine ⟨?_, p.property⟩
-    rw [mem_derivedSet_iff]
-    intro r hr
-
-    obtain ⟨q, hq, hne, hd⟩ := (mem_derivedSet_iff _ _).mp hp r hr
-
-    exact ⟨q.val, hq, fun heq => hne (Subtype.ext heq), hd⟩
-
 /-- Proposition: the inherited subtype distance satisfies the ambient metric axioms. -/
 theorem subspace_metric (Y : Set X) (p q z : Y) :
     dist p q = dist p.val q.val ∧ 0 ≤ dist p q ∧
     (dist p q = 0 ↔ p = q) ∧ dist p q = dist q p ∧
     dist p z ≤ dist p q + dist q z := by
   exact ⟨rfl, dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
+
+/-- Proposition: the metric axioms, supplied by Mathlib's `MetricSpace` structure. -/
+theorem metric_axioms (p q z : X) :
+    0 ≤ dist p q ∧ (dist p q = 0 ↔ p = q) ∧
+    dist p q = dist q p ∧ dist p q ≤ dist p z + dist z q := by
+  exact ⟨dist_nonneg, dist_eq_zero, dist_comm _ _, dist_triangle _ _ _⟩
+
+/-- Lemma: membership in an open ball is a strict distance bound. -/
+theorem mem_ball_iff (p q : X) (r : ℝ) : q ∈ ball p r ↔ dist p q < r := by
+  rw [mem_ball, dist_comm]
+
+/-- Lemma: an interior point has a ball contained in the set. -/
+theorem mem_interior_iff (E : Set X) (p : X) :
+    p ∈ interior E ↔ ∃ r > 0, ball p r ⊆ E := by
+  rw [mem_interior_iff_mem_nhds, Metric.mem_nhds_iff]
+
+/-- Lemma: an open set contains a ball about each of its points. -/
+theorem isOpen_iff (E : Set X) :
+    IsOpen E ↔ ∀ p ∈ E, ∃ r > 0, ball p r ⊆ E :=
+  Metric.isOpen_iff
+
+omit [MetricSpace X] in
+/-- Lemma: the complement contains exactly the points outside the set. -/
+theorem mem_compl_iff (E : Set X) (p : X) : p ∈ Eᶜ ↔ p ∉ E := Iff.rfl
+
+/-- Lemma: a perfect set is closed and every one of its points is a limit point. -/
+theorem perfect_iff_closed_and_limit_points (E : Set X) :
+    Perfect E ↔ IsClosed E ∧ E ⊆ derivedSet E := by
+  rw [perfect_def]
+  rfl
+
+/-- Lemma: a dense set contains each ambient point or has it as a limit point. -/
+theorem dense_iff_mem_or_limit_point (E : Set X) :
+    Dense E ↔ ∀ p : X, p ∈ E ∨ p ∈ derivedSet E := by
+  change (∀ p : X, p ∈ closure E) ↔ _
+  rw [closure_eq_union_derivedSet]
+  rfl
+
+/-- Corollary: closedness is equivalent to openness of the complement. -/
+theorem isClosed_iff_compl_open (E : Set X) : IsClosed E ↔ IsOpen Eᶜ :=
+  isOpen_compl_iff.symm
+
+/-- Theorem: openness is equivalent to closedness of the complement. -/
+theorem isOpen_iff_compl_closed (E : Set X) : IsOpen E ↔ IsClosed Eᶜ := by
+  rw [closed_iff_derivedSet]
+  exact open_iff_compl_derivedSet E
+
+/-- Lemma: relative openness uses balls intersected with the ambient subset. -/
+theorem relative_open_iff_ball (E Y : Set X) (hEY : E ⊆ Y) :
+    IsOpen ((Subtype.val : Y → X) ⁻¹' E) ↔
+      ∀ p ∈ E, ∃ r > 0, Y ∩ ball p r ⊆ E := by
+  constructor
+
+  · intro h p hp
+    obtain ⟨r, hr, hs⟩ := Metric.isOpen_iff.mp h ⟨p, hEY hp⟩ hp
+    exact ⟨r, hr, fun q hq => hs (show (⟨q, hq.1⟩ : Y) ∈ ball ⟨p, hEY hp⟩ r from hq.2)⟩
+
+  · intro h
+    apply Metric.isOpen_iff.mpr
+    intro p hp
+    obtain ⟨r, hr, hs⟩ := h p.val hp
+    exact ⟨r, hr, fun q hq => hs ⟨q.property, hq⟩⟩
+
+/-- Proposition: the Euclidean norm gives a metric. -/
+theorem euclidean_metric (n : ℕ) :
+    (∀ x y : EuclideanSpace ℝ (Fin n), 0 ≤ ‖x - y‖) ∧
+    (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = 0 ↔ x = y) ∧
+    (∀ x y : EuclideanSpace ℝ (Fin n), ‖x - y‖ = ‖y - x‖) ∧
+    (∀ x y z : EuclideanSpace ℝ (Fin n),
+      ‖x - z‖ ≤ ‖x - y‖ + ‖y - z‖) := by
+  refine ⟨fun x y => norm_nonneg _, ?_, ?_, ?_⟩
+
+  · intro x y
+    rw [norm_eq_zero, sub_eq_zero]
+
+  · intro x y
+    exact norm_sub_rev x y
+
+  · intro x y z
+    calc
+      ‖x - z‖ = ‖(x - y) + (y - z)‖ := by
+        rw [sub_add_sub_cancel]
+      _ ≤ ‖x - y‖ + ‖y - z‖ := norm_add_le _ _
+
 
 end MathematicalAnalysis.Chapter01

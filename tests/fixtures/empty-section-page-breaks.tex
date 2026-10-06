@@ -1,0 +1,17 @@
+\documentclass[oneside]{book}
+\usepackage{textbook-core}
+
+\begin{document}
+\chapter{Empty sections}
+\section{First empty section}\label{first-empty}
+\newcount\emptysection
+\emptysection=0
+\loop
+\section{Another empty section}
+\advance\emptysection by 1
+\ifnum\emptysection<20
+\repeat
+\section{Section with body}\label{body-heading}
+This paragraph should stay with its section heading.
+\label{body-paragraph}
+\end{document}

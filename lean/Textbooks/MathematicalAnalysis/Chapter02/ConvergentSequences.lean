@@ -65,75 +65,142 @@ theorem convergent_properties (u : ℕ → X) (p : X) (hp : Filter.Tendsto u Fil
     Bornology.IsBounded (range u) ∧ ∀ q : X, Filter.Tendsto u Filter.atTop (nhds q) → p = q := by
   exact ⟨convergent_bounded u p hp, fun q hq => limit_unique u p q hp hq⟩
 
-/-- Lemma: convergence is equivalent to finitely many indices outside every ball
-about the limit. The condition counts indices, rather than distinct values. -/
-theorem tendsto_iff_finite_exceptions (u : ℕ → X) (p : X) :
-    Filter.Tendsto u Filter.atTop (nhds p) ↔
-      ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite := by
-  rw [Metric.tendsto_atTop]
+open Filter
+open scoped Topology
+
+/-- Lemma: real convergence has the epsilon characterization with a strict index bound. -/
+theorem real_tendsto_iff (u : ℕ → ℝ) (a : ℝ) :
+    Tendsto u atTop (𝓝 a) ↔ ∀ ε > 0, ∃ N : ℕ, ∀ n > N, |u n - a| < ε := by
+  simpa only [Real.dist_eq] using (Metric.tendsto_atTop' (u := u) (a := a))
+
+/-- Lemma: a real sequence is bounded exactly when all its terms have a strict absolute bound. -/
+theorem real_bounded_iff (u : ℕ → ℝ) :
+    Bornology.IsBounded (range u) ↔ ∃ C > 0, ∀ n, |u n| < C := by
   constructor
 
-  · intro h ε hε
+  · intro h
+    obtain ⟨p, r, hr, hs⟩ := (isBounded_iff (range u)).mp h ⟨0⟩
+    refine ⟨r + |p|, by linarith [abs_nonneg p], ?_⟩
+    intro n
+    have hn : |u n - p| < r := hs (mem_range_self n)
+    have ht : |u n| ≤ |u n - p| + |p| := by
+      simpa only [sub_add_cancel] using abs_add_le (u n - p) p
+    linarith
 
-    obtain ⟨N, hN⟩ := h ε hε
+  · rintro ⟨C, hC, hu⟩
+    apply (isBounded_iff (range u)).mpr
+    intro _
+    refine ⟨0, C, hC, ?_⟩
+    rintro x ⟨n, rfl⟩
+    simpa only [mem_ball, Real.dist_eq, sub_zero] using hu n
 
-    apply (Finset.range N).finite_toSet.subset
-    intro n hn
-    apply Finset.mem_range.mpr
-    by_contra hnot
-    exact (not_lt_of_ge hn) (hN n (Nat.le_of_not_gt hnot))
+/-- Lemma: a constant real sequence converges to its value. -/
+theorem real_tendsto_const (a : ℝ) : Tendsto (fun _ : ℕ => a) atTop (𝓝 a) := by
+  apply Metric.tendsto_atTop.mpr
+  intro ε hε
+  exact ⟨0, fun _ _ => by simpa only [dist_self] using hε⟩
 
-  · intro h ε hε
+/-- Theorem: limits commute with addition of real sequences. -/
+theorem real_tendsto_add (u v : ℕ → ℝ) (a b : ℝ)
+    (hu : Tendsto u atTop (𝓝 a)) (hv : Tendsto v atTop (𝓝 b)) :
+    Tendsto (fun n => u n + v n) atTop (𝓝 (a + b)) := by
+  apply Metric.tendsto_atTop.mpr
+  intro ε hε
+  obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu (ε / 2) (half_pos hε)
+  obtain ⟨M, hM⟩ := Metric.tendsto_atTop.mp hv (ε / 2) (half_pos hε)
+  refine ⟨max N M, ?_⟩
+  intro n hn
+  have hx := hN n ((le_max_left _ _).trans hn)
+  have hy := hM n ((le_max_right _ _).trans hn)
+  rw [Real.dist_eq] at hx hy ⊢
 
-    obtain ⟨N, hN⟩ := (h ε hε).bddAbove
+  have hbound : |u n + v n - (a + b)| ≤ |u n - a| + |v n - b| := by
+    rw [show u n + v n - (a + b) = (u n - a) + (v n - b) by ring]
+    exact abs_add_le _ _
+  linarith
 
-    refine ⟨N + 1, ?_⟩
-    intro n hn
-    by_contra hdist
+/-- Theorem: limits commute with multiplication of real sequences. -/
+theorem real_tendsto_mul (u v : ℕ → ℝ) (a b : ℝ)
+    (hu : Tendsto u atTop (𝓝 a)) (hv : Tendsto v atTop (𝓝 b)) :
+    Tendsto (fun n => u n * v n) atTop (𝓝 (a * b)) := by
+  obtain ⟨C, hC, hbound⟩ := (real_bounded_iff u).mp (convergent_bounded u a hu)
+  apply Metric.tendsto_atTop.mpr
+  intro ε hε
+  let δ := ε / (2 * (|b| + C + 1))
+  have hden : 0 < 2 * (|b| + C + 1) := by linarith [abs_nonneg b]
+  have hδ : 0 < δ := div_pos hε hden
+  have hδε : δ * (2 * (|b| + C + 1)) = ε := div_mul_cancel₀ ε hden.ne'
 
-    have hle := hN (show n ∈ {n : ℕ | ε ≤ dist (u n) p} from le_of_not_gt hdist)
+  obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu δ hδ
+  obtain ⟨M, hM⟩ := Metric.tendsto_atTop.mp hv δ hδ
 
-    omega
+  refine ⟨max N M, ?_⟩
+  intro n hn
+  have hx := hN n ((le_max_left _ _).trans hn)
+  have hy := hM n ((le_max_right _ _).trans hn)
+  rw [Real.dist_eq] at hx hy ⊢
 
-/-- Lemma: Accepted Archimedean arithmetic supplies an index with reciprocal below ε. -/
-theorem reciprocal_small (ε : ℝ) (hε : 0 < ε) :
-    ∃ N : ℕ, ∀ n ≥ N, 1 / ((n : ℝ) + 1) < ε := by
-  obtain ⟨N, hN⟩ := exists_nat_gt (1 / ε)
+  have hcalc : u n * v n - a * b = (u n - a) * b + u n * (v n - b) := by ring
+  have hsum := abs_add_le ((u n - a) * b) (u n * (v n - b))
+  rw [← hcalc, abs_mul, abs_mul] at hsum
+
+  have hleft := mul_le_mul_of_nonneg_right hx.le (abs_nonneg b)
+  have hright := mul_le_mul (hbound n).le hy.le (abs_nonneg _) hC.le
+  nlinarith
+
+/-- Theorem: a constant factor may be passed through a real limit. -/
+theorem real_tendsto_const_mul (u : ℕ → ℝ) (a c : ℝ)
+    (hu : Tendsto u atTop (𝓝 a)) :
+    Tendsto (fun n => c * u n) atTop (𝓝 (c * a)) :=
+  real_tendsto_mul (fun _ => c) u c a (real_tendsto_const c) hu
+
+/-- Theorem: reciprocals converge when all denominators and the limit are nonzero. -/
+theorem real_tendsto_inv (u : ℕ → ℝ) (a : ℝ)
+    (hu : Tendsto u atTop (𝓝 a)) (hu0 : ∀ n, u n ≠ 0) (ha : a ≠ 0) :
+    Tendsto (fun n => 1 / u n) atTop (𝓝 (1 / a)) := by
+  apply Metric.tendsto_atTop.mpr
+  intro ε hε
+  have ha' : 0 < |a| := abs_pos.mpr ha
+  let δ := min (|a| / 2) (ε * |a| ^ 2 / 2)
+  have hδ : 0 < δ := lt_min (half_pos ha') (by positivity)
+
+  obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu δ hδ
 
   refine ⟨N, ?_⟩
   intro n hn
+  have hd : |u n - a| < δ := hN n hn
+  have hsmall := hd.trans_le (min_le_left _ _)
+  have herror := hd.trans_le (min_le_right _ _)
+  have htriangle : |a| ≤ |a - u n| + |u n| := by
+    simpa only [sub_add_cancel] using abs_add_le (a - u n) (u n)
+  rw [abs_sub_comm a (u n)] at htriangle
 
-  have hcast : (N : ℝ) ≤ n := Nat.cast_le.mpr hn
+  have hlower : |a| / 2 < |u n| := by linarith
+  have hprod : 0 < |u n| * |a| := mul_pos (abs_pos.mpr (hu0 n)) ha'
 
-  have hprod : 1 < (N : ℝ) * ε := (div_lt_iff₀ hε).mp hN
+  rw [Real.dist_eq, one_div, one_div, inv_sub_inv (hu0 n) ha,
+    abs_div, abs_mul, abs_sub_comm a (u n), div_lt_iff₀ hprod]
 
-  apply (div_lt_iff₀ (show 0 < (n : ℝ) + 1 by positivity)).mpr
+  have hmul := mul_lt_mul_of_pos_right hlower ha'
   nlinarith
 
-/-- Lemma: choose a distinct point within radius 1/(n+1). -/
-theorem sequence_at_limit_point (E : Set X) (p : X) (hp : p ∈ derivedSet E) :
-    ∃ u : ℕ → X, (∀ n, u n ∈ E ∧ u n ≠ p) ∧ Filter.Tendsto u Filter.atTop (nhds p) := by
-  rw [mem_derivedSet_iff] at hp
-  have hex : ∀ n : ℕ, ∃ q ∈ E, q ≠ p ∧ dist q p < 1 / ((n : ℝ) + 1) :=
-    fun n => hp _ (by positivity)
-
-  choose u hu hne hd using hex
-
-  refine ⟨u, fun n => ⟨hu n, hne n⟩, ?_⟩
-  rw [Metric.tendsto_atTop]
+/-- Theorem: a sequence between two sequences with the same limit has that limit. -/
+theorem real_tendsto_squeeze (u v w : ℕ → ℝ) (a : ℝ)
+    (huv : ∀ n, u n ≤ v n) (hvw : ∀ n, v n ≤ w n)
+    (hu : Tendsto u atTop (𝓝 a)) (hw : Tendsto w atTop (𝓝 a)) :
+    Tendsto v atTop (𝓝 a) := by
+  apply Metric.tendsto_atTop.mpr
   intro ε hε
+  obtain ⟨N, hN⟩ := Metric.tendsto_atTop.mp hu ε hε
+  obtain ⟨M, hM⟩ := Metric.tendsto_atTop.mp hw ε hε
+  refine ⟨max N M, ?_⟩
+  intro n hn
+  have hx : |u n - a| < ε := hN n ((le_max_left _ _).trans hn)
+  have hz : |w n - a| < ε := hM n ((le_max_right _ _).trans hn)
+  rw [Real.dist_eq, abs_lt]
 
-  obtain ⟨N, hN⟩ := reciprocal_small ε hε
-
-  exact ⟨N, fun n hn => (hd n).trans (hN n hn)⟩
-
-/-- Theorem: convergence is characterized by finitely many indices outside each
-ball about the limit, and every limit point is approached by a sequence of
-points in the set that differ from the limit. -/
-theorem neighborhood_characterization (u : ℕ → X) (p : X) :
-    (Filter.Tendsto u Filter.atTop (nhds p) ↔ ∀ ε : ℝ, 0 < ε → {n : ℕ | ε ≤ dist (u n) p}.Finite) ∧
-    (∀ E : Set X, p ∈ derivedSet E →
-      ∃ v : ℕ → X, (∀ n, v n ∈ E ∧ v n ≠ p) ∧ Filter.Tendsto v Filter.atTop (nhds p)) := by
-  exact ⟨tendsto_iff_finite_exceptions u p, fun E hp => sequence_at_limit_point E p hp⟩
+  obtain ⟨hx', _⟩ := abs_lt.mp hx
+  obtain ⟨_, hz'⟩ := abs_lt.mp hz
+  constructor <;> linarith [huv n, hvw n]
 
 end MathematicalAnalysis.Chapter02
