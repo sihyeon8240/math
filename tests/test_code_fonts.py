@@ -62,6 +62,19 @@ class CodeFontTests(unittest.TestCase):
     def test_glyphs_in_regular_italic_bold_and_bold_italic(self) -> None:
         self.render("lean-fonts", ROOT / "build/font-check")
 
+    def test_empty_sections_break_without_separating_heading_and_body(self) -> None:
+        aux = self.render(
+            "empty-section-page-breaks", ROOT / "build/empty-section-page-breaks"
+        )
+        pages = {
+            name: int(page)
+            for name, page in re.findall(
+                r"\\newlabel\{([^}]+)\}\{\{[^}]*\}\{(\d+)\}", aux.read_text()
+            )
+        }
+        self.assertGreater(pages["body-heading"], pages["first-empty"])
+        self.assertEqual(pages["body-heading"], pages["body-paragraph"])
+
     def test_short_boxes_stay_whole_and_long_boxes_split(self) -> None:
         aux = self.render("lean-page-breaks", ROOT / "build/lean-page-breaks")
         pages = {

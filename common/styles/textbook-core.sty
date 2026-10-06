@@ -35,6 +35,17 @@
 
 \setlength{\parindent}{0pt}
 
+% Empty sections may break between headings; keep each heading with its body.
+\makeatletter
+\AddToHook{cmd/section/before}{%
+  \if@nobreak
+    \ifnum\c@section>\z@
+      \@nobreakfalse
+    \fi
+  \fi
+}
+\makeatother
+
 %% Hyperlinks and Cross References
 
 \RequirePackage[
