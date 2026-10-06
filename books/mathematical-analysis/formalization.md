@@ -27,7 +27,8 @@ the complex numbers with their field operations, conjugation, and modulus.
 - Elementary real order theory: suprema and infima, the Archimedean property,
   density of the rationals, positive roots, and arbitrarily small reciprocal
   powers of a real number greater than one. Accept extended-real order and its
-  empty-set conventions. This does not assume sequence convergence theorems or
+  empty-set conventions. For real powers, accept algebraic laws, positivity,
+  and order comparisons. This does not assume sequence convergence theorems or
   other characterizations of completeness.
 - Elementary real and complex polynomial algebra through evaluation, degree
   rules, division, and the factor theorem.

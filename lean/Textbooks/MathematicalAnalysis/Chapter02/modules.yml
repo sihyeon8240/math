@@ -1,0 +1,14 @@
+schema_version: 1
+
+modules:
+  - ConvergentSequences
+  - Subsequences
+  - MonotoneSequences
+  - CauchySequences
+  - UpperLowerLimits
+  - SpecialSequences
+  - Series
+  - CondensationTest
+  - RootRatioTests
+  - RootRatioComparison
+  - SeriesBoundaries
