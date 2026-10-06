@@ -3,6 +3,7 @@
 import Textbooks.MathematicalAnalysis.Chapter01.MetricSpaces
 import Textbooks.MathematicalAnalysis.Chapter01.CompactSets
 import Textbooks.MathematicalAnalysis.Chapter01.SequentialCompactness
+import Textbooks.MathematicalAnalysis.Chapter01.ConnectedSets
 
 import Textbooks.MathematicalAnalysis.Chapter02.ConvergentSequences
 import Textbooks.MathematicalAnalysis.Chapter02.Subsequences
@@ -15,3 +16,9 @@ import Textbooks.MathematicalAnalysis.Chapter02.CondensationTest
 import Textbooks.MathematicalAnalysis.Chapter02.RootRatioTests
 import Textbooks.MathematicalAnalysis.Chapter02.RootRatioComparison
 import Textbooks.MathematicalAnalysis.Chapter02.SeriesBoundaries
+
+import Textbooks.MathematicalAnalysis.Chapter03.FunctionLimits
+import Textbooks.MathematicalAnalysis.Chapter03.ContinuousFunctions
+import Textbooks.MathematicalAnalysis.Chapter03.CompactContinuity
+import Textbooks.MathematicalAnalysis.Chapter03.ConnectedContinuity
+import Textbooks.MathematicalAnalysis.Chapter03.LipschitzFunctions

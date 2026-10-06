@@ -4,3 +4,4 @@ modules:
   - MetricSpaces
   - CompactSets
   - SequentialCompactness
+  - ConnectedSets
