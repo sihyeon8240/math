@@ -22,3 +22,11 @@ import Textbooks.MathematicalAnalysis.Chapter03.ContinuousFunctions
 import Textbooks.MathematicalAnalysis.Chapter03.CompactContinuity
 import Textbooks.MathematicalAnalysis.Chapter03.ConnectedContinuity
 import Textbooks.MathematicalAnalysis.Chapter03.LipschitzFunctions
+
+import Textbooks.MathematicalAnalysis.Chapter04.DerivativeLimits
+import Textbooks.MathematicalAnalysis.Chapter04.DerivativeAlgebra
+import Textbooks.MathematicalAnalysis.Chapter04.MeanValue
+import Textbooks.MathematicalAnalysis.Chapter04.DerivativeProperties
+import Textbooks.MathematicalAnalysis.Chapter04.LHopital
+import Textbooks.MathematicalAnalysis.Chapter04.Taylor
+import Textbooks.MathematicalAnalysis.Chapter04.VectorDerivatives
